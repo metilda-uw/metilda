@@ -7,7 +7,7 @@ def hello_world():
     return jsonify({'hello': 'world'})
 
 
-def run_app():
+def get_app():
     return app
 
 
