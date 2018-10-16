@@ -1,0 +1,1 @@
+web: waitress-serve --call src.main:run_app

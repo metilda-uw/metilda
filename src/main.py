@@ -7,5 +7,10 @@ def hello_world():
     return jsonify({'hello': 'world'})
 
 
+def run_app():
+    app.run()
+    return app
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    run_app()
