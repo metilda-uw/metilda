@@ -8,9 +8,8 @@ def hello_world():
 
 
 def run_app():
-    app.run()
     return app
 
 
 if __name__ == "__main__":
-    run_app()
+    app.run()
