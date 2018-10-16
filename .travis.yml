@@ -1,13 +1,13 @@
 language: python
 python:
-- '2.7.15'
+- 2.7.15
 install:
 - pip install -r requirements.txt
 script:
 - "(cd src && python -m unittest discover ../tests)"
 deploy:
   provider: heroku
-  api_key:
-    secure: K376Wl6pXFCEwknycyA8I5ZXUkh1PrVMmkp6D0aXK0o/wrUgNcUoc1V/KSVbb/Xrp2ysP88nUxmuJcHioio5J1soAwOy3Wvqf9zAChGsmWu7vfg4fmQ0YORQaWzkVfUcpCqjs3qrFo4jDw9EGiuDog+hhuAzLBjfHi3qD5/e9x2krDqNYXwjpqFCl9XD9McjsWxePrlCbCcS/Z7bQ1ByxTulHAYyRW71voLat8qXPfl7mBZoGwkwYn3AHHUHTItUAXiEcG4yIYrA8UHbe44f5Pv7Dxo53v0DxWUEXZI5FywLINp2jeU+Uf0/akQgoUgOyDFVbgmFo+mQSonSE4gsHDNt33uz9b3tE6VZDIJ0KYZEqSq3r8aXc0cp7XgZBk/qPIz/IeicLpRRjuxuZPmvK8RSbp95q5y7mqUG1MmF7dYB2TGMNQZFgEUVngu+LVNKZbAqYkPxPxtTeiXs1puW6mcIcUpanknihU5cooHYbCx+elr2rh9XYvYUOCNIPdcgzugZpqySs+lY8HqubH15tOi5K0t80TJZsvO2U5l6KF5MCZ93CDGmJyZn/6ph7Av+okPiTbU8Ikxxke5QS0h4SIbb7V2+iUJ19IHAbH1WpLLLLctTtIt28At2zKtUY08ctCl3FjiJqk3/5kHxYlf5KffEnp7FARmrxyZO6rZ7GDA=
   app:
     master: metilda-dev
+  api_key:
+    secure: IYNjjOZT3M50Ke+1+sT/kyW+vrYKYZLwJRL0/0P/qIezgWaD+ipZwM3+5fZ8Vkp/f/aTFiilzfOk4E3rgq0wryfKUR05vyakQEQ83wXfz4a9WLYQKxTgTnGGsHx//CU5BM+bXHjVtli4CUhLaptLX+rpVsEc4vN03bmqAE91erMOetsBVaLn3n7LMHxzF+7zp/VZH+4Ts3TZrii+a+i8iEeh2Bg6KpaCTVssz15HPwaNuY6dvzJ6dtCOkJbQ0hxd9GMQCX8fQd5bQ5y9EQTSPfjG6hXY4W1b7p6cMucAAuPYIMUHrmUCInHz7hj+xMA5ESSRGcQ2M5+6pR0+TYtJPPmiutO6rJrC/aNDyfa1NcSa8WplJULe+chhsxGbgSXk09AJYs2O545Os/ivRSkgN5swueinDe+8uZWhz5FNDtZ19iVHbQRVfnJ4ncINXoCaIBRumKrrCqwdHDgXk2sJW1UGvUckEwM3tcu2i6JFryDeKSXNaVL4gubXjSr4qJfKcTG4hKT76YRrMHZPBK3Q6Zc0lqM18WzI5LUlUoQgygvgyKDFZniOTKobw4YCLoM8eaJyOybwFCvda9cj51NLMOJ26bkxdCiGbbR+3FJzguwqtwvZ9tWllxGXL+CxuC5OYKi+FDnQtmJxSfki7i6IaQMjSJKEneCNdtgf6ZS/cLg=
