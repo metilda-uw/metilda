@@ -1,4 +1,6 @@
 # metilda
+[![Build Status](https://travis-ci.com/mitchl2/metilda.svg?branch=master)](https://travis-ci.com/mitchl2/metilda)
+
 Audio analysis web app.
 
 ## Links
