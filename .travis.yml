@@ -4,7 +4,7 @@ python:
 install:
 - pip install -r requirements.txt
 script:
-- "./runTests.sh"
+- bash runTests.sh
 deploy:
   provider: heroku
   api_key:
