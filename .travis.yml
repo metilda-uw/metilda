@@ -1,7 +1,7 @@
 jobs:
   include:
     - stage: test backend
-    - language: python
+      language: python
       python:
       - 2.7.15
       install:
@@ -9,7 +9,7 @@ jobs:
       script:
       - bash runTests.sh --python
     - stage: test frontend
-    - language: node_js
+      language: node_js
       node_js:
       - "8.12.0"
       install:
