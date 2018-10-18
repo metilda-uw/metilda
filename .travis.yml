@@ -11,7 +11,7 @@ matrix:
       node_js:
       - "8.12.0"
       install:
-      - (cd frontend && npm install)
+      - (cd frontend && npm ci)
       script:
       - bash runTests.sh --nodejs
 deploy:
