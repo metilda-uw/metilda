@@ -2,6 +2,9 @@
   "name": "frontend",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": "8.12.0"
+  },
   "dependencies": {
     "react": "^16.5.2",
     "react-dom": "^16.5.2",

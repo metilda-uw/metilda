@@ -8,6 +8,8 @@ matrix:
       script:
       - bash runTests.sh --python
     - language: node_js
+      node_js:
+      - "8.12.0"
       install:
       - (cd frontend && npm install)
       script:
