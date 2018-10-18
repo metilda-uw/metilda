@@ -1,3 +1,4 @@
 #!/bin/bash
 PATH=$PATH:../venv/Scripts
 (cd src && python -m unittest discover ../tests)
+(cd frontend && CI=true npm test)
