@@ -1,3 +1,5 @@
 {
-  "start": { "postinstall": "cd frontend && npm ci" }
+  "scripts": {
+    "heroku-prebuild": "cd frontend && npm ci && npm run build"
+  }
 }
