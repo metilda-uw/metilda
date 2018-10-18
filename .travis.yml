@@ -1,6 +1,6 @@
 jobs:
   include:
-    - stage: test
+    - stage: test backend
     - language: python
       python:
       - 2.7.15
@@ -8,6 +8,7 @@ jobs:
       - pip install -r requirements.txt
       script:
       - bash runTests.sh --python
+    - stage: test frontend
     - language: node_js
       node_js:
       - "8.12.0"
@@ -16,6 +17,7 @@ jobs:
       script:
       - bash runTests.sh --nodejs
     - stage: deploy
+      script: skip
       deploy: &heroku
         provider: heroku
         api_key:
