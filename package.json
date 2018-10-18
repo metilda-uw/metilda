@@ -1,0 +1,3 @@
+{
+  "start": { "postinstall": "cd frontend && npm ci" }
+}
