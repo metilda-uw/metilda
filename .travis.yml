@@ -1,10 +1,17 @@
-language: python
-python:
-- 2.7.15
-install:
-- pip install -r requirements.txt
-script:
-- bash runTests.sh
+matrix:
+  include:
+    - language: python
+      python:
+      - 2.7.15
+      install:
+      - pip install -r requirements.txt
+      script:
+      - bash runTests.sh --python
+    - language: node_js
+      install:
+      - (cd frontend && npm install)
+      script:
+      - bash runTests.sh --nodejs
 deploy:
   provider: heroku
   api_key:

@@ -1,2 +1,2 @@
 #!/bin/bash
-./runTests.sh && git push
+./runTests.sh --all && git push
