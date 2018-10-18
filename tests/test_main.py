@@ -9,6 +9,6 @@ class MainTest(unittest.TestCase):
         self.app.testing = True
 
     def test_hello_world(self):
-        response = self.app.get("/hello_world")
+        response = self.app.get("/api/hello_world")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(json.loads(response.data), {"hello": "world"})
