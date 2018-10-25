@@ -1,36 +1,20 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react';
+import Header from './Layout/Header.js';
+import UploadAudio from "./PitchArtWizard/UploadAudio";
+import {Route} from "react-router-dom";
 
 class App extends Component {
-    state = {};
+  state = {};
 
   componentDidMount() {
-      fetch('/api/hello_world')
-            .then(response => response.json())
-            .then(message => {
-                this.setState({message: message.hello});
-            });
+
   }
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">{this.state.message}</h1>
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <Header />
+        <Route exact path="/pitchartwizard/1" component={UploadAudio} />
       </div>
     );
   }
