@@ -1,0 +1,17 @@
+.wizard-header {
+    margin-bottom: 60px;
+}
+
+.wizard-header h3, h4 {
+    position: relative;
+    left: 24px;
+    text-align: left;
+}
+
+.wizard-form {
+    margin-left: 16px;
+}
+
+.gender-selection {
+    text-align: left;
+}

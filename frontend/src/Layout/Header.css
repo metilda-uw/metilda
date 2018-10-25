@@ -1,3 +1,13 @@
+#metilda-navbar {
+    text-align: left;
+    display: flex;
+    margin-left: 24px;
+}
+
 #metilda-navbar .app-logo {
     font-size: 32px;
+}
+
+.metilda-navbar-item {
+    margin-right: 16px;
 }

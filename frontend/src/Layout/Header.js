@@ -14,14 +14,10 @@ class Header extends Component {
     return (
         <nav>
             <div id="metilda-navbar" className="row">
-                <div className="col s2">
-                    <a href="/" className="app-logo">MeTILDA</a>
-                </div>
-                <div className="col s2">
-                    <ul>
-                        <li><Link to="/pitchartwizard/1">Pitch Art Wizard</Link></li>
-                    </ul>
-                </div>
+                <a href="/" className="app-logo metilda-navbar-item">MeTILDA</a>
+                <ul className="metilda-navbar-item">
+                    <li><Link to="/pitchartwizard/1">Pitch Art Wizard</Link></li>
+                </ul>
             </div>
         </nav>
     );
