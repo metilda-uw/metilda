@@ -16,7 +16,7 @@ class App extends Component {
       <div className="App">
         <Header />
         <Route exact path="/pitchartwizard/1" component={UploadAudio} />
-          <Route path="/pitchartwizard/2" component={TranscribeAudio} />
+          <Route path="/pitchartwizard/2/:uploadId" component={TranscribeAudio} />
       </div>
     );
   }

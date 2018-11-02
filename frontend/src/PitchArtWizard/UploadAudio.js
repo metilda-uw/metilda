@@ -25,8 +25,10 @@ class UploadAudio extends Component {
       event.preventDefault();
       const audioForm = new FormData();
       audioForm.append("file", this.state.audioFile);
+
       const reactController = this;
       let jsonObj = Object.assign({}, this.state);
+      jsonObj["audioFileName"] = this.state.audioFile.name;
 
       fetch("/api/upload-audio-file", {
             method: "POST",
@@ -70,7 +72,7 @@ class UploadAudio extends Component {
 
   render() {
     if (this.state.redirectId !== null) {
-      return <Redirect to={"/pitchartwizard/2?id=" + this.state.redirectId} />
+      return <Redirect to={"/pitchartwizard/2/" + this.state.redirectId} />
     }
 
     return (

@@ -4,7 +4,7 @@ import os
 app = Flask(__name__,
             static_folder="../frontend/build/static",
             template_folder="../frontend/build")
-app.config["UPLOAD_FOLDER"] = "./uploads"
+app.config["UPLOAD_FOLDER"] = "uploads"
 
 if not os.path.exists(app.config["UPLOAD_FOLDER"]):
     os.mkdir(app.config["UPLOAD_FOLDER"])
