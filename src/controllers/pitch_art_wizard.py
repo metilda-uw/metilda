@@ -3,7 +3,6 @@ import os
 import json
 from flask import request, jsonify, send_from_directory
 from werkzeug.utils import secure_filename
-
 from main import app
 
 

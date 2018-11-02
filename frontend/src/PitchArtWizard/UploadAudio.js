@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 import './UploadAudio.css'
+import {Redirect} from "react-router-dom";
 
 class UploadAudio extends Component {
   state = {};
@@ -12,7 +13,8 @@ class UploadAudio extends Component {
           audioFile: null,
           audioFileName: null,
           description: null,
-          gender: null
+          gender: null,
+          redirectId: null
       }
 
       this.sendFormSubmit = this.sendFormSubmit.bind(this);
@@ -23,14 +25,18 @@ class UploadAudio extends Component {
       event.preventDefault();
       const audioForm = new FormData();
       audioForm.append("file", this.state.audioFile);
-
-      const jsonData = JSON.stringify(this.state);
+      const reactController = this;
+      let jsonObj = Object.assign({}, this.state);
 
       fetch("/api/upload-audio-file", {
             method: "POST",
             body: audioForm})
       .then(response => response.json())
       .then(function(data) {
+        let uploadId = data["id"];
+        jsonObj["id"] = uploadId;
+        const jsonData = JSON.stringify(jsonObj);
+
         fetch("/api/upload-audio-metadata", {
             method: "POST",
             headers: {
@@ -38,9 +44,8 @@ class UploadAudio extends Component {
               'Content-Type': 'application/json'
             },
             body: jsonData})
-        .then(response => response.json())
-        .then(function(data) {
-        });
+        .then(response => response.text())
+        .then(data => reactController.setState({redirectId: uploadId}));
       });
   }
 
@@ -64,6 +69,10 @@ class UploadAudio extends Component {
   }
 
   render() {
+    if (this.state.redirectId !== null) {
+      return <Redirect to={"/pitchartwizard/2?id=" + this.state.redirectId} />
+    }
+
     return (
       <div>
         <div className="wizard-header">

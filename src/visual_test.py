@@ -42,8 +42,8 @@ plt.ylabel("amplitude")
 
 plt.subplot(2, 1, 2)
 draw_spectrogram(snd.to_spectrogram())
-spec_fig = plt.figure(dpi=800, figsize=(8, 6))
-spec_fig.savefig(r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\image_test_spec_only.png")
+# spec_fig = plt.figure(dpi=800, figsize=(8, 6))
+# spec_fig.savefig(r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\image_test_spec_only.png")
 
 #plt.show()
 plt.subplots_adjust(hspace=0.3)
