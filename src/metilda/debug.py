@@ -1,5 +1,5 @@
 # Launcher for local, debug runs
-from main import get_app
+from metilda import get_app
 
 
 if __name__ == '__main__':

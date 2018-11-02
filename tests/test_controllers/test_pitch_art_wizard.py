@@ -4,7 +4,7 @@ import shutil
 from StringIO import StringIO
 import json
 
-from main import app
+from metilda import app
 
 
 class PitchArtWizard(unittest.TestCase):

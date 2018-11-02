@@ -1,12 +1,11 @@
 import os
-import io
 
 import json
-from flask import request, jsonify, send_from_directory, send_file
+from flask import request, jsonify, send_file
 
 from werkzeug.utils import secure_filename
-from main import app
-from services import audio_analysis
+from metilda import app
+from metilda.services import audio_analysis
 
 
 @app.route('/api/upload-audio-file', methods=["POST"])

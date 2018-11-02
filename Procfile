@@ -1,1 +1,1 @@
-web: waitress-serve  --port=$PORT --call src.main:get_app
+web: PYTHONPATH="$PYTHONPATH:src" waitress-serve.exe  --port=$PORT --call metilda.get_app
