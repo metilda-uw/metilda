@@ -8,7 +8,7 @@ import os
 app = Flask(__name__,
             static_folder="../../frontend/build/static",
             template_folder="../../frontend/build")
-app.config["UPLOAD_FOLDER"] = "../../uploads"
+app.config["UPLOAD_FOLDER"] = "../uploads"
 
 import metilda.controllers.pitch_art_wizard
 
