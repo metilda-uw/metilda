@@ -17,7 +17,6 @@ with db.transaction() as conn:
 app = Flask(__name__,
             static_folder="../../frontend/build/static",
             template_folder="../../frontend/build")
-app.config["UPLOAD_FOLDER"] = "../uploads"
 
 import metilda.controllers.pitch_art_wizard
 
@@ -27,6 +26,4 @@ def homepage():
 
 
 def get_app():
-    if not os.path.exists(app.config["UPLOAD_FOLDER"]):
-        os.mkdir(app.config["UPLOAD_FOLDER"])
     return app
