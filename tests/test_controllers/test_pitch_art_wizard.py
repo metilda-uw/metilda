@@ -15,6 +15,7 @@ class PitchArtWizard(unittest.TestCase):
         app.config["UPLOAD_FOLDER"] = self.temp_dir
         self.client = app.test_client()
 
+    @unittest.skip("Not providing audio upload feature for now")
     def test_upload_audio_file(self):
         response = self.client.post(
             "/api/upload-audio-file",
@@ -25,7 +26,7 @@ class PitchArtWizard(unittest.TestCase):
         self.assertTrue("id" in response)
         self.assertTrue(len(response["id"]) > 0)
 
-    @unittest.skip("Allowing this function to be broken for now")
+    @unittest.skip("Not providing audio metadata support for now")
     def test_upload_audio_metadata(self):
         # Upload a fake file
         response = self.client.post(

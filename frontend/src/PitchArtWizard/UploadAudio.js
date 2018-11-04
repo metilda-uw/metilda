@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
+import M from 'materialize-css/dist/js/materialize.min.js'
 import './UploadAudio.css'
 import {Redirect} from "react-router-dom";
 
@@ -11,7 +12,7 @@ class UploadAudio extends Component {
       super(props);
       this.state = {
           audioFile: null,
-          audioFileName: null,
+          audioFileName: "OldPart1.mp3",
           description: null,
           gender: null,
           redirectId: null
@@ -21,34 +22,15 @@ class UploadAudio extends Component {
       this.handleInputChange = this.handleInputChange.bind(this);
   }
 
+  componentDidMount() {
+    var elems = document.querySelectorAll('select');
+    M.FormSelect.init(elems);
+  }
+
   sendFormSubmit(event) {
       event.preventDefault();
-      const audioForm = new FormData();
-      audioForm.append("file", this.state.audioFile);
-
-      const reactController = this;
-      let jsonObj = Object.assign({}, this.state);
-      jsonObj["audioFileName"] = this.state.audioFile.name;
-
-      fetch("/api/upload-audio-file", {
-            method: "POST",
-            body: audioForm})
-      .then(response => response.json())
-      .then(function(data) {
-        let uploadId = data["id"];
-        jsonObj["id"] = uploadId;
-        const jsonData = JSON.stringify(jsonObj);
-
-        fetch("/api/upload-audio-metadata", {
-            method: "POST",
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            body: jsonData})
-        .then(response => response.text())
-        .then(data => reactController.setState({redirectId: uploadId}));
-      });
+      console.log(this.state);
+      this.setState({redirectId: this.state.audioFileName});
   }
 
   handleInputChange(event) {
@@ -83,27 +65,12 @@ class UploadAudio extends Component {
         </div>
         <form className="wizard-form" method="post">
             <div className="row">
-                <div className="file-field input-field col s6">
-                    <div className="btn">
-                        <span>Select File</span>
-                        <input type="file" name="audioFile" onChange={this.handleInputChange}/>
-                    </div>
-                    <div className="file-path-wrapper">
-                        <input className="file-path validate"
-                               onChange={this.handleInputChange}
-                               name="audioFileName"
-                               type="text"
-                               required="required"/>
-                    </div>
-                </div>
-            </div>
-            <div className="row">
-                <div className="input-field col s6">
-                    <input type="text"
-                          onChange={this.handleInputChange}
-                           name="description"
-                           required="required"/>
-                    <label htmlFor="description">Description</label>
+                <div className="input-field col s12">
+                    <select value={this.state.audioFileName} name="audioFileName" onChange={this.handleInputChange}>
+                        <option value="" disabled="disabled">Choose audio file</option>
+                        <option value="OldPart1.mp3">OldPart1.mp3</option>
+                    </select>
+                    <label>Audio File</label>
                 </div>
             </div>
             <div className="row">
