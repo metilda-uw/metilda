@@ -1,5 +1,6 @@
 import parselmouth
 
+from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
 from StringIO import StringIO
@@ -34,7 +35,7 @@ def draw_pitch(pitch):
 def audio_analysis_image(upload_path):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
-    plt.figure(dpi=800, figsize=(8, 6))
+    plt.figure()
 
     # Draw waveform
     plt.subplot(2, 1, 1)
@@ -46,9 +47,10 @@ def audio_analysis_image(upload_path):
     # Draw spectogram
     plt.subplot(2, 1, 2)
     draw_spectrogram(snd.to_spectrogram())
-    plt.subplots_adjust(hspace=0.3)
+    plt.subplots_adjust(hspace=0.5)
 
     image = io.BytesIO()
-    plt.savefig(image, format="png")
+    plt.savefig(image, format="png", dpi=400, figsize=(4, 3))
     image.seek(0)
+
     return image
