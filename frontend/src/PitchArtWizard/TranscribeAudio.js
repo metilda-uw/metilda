@@ -24,7 +24,7 @@ class TranscribeAudio extends Component {
             <div className="row">
                 <div className="col s6">
                       <img className="metilda-audio-analysis-image"
-                           src={"/api/audio-analysis-image/" + uploadId + ".png"} />
+                           src={"/api/audio-analysis-image/" + uploadId + ".png?faketimestamp=" + Date.now()} />
                 </div>
             </div>
         </div>
