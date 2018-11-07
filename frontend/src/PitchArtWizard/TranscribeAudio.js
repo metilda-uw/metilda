@@ -1,14 +1,33 @@
 import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
-import './UploadAudio.css'
-import styles from "./TranscribeAudio.css"
+import './UploadAudio.css';
+import styles from "./TranscribeAudio.css";
+import $ from "jquery";
+import '../Lib/imgareaselect/css/imgareaselect-default.css';
+import '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
 
 class TranscribeAudio extends Component {
   state = {};
 
   constructor(props) {
       super(props);
+  }
+
+  componentDidMount() {
+    var $el = $("#metilda-audio-analysis-image");
+    var imgObj = $el.imgAreaSelect({
+        instance: true,
+        handles: true,
+        onInit: function() {
+            console.log("onInit");
+            console.log("height: " + $el.height());
+            imgObj.setOptions({minHeight: $el.height()});
+        },
+        onSelectStart: function() {
+            console.log("onSelectStart")
+        }
+    });
   }
 
   render() {
@@ -24,6 +43,8 @@ class TranscribeAudio extends Component {
             <div className="row">
                 <div className="col s6">
                       <img className="metilda-audio-analysis-image"
+                           id="metilda-audio-analysis-image"
+                           ref={audioImage => this.audioImage = audioImage}
                            src={"/api/audio-analysis-image/" + uploadId + ".png?faketimestamp=" + Date.now()} />
                 </div>
             </div>
