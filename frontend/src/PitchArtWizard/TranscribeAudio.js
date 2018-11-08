@@ -38,6 +38,9 @@ class TranscribeAudio extends Component {
             <div className="row">
                 <div>
                       <AudioImg uploadId={uploadId}
+                                ref="audioImage"
+                                graphStartX={320.0}
+                                graphEndX={2306.0}
                                 letterIntervalSelected={this.letterIntervalSelected} />
 
                 </div>

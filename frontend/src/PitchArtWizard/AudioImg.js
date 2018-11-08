@@ -12,20 +12,23 @@ class AudioImg extends Component {
   }
 
   componentDidMount() {
-    let audioImage = this;
-    let imgBox = {
-        xminPerc: 320.0 / 2560.0,
-        xmaxPerc: 2306.0 / 2560.0
-    };
+    const {graphStartX, graphEndX} = this.props;
 
+    let audioImage = this;
     let cropAreaLeftX;
     let cropAreaRightX;
     let $el = $("#metilda-audio-analysis-image");
+    let imgBox;
+
     let imgObj = $el.imgAreaSelect({
         instance: true,
         handles: true,
         onInit: function() {
             imgObj.setOptions({minHeight: $el.height()});
+            imgBox = {
+                xminPerc: graphStartX / $el.width(),
+                xmaxPerc: graphEndX / $el.width()
+            };
         },
         onSelectStart: function(img, loc) {
             if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
