@@ -15,7 +15,7 @@ class AudioLetter extends Component {
 
     return (
       <div className="metilda-transcribe-letter"
-           style={{left: leftX + 28, width: rightX - leftX}}>
+           style={{left: leftX + 16, width: rightX - leftX}}>
           <p>{letter}</p>
       </div>
     );

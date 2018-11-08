@@ -34,14 +34,14 @@ class TranscribeAudio extends Component {
             <h3>Pitch Art Wizard</h3>
             <h4>Transcribe Audio (step 2/4)</h4>
         </div>
-        <div className="metilda-audio-analysis-form">
+        <div className="metilda-audio-analysis">
             <div className="row">
-                <div className="col s12 left-align">
+                <div>
                       <AudioImg uploadId={uploadId}
                                 letterIntervalSelected={this.letterIntervalSelected} />
 
                 </div>
-                <div id="metilda-transcribe-container" className="col s12">
+                <div id="metilda-transcribe-container">
                     {
                         this.state.letters.map(function(item, index) {
                             return <AudioLetter key={index}

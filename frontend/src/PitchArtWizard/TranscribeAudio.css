@@ -2,24 +2,24 @@
     margin-left: 16px;
 }
 
-.metilda-audio-analysis-image-container {
+.metilda-audio-analysis {
+    margin-left: 16px;
     width: 800px;
     display: flex;
 }
 
 .metilda-audio-analysis-image {
     border: 1px solid black;
-    width: 800px;
+    width: 100%;
 }
-
 
 #metilda-transcribe-container {
     border: 1px solid black;
     height: 52px;
-    width: 800px;
     margin-top: 16px;
     margin-bottom: 64px;
-    margin-left: 10px;
+    margin-left: 100px;
+    width: 77.5%;
 }
 
 .metilda-transcribe-letter {
