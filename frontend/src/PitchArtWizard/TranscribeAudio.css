@@ -30,10 +30,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    background: lightgray;
 }
 
 #metilda-transcribe-letter-container {
     width: 77.5%;
+}
+
+.metilda-transcribe-letter-container-end {
+    width: 10%;
+    background: lightgray;
 }
 
 .metilda-transcribe-letter {

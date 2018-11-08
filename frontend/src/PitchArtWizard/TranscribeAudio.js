@@ -57,6 +57,7 @@ class TranscribeAudio extends Component {
                             })
                         }
                     </div>
+                    <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
                 </div>
             </div>
         </div>
