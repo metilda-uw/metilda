@@ -41,15 +41,22 @@ class TranscribeAudio extends Component {
                                 letterIntervalSelected={this.letterIntervalSelected} />
 
                 </div>
-                <div id="metilda-transcribe-container">
-                    {
-                        this.state.letters.map(function(item, index) {
-                            return <AudioLetter key={index}
-                                                letter={item.letter}
-                                                leftX={item.leftX}
-                                                rightX={item.rightX}/>
-                        })
-                    }
+
+                <div className="metilda-transcribe-container">
+                    <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
+                        <span>Letters</span>
+                    </div>
+                    <div id="metilda-transcribe-letter-container"
+                         className="metilda-transcribe-container-col">
+                        {
+                            this.state.letters.map(function(item, index) {
+                                return <AudioLetter key={index}
+                                                    letter={item.letter}
+                                                    leftX={item.leftX}
+                                                    rightX={item.rightX}/>
+                            })
+                        }
+                    </div>
                 </div>
             </div>
         </div>

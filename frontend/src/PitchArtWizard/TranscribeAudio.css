@@ -13,12 +13,26 @@
     width: 100%;
 }
 
-#metilda-transcribe-container {
+.metilda-transcribe-container {
+    display: flex;
+    align-items: center;
+}
+
+.metilda-transcribe-container-col {
     border: 1px solid black;
     height: 52px;
     margin-top: 16px;
     margin-bottom: 64px;
-    margin-left: 100px;
+}
+
+.metilda-transcribe-letter-container-label {
+    width: 12.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#metilda-transcribe-letter-container {
     width: 77.5%;
 }
 
