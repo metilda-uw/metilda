@@ -68,7 +68,9 @@ class UploadAudio extends Component {
                 <div className="input-field col s12">
                     <select value={this.state.audioFileName} name="audioFileName" onChange={this.handleInputChange}>
                         <option value="" disabled="disabled">Choose audio file</option>
-                        <option value="OldPart1.mp3">OldPart1.mp3</option>
+                        <option>OldPart1.mp3</option>
+                        <option>OldPart2.mp3</option>
+                        <option>ShirleeFriends.mp3</option>
                     </select>
                     <label>Audio File</label>
                 </div>

@@ -47,6 +47,12 @@ def audio_analysis_image(upload_path):
     # Draw spectogram
     plt.subplot(2, 1, 2)
     draw_spectrogram(snd.to_spectrogram())
+
+    # Draw pitch
+    plt.twinx()
+    draw_pitch(snd.to_pitch())
+    plt.xlim([snd.xmin, snd.xmax])
+
     plt.subplots_adjust(hspace=0.5)
 
     image = io.BytesIO()
