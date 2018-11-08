@@ -1,7 +1,28 @@
-.metilda-audio-analysis-image {
-    width: 100%;
-}
-
 .metilda-audio-analysis-form {
     margin-left: 16px;
+}
+
+.metilda-audio-analysis-image-container {
+    width: 800px;
+    display: flex;
+}
+
+.metilda-audio-analysis-image {
+    border: 1px solid black;
+    width: 800px;
+}
+
+
+#metilda-transcribe-container {
+    border: 1px solid black;
+    height: 52px;
+    width: 800px;
+    margin-top: 16px;
+    margin-bottom: 64px;
+    margin-left: 10px;
+}
+
+.metilda-transcribe-letter {
+    position: absolute;
+    background: lightblue;
 }
