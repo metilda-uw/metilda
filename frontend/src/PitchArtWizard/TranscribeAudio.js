@@ -15,17 +15,50 @@ class TranscribeAudio extends Component {
   }
 
   componentDidMount() {
-    var $el = $("#metilda-audio-analysis-image");
-    var imgObj = $el.imgAreaSelect({
+    var imgBox = {
+        xminPerc: 320.0 / 2560.0,
+        xmaxPerc: 2306.0 / 2560.0
+    };
+
+    let cropAreaLeftX;
+    let cropAreaRightX;
+    let $el = $("#metilda-audio-analysis-image");
+    let imgObj = $el.imgAreaSelect({
         instance: true,
         handles: true,
         onInit: function() {
-            console.log("onInit");
-            console.log("height: " + $el.height());
             imgObj.setOptions({minHeight: $el.height()});
         },
-        onSelectStart: function() {
-            console.log("onSelectStart")
+        onSelectStart: function(img, loc) {
+            if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
+                imgObj.cancelSelection();
+            } else {
+                cropAreaLeftX = loc.x1;
+                cropAreaRightX = loc.x2;
+            }
+        },
+        onSelectChange: function(img, loc) {
+            if (cropAreaLeftX !== undefined && cropAreaRightX !== undefined) {
+                let isLeftEdgeMovingLeft = loc.x1 < cropAreaLeftX;
+                let isRightEdgeMovingRight = loc.x2 > cropAreaRightX;
+                let maxWidth;
+
+                if (isLeftEdgeMovingLeft) {
+                    let imgLeftX = imgBox.xminPerc * img.width;
+                    maxWidth = loc.x2 - imgLeftX;
+                } else if (isRightEdgeMovingRight) {
+                    let imgRightX = imgBox.xmaxPerc * img.width;
+                    maxWidth = imgRightX - loc.x1;
+                }
+
+                if (maxWidth !== undefined) {
+                    imgObj.setOptions({maxWidth: maxWidth});
+                }
+            }
+        },
+        onSelectEnd: function(img, loc) {
+            cropAreaLeftX = undefined;
+            cropAreaRightX = undefined;
         }
     });
   }
@@ -44,7 +77,6 @@ class TranscribeAudio extends Component {
                 <div className="col s6">
                       <img className="metilda-audio-analysis-image"
                            id="metilda-audio-analysis-image"
-                           ref={audioImage => this.audioImage = audioImage}
                            src={"/api/audio-analysis-image/" + uploadId + ".png?faketimestamp=" + Date.now()} />
                 </div>
             </div>
