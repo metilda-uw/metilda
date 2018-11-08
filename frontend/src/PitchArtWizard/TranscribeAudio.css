@@ -5,7 +5,6 @@
 .metilda-audio-analysis {
     margin-left: 16px;
     width: 800px;
-    display: flex;
 }
 
 .metilda-audio-analysis-image {
@@ -22,7 +21,7 @@
     border: 1px solid black;
     height: 52px;
     margin-top: 16px;
-    margin-bottom: 64px;
+    margin-bottom: 32px;
 }
 
 .metilda-transcribe-letter-container-label {

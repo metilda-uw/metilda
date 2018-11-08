@@ -35,16 +35,14 @@ class TranscribeAudio extends Component {
             <h4>Transcribe Audio (step 2/4)</h4>
         </div>
         <div className="metilda-audio-analysis">
-            <div className="row">
+            <div>
                 <div>
                       <AudioImg uploadId={uploadId}
                                 ref="audioImage"
                                 graphStartX={320.0}
                                 graphEndX={2306.0}
                                 letterIntervalSelected={this.letterIntervalSelected} />
-
                 </div>
-
                 <div className="metilda-transcribe-container">
                     <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
                         <span>Letters</span>
@@ -63,9 +61,7 @@ class TranscribeAudio extends Component {
                     <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
                 </div>
             </div>
-        </div>
-        <div className="row">
-            <div className="col s4 right-align">
+            <div className="right-align">
                 <button className="btn waves-effect waves-light"
                         type="submit"
                         name="action">
