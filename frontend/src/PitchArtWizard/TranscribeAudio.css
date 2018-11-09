@@ -44,4 +44,5 @@
 .metilda-transcribe-letter {
     position: absolute;
     background: lightblue;
+    outline: 1px solid black;
 }
