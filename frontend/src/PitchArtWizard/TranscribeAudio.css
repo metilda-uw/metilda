@@ -46,3 +46,17 @@
     background: lightblue;
     outline: 1px solid black;
 }
+
+.metilda-audio-analysis-image-loading {
+    width: 800px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid black;
+}
+
+.metilda-audio-analysis-image-loading .preloader-wrapper.big {
+    width: 160px;
+    height: 160px;
+}

@@ -4,15 +4,18 @@ import 'materialize-css/dist/css/materialize.min.css';
 import './UploadAudio.css';
 import styles from "./TranscribeAudio.css";
 import AudioImg from "./AudioImg";
+import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
+
 
 class TranscribeAudio extends Component {
   state = {};
 
   constructor(props) {
       super(props);
-      this.state = {letters: []};
+      this.state = {letters: [], isAudioImageLoaded: false};
       this.letterIntervalSelected = this.letterIntervalSelected.bind(this);
+      this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
   }
 
   letterIntervalSelected(leftX, rightX) {
@@ -25,8 +28,18 @@ class TranscribeAudio extends Component {
       }
   }
 
+  onAudioImageLoaded() {
+      console.log("img loaded");
+      this.setState({isAudioImageLoaded: true});
+  }
+
   render() {
     const {uploadId} = this.props.match.params;
+
+    let audioImageLoading;
+    if (!this.state.isAudioImageLoaded) {
+        audioImageLoading = <AudioImgLoading />
+    }
 
     return (
       <div>
@@ -37,11 +50,13 @@ class TranscribeAudio extends Component {
         <div className="metilda-audio-analysis">
             <div>
                 <div>
+                    {audioImageLoading}
                       <AudioImg uploadId={uploadId}
                                 ref="audioImage"
                                 xminPerc={320.0 / 2560.0}
                                 xmaxPerc={2306.0 / 2560.0}
-                                letterIntervalSelected={this.letterIntervalSelected} />
+                                letterIntervalSelected={this.letterIntervalSelected}
+                                onAudioImageLoaded={this.onAudioImageLoaded}/>
                 </div>
                 <div className="metilda-transcribe-container">
                     <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
