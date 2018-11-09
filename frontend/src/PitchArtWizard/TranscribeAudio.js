@@ -39,8 +39,8 @@ class TranscribeAudio extends Component {
                 <div>
                       <AudioImg uploadId={uploadId}
                                 ref="audioImage"
-                                graphStartX={320.0}
-                                graphEndX={2306.0}
+                                xminPerc={320.0 / 2560.0}
+                                xmaxPerc={2306.0 / 2560.0}
                                 letterIntervalSelected={this.letterIntervalSelected} />
                 </div>
                 <div className="metilda-transcribe-container">
