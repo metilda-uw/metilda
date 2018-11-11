@@ -12,7 +12,7 @@ class UploadAudio extends Component {
       super(props);
       this.state = {
           audioFile: null,
-          audioFileName: "OldPart1.mp3",
+          audioFileName: "PHEOP001 apaniiwa.wav",
           description: null,
           gender: null,
           redirectId: null
@@ -29,7 +29,6 @@ class UploadAudio extends Component {
 
   sendFormSubmit(event) {
       event.preventDefault();
-      console.log(this.state);
       this.setState({redirectId: this.state.audioFileName});
   }
 
@@ -68,9 +67,10 @@ class UploadAudio extends Component {
                 <div className="input-field col s12">
                     <select value={this.state.audioFileName} name="audioFileName" onChange={this.handleInputChange}>
                         <option value="" disabled="disabled">Choose audio file</option>
-                        <option>OldPart1.mp3</option>
-                        <option>OldPart2.mp3</option>
-                        <option>ShirleeFriends.mp3</option>
+                        <option>PHEOP001 apaniiwa.wav</option>
+                        <option>PHEOP011 isska.wav</option>
+                        <option>PHEOP019 onni.wav</option>
+                        <option>PHEOP117 saahkomaapiwa.wav</option>
                     </select>
                     <label>Audio File</label>
                 </div>

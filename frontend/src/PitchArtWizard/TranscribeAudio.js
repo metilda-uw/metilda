@@ -13,23 +13,63 @@ class TranscribeAudio extends Component {
 
   constructor(props) {
       super(props);
-      this.state = {letters: [], isAudioImageLoaded: false};
+      this.state = {
+          letters: [],
+          isAudioImageLoaded: false,
+          soundLength: -1};
       this.letterIntervalSelected = this.letterIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
   }
 
-  letterIntervalSelected(leftX, rightX) {
+  componentDidMount() {
+    const {uploadId} = this.props.match.params;
+    var controller = this;
+    fetch("/api/sound-length/" + uploadId, {
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: {uploadId: uploadId}})
+    .then(response => response.json())
+    .then(function(data) {
+        controller.setState({soundLength: data["sound_length"]});
+    });
+  }
+
+  letterIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
       let letter = prompt("Enter a letter");
 
       if (letter !== null && letter.trim().length > 0) {
          this.setState(state => state.letters.push(
              {letter: letter, leftX: leftX, rightX: rightX}
          ));
+
+         const {uploadId} = this.props.match.params;
+         let json = {
+           "time_ranges": [
+               [
+                   minTimePerc * this.state.soundLength,
+                   maxTimePerc * this.state.soundLength
+               ]
+           ]
+         };
+
+         fetch("/api/max-pitches/" + uploadId, {
+            method: "POST",
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(json)})
+        .then(response => response.json())
+        .then(function(data) {
+            console.log(data);
+        });
       }
   }
 
   onAudioImageLoaded() {
-      console.log("img loaded");
       this.setState({isAudioImageLoaded: true});
   }
 

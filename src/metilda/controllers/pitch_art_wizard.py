@@ -22,3 +22,17 @@ def audio_analysis_image(upload_id):
     image_binary = audio_analysis.audio_analysis_image(image_path)
     return send_file(image_binary, mimetype="image/png")
     # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
+
+
+@app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])
+def max_pitches(upload_id):
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    pitches = audio_analysis.get_max_pitches(request.json['time_ranges'], sound_path)
+    return jsonify(pitches)
+
+
+@app.route('/api/sound-length/<string:upload_id>', methods=["POST"])
+def sound_length(upload_id):
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    sound_length = audio_analysis.get_sound_length(sound_path)
+    return jsonify({'sound_length': sound_length})

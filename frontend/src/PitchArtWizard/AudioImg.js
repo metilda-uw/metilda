@@ -42,11 +42,11 @@ class AudioImg extends Component {
                 let maxWidth;
 
                 if (isLeftEdgeMovingLeft) {
-                    let imgLeftX = imgBox.xminPerc * img.width;
-                    maxWidth = loc.x2 - imgLeftX;
+                    let graphLeftX = imgBox.xminPerc * img.width;
+                    maxWidth = loc.x2 - graphLeftX;
                 } else if (isRightEdgeMovingRight) {
-                    let imgRightX = imgBox.xmaxPerc * img.width;
-                    maxWidth = imgRightX - loc.x1;
+                    let graphRightX = imgBox.xmaxPerc * img.width;
+                    maxWidth = graphRightX - loc.x1;
                 }
 
                 if (maxWidth !== undefined) {
@@ -59,7 +59,14 @@ class AudioImg extends Component {
             cropAreaRightX = undefined;
 
             if (loc.x1 < loc.x2) {
-                audioImage.props.letterIntervalSelected(loc.x1, loc.x2);
+                let imgLeftX = imgBox.xminPerc * img.width;
+                let imgRightX = imgBox.xmaxPerc * img.width;
+                let graphWidth = imgRightX - imgLeftX;
+                audioImage.props.letterIntervalSelected(
+                    loc.x1,
+                    loc.x2,
+                    (loc.x1 - imgLeftX) / graphWidth,
+                    (loc.x2 - imgLeftX) / graphWidth);
                 imgObj.cancelSelection();
             }
         }

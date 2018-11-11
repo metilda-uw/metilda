@@ -1,5 +1,6 @@
 import parselmouth
 
+from math import isnan
 import numpy as np
 import matplotlib.pyplot as plt
 from StringIO import StringIO
@@ -59,3 +60,22 @@ def audio_analysis_image(upload_path):
     image.seek(0)
 
     return image
+
+
+def get_pitches_in_range(tmin, tmax, snd_pitch):
+    tmin = max(tmin, snd_pitch.xmin)
+    tmax = min(tmax, snd_pitch.xmax)
+    pitch_samples = [(t, snd_pitch.get_value_at_time(t)) for t in snd_pitch.xs() if tmin <= t <= tmax]
+    return [p for _, p in pitch_samples if not isnan(p)]
+
+
+def get_max_pitches(time_ranges, upload_path):
+    snd = parselmouth.Sound(upload_path)
+    snd_pitch = snd.to_pitch()
+    pitch_ranges = [get_pitches_in_range(t0, t1, snd_pitch) for t0, t1 in time_ranges]
+    return [max(pitches) if len(pitches) > 0 else -1 for pitches in pitch_ranges]
+
+
+def get_sound_length(upload_path):
+    return parselmouth.Sound(upload_path).get_total_duration()
+
