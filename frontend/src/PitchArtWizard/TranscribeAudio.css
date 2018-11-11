@@ -7,9 +7,21 @@
     width: 800px;
 }
 
+.metilda-audio-analysis-image-container {
+    margin-bottom: 32px;
+}
+
 .metilda-audio-analysis-image {
     border: 1px solid black;
     width: 100%;
+}
+
+.metilda-audio-analysis-input {
+    text-align: left;
+}
+
+.metilda-checkbox-label {
+    margin-right: 16px;
 }
 
 .metilda-transcribe-container {

@@ -16,9 +16,11 @@ class TranscribeAudio extends Component {
       this.state = {
           letters: [],
           isAudioImageLoaded: false,
-          soundLength: -1};
+          soundLength: -1,
+          selectionInterval: "Letter"};
       this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
+      this.handleInputChange = this.handleInputChange.bind(this);
   }
 
   componentDidMount() {
@@ -73,6 +75,25 @@ class TranscribeAudio extends Component {
       this.setState({isAudioImageLoaded: true});
   }
 
+  handleInputChange(event) {
+    const target = event.target;
+
+    let value = null;
+    if (target.type === "checkbox") {
+        value = target.checked;
+    } else if (target.type === "file") {
+        value = target.files[0];
+    } else {
+        value = target.value;
+    }
+
+    const name = target.name;
+
+    this.setState({
+      [name]: value
+    });
+  }
+
   render() {
     const {uploadId} = this.props.match.params;
 
@@ -89,7 +110,7 @@ class TranscribeAudio extends Component {
         </div>
         <div className="metilda-audio-analysis">
             <div>
-                <div>
+                <div className="metilda-audio-analysis-image-container">
                     {audioImageLoading}
                       <AudioImg uploadId={uploadId}
                                 ref="audioImage"
@@ -98,6 +119,18 @@ class TranscribeAudio extends Component {
                                 imageIntervalSelected={this.imageIntervalSelected}
                                 onAudioImageLoaded={this.onAudioImageLoaded}/>
                 </div>
+                {/*<div className="switch metilda-audio-analysis-input">*/}
+                    {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
+                    {/*<label>*/}
+                        {/*Sound*/}
+                        {/*<input name="imageSelection"*/}
+                               {/*type="checkbox"*/}
+                               {/*onChange={this.handleInputChange}*/}
+                               {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
+                        {/*<span className="lever"></span>*/}
+                        {/*Letter*/}
+                    {/*</label>*/}
+                {/*</div>*/}
                 <div className="metilda-transcribe-container">
                     <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
                         <span>Letters</span>
