@@ -62,7 +62,7 @@ class AudioImg extends Component {
                 let imgLeftX = imgBox.xminPerc * img.width;
                 let imgRightX = imgBox.xmaxPerc * img.width;
                 let graphWidth = imgRightX - imgLeftX;
-                audioImage.props.letterIntervalSelected(
+                audioImage.props.imageIntervalSelected(
                     loc.x1,
                     loc.x2,
                     (loc.x1 - imgLeftX) / graphWidth,

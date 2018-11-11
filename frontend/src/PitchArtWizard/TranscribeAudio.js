@@ -17,7 +17,7 @@ class TranscribeAudio extends Component {
           letters: [],
           isAudioImageLoaded: false,
           soundLength: -1};
-      this.letterIntervalSelected = this.letterIntervalSelected.bind(this);
+      this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
   }
 
@@ -37,7 +37,7 @@ class TranscribeAudio extends Component {
     });
   }
 
-  letterIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
+  imageIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
       let letter = prompt("Enter a letter");
 
       if (letter !== null && letter.trim().length > 0) {
@@ -95,7 +95,7 @@ class TranscribeAudio extends Component {
                                 ref="audioImage"
                                 xminPerc={320.0 / 2560.0}
                                 xmaxPerc={2306.0 / 2560.0}
-                                letterIntervalSelected={this.letterIntervalSelected}
+                                imageIntervalSelected={this.imageIntervalSelected}
                                 onAudioImageLoaded={this.onAudioImageLoaded}/>
                 </div>
                 <div className="metilda-transcribe-container">
