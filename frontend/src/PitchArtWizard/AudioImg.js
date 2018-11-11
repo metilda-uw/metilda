@@ -79,7 +79,7 @@ class AudioImg extends Component {
     return (
       <img id="metilda-audio-analysis-image"
            className="metilda-audio-analysis-image"
-           src={"/api/audio-analysis-image/" + uploadId + ".png?faketimestamp=" + Date.now()} />
+           src={"/api/audio-analysis-image/" + uploadId + ".png"} />
     );
   }
 }
