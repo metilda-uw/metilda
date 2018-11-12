@@ -1,7 +1,8 @@
 import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
-import { Stage, Layer, Rect, Line } from 'react-konva';
+import Konva from 'konva';
+import { Stage, Layer, Rect, Line, Circle} from 'react-konva';
 
 
 class PitchArt extends React.Component {
@@ -32,11 +33,20 @@ class PitchArt extends React.Component {
 
     render() {
         let points = [];
+        let lineCircles = [];
         for (let i = 0; i < this.props.pitches.length; i++) {
-            points.push(this.horzIndexToRectCoords(i));
-            points.push(this.vertValueToRectCoords(this.props.pitches[i]));
+            let x = this.horzIndexToRectCoords(i);
+            let y = this.vertValueToRectCoords(this.props.pitches[i]);
+
+            points.push(x);
+            points.push(y);
+            lineCircles.push(
+                <Circle x={x}
+                        y={y}
+                        fill="#00cc44"
+                        stroke="blue"
+                        radius={10}/>);
         }
-        console.log(points);
 
         return (
             <Stage width={this.props.width} height={this.props.height}>
@@ -45,11 +55,18 @@ class PitchArt extends React.Component {
                           height={this.props.height}
                           fill="white" />
                     <Line points={points}
-                          stroke="red"/>
+                          strokeWidth={5}
+                          stroke="blue"/>
                     <Line points={[0, this.props.height / 2.0, this.props.width, this.props.height / 2.0]}
                           stroke="blue"/>
                     <Line points={[this.props.width / 2.0, 0, this.props.width / 2.0, this.props.height]}
                           stroke="yellow"/>
+                </Layer>
+                <Layer>
+                    {lineCircles}
+                </Layer>
+                <Layer>
+
                 </Layer>
             </Stage>
         )
