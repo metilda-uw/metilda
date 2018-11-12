@@ -12,6 +12,9 @@ class PitchArt extends React.Component {
         super(props);
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
+
+        // TODO: Set innerwidth and innerheight to be more narrow when appropriate
+        // (see examples)
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.75;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
@@ -67,10 +70,6 @@ class PitchArt extends React.Component {
                     <Line points={points}
                           strokeWidth={this.graphWidth}
                           stroke="blue"/>
-                    <Line points={[0, this.props.height / 2.0, this.props.width, this.props.height / 2.0]}
-                          stroke="blue"/>
-                    <Line points={[this.props.width / 2.0, 0, this.props.width / 2.0, this.props.height]}
-                          stroke="yellow"/>
                 </Layer>
                 <Layer>
                     {lineCircles}

@@ -13,15 +13,8 @@ class ReviewPitchArt extends React.Component {
         let urlMap = queryString.parse(this.props.location.search);
 
         this.state = {
-            times: urlMap["t"].map(parseFloat),
             pitches: urlMap["p"].map(parseFloat)
         };
-
-        console.log(this.state);
-    }
-
-    componentDidMount() {
-       console.log();
     }
 
     render() {
@@ -34,7 +27,7 @@ class ReviewPitchArt extends React.Component {
                 <div className="pitch-art-container">
                     <PitchArt width={700}
                               height={500}
-                              pitches={[85, 107, 68, 59]}/>
+                              pitches={this.state.pitches}/>
                 </div>
             </div>
         )
