@@ -12,23 +12,31 @@ class PitchArt extends React.Component {
         super(props);
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
+        this.innerWidth = this.props.width * 0.75;
+        this.innerHeight = this.props.height * 0.75;
+        this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
+        this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
+
+        this.innerBorderX0 = (this.props.width - this.props.width * 0.95) / 2.0;
+        this.innerBorderY0 = (this.props.height - this.props.height * 0.95) / 2.0;
+
+        this.graphWidth = 10;
+        this.borderWidth = 10;
+        this.circleRadius = 15;
+        this.circleStrokeWidth = 10;
     }
 
     horzIndexToRectCoords(index) {
-        let innerWidth = this.props.width * 0.80;
-        let pointDx0 = (this.props.width - innerWidth) / 2.0;
-        let pointDx = innerWidth / (this.props.pitches.length - 1);
-        return pointDx0 + (pointDx * index);
+        let pointDx = this.innerWidth / (this.props.pitches.length - 1);
+        return this.pointDx0 + (pointDx * index);
     }
 
     vertValueToRectCoords(value) {
         // scale the coordinates to occupy the full height
         let minPitch = Math.min(...this.props.pitches);
         value = value - minPitch;
-        let innerHeight = this.props.height * 0.80;
-        let pointDy0 = (this.props.height - innerHeight) / 2.0;
-        let rectHeight = innerHeight * (value / Math.max(...this.props.pitches.map(val => val - minPitch)));
-        return innerHeight - rectHeight + pointDy0;
+        let rectHeight = this.innerHeight * (value / Math.max(...this.props.pitches.map(val => val - minPitch)));
+        return this.innerHeight - rectHeight + this.pointDy0;
     }
 
     render() {
@@ -45,7 +53,9 @@ class PitchArt extends React.Component {
                         y={y}
                         fill="#00cc44"
                         stroke="blue"
-                        radius={10}/>);
+                        strokeWidth={this.circleStrokeWidth}
+                        radius={this.circleRadius}
+                        key={i}/>);
         }
 
         return (
@@ -55,7 +65,7 @@ class PitchArt extends React.Component {
                           height={this.props.height}
                           fill="white" />
                     <Line points={points}
-                          strokeWidth={5}
+                          strokeWidth={this.graphWidth}
                           stroke="blue"/>
                     <Line points={[0, this.props.height / 2.0, this.props.width, this.props.height / 2.0]}
                           stroke="blue"/>
@@ -66,7 +76,13 @@ class PitchArt extends React.Component {
                     {lineCircles}
                 </Layer>
                 <Layer>
-
+                    <Line points={[this.innerBorderX0, this.innerBorderY0,
+                                   this.props.width - this.innerBorderX0, this.innerBorderY0,
+                                   this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
+                                   this.innerBorderX0, this.props.height - this.innerBorderY0,
+                                   this.innerBorderX0, this.innerBorderY0]}
+                          strokeWidth={this.borderWidth}
+                          stroke="blue"/>
                 </Layer>
             </Stage>
         )
