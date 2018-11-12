@@ -21,6 +21,7 @@ class TranscribeAudio extends Component {
       this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
       this.handleInputChange = this.handleInputChange.bind(this);
+      this.nextClicked = this.nextClicked.bind(this);
   }
 
   componentDidMount() {
@@ -43,18 +44,12 @@ class TranscribeAudio extends Component {
       let letter = prompt("Enter a letter");
 
       if (letter !== null && letter.trim().length > 0) {
-         this.setState(state => state.letters.push(
-             {letter: letter, leftX: leftX, rightX: rightX}
-         ));
-
+         let t0 = minTimePerc * this.state.soundLength;
+         let t1 = maxTimePerc * this.state.soundLength;
+         const controller = this;
          const {uploadId} = this.props.match.params;
          let json = {
-           "time_ranges": [
-               [
-                   minTimePerc * this.state.soundLength,
-                   maxTimePerc * this.state.soundLength
-               ]
-           ]
+           "time_ranges": [[t0, t1]]
          };
 
          fetch("/api/max-pitches/" + uploadId, {
@@ -66,9 +61,20 @@ class TranscribeAudio extends Component {
             body: JSON.stringify(json)})
         .then(response => response.json())
         .then(function(data) {
-            console.log(data);
+            controller.setState(state => state.letters.push(
+              {letter: letter,
+               leftX: leftX,
+               rightX: rightX,
+               t0: t0,
+               t1: t1,
+               pitch: data[0]}
+            ));
         });
       }
+  }
+
+  nextClicked() {
+
   }
 
   onAudioImageLoaded() {
@@ -152,7 +158,8 @@ class TranscribeAudio extends Component {
             <div className="right-align">
                 <button className="btn waves-effect waves-light"
                         type="submit"
-                        name="action">
+                        name="action"
+                        onClick={this.nextClicked}>
                     Next
                 </button>
             </div>
