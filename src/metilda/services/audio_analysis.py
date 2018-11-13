@@ -32,9 +32,16 @@ def draw_pitch(pitch):
     plt.ylabel("fundamental frequency [Hz]")
 
 
-def audio_analysis_image(upload_path):
+def audio_analysis_image(upload_path, tmin=1, tmax=2):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
+
+    if tmin > -1 or tmax > -1:
+        tmin = max(0, tmin)
+        tmax = min(snd.xmax, tmax)
+        snd = snd.extract_part(from_time=tmin, to_time=tmax)
+        snd.scale_times_to(tmin, tmax)
+
     plt.figure()
 
     # Draw waveform
