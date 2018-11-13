@@ -103,7 +103,8 @@ class PitchArt extends React.Component {
             />;
 
         let outlineCircles = [0, 1, 2].map(index =>
-            <Circle x={x}
+            <Circle key={index}
+                    x={x}
                     y={y}
                     stroke={"#e38748"}
                     radius={this.accentedCircleRadius + index * 8}

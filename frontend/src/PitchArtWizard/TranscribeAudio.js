@@ -6,6 +6,7 @@ import styles from "./TranscribeAudio.css";
 import AudioImg from "./AudioImg";
 import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
+import {Redirect} from "react-router-dom";
 
 
 class TranscribeAudio extends Component {
@@ -17,7 +18,8 @@ class TranscribeAudio extends Component {
           letters: [],
           isAudioImageLoaded: false,
           soundLength: -1,
-          selectionInterval: "Letter"};
+          selectionInterval: "Letter",
+          redirectId: null};
       this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
       this.handleInputChange = this.handleInputChange.bind(this);
@@ -74,7 +76,8 @@ class TranscribeAudio extends Component {
   }
 
   nextClicked() {
-
+      const {uploadId} = this.props.match.params;
+      this.setState({redirectId: uploadId});
   }
 
   onAudioImageLoaded() {
@@ -101,6 +104,11 @@ class TranscribeAudio extends Component {
   }
 
   render() {
+    if (this.state.redirectId !== null) {
+      let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
+      return <Redirect to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString } />
+    }
+
     const {uploadId} = this.props.match.params;
 
     let audioImageLoading;
