@@ -106,7 +106,7 @@ class TranscribeAudio extends Component {
   render() {
     if (this.state.redirectId !== null) {
       let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
-      return <Redirect to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString } />
+      return <Redirect push to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString } />
     }
 
     const {uploadId} = this.props.match.params;

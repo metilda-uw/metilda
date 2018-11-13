@@ -53,7 +53,7 @@ class UploadAudio extends Component {
 
   render() {
     if (this.state.redirectId !== null) {
-      return <Redirect to={"/pitchartwizard/2/" + this.state.redirectId} />
+      return <Redirect push to={"/pitchartwizard/2/" + this.state.redirectId} />
     }
 
     return (
