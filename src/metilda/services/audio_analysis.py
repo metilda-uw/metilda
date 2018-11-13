@@ -32,7 +32,7 @@ def draw_pitch(pitch):
     plt.ylabel("fundamental frequency [Hz]")
 
 
-def audio_analysis_image(upload_path, tmin=1, tmax=2):
+def audio_analysis_image(upload_path, tmin=-1, tmax=-1):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
 
