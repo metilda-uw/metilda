@@ -27,6 +27,62 @@ class PitchArt extends React.Component {
         this.borderWidth = 10;
         this.circleRadius = 15;
         this.circleStrokeWidth = 10;
+
+        // determine color scheme
+        let maxPitchIndex = this.maxPitchIndex(this.props.pitches);
+        switch (this.props.pitches.length) {
+            case 2:
+                switch (maxPitchIndex) {
+                    case 0:
+                        this.lineStrokeColor = "#272264";
+                        this.dotFillColor = "#0ba14a";
+                        break;
+                    case 1:
+                        this.lineStrokeColor = "#71002b";
+                        this.dotFillColor = "#2e3192";
+                        break;
+                }
+                break;
+            case 3:
+                switch (maxPitchIndex) {
+                    case 0:
+                        this.lineStrokeColor = "#92278f";
+                        this.dotFillColor = "#000000";
+                        break;
+                    case 1:
+                        this.lineStrokeColor = "#056839";
+                        this.dotFillColor = "#be72b0";
+                        break;
+                    case 2:
+                    default:
+                        this.lineStrokeColor = "#5b4a42";
+                        this.dotFillColor = "#166e92";
+                }
+                break;
+            case 4:
+                switch (maxPitchIndex) {
+                    case 0:
+                        this.lineStrokeColor = "#f1592a";
+                        this.dotFillColor = "#12a89d";
+                        break;
+                    case 1:
+                        this.lineStrokeColor = "#283890";
+                        this.dotFillColor = "#8cc63e";
+                        break;
+                    case 2:
+                    default:
+                        this.lineStrokeColor = "#9e1f62";
+                        this.dotFillColor = "#f7941d";
+                }
+                break;
+            default:
+                this.lineStrokeColor = "black";
+                this.dotFillColor = "black";
+        }
+    }
+
+    maxPitchIndex(pitches) {
+        return pitches.indexOf(Math.max(...pitches));
     }
 
     horzIndexToRectCoords(index) {
@@ -54,8 +110,8 @@ class PitchArt extends React.Component {
             lineCircles.push(
                 <Circle x={x}
                         y={y}
-                        fill="#00cc44"
-                        stroke="blue"
+                        fill={this.dotFillColor}
+                        stroke={this.lineStrokeColor}
                         strokeWidth={this.circleStrokeWidth}
                         radius={this.circleRadius}
                         key={i}/>);
@@ -69,7 +125,7 @@ class PitchArt extends React.Component {
                           fill="white" />
                     <Line points={points}
                           strokeWidth={this.graphWidth}
-                          stroke="blue"/>
+                          stroke={this.lineStrokeColor}/>
                 </Layer>
                 <Layer>
                     {lineCircles}
@@ -81,7 +137,7 @@ class PitchArt extends React.Component {
                                    this.innerBorderX0, this.props.height - this.innerBorderY0,
                                    this.innerBorderX0, this.innerBorderY0]}
                           strokeWidth={this.borderWidth}
-                          stroke="blue"/>
+                          stroke={this.lineStrokeColor}/>
                 </Layer>
             </Stage>
         )
