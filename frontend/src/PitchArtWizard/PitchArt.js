@@ -13,8 +13,6 @@ class PitchArt extends React.Component {
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
 
-        // TODO: Set innerwidth and innerheight to be more narrow when appropriate
-        // (see examples)
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.75;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
