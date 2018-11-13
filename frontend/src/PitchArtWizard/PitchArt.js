@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 import Konva from 'konva';
-import { Stage, Layer, Rect, Line, Circle} from 'react-konva';
+import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
 
 
 class PitchArt extends React.Component {
@@ -12,9 +12,10 @@ class PitchArt extends React.Component {
         super(props);
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
+        this.accentedPoint = this.accentedPoint.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
-        this.innerHeight = this.props.height * 0.75;
+        this.innerHeight = this.props.height * 0.70;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
         this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
 
@@ -25,12 +26,13 @@ class PitchArt extends React.Component {
         this.borderWidth = 10;
         this.circleRadius = 15;
         this.circleStrokeWidth = 10;
+        this.accentedCircleRadius = 30;
 
         // determine color scheme
-        let maxPitchIndex = this.maxPitchIndex(this.props.pitches);
+        this.maxPitchIndex = this.props.pitches.indexOf(Math.max(...this.props.pitches));
         switch (this.props.pitches.length) {
             case 2:
-                switch (maxPitchIndex) {
+                switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#272264";
                         this.dotFillColor = "#0ba14a";
@@ -42,7 +44,7 @@ class PitchArt extends React.Component {
                 }
                 break;
             case 3:
-                switch (maxPitchIndex) {
+                switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#92278f";
                         this.dotFillColor = "#000000";
@@ -58,7 +60,7 @@ class PitchArt extends React.Component {
                 }
                 break;
             case 4:
-                switch (maxPitchIndex) {
+                switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#f1592a";
                         this.dotFillColor = "#12a89d";
@@ -79,10 +81,6 @@ class PitchArt extends React.Component {
         }
     }
 
-    maxPitchIndex(pitches) {
-        return pitches.indexOf(Math.max(...pitches));
-    }
-
     horzIndexToRectCoords(index) {
         let pointDx = this.innerWidth / (this.props.pitches.length - 1);
         return this.pointDx0 + (pointDx * index);
@@ -96,8 +94,33 @@ class PitchArt extends React.Component {
         return this.innerHeight - rectHeight + this.pointDy0;
     }
 
+    accentedPoint(x, y) {
+        let accentedPoint =
+            <Circle x={x}
+                    y={y}
+                    fill={"#fcb040"}
+                    radius={this.accentedCircleRadius}
+            />;
+
+        let outlineCircles = [0, 1, 2].map(index =>
+            <Circle x={x}
+                    y={y}
+                    stroke={"#e38748"}
+                    radius={this.accentedCircleRadius + index * 8}
+            />
+        );
+
+        return (
+            <Group>
+                {accentedPoint}
+                {outlineCircles}
+            </Group>
+        );
+    }
+
     render() {
         let points = [];
+        let pointPairs = [];
         let lineCircles = [];
         for (let i = 0; i < this.props.pitches.length; i++) {
             let x = this.horzIndexToRectCoords(i);
@@ -105,6 +128,8 @@ class PitchArt extends React.Component {
 
             points.push(x);
             points.push(y);
+            pointPairs.push([x, y]);
+
             lineCircles.push(
                 <Circle x={x}
                         y={y}
@@ -115,20 +140,16 @@ class PitchArt extends React.Component {
                         key={i}/>);
         }
 
+        let accentedPoint = this.accentedPoint(
+            pointPairs[this.maxPitchIndex][0],
+            pointPairs[this.maxPitchIndex][1]);
+
         return (
             <Stage width={this.props.width} height={this.props.height}>
                 <Layer>
                     <Rect width={this.props.width}
                           height={this.props.height}
                           fill="white" />
-                    <Line points={points}
-                          strokeWidth={this.graphWidth}
-                          stroke={this.lineStrokeColor}/>
-                </Layer>
-                <Layer>
-                    {lineCircles}
-                </Layer>
-                <Layer>
                     <Line points={[this.innerBorderX0, this.innerBorderY0,
                                    this.props.width - this.innerBorderX0, this.innerBorderY0,
                                    this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
@@ -136,6 +157,13 @@ class PitchArt extends React.Component {
                                    this.innerBorderX0, this.innerBorderY0]}
                           strokeWidth={this.borderWidth}
                           stroke={this.lineStrokeColor}/>
+                    {accentedPoint}
+                </Layer>
+                <Layer>
+                    <Line points={points}
+                          strokeWidth={this.graphWidth}
+                          stroke={this.lineStrokeColor}/>
+                    {lineCircles}
                 </Layer>
             </Stage>
         )
