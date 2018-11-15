@@ -83,38 +83,38 @@ class UploadAudio extends Component {
                     <label>Audio File</label>
                 </div>
             </div>
-            <div className="row">
-                <div className="col s6 gender-selection">
-                    <p>Gender</p>
-                    <p>
-                        <label>
-                            <input name="gender"
-                                   onChange={this.handleInputChange}
-                                   type="radio"
-                                   required="required" />
-                            <span>Male</span>
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input name="gender"
-                                   onChange={this.handleInputChange}
-                                   type="radio"
-                                   required="required" />
-                            <span>Female</span>
-                        </label>
-                    </p>
-                    <p>
-                        <label>
-                            <input name="gender"
-                                   onChange={this.handleInputChange}
-                                   type="radio"
-                                   required="required" />
-                            <span>Unknown</span>
-                        </label>
-                    </p>
-                </div>
-            </div>
+            {/*<div className="row">*/}
+                {/*<div className="col s6 gender-selection">*/}
+                    {/*<p>Gender</p>*/}
+                    {/*<p>*/}
+                        {/*<label>*/}
+                            {/*<input name="gender"*/}
+                                   {/*onChange={this.handleInputChange}*/}
+                                   {/*type="radio"*/}
+                                   {/*required="required" />*/}
+                            {/*<span>Male</span>*/}
+                        {/*</label>*/}
+                    {/*</p>*/}
+                    {/*<p>*/}
+                        {/*<label>*/}
+                            {/*<input name="gender"*/}
+                                   {/*onChange={this.handleInputChange}*/}
+                                   {/*type="radio"*/}
+                                   {/*required="required" />*/}
+                            {/*<span>Female</span>*/}
+                        {/*</label>*/}
+                    {/*</p>*/}
+                    {/*<p>*/}
+                        {/*<label>*/}
+                            {/*<input name="gender"*/}
+                                   {/*onChange={this.handleInputChange}*/}
+                                   {/*type="radio"*/}
+                                   {/*required="required" />*/}
+                            {/*<span>Unknown</span>*/}
+                        {/*</label>*/}
+                    {/*</p>*/}
+                {/*</div>*/}
+            {/*</div>*/}
             <div className="row">
                 <div className="col s12">
                     <button className="btn waves-effect waves-light"
