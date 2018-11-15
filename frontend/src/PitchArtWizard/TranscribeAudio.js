@@ -120,7 +120,7 @@ class TranscribeAudio extends Component {
       <div>
         <div className="wizard-header">
             <h3>Pitch Art Wizard</h3>
-            <h4>Transcribe Audio (step 2/4)</h4>
+            <h4>Transcribe Audio (step 2/3)</h4>
         </div>
         <div className="metilda-audio-analysis">
             <div>

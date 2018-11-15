@@ -22,7 +22,7 @@ class ReviewPitchArt extends React.Component {
             <div>
                 <div className="wizard-header">
                     <h3>Pitch Art Wizard</h3>
-                    <h4>Review Pitch Art (step 4/4)</h4>
+                    <h4>Review Pitch Art (step 3/3)</h4>
                 </div>
                 <div className="pitch-art-container">
                     <PitchArt width={700}

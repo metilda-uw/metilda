@@ -71,7 +71,7 @@ class UploadAudio extends Component {
       <div>
         <div className="wizard-header">
             <h3>Pitch Art Wizard</h3>
-            <h4>Upload Recording (step 1/4)</h4>
+            <h4>Upload Recording (step 1/3)</h4>
         </div>
         <form className="wizard-form" method="post">
             <div className="row">
