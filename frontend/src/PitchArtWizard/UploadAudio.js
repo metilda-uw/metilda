@@ -12,10 +12,11 @@ class UploadAudio extends Component {
       super(props);
       this.state = {
           audioFile: null,
-          audioFileName: "PHEOP001 apaniiwa.wav",
+          audioFileName: "",
           description: null,
           gender: null,
-          redirectId: null
+          redirectId: null,
+          availableFiles: []
       }
 
       this.sendFormSubmit = this.sendFormSubmit.bind(this);
@@ -23,8 +24,14 @@ class UploadAudio extends Component {
   }
 
   componentDidMount() {
-    var elems = document.querySelectorAll('select');
-    M.FormSelect.init(elems);
+    fetch("/api/available-files")
+        .then(data => data.json())
+        .then(data => this.setState({availableFiles: data["available_files"]}))
+        .then(function() {
+            // initialize dropdowns
+            var elems = document.querySelectorAll('select');
+            M.FormSelect.init(elems);
+        })
   }
 
   sendFormSubmit(event) {
@@ -56,6 +63,10 @@ class UploadAudio extends Component {
       return <Redirect push to={"/pitchartwizard/2/" + this.state.redirectId} />
     }
 
+    const availableFilesList = this.state.availableFiles.map(item =>
+        <option key={item}>{item}</option>
+    );
+
     return (
       <div>
         <div className="wizard-header">
@@ -67,10 +78,7 @@ class UploadAudio extends Component {
                 <div className="input-field col s12">
                     <select value={this.state.audioFileName} name="audioFileName" onChange={this.handleInputChange}>
                         <option value="" disabled="disabled">Choose audio file</option>
-                        <option>PHEOP001 apaniiwa.wav</option>
-                        <option>PHEOP011 isska.wav</option>
-                        <option>PHEOP019 onni.wav</option>
-                        <option>PHEOP117 saahkomaapiwa.wav</option>
+                        {availableFilesList}
                     </select>
                     <label>Audio File</label>
                 </div>

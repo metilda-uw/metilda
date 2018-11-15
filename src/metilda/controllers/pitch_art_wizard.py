@@ -3,7 +3,7 @@ import os
 from flask import request, jsonify, send_file
 
 from metilda import app
-from metilda.services import audio_analysis
+from metilda.services import audio_analysis, file_io
 
 
 @app.route('/api/upload-audio-file', methods=["POST"])
@@ -36,3 +36,8 @@ def sound_length(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     sound_length = audio_analysis.get_sound_length(sound_path)
     return jsonify({'sound_length': sound_length})
+
+
+@app.route('/api/available-files', methods=["GET"])
+def available_files():
+    return jsonify({'available_files': file_io.available_files(app.config["SOUNDS"])})

@@ -85,4 +85,3 @@ def get_max_pitches(time_ranges, upload_path):
 
 def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
-
