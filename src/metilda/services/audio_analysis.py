@@ -1,5 +1,6 @@
 import parselmouth
 
+import os
 from math import isnan
 import numpy as np
 import matplotlib.pyplot as plt
@@ -42,7 +43,10 @@ def audio_analysis_image(upload_path, tmin=-1, tmax=-1):
         snd = snd.extract_part(from_time=tmin, to_time=tmax)
         snd.scale_times_to(tmin, tmax)
 
-    plt.figure()
+    fig = plt.figure()
+
+    title = os.path.basename(upload_path)
+    fig.suptitle(title, y=0.95)
 
     # Draw waveform
     plt.subplot(2, 1, 1)
