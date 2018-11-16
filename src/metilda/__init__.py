@@ -11,6 +11,7 @@ app = Flask(__name__,
             static_folder="../../frontend/build/static",
             template_folder="../../frontend/build")
 app.config["SOUNDS"] = os.path.join(os.path.dirname(__file__), "sounds")
+app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
 
 import metilda.controllers.pitch_art_wizard
 

@@ -22,7 +22,9 @@ def audio_analysis_image(upload_id):
     # image_binary = audio_analysis.audio_analysis_image(image_path)
     # return send_file(image_binary, mimetype="image/png")
     # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
-    return send_file(r"C:\Users\Mitchell\Downloads\PHEOP019 onni.png")
+    file_name = os.path.splitext(upload_id)[0]
+    image_path = os.path.join(app.config["PICTURES"], file_name + ".png")
+    return send_file(image_path)
 
 
 @app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])

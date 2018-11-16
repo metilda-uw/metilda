@@ -33,7 +33,7 @@ def draw_pitch(pitch):
     plt.ylabel("fundamental frequency [Hz]")
 
 
-def audio_analysis_image(upload_path, tmin=-1, tmax=-1):
+def audio_analysis_image(upload_path, tmin=-1, tmax=-1, output_path=None):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
 
@@ -70,6 +70,9 @@ def audio_analysis_image(upload_path, tmin=-1, tmax=-1):
     plt.savefig(image, format="png", dpi=400, figsize=(4, 3))
     image.seek(0)
 
+    if output_path is not None:
+        plt.savefig(output_path, format="png", dpi=400, figsize=(4, 3))
+
     return image
 
 
@@ -89,3 +92,13 @@ def get_max_pitches(time_ranges, upload_path):
 
 def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
+
+
+if __name__ == "__main__":
+    import glob
+    sdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds"
+    pdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\pictures"
+    for path in glob.iglob(os.path.join(sdir, "*.wav")):
+        file_name = os.path.basename(os.path.splitext(path)[0])
+        print("Processing %s" % file_name)
+        audio_analysis_image(path, output_path=os.path.join(pdir, file_name + ".png"))
