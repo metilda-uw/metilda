@@ -2,9 +2,15 @@
     margin-left: 16px;
 }
 
+.metilda-audio-analysis-layout {
+    display: flex;
+    justify-content: flex-start;
+}
+
 .metilda-audio-analysis {
     margin-left: 16px;
     width: 800px;
+    min-width: 800px;
 }
 
 .metilda-audio-analysis-image-container {
@@ -71,4 +77,12 @@
 .metilda-audio-analysis-image-loading .preloader-wrapper.big {
     width: 160px;
     height: 160px;
+}
+
+.metilda-audio-analysis-pitch-art {
+    margin-left: 48px;
+}
+
+.m-r-16 {
+    margin-right: 16px;
 }

@@ -7,6 +7,7 @@ import AudioImg from "./AudioImg";
 import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
 import {Redirect} from "react-router-dom";
+import PitchArt from "./PitchArt";
 
 
 class TranscribeAudio extends Component {
@@ -23,7 +24,10 @@ class TranscribeAudio extends Component {
       this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
       this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
       this.handleInputChange = this.handleInputChange.bind(this);
+
       this.nextClicked = this.nextClicked.bind(this);
+      this.resetClicked = this.resetClicked.bind(this);
+      this.removePrevious = this.removePrevious.bind(this);
   }
 
   componentDidMount() {
@@ -80,6 +84,15 @@ class TranscribeAudio extends Component {
       this.setState({redirectId: uploadId});
   }
 
+  removePrevious() {
+      let letters = this.state.letters.slice(0, this.state.letters.length - 1);
+      this.setState({letters: letters});
+  }
+
+  resetClicked() {
+      this.setState({letters: []});
+  }
+
   onAudioImageLoaded() {
       this.setState({isAudioImageLoaded: true});
   }
@@ -116,60 +129,86 @@ class TranscribeAudio extends Component {
         audioImageLoading = <AudioImgLoading />
     }
 
+    let pitchArt;
+    if (this.state.letters.length > 1) {
+        pitchArt = <PitchArt width={700}
+                              height={500}
+                              pitches={this.state.letters.map(item => item.pitch)}/>;
+    }
+
     return (
       <div>
         <div className="wizard-header">
             <h3>Pitch Art Wizard</h3>
             <h4>Transcribe Audio (step 2/3)</h4>
         </div>
-        <div className="metilda-audio-analysis">
-            <div>
-                <div className="metilda-audio-analysis-image-container">
-                    {audioImageLoading}
-                      <AudioImg uploadId={uploadId}
-                                ref="audioImage"
-                                xminPerc={320.0 / 2560.0}
-                                xmaxPerc={2306.0 / 2560.0}
-                                imageIntervalSelected={this.imageIntervalSelected}
-                                onAudioImageLoaded={this.onAudioImageLoaded}/>
+        <div className="metilda-audio-analysis-layout">
+            <div className="metilda-audio-analysis">
+                <div>
+                    <div className="metilda-audio-analysis-image-container">
+                        {audioImageLoading}
+                          <AudioImg uploadId={uploadId}
+                                    ref="audioImage"
+                                    xminPerc={320.0 / 2560.0}
+                                    xmaxPerc={2306.0 / 2560.0}
+                                    imageIntervalSelected={this.imageIntervalSelected}
+                                    onAudioImageLoaded={this.onAudioImageLoaded}/>
+                    </div>
+                    {/*<div className="switch metilda-audio-analysis-input">*/}
+                        {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
+                        {/*<label>*/}
+                            {/*Sound*/}
+                            {/*<input name="imageSelection"*/}
+                                   {/*type="checkbox"*/}
+                                   {/*onChange={this.handleInputChange}*/}
+                                   {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
+                            {/*<span className="lever"></span>*/}
+                            {/*Letter*/}
+                        {/*</label>*/}
+                    {/*</div>*/}
+                    <div className="metilda-transcribe-container">
+                        <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
+                            <span>Letters</span>
+                        </div>
+                        <div id="metilda-transcribe-letter-container"
+                             className="metilda-transcribe-container-col">
+                            {
+                                this.state.letters.map(function(item, index) {
+                                    return <AudioLetter key={index}
+                                                        letter={item.letter}
+                                                        leftX={item.leftX}
+                                                        rightX={item.rightX}/>
+                                })
+                            }
+                        </div>
+                        <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
+                    </div>
                 </div>
-                {/*<div className="switch metilda-audio-analysis-input">*/}
-                    {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
-                    {/*<label>*/}
-                        {/*Sound*/}
-                        {/*<input name="imageSelection"*/}
-                               {/*type="checkbox"*/}
-                               {/*onChange={this.handleInputChange}*/}
-                               {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
-                        {/*<span className="lever"></span>*/}
-                        {/*Letter*/}
-                    {/*</label>*/}
-                {/*</div>*/}
-                <div className="metilda-transcribe-container">
-                    <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
-                        <span>Letters</span>
-                    </div>
-                    <div id="metilda-transcribe-letter-container"
-                         className="metilda-transcribe-container-col">
-                        {
-                            this.state.letters.map(function(item, index) {
-                                return <AudioLetter key={index}
-                                                    letter={item.letter}
-                                                    leftX={item.leftX}
-                                                    rightX={item.rightX}/>
-                            })
-                        }
-                    </div>
-                    <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
+                <div className="right-align">
+                    <button className="btn waves-effect waves-light m-r-16"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.letters == 0}
+                            onClick={this.removePrevious}>
+                        Remove Previous
+                    </button>
+                    <button className="btn waves-effect waves-light"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.letters == 0}
+                            onClick={this.resetClicked}>
+                        Reset
+                    </button>
+                    {/*<button className="btn waves-effect waves-light"*/}
+                            {/*type="submit"*/}
+                            {/*name="action"*/}
+                            {/*onClick={this.nextClicked}>*/}
+                        {/*Next*/}
+                    {/*</button>*/}
                 </div>
             </div>
-            <div className="right-align">
-                <button className="btn waves-effect waves-light"
-                        type="submit"
-                        name="action"
-                        onClick={this.nextClicked}>
-                    Next
-                </button>
+            <div className="metilda-audio-analysis-pitch-art">
+                {pitchArt}
             </div>
         </div>
       </div>
