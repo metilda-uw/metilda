@@ -71,12 +71,14 @@ class UploadAudio extends Component {
       <div>
         <div className="wizard-header">
             <h3>Pitch Art Wizard</h3>
-            <h4>Upload Recording (step 1/3)</h4>
+            <h4>Upload Recording (step 1/2)</h4>
         </div>
         <form className="wizard-form" method="post">
             <div className="row">
                 <div className="input-field col s12">
-                    <select value={this.state.audioFileName} name="audioFileName" onChange={this.handleInputChange}>
+                    <select value={this.state.audioFileName}
+                            name="audioFileName"
+                            onChange={this.handleInputChange}>
                         <option value="" disabled="disabled">Choose audio file</option>
                         {availableFilesList}
                     </select>
