@@ -141,9 +141,16 @@ class PitchArt extends React.Component {
                         key={i}/>);
         }
 
-        let accentedPoint = this.accentedPoint(
+        var accentedPoint;
+
+        try {
+            accentedPoint = this.accentedPoint(
             pointPairs[this.maxPitchIndex][0],
             pointPairs[this.maxPitchIndex][1]);
+        } catch(e) {
+            debugger;
+        }
+
 
         return (
             <Stage width={this.props.width} height={this.props.height}>

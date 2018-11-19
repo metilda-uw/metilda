@@ -11,209 +11,229 @@ import PitchArt from "./PitchArt";
 
 
 class TranscribeAudio extends Component {
-  state = {};
+    state = {};
 
-  constructor(props) {
-      super(props);
-      this.state = {
-          letters: [],
-          isAudioImageLoaded: false,
-          soundLength: -1,
-          selectionInterval: "Letter",
-          redirectId: null};
-      this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
-      this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
-      this.handleInputChange = this.handleInputChange.bind(this);
+    constructor(props) {
+        super(props);
+        this.state = {
+            letters: [],
+            isAudioImageLoaded: false,
+            soundLength: -1,
+            selectionInterval: "Letter",
+            updateCounter: 0,
+            redirectId: null
+        };
+        this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+        this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
 
-      this.nextClicked = this.nextClicked.bind(this);
-      this.resetClicked = this.resetClicked.bind(this);
-      this.removePrevious = this.removePrevious.bind(this);
-  }
+        this.nextClicked = this.nextClicked.bind(this);
+        this.resetClicked = this.resetClicked.bind(this);
+        this.removePrevious = this.removePrevious.bind(this);
+    }
 
-  componentDidMount() {
-    const {uploadId} = this.props.match.params;
-    var controller = this;
-    fetch("/api/sound-length/" + uploadId, {
-        method: "POST",
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: {uploadId: uploadId}})
-    .then(response => response.json())
-    .then(function(data) {
-        controller.setState({soundLength: data["sound_length"]});
-    });
-  }
-
-  imageIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
-      let letter = prompt("Enter a letter");
-
-      if (letter !== null && letter.trim().length > 0) {
-         let t0 = minTimePerc * this.state.soundLength;
-         let t1 = maxTimePerc * this.state.soundLength;
-         const controller = this;
-         const {uploadId} = this.props.match.params;
-         let json = {
-           "time_ranges": [[t0, t1]]
-         };
-
-         fetch("/api/max-pitches/" + uploadId, {
+    componentDidMount() {
+        const {uploadId} = this.props.match.params;
+        var controller = this;
+        fetch("/api/sound-length/" + uploadId, {
             method: "POST",
             headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify(json)})
-        .then(response => response.json())
-        .then(function(data) {
-            controller.setState(state => state.letters.push(
-              {letter: letter,
-               leftX: leftX,
-               rightX: rightX,
-               t0: t0,
-               t1: t1,
-               pitch: data[0]}
-            ));
+            body: {uploadId: uploadId}
+        })
+            .then(response => response.json())
+            .then(function (data) {
+                controller.setState({soundLength: data["sound_length"]});
+            });
+    }
+
+    imageIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
+        let letter = prompt("Enter a letter");
+
+        if (letter !== null && letter.trim().length > 0) {
+            let t0 = minTimePerc * this.state.soundLength;
+            let t1 = maxTimePerc * this.state.soundLength;
+            const controller = this;
+            const {uploadId} = this.props.match.params;
+            let json = {
+                "time_ranges": [[t0, t1]]
+            };
+
+            fetch("/api/max-pitches/" + uploadId, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(json)
+            })
+                .then(response => response.json())
+                .then(function (data) {
+                        controller.setState(prevState =>
+                            ({
+                                letters: prevState.letters.concat({
+                                    letter: letter,
+                                    leftX: leftX,
+                                    rightX: rightX,
+                                    t0: t0,
+                                    t1: t1,
+                                    pitch: data[0]
+                                }),
+                                updateCounter: prevState.updateCounter + 1
+                            })
+                        )
+                    }
+                )
+        }
+    }
+
+    nextClicked() {
+        const {uploadId} = this.props.match.params;
+        this.setState({redirectId: uploadId});
+    }
+
+    removePrevious() {
+        let letters = this.state.letters.slice(0, this.state.letters.length - 1);
+        this.setState(prevState => (
+            {letters: letters, updateCounter: prevState.updateCounter + 1})
+        );
+    }
+
+    resetClicked() {
+        this.setState(prevState => (
+            {letters: [], updateCounter: prevState.updateCounter + 1})
+        );
+    }
+
+    onAudioImageLoaded() {
+        this.setState({isAudioImageLoaded: true});
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+
+        let value = null;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else if (target.type === "file") {
+            value = target.files[0];
+        } else {
+            value = target.value;
+        }
+
+        const name = target.name;
+
+        this.setState({
+            [name]: value
         });
-      }
-  }
-
-  nextClicked() {
-      const {uploadId} = this.props.match.params;
-      this.setState({redirectId: uploadId});
-  }
-
-  removePrevious() {
-      let letters = this.state.letters.slice(0, this.state.letters.length - 1);
-      this.setState({letters: letters});
-  }
-
-  resetClicked() {
-      this.setState({letters: []});
-  }
-
-  onAudioImageLoaded() {
-      this.setState({isAudioImageLoaded: true});
-  }
-
-  handleInputChange(event) {
-    const target = event.target;
-
-    let value = null;
-    if (target.type === "checkbox") {
-        value = target.checked;
-    } else if (target.type === "file") {
-        value = target.files[0];
-    } else {
-        value = target.value;
     }
 
-    const name = target.name;
+    render() {
+        if (this.state.redirectId !== null) {
+            let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
+            return <Redirect push to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString}/>
+        }
 
-    this.setState({
-      [name]: value
-    });
-  }
+        const {uploadId} = this.props.match.params;
 
-  render() {
-    if (this.state.redirectId !== null) {
-      let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
-      return <Redirect push to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString } />
-    }
+        let audioImageLoading;
+        if (!this.state.isAudioImageLoaded) {
+            audioImageLoading = <AudioImgLoading/>
+        }
 
-    const {uploadId} = this.props.match.params;
+        let pitchArt;
+        if (this.state.letters.length > 1) {
+            let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
+            let sortedPitches = timesAndPitches.sort((a, b) => b[0] - a[0]).map(item => item[1]);
 
-    let audioImageLoading;
-    if (!this.state.isAudioImageLoaded) {
-        audioImageLoading = <AudioImgLoading />
-    }
+            pitchArt = <PitchArt width={700}
+                                 height={500}
+                                 key={this.state.updateCounter}
+                                 pitches={sortedPitches}/>;
+        }
 
-    let pitchArt;
-    if (this.state.letters.length > 1) {
-        pitchArt = <PitchArt width={700}
-                              height={500}
-                              pitches={this.state.letters.map(item => item.pitch)}/>;
-    }
-
-    return (
-      <div>
-        <div className="wizard-header">
-            <h3>Pitch Art Wizard</h3>
-            <h4>Transcribe Audio (step 2/3)</h4>
-        </div>
-        <div className="metilda-audio-analysis-layout">
-            <div className="metilda-audio-analysis">
-                <div>
-                    <div className="metilda-audio-analysis-image-container">
-                        {audioImageLoading}
-                          <AudioImg uploadId={uploadId}
-                                    ref="audioImage"
-                                    xminPerc={320.0 / 2560.0}
-                                    xmaxPerc={2306.0 / 2560.0}
-                                    imageIntervalSelected={this.imageIntervalSelected}
-                                    onAudioImageLoaded={this.onAudioImageLoaded}/>
-                    </div>
-                    {/*<div className="switch metilda-audio-analysis-input">*/}
-                        {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
-                        {/*<label>*/}
+        return (
+            <div>
+                <div className="wizard-header">
+                    <h3>Pitch Art Wizard</h3>
+                    <h4>Transcribe Audio (step 2/3)</h4>
+                </div>
+                <div className="metilda-audio-analysis-layout">
+                    <div className="metilda-audio-analysis">
+                        <div>
+                            <div className="metilda-audio-analysis-image-container">
+                                {audioImageLoading}
+                                <AudioImg uploadId={uploadId}
+                                          ref="audioImage"
+                                          xminPerc={320.0 / 2560.0}
+                                          xmaxPerc={2306.0 / 2560.0}
+                                          imageIntervalSelected={this.imageIntervalSelected}
+                                          onAudioImageLoaded={this.onAudioImageLoaded}/>
+                            </div>
+                            {/*<div className="switch metilda-audio-analysis-input">*/}
+                            {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
+                            {/*<label>*/}
                             {/*Sound*/}
                             {/*<input name="imageSelection"*/}
-                                   {/*type="checkbox"*/}
-                                   {/*onChange={this.handleInputChange}*/}
-                                   {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
+                            {/*type="checkbox"*/}
+                            {/*onChange={this.handleInputChange}*/}
+                            {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
                             {/*<span className="lever"></span>*/}
                             {/*Letter*/}
-                        {/*</label>*/}
-                    {/*</div>*/}
-                    <div className="metilda-transcribe-container">
-                        <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
-                            <span>Letters</span>
+                            {/*</label>*/}
+                            {/*</div>*/}
+                            <div className="metilda-transcribe-container">
+                                <div
+                                    className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
+                                    <span>Letters</span>
+                                </div>
+                                <div id="metilda-transcribe-letter-container"
+                                     className="metilda-transcribe-container-col">
+                                    {
+                                        this.state.letters.map(function (item, index) {
+                                            return <AudioLetter key={index}
+                                                                letter={item.letter}
+                                                                leftX={item.leftX}
+                                                                rightX={item.rightX}/>
+                                        })
+                                    }
+                                </div>
+                                <div
+                                    className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
+                            </div>
                         </div>
-                        <div id="metilda-transcribe-letter-container"
-                             className="metilda-transcribe-container-col">
-                            {
-                                this.state.letters.map(function(item, index) {
-                                    return <AudioLetter key={index}
-                                                        letter={item.letter}
-                                                        leftX={item.leftX}
-                                                        rightX={item.rightX}/>
-                                })
-                            }
-                        </div>
-                        <div className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
-                    </div>
-                </div>
-                <div className="right-align">
-                    <button className="btn waves-effect waves-light m-r-16"
-                            type="submit"
-                            name="action"
-                            disabled={this.state.letters == 0}
-                            onClick={this.removePrevious}>
-                        Remove Previous
-                    </button>
-                    <button className="btn waves-effect waves-light"
-                            type="submit"
-                            name="action"
-                            disabled={this.state.letters == 0}
-                            onClick={this.resetClicked}>
-                        Reset
-                    </button>
-                    {/*<button className="btn waves-effect waves-light"*/}
+                        <div className="right-align">
+                            <button className="btn waves-effect waves-light m-r-16"
+                                    type="submit"
+                                    name="action"
+                                    disabled={this.state.letters.length === 0}
+                                    onClick={this.removePrevious}>
+                                Remove Previous
+                            </button>
+                            <button className="btn waves-effect waves-light"
+                                    type="submit"
+                                    name="action"
+                                    disabled={this.state.letters.length === 0}
+                                    onClick={this.resetClicked}>
+                                Reset
+                            </button>
+                            {/*<button className="btn waves-effect waves-light"*/}
                             {/*type="submit"*/}
                             {/*name="action"*/}
                             {/*onClick={this.nextClicked}>*/}
-                        {/*Next*/}
-                    {/*</button>*/}
+                            {/*Next*/}
+                            {/*</button>*/}
+                        </div>
+                    </div>
+                    <div className="metilda-audio-analysis-pitch-art">
+                        {pitchArt}
+                    </div>
                 </div>
             </div>
-            <div className="metilda-audio-analysis-pitch-art">
-                {pitchArt}
-            </div>
-        </div>
-      </div>
-    );
-  }
+        );
+    }
 }
 
 export default TranscribeAudio;
