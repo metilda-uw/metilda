@@ -74,12 +74,12 @@ class AudioImg extends Component {
   }
 
   render() {
-    const {uploadId} = this.props;
+    const {src} = this.props;
 
     return (
       <img id="metilda-audio-analysis-image"
            className="metilda-audio-analysis-image"
-           src={"/api/audio-analysis-image/" + uploadId + ".png"} />
+           src={src} />
     );
   }
 }

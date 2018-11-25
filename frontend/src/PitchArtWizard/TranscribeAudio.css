@@ -30,8 +30,21 @@
     margin-right: 16px;
 }
 
+.metilda-audio-analysis-image-col-1,
+.metilda-audio-analysis-image-col-2,
+.metilda-audio-analysis-image-col-3 {
+    border: 1px solid black;
+    height: 52px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+}
+
 .metilda-audio-analysis-image-col-1 {
     width: 12.5%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: lightgray;
 }
 
 .metilda-audio-analysis-image-col-2 {
@@ -40,33 +53,12 @@
 
 .metilda-audio-analysis-image-col-3 {
     width: 10%;
-}
-
-.metilda-transcribe-container, .metilda-playback-container {
-    display: flex;
-    align-items: center;
-}
-
-.metilda-transcribe-container-col {
-    border: 1px solid black;
-    height: 52px;
-    margin-top: 16px;
-    margin-bottom: 32px;
-}
-
-.metilda-transcribe-letter-container-label {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     background: lightgray;
 }
 
-#metilda-transcribe-letter-container {
-    width: 77.5%;
-}
-
-.metilda-transcribe-letter-container-end {
-    background: lightgray;
+.metilda-control-container {
+    display: flex;
+    align-items: center;
 }
 
 .metilda-transcribe-letter {
