@@ -21,7 +21,7 @@ def draw_spectrogram(spectrogram, dynamic_range=70):
     plt.ylabel("frequency [Hz]")
 
 
-def draw_pitch(pitch):
+def draw_pitch(pitch, max_pitch):
     # Extract selected pitch contour, and
     # replace unvoiced samples by NaN to not plot
     pitch_values = pitch.selected_array['frequency']
@@ -29,11 +29,15 @@ def draw_pitch(pitch):
     plt.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='w')
     plt.plot(pitch.xs(), pitch_values, 'o', markersize=2)
     plt.grid(False)
-    plt.ylim(0, pitch.ceiling)
+    plt.ylim(0, min(pitch.ceiling, max_pitch))
     plt.ylabel("fundamental frequency [Hz]")
 
 
-def audio_analysis_image(upload_path, tmin=-1, tmax=-1, output_path=None):
+def audio_analysis_image(upload_path,
+                         tmin=-1,
+                         tmax=-1,
+                         max_pitch=float('inf'),
+                         output_path=None):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
 
@@ -61,7 +65,7 @@ def audio_analysis_image(upload_path, tmin=-1, tmax=-1, output_path=None):
 
     # Draw pitch
     plt.twinx()
-    draw_pitch(snd.to_pitch())
+    draw_pitch(snd.to_pitch(), max_pitch)
     plt.xlim([snd.xmin, snd.xmax])
 
     plt.subplots_adjust(hspace=0.5)

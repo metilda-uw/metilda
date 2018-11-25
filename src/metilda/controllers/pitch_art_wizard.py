@@ -19,7 +19,10 @@ def upload_audio_metadata():
 @app.route('/api/audio-analysis-image/<string:upload_id>.png', methods=["GET"])
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
-    image_binary = audio_analysis.audio_analysis_image(image_path)
+
+    max_pitch = request.args.get('max-pitch', float('inf'), type=float)
+
+    image_binary = audio_analysis.audio_analysis_image(image_path, max_pitch=max_pitch)
     return send_file(image_binary, mimetype="image/png")
     # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
     # file_name = os.path.splitext(upload_id)[0]

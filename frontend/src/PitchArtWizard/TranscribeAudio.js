@@ -8,7 +8,8 @@ import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
 import {Redirect} from "react-router-dom";
 import PitchArt from "./PitchArt";
-import {Media, Player, controls } from 'react-media-player';
+import {Media, Player, controls} from 'react-media-player';
+
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
 
@@ -17,13 +18,19 @@ class TranscribeAudio extends Component {
 
     constructor(props) {
         super(props);
+
+        const {uploadId} = this.props.match.params;
+        const initMaxPitch = "";
         this.state = {
             letters: [],
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
             updateCounter: 0,
-            redirectId: null
+            redirectId: null,
+            maxPitch: initMaxPitch,
+            imageUrl: TranscribeAudio.formatImageUrl(uploadId, initMaxPitch),
+            audioEditVersion: 0
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -31,6 +38,12 @@ class TranscribeAudio extends Component {
         this.nextClicked = this.nextClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.removePrevious = this.removePrevious.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.applyMaxPitch = this.applyMaxPitch.bind(this);
+    }
+
+    static formatImageUrl(uploadId, maxPitch) {
+        return "/api/audio-analysis-image/" + uploadId + ".png?max-pitch=" + maxPitch;
     }
 
     componentDidMount() {
@@ -112,6 +125,34 @@ class TranscribeAudio extends Component {
         this.setState({isAudioImageLoaded: true});
     }
 
+    handleInputChange(event) {
+        const target = event.target;
+
+        let value = null;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else if (target.type === "file") {
+            value = target.files[0];
+        } else {
+            value = target.value;
+        }
+
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
+    }
+
+    applyMaxPitch() {
+        const {uploadId} = this.props.match.params;
+        let newUrl = TranscribeAudio.formatImageUrl(uploadId, this.state.maxPitch);
+        let {audioEditVersion} = this.state;
+        this.setState({imageUrl: newUrl,
+                       isAudioImageLoaded: false,
+                       audioEditVersion: audioEditVersion + 1});
+    }
+
     render() {
         if (this.state.redirectId !== null) {
             let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
@@ -119,6 +160,7 @@ class TranscribeAudio extends Component {
         }
 
         const {uploadId} = this.props.match.params;
+        const {imageUrl} = this.state;
 
         let audioImageLoading;
         if (!this.state.isAudioImageLoaded) {
@@ -147,8 +189,9 @@ class TranscribeAudio extends Component {
                         <div>
                             <div className="metilda-audio-analysis-image-container">
                                 {audioImageLoading}
-                                <AudioImg uploadId={uploadId}
-                                          src={"/api/audio-analysis-image/" + uploadId + ".png?max-pitch=150"}
+                                <AudioImg key={this.state.audioEditVersion}
+                                          uploadId={uploadId}
+                                          src={imageUrl}
                                           ref="audioImage"
                                           xminPerc={320.0 / 2560.0}
                                           xmaxPerc={2306.0 / 2560.0}
@@ -168,18 +211,6 @@ class TranscribeAudio extends Component {
                             {/*</label>*/}
                             {/*</div>*/}
                             <div>
-                                <div className="metilda-control-container">
-                                    <div className="metilda-audio-analysis-image-col-1">
-
-                                    </div>
-                                    <div className="metilda-audio-analysis-image-col-2 vert-center">
-
-                                    </div>
-                                    <div className="metilda-audio-analysis-image-col-3">
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
                                 <Media>
                                     <div className="media">
                                         <div className="media-player">
@@ -187,7 +218,7 @@ class TranscribeAudio extends Component {
                                         </div>
                                         <div className="media-controls metilda-control-container">
                                             <div className="metilda-audio-analysis-image-col-1">
-                                                <PlayPause />
+                                                <PlayPause/>
                                             </div>
                                             <div className="metilda-audio-analysis-image-col-2 vert-center">
                                                 <SeekBar className="no-border"/>
@@ -197,6 +228,23 @@ class TranscribeAudio extends Component {
                                         </div>
                                     </div>
                                 </Media>
+                            </div>
+                            <div>
+                                <div className="metilda-control-container">
+                                    <div className="metilda-audio-analysis-image-col-1">
+                                        Max Frequency
+                                    </div>
+                                    <div className="metilda-audio-analysis-image-col-2">
+                                        <input name="maxPitch"
+                                               onChange={this.handleInputChange}
+                                               placeholder="Max frequency (ex: 200)"
+                                               type="text"/>
+                                    </div>
+                                    <div className="metilda-audio-analysis-image-col-3">
+                                        <a className="waves-effect waves-light btn fill-parent vert-center"
+                                           onClick={this.applyMaxPitch}>Apply</a>
+                                    </div>
+                                </div>
                             </div>
                             <div className="metilda-control-container">
                                 <div className="metilda-audio-analysis-image-col-1">
