@@ -30,7 +30,19 @@
     margin-right: 16px;
 }
 
-.metilda-transcribe-container {
+.metilda-audio-analysis-image-col-1 {
+    width: 12.5%;
+}
+
+.metilda-audio-analysis-image-col-2 {
+    width: 77.5%;
+}
+
+.metilda-audio-analysis-image-col-3 {
+    width: 10%;
+}
+
+.metilda-transcribe-container, .metilda-playback-container {
     display: flex;
     align-items: center;
 }
@@ -43,7 +55,6 @@
 }
 
 .metilda-transcribe-letter-container-label {
-    width: 12.5%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -55,7 +66,6 @@
 }
 
 .metilda-transcribe-letter-container-end {
-    width: 10%;
     background: lightgray;
 }
 
@@ -85,4 +95,12 @@
 
 .m-r-16 {
     margin-right: 16px;
+}
+
+.no-border {
+    border: none !important;
+}
+
+.vert-center {
+    display: flex;
 }

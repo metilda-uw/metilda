@@ -8,6 +8,8 @@ import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
 import {Redirect} from "react-router-dom";
 import PitchArt from "./PitchArt";
+import {Media, Player, controls } from 'react-media-player';
+const {PlayPause, MuteUnmute, SeekBar} = controls;
 
 
 class TranscribeAudio extends Component {
@@ -25,7 +27,6 @@ class TranscribeAudio extends Component {
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
 
         this.nextClicked = this.nextClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -111,25 +112,6 @@ class TranscribeAudio extends Component {
         this.setState({isAudioImageLoaded: true});
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-
-        let value = null;
-        if (target.type === "checkbox") {
-            value = target.checked;
-        } else if (target.type === "file") {
-            value = target.files[0];
-        } else {
-            value = target.value;
-        }
-
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
-    }
-
     render() {
         if (this.state.redirectId !== null) {
             let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
@@ -184,9 +166,35 @@ class TranscribeAudio extends Component {
                             {/*Letter*/}
                             {/*</label>*/}
                             {/*</div>*/}
+                            <div>
+                                <Media>
+                                    <div className="media">
+                                        <div className="media-player">
+                                            <Player src={"/api/audio/" + uploadId}/>
+                                        </div>
+                                        <div className="media-controls metilda-playback-container">
+                                            <div className="metilda-transcribe-container-col
+                                                           metilda-audio-analysis-image-col-1
+                                                           metilda-transcribe-letter-container-label">
+                                                <PlayPause />
+                                            </div>
+                                            <div className="metilda-audio-analysis-image-col-2
+                                                            metilda-transcribe-container-col
+                                                            vert-center">
+                                                <SeekBar className="no-border"/>
+                                            </div>
+                                            <div className="metilda-transcribe-container-col
+                                                            metilda-audio-analysis-image-col-3
+                                                            metilda-transcribe-letter-container-end">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </Media>
+                            </div>
                             <div className="metilda-transcribe-container">
-                                <div
-                                    className="metilda-transcribe-container-col metilda-transcribe-letter-container-label">
+                                <div className="metilda-transcribe-container-col
+                                               metilda-audio-analysis-image-col-1
+                                               metilda-transcribe-letter-container-label">
                                     <span>Letters</span>
                                 </div>
                                 <div id="metilda-transcribe-letter-container"
@@ -200,8 +208,10 @@ class TranscribeAudio extends Component {
                                         })
                                     }
                                 </div>
-                                <div
-                                    className="metilda-transcribe-container-col metilda-transcribe-letter-container-end"></div>
+                                <div className="metilda-transcribe-container-col
+                                                metilda-audio-analysis-image-col-3
+                                                metilda-transcribe-letter-container-end">
+                                </div>
                             </div>
                         </div>
                         <div className="right-align">

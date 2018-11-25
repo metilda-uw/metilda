@@ -27,6 +27,12 @@ def audio_analysis_image(upload_id):
     # return send_file(image_path)
 
 
+@app.route('/api/audio/<string:upload_id>', methods=["GET"])
+def audio(upload_id):
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    return send_file(sound_path, mimetype="audio/wav")
+
+
 @app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])
 def max_pitches(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
