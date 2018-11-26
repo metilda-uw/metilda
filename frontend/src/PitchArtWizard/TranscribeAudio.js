@@ -198,18 +198,6 @@ class TranscribeAudio extends Component {
                                           imageIntervalSelected={this.imageIntervalSelected}
                                           onAudioImageLoaded={this.onAudioImageLoaded}/>
                             </div>
-                            {/*<div className="switch metilda-audio-analysis-input">*/}
-                            {/*<span className="metilda-checkbox-label">Selection Interval</span>*/}
-                            {/*<label>*/}
-                            {/*Sound*/}
-                            {/*<input name="imageSelection"*/}
-                            {/*type="checkbox"*/}
-                            {/*onChange={this.handleInputChange}*/}
-                            {/*checked={this.state.selectionInterval === "Letter" ? "checked": ""}/>*/}
-                            {/*<span className="lever"></span>*/}
-                            {/*Letter*/}
-                            {/*</label>*/}
-                            {/*</div>*/}
                             <div>
                                 <Media>
                                     <div className="media">
