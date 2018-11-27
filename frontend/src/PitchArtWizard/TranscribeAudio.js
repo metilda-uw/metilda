@@ -21,6 +21,8 @@ class TranscribeAudio extends Component {
 
         const {uploadId} = this.props.match.params;
         const initMaxPitch = "";
+        const minImageXPerc = 320.0 / 2560.0;
+        const maxImageXPerc = 2306.0 / 2560.0;
         this.state = {
             letters: [],
             isAudioImageLoaded: false,
@@ -30,16 +32,24 @@ class TranscribeAudio extends Component {
             redirectId: null,
             maxPitch: initMaxPitch,
             imageUrl: TranscribeAudio.formatImageUrl(uploadId, initMaxPitch),
-            audioEditVersion: 0
+            audioEditVersion: 0,
+            minSelectX: minImageXPerc * 800,
+            maxSelectX: maxImageXPerc * 800,
+            minAudioX: minImageXPerc * 800,
+            maxAudioX: maxImageXPerc * 800,
+            closeImgSelectionCallback: null
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
+        this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
 
         this.nextClicked = this.nextClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
         this.removePrevious = this.removePrevious.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.applyMaxPitch = this.applyMaxPitch.bind(this);
+        this.scaleIntervals = this.scaleIntervals.bind(this);
+        this.pitchArtClicked = this.pitchArtClicked.bind(this);
     }
 
     static formatImageUrl(uploadId, maxPitch) {
@@ -63,17 +73,23 @@ class TranscribeAudio extends Component {
             });
     }
 
-    imageIntervalSelected(leftX, rightX, minTimePerc, maxTimePerc) {
+    audioIntervalSelected(leftX, rightX) {
+        this.setState({minSelectX: leftX, maxSelectX: rightX});
+    }
+
+    imageIntervalSelected(leftX, rightX) {
         let letter = prompt("Enter a letter");
 
         if (letter !== null && letter.trim().length > 0) {
-            let t0 = minTimePerc * this.state.soundLength;
-            let t1 = maxTimePerc * this.state.soundLength;
+            let t0 = (leftX - this.state.minAudioX) / this.state.maxAudioX  * this.state.soundLength;
+            let t1 = (rightX - this.state.minAudioX) / this.state.maxAudioX * this.state.soundLength;
             const controller = this;
             const {uploadId} = this.props.match.params;
             let json = {
                 "time_ranges": [[t0, t1]]
             };
+
+            console.log("[" + leftX + ", " + rightX + "]");
 
             fetch("/api/max-pitches/" + uploadId, {
                 method: "POST",
@@ -101,6 +117,13 @@ class TranscribeAudio extends Component {
                     }
                 )
         }
+
+        this.state.closeImgSelectionCallback();
+    }
+
+    pitchArtClicked() {
+        this.imageIntervalSelected(this.state.minSelectX,
+                                   this.state.maxSelectX);
     }
 
     nextClicked() {
@@ -121,8 +144,9 @@ class TranscribeAudio extends Component {
         );
     }
 
-    onAudioImageLoaded() {
-        this.setState({isAudioImageLoaded: true});
+    onAudioImageLoaded(cancelCallback) {
+        this.setState({isAudioImageLoaded: true,
+                       closeImgSelectionCallback: cancelCallback});
     }
 
     handleInputChange(event) {
@@ -148,9 +172,41 @@ class TranscribeAudio extends Component {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(uploadId, this.state.maxPitch);
         let {audioEditVersion} = this.state;
-        this.setState({imageUrl: newUrl,
-                       isAudioImageLoaded: false,
-                       audioEditVersion: audioEditVersion + 1});
+        this.setState({
+            imageUrl: newUrl,
+            isAudioImageLoaded: false,
+            audioEditVersion: audioEditVersion + 1
+        });
+    }
+
+    scaleIntervals() {
+        // Scale letter intervals to be within the range [0, 1], where
+        // 0 is the left side of the selection interval and 1 is the right
+        // side of the selection interval.
+        let state = this.state;
+        let maxSelectionX = Math.max(state.minSelectX, state.maxSelectX);
+        let minSelectionX = Math.min(state.minSelectX, state.maxSelectX);
+        let intervalsInSelection = this.state.letters.filter(function (item) {
+            let maxItemX = Math.max(item.leftX, item.rightX);
+            let minItemX = Math.min(item.leftX, item.rightX);
+
+            let tooFarLeft = maxItemX < minSelectionX;
+            let tooFarRight = minItemX > maxSelectionX;
+            return !(tooFarLeft || tooFarRight);
+        });
+
+        let selectionWidth = state.maxSelectX - state.minSelectX;
+        let scaledIntervals = intervalsInSelection.map(function (item) {
+            let itemCopy = Object.assign({}, item);
+            let u1 = (itemCopy.leftX - state.minSelectX) / selectionWidth;
+            let u2 = (state.maxSelectX - itemCopy.rightX) / selectionWidth;
+            itemCopy.u1 = u1;
+            itemCopy.u2 = u2;
+            return itemCopy;
+        });
+
+        // // TODO: Check that intervals are filtered out as expected here
+        console.log(scaledIntervals);
     }
 
     render() {
@@ -195,8 +251,14 @@ class TranscribeAudio extends Component {
                                           ref="audioImage"
                                           xminPerc={320.0 / 2560.0}
                                           xmaxPerc={2306.0 / 2560.0}
-                                          imageIntervalSelected={this.imageIntervalSelected}
+                                          audioIntervalSelected={this.audioIntervalSelected}
                                           onAudioImageLoaded={this.onAudioImageLoaded}/>
+                            </div>
+                            <div id="metilda-audio-function-btns">
+                                <button className="waves-effect waves-light btn">All</button>
+                                <button className="waves-effect waves-light btn">Sel</button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.pitchArtClicked}>Pch</button>
                             </div>
                             <div>
                                 <Media>

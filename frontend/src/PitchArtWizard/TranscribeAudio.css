@@ -103,3 +103,13 @@
     width: 100%;
     height: 100%;
 }
+
+#metilda-audio-function-btns {
+    display: flex;
+    justify-content: flex-start;
+    margin-bottom: 16px;
+}
+
+#metilda-audio-function-btns button {
+    margin-right: 32px;
+}

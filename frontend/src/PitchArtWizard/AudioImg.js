@@ -25,7 +25,7 @@ class AudioImg extends Component {
         handles: true,
         onInit: function() {
             imgObj.setOptions({minHeight: $el.height()});
-            audioImage.props.onAudioImageLoaded();
+            audioImage.props.onAudioImageLoaded(imgObj.cancelSelection);
         },
         onSelectStart: function(img, loc) {
             if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
@@ -59,15 +59,7 @@ class AudioImg extends Component {
             cropAreaRightX = undefined;
 
             if (loc.x1 < loc.x2) {
-                let imgLeftX = imgBox.xminPerc * img.width;
-                let imgRightX = imgBox.xmaxPerc * img.width;
-                let graphWidth = imgRightX - imgLeftX;
-                audioImage.props.imageIntervalSelected(
-                    loc.x1,
-                    loc.x2,
-                    (loc.x1 - imgLeftX) / graphWidth,
-                    (loc.x2 - imgLeftX) / graphWidth);
-                imgObj.cancelSelection();
+                audioImage.props.audioIntervalSelected(loc.x1, loc.x2);
             }
         }
     });
