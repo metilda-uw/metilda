@@ -15,14 +15,23 @@ const {PlayPause, MuteUnmute, SeekBar} = controls;
 class TranscribeAudio extends Component {
     state = {};
 
+    static get MIN_IMAGE_XPERC() {
+        return 320.0 / 2560.0;
+    }
+
+    static get MAX_IMAGE_XPERC() {
+        return 2306.0 / 2560.0;
+    }
+
+    static get AUDIO_IMG_WIDTH() {
+        return 800;
+    }
+
     constructor(props) {
         super(props);
 
         const {uploadId} = this.props.match.params;
         const initMaxPitch = "";
-        const minImageXPerc = 320.0 / 2560.0;
-        const maxImageXPerc = 2306.0 / 2560.0;
-        const audioImgWidth = 800;
         this.state = {
             letters: [],
             isAudioImageLoaded: false,
@@ -33,13 +42,14 @@ class TranscribeAudio extends Component {
             maxPitch: initMaxPitch,
             imageUrl: TranscribeAudio.formatImageUrl(uploadId, initMaxPitch),
             audioEditVersion: 0,
-            minSelectX: minImageXPerc * audioImgWidth,
-            maxSelectX: maxImageXPerc * audioImgWidth,
-            minAudioFrameX: minImageXPerc * audioImgWidth,
-            maxAudioFrameX: maxImageXPerc * audioImgWidth,
-            minAudioX: minImageXPerc * audioImgWidth,
-            maxAudioX: maxImageXPerc * audioImgWidth,
-            audioImgWidth: (maxImageXPerc - minImageXPerc) * audioImgWidth,
+            minSelectX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            maxSelectX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minAudioFrameX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            maxAudioFrameX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minAudioX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            maxAudioX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
+                            * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null)
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
@@ -272,8 +282,8 @@ class TranscribeAudio extends Component {
                                           uploadId={uploadId}
                                           src={imageUrl}
                                           ref="audioImage"
-                                          xminPerc={320.0 / 2560.0}
-                                          xmaxPerc={2306.0 / 2560.0}
+                                          xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
+                                          xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
                                           audioIntervalSelected={this.audioIntervalSelected}
                                           onAudioImageLoaded={this.onAudioImageLoaded}/>
                             </div>
