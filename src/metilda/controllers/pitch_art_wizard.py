@@ -20,9 +20,16 @@ def upload_audio_metadata():
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
 
+    tmin = request.args.get('tmin', -1, type=float)
+    tmax = request.args.get('tmax', -1, type=float)
     max_pitch = request.args.get('max-pitch', float('inf'), type=float)
 
-    image_binary = audio_analysis.audio_analysis_image(image_path, max_pitch=max_pitch)
+    image_binary = audio_analysis.audio_analysis_image(
+        image_path,
+        max_pitch=max_pitch,
+        tmin=tmin,
+        tmax=tmax)
+
     return send_file(image_binary, mimetype="image/png")
     # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
     # file_name = os.path.splitext(upload_id)[0]

@@ -31,7 +31,6 @@ class TranscribeAudio extends Component {
         super(props);
 
         const {uploadId} = this.props.match.params;
-        const initMaxPitch = "";
         this.state = {
             letters: [],
             isAudioImageLoaded: false,
@@ -39,8 +38,8 @@ class TranscribeAudio extends Component {
             selectionInterval: "Letter",
             updateCounter: 0,
             redirectId: null,
-            maxPitch: initMaxPitch,
-            imageUrl: TranscribeAudio.formatImageUrl(uploadId, initMaxPitch),
+            maxPitch: "",
+            imageUrl: TranscribeAudio.formatImageUrl(uploadId),
             audioEditVersion: 0,
             minSelectX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             maxSelectX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
@@ -69,8 +68,27 @@ class TranscribeAudio extends Component {
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
     }
 
-    static formatImageUrl(uploadId, maxPitch) {
-        return "/api/audio-analysis-image/" + uploadId + ".png?max-pitch=" + maxPitch;
+    static formatImageUrl(uploadId, maxPitch, tmin, tmax) {
+        let url = `/api/audio-analysis-image/${uploadId}.png`;
+        let urlOptions = [];
+
+        if (maxPitch) {
+            urlOptions.push(`max-pitch=${maxPitch}`);
+        }
+
+        if (tmin) {
+            urlOptions.push(`tmin=${tmin}`);
+        }
+
+        if (tmax) {
+            urlOptions.push(`&tmax=${tmax}`);
+        }
+
+        if (urlOptions.length > 0) {
+            url += "?" + urlOptions.join("&");
+        }
+
+        return url;
     }
 
     componentDidMount() {
@@ -186,17 +204,33 @@ class TranscribeAudio extends Component {
 
     applyMaxPitch() {
         const {uploadId} = this.props.match.params;
-        let newUrl = TranscribeAudio.formatImageUrl(uploadId, this.state.maxPitch);
-        let {audioEditVersion} = this.state;
+        let newUrl = TranscribeAudio.formatImageUrl(
+            uploadId,
+            this.state.maxPitch,
+            this.state.minAudioTime,
+            this.state.maxAudioTime);
         this.setState({
             imageUrl: newUrl,
             isAudioImageLoaded: false,
-            audioEditVersion: audioEditVersion + 1
+            audioEditVersion: this.state.audioEditVersion + 1
         });
     }
 
     showAllClicked() {
-        this.setState({minAudioTime: 0, maxAudioTime: this.state.soundLength});
+        const {uploadId} = this.props.match.params;
+        let newUrl = TranscribeAudio.formatImageUrl(
+            uploadId,
+            this.state.maxPitch,
+            0,
+            this.state.soundLength);
+
+        this.setState({
+            imageUrl: newUrl,
+            isAudioImageLoaded: false,
+            audioEditVersion: this.state.audioEditVersion + 1,
+            minAudioTime: 0,
+            maxAudioTime: this.state.soundLength
+        });
         this.state.closeImgSelectionCallback();
     }
 
@@ -230,13 +264,25 @@ class TranscribeAudio extends Component {
     }
 
     selectionIntervalClicked() {
-        // TODO: Scale these values if the user is already zoomed in
         // Compute the new time scale
         let ts = this.imageIntervalToTimeInterval(
             this.state.minSelectX,
             this.state.maxSelectX);
 
-        this.setState({minAudioTime: ts[0], maxAudioTime: ts[1]});
+        const {uploadId} = this.props.match.params;
+        let newUrl = TranscribeAudio.formatImageUrl(
+            uploadId,
+            this.state.maxPitch,
+            ts[0],
+            ts[1]);
+
+        this.setState({
+            imageUrl: newUrl,
+            isAudioImageLoaded: false,
+            audioEditVersion: this.state.audioEditVersion + 1,
+            minAudioTime: ts[0],
+            maxAudioTime: ts[1]
+        });
 
         this.state.closeImgSelectionCallback();
     }
