@@ -44,10 +44,10 @@ class TranscribeAudio extends Component {
             audioEditVersion: 0,
             minSelectX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             maxSelectX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
-            minAudioFrameX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
-            maxAudioFrameX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             minAudioX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             maxAudioX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minAudioTime: 0.0,
+            maxAudioTime: -1.0,
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
                             * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null)
@@ -65,6 +65,8 @@ class TranscribeAudio extends Component {
         this.scaleIntervals = this.scaleIntervals.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
         this.pitchArtClicked = this.pitchArtClicked.bind(this);
+        this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
+        this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
     }
 
     static formatImageUrl(uploadId, maxPitch) {
@@ -84,7 +86,8 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(function (data) {
-                controller.setState({soundLength: data["sound_length"]});
+                controller.setState({soundLength: data["sound_length"],
+                                     maxAudioTime: data["sound_length"]});
             });
     }
 
@@ -96,15 +99,13 @@ class TranscribeAudio extends Component {
         let letter = prompt("Enter a letter");
 
         if (letter !== null && letter.trim().length > 0) {
-            let t0 = (leftX - this.state.minAudioX) / this.state.maxAudioX  * this.state.soundLength;
-            let t1 = (rightX - this.state.minAudioX) / this.state.maxAudioX * this.state.soundLength;
+            let ts = this.imageIntervalToTimeInterval(leftX, rightX);
+
             const controller = this;
             const {uploadId} = this.props.match.params;
             let json = {
-                "time_ranges": [[t0, t1]]
+                "time_ranges": [ts]
             };
-
-            console.log("[" + leftX + ", " + rightX + "]");
 
             fetch("/api/max-pitches/" + uploadId, {
                 method: "POST",
@@ -120,10 +121,10 @@ class TranscribeAudio extends Component {
                             ({
                                 letters: prevState.letters.concat({
                                     letter: letter,
-                                    leftX: leftX,
-                                    rightX: rightX,
-                                    t0: t0,
-                                    t1: t1,
+                                    leftX: -1,
+                                    rightX: -1,
+                                    t0: ts[0],
+                                    t1: ts[1],
                                     pitch: data[0]
                                 }),
                                 updateCounter: prevState.updateCounter + 1
@@ -195,14 +196,48 @@ class TranscribeAudio extends Component {
     }
 
     showAllClicked() {
-        this.setState({minAudioFrameX: this.state.minAudioX,
-                       maxAudioFrameX: this.state.maxAudioX});
+        this.setState({minAudioTime: 0, maxAudioTime: this.state.soundLength});
         this.state.closeImgSelectionCallback();
     }
 
+    imageIntervalToTimeInterval(x1, x2) {
+        let dt = this.state.maxAudioTime - this.state.minAudioTime;
+        let dx = this.state.maxAudioX - this.state.minAudioX;
+        let u0 = (x1 - this.state.minAudioX) / dx;
+        let u1 = (x2 - this.state.minAudioX) / dx;
+
+        let t0 = this.state.minAudioTime + (u0 * dt);
+        let t1 = this.state.minAudioTime + (u1 * dt);
+
+        return [t0, t1];
+    }
+
+    timeCoordToImageCoord(t) {
+        // clip times that lie beyond the image boundaries
+        if (t < this.state.minAudioTime) {
+            return this.state.minAudioX;
+        } else if (t > this.state.maxAudioTime) {
+            return this.state.maxAudioX;
+        }
+
+        let dt = this.state.maxAudioTime - this.state.minAudioTime;
+        let u0 = (t - this.state.minAudioTime) / dt;
+
+        let dx = this.state.maxAudioX - this.state.minAudioX;
+        let x0 = this.state.minAudioX + (u0 * dx);
+
+        return x0
+    }
+
     selectionIntervalClicked() {
-        this.setState({minAudioFrameX: this.state.minSelectX,
-                       maxAudioFrameX: this.state.maxSelectX});
+        // TODO: Scale these values if the user is already zoomed in
+        // Compute the new time scale
+        let ts = this.imageIntervalToTimeInterval(
+            this.state.minSelectX,
+            this.state.maxSelectX);
+
+        this.setState({minAudioTime: ts[0], maxAudioTime: ts[1]});
+
         this.state.closeImgSelectionCallback();
     }
 
@@ -211,31 +246,21 @@ class TranscribeAudio extends Component {
         // 0 is the left side of the selection interval and 1 is the right
         // side of the selection interval.
         let state = this.state;
-        let maxSelectionX = Math.max(state.minAudioFrameX, state.maxAudioFrameX);
-        let minSelectionX = Math.min(state.minAudioFrameX, state.maxAudioFrameX);
         let intervalsInSelection = this.state.letters.filter(function (item) {
-            let maxItemX = Math.max(item.leftX, item.rightX);
-            let minItemX = Math.min(item.leftX, item.rightX);
-
-            let tooFarLeft = maxItemX < minSelectionX;
-            let tooFarRight = minItemX > maxSelectionX;
+            let tooFarLeft = item.t1 < state.minAudioTime;
+            let tooFarRight = item.t0 > state.maxAudioTime;
             return !(tooFarLeft || tooFarRight);
         });
 
-        let selectionWidth = state.maxAudioFrameX - state.minAudioFrameX;
-
+        let controller = this;
         return intervalsInSelection.map(function (item) {
             let itemCopy = Object.assign({}, item);
 
-            let u1 = (itemCopy.leftX - state.minAudioFrameX) / selectionWidth;
-            let u2 = (itemCopy.rightX - state.minAudioFrameX) / selectionWidth;
+            itemCopy.leftX = controller.timeCoordToImageCoord(itemCopy.t0);
+            itemCopy.rightX = controller.timeCoordToImageCoord(itemCopy.t1);
 
+            // transform letter interval into new time scale
             // clip boundaries to prevent overflow
-            u1 = Math.max(u1, 0.0);
-            u2 = Math.min(u2, 1.0);
-
-            itemCopy.leftX = u1 * state.audioImgWidth + state.minAudioX;
-            itemCopy.rightX = u2 * state.audioImgWidth + state.minAudioX;
             return itemCopy;
         });
     }
