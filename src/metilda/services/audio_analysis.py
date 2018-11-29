@@ -1,3 +1,6 @@
+import shutil
+import tempfile
+
 import parselmouth
 
 import os
@@ -98,11 +101,35 @@ def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
 
 
+def get_audio(upload_path, tmin=-1, tmax=-1):
+    snd = parselmouth.Sound(upload_path)
+    if tmin > -1 or tmax > -1:
+        tmin = max(0, tmin)
+        tmax = min(snd.xmax, tmax)
+        snd = snd.extract_part(from_time=tmin, to_time=tmax)
+        snd.scale_times_to(tmin, tmax)
+
+    temp_dir = tempfile.mkdtemp()
+    temp_file = os.path.join(temp_dir, "audio.wav")
+    snd.save(temp_file, "WAV")
+
+    audio_file = open(temp_file, "rb")
+    file_bytes = io.BytesIO(audio_file.read())
+    file_bytes.seek(0)
+    audio_file.close()
+
+    shutil.rmtree(temp_dir)
+    return file_bytes
+
+
 if __name__ == "__main__":
-    import glob
-    sdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds"
-    pdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\pictures"
-    for path in glob.iglob(os.path.join(sdir, "*.wav")):
-        file_name = os.path.basename(os.path.splitext(path)[0])
-        print("Processing %s" % file_name)
-        audio_analysis_image(path, output_path=os.path.join(pdir, file_name + ".png"))
+    get_audio(
+        r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds\PHEOP001 apaniiwa.wav",
+        r"C:\Users\Mitchell\Downloads\output.wav")
+    # import glob
+    # sdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds"
+    # pdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\pictures"
+    # for path in glob.iglob(os.path.join(sdir, "*.wav")):
+    #     file_name = os.path.basename(os.path.splitext(path)[0])
+    #     print("Processing %s" % file_name)
+    #     audio_analysis_image(path, output_path=os.path.join(pdir, file_name + ".png"))

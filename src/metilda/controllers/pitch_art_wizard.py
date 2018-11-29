@@ -30,7 +30,7 @@ def audio_analysis_image(upload_id):
         tmin=tmin,
         tmax=tmax)
 
-    return send_file(image_binary, mimetype="image/png")
+    return send_file(image_binary, mimetype="imaZge/png")
     # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
     # file_name = os.path.splitext(upload_id)[0]
     # image_path = os.path.join(app.config["PICTURES"], file_name + ".png")
@@ -40,7 +40,10 @@ def audio_analysis_image(upload_id):
 @app.route('/api/audio/<string:upload_id>', methods=["GET"])
 def audio(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-    return send_file(sound_path, mimetype="audio/wav")
+    tmin = request.args.get('tmin', -1, type=float)
+    tmax = request.args.get('tmax', -1, type=float)
+    file_bytes = audio_analysis.get_audio(sound_path, tmin=tmin, tmax=tmax)
+    return send_file(file_bytes, mimetype="audio/wav")
 
 
 @app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])

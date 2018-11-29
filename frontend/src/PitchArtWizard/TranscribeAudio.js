@@ -36,10 +36,11 @@ class TranscribeAudio extends Component {
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
-            updateCounter: 0,
+            letterEditVersion: 0,
             redirectId: null,
             maxPitch: "",
             imageUrl: TranscribeAudio.formatImageUrl(uploadId),
+            audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
             audioEditVersion: 0,
             minSelectX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             maxSelectX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
@@ -89,6 +90,14 @@ class TranscribeAudio extends Component {
         }
 
         return url;
+    }
+
+    static formatAudioUrl(uploadId, tmin, tmax) {
+        if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
+            return `/api/audio/${uploadId}?tmin=${tmin}&tmax=${tmax}`;
+        } else {
+            return `/api/audio/${uploadId}`;
+        }
     }
 
     componentDidMount() {
@@ -145,7 +154,7 @@ class TranscribeAudio extends Component {
                                     t1: ts[1],
                                     pitch: data[0]
                                 }),
-                                updateCounter: prevState.updateCounter + 1
+                                letterEditVersion: prevState.letterEditVersion + 1
                             })
                         )
                     }
@@ -168,13 +177,13 @@ class TranscribeAudio extends Component {
     removePrevious() {
         let letters = this.state.letters.slice(0, this.state.letters.length - 1);
         this.setState(prevState => (
-            {letters: letters, updateCounter: prevState.updateCounter + 1})
+            {letters: letters, letterEditVersion: prevState.letterEditVersion + 1})
         );
     }
 
     resetClicked() {
         this.setState(prevState => (
-            {letters: [], updateCounter: prevState.updateCounter + 1})
+            {letters: [], letterEditVersion: prevState.letterEditVersion + 1})
         );
     }
 
@@ -270,14 +279,20 @@ class TranscribeAudio extends Component {
             this.state.maxSelectX);
 
         const {uploadId} = this.props.match.params;
-        let newUrl = TranscribeAudio.formatImageUrl(
+        let newImageUrl = TranscribeAudio.formatImageUrl(
             uploadId,
             this.state.maxPitch,
             ts[0],
             ts[1]);
 
+        let newAudioUrl = TranscribeAudio.formatAudioUrl(
+            uploadId,
+            ts[0],
+            ts[1]);
+
         this.setState({
-            imageUrl: newUrl,
+            imageUrl: newImageUrl,
+            audioUrl: newAudioUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
             minAudioTime: ts[0],
@@ -318,7 +333,6 @@ class TranscribeAudio extends Component {
         }
 
         const {uploadId} = this.props.match.params;
-        const {imageUrl} = this.state;
 
         let audioImageLoading;
         if (!this.state.isAudioImageLoaded) {
@@ -332,7 +346,7 @@ class TranscribeAudio extends Component {
 
             pitchArt = <PitchArt width={700}
                                  height={500}
-                                 key={this.state.updateCounter}
+                                 key={this.state.letterEditVersion}
                                  pitches={sortedPitches}/>;
         }
 
@@ -351,7 +365,7 @@ class TranscribeAudio extends Component {
                                 {audioImageLoading}
                                 <AudioImg key={this.state.audioEditVersion}
                                           uploadId={uploadId}
-                                          src={imageUrl}
+                                          src={this.state.imageUrl}
                                           ref="audioImage"
                                           xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
                                           xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
@@ -367,14 +381,14 @@ class TranscribeAudio extends Component {
                                         onClick={this.pitchArtClicked}>Pch</button>
                             </div>
                             <div>
-                                <Media>
+                                <Media key={this.state.audioEditVersion}>
                                     <div className="media">
                                         <div className="media-player">
-                                            <Player src={"/api/audio/" + uploadId}/>
+                                            <Player src={this.state.audioUrl}/>
                                         </div>
                                         <div className="media-controls metilda-control-container">
                                             <div className="metilda-audio-analysis-image-col-1">
-                                                <PlayPause/>
+                                                <PlayPause />
                                             </div>
                                             <div className="metilda-audio-analysis-image-col-2 vert-center">
                                                 <SeekBar className="no-border"/>
