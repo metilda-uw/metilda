@@ -73,15 +73,15 @@ class TranscribeAudio extends Component {
         let url = `/api/audio-analysis-image/${uploadId}.png`;
         let urlOptions = [];
 
-        if (maxPitch) {
+        if (maxPitch !== undefined) {
             urlOptions.push(`max-pitch=${maxPitch}`);
         }
 
-        if (tmin) {
+        if (tmin !== undefined) {
             urlOptions.push(`tmin=${tmin}`);
         }
 
-        if (tmax) {
+        if (tmax !== undefined) {
             urlOptions.push(`&tmax=${tmax}`);
         }
 
@@ -381,7 +381,7 @@ class TranscribeAudio extends Component {
                                         onClick={this.pitchArtClicked}>Pch</button>
                             </div>
                             <div>
-                                <Media key={this.state.audioEditVersion}>
+                                <Media>
                                     <div className="media">
                                         <div className="media-player">
                                             <Player src={this.state.audioUrl}/>
