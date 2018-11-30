@@ -233,8 +233,14 @@ class TranscribeAudio extends Component {
             0,
             this.state.soundLength);
 
+        let newAudioUrl = TranscribeAudio.formatAudioUrl(
+            uploadId,
+            0,
+            this.state.soundLength);
+
         this.setState({
             imageUrl: newUrl,
+            audioUrl: newAudioUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
             minAudioTime: 0,
