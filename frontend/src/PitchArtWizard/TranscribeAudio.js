@@ -42,8 +42,8 @@ class TranscribeAudio extends Component {
             imageUrl: TranscribeAudio.formatImageUrl(uploadId),
             audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
             audioEditVersion: 0,
-            minSelectX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
-            maxSelectX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minSelectX: -1,
+            maxSelectX: -1,
             minAudioX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             maxAudioX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
             minAudioTime: 0.0,
@@ -55,6 +55,7 @@ class TranscribeAudio extends Component {
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
         this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
+        this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
 
         this.nextClicked = this.nextClicked.bind(this);
         this.resetClicked = this.resetClicked.bind(this);
@@ -118,48 +119,50 @@ class TranscribeAudio extends Component {
             });
     }
 
+    audioIntervalSelectionCanceled() {
+        this.setState({minSelectX: -1, maxSelectX: -1});
+    }
+
     audioIntervalSelected(leftX, rightX) {
         this.setState({minSelectX: leftX, maxSelectX: rightX});
     }
 
     imageIntervalSelected(leftX, rightX) {
-        let letter = prompt("Enter a letter");
+        let letter = "X";
 
-        if (letter !== null && letter.trim().length > 0) {
-            let ts = this.imageIntervalToTimeInterval(leftX, rightX);
+        let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
-            const controller = this;
-            const {uploadId} = this.props.match.params;
-            let json = {
-                "time_ranges": [ts]
-            };
+        const controller = this;
+        const {uploadId} = this.props.match.params;
+        let json = {
+            "time_ranges": [ts]
+        };
 
-            fetch("/api/max-pitches/" + uploadId, {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(json)
-            })
-                .then(response => response.json())
-                .then(function (data) {
-                        controller.setState(prevState =>
-                            ({
-                                letters: prevState.letters.concat({
-                                    letter: letter,
-                                    leftX: -1,
-                                    rightX: -1,
-                                    t0: ts[0],
-                                    t1: ts[1],
-                                    pitch: data[0]
-                                }),
-                                letterEditVersion: prevState.letterEditVersion + 1
-                            })
-                        )
-                    }
-                )
-        }
+        fetch("/api/max-pitches/" + uploadId, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(json)
+        })
+            .then(response => response.json())
+            .then(function (data) {
+                    controller.setState(prevState =>
+                        ({
+                            letters: prevState.letters.concat({
+                                letter: letter,
+                                leftX: -1,
+                                rightX: -1,
+                                t0: ts[0],
+                                t1: ts[1],
+                                pitch: data[0]
+                            }),
+                            letterEditVersion: prevState.letterEditVersion + 1
+                        })
+                    )
+                }
+            )
 
         this.state.closeImgSelectionCallback();
     }
@@ -357,6 +360,10 @@ class TranscribeAudio extends Component {
         }
 
         let letters = this.scaleIntervals();
+        const isSelectionActive = this.state.minSelectX !== -1
+                               && this.state.maxSelectX !== -1;
+        const isAllShown = this.state.minAudioTime === 0
+                        && this.state.maxAudioTime === this.state.soundLength;
 
         return (
             <div>
@@ -376,15 +383,19 @@ class TranscribeAudio extends Component {
                                           xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
                                           xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
                                           audioIntervalSelected={this.audioIntervalSelected}
+                                          audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
                                           onAudioImageLoaded={this.onAudioImageLoaded}/>
                             </div>
                             <div id="metilda-audio-function-btns">
                                 <button className="waves-effect waves-light btn"
-                                        onClick={this.showAllClicked}>All</button>
+                                        onClick={this.showAllClicked}
+                                        disabled={isAllShown}>All</button>
                                 <button className="waves-effect waves-light btn"
-                                        onClick={this.selectionIntervalClicked}>Sel</button>
+                                        onClick={this.selectionIntervalClicked}
+                                        disabled={!isSelectionActive}>Sel</button>
                                 <button className="waves-effect waves-light btn"
-                                        onClick={this.pitchArtClicked}>Pch</button>
+                                        onClick={this.pitchArtClicked}
+                                        disabled={!isSelectionActive}>Pch</button>
                             </div>
                             <div>
                                 <Media>

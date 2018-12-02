@@ -60,6 +60,8 @@ class AudioImg extends Component {
 
             if (loc.x1 < loc.x2) {
                 audioImage.props.audioIntervalSelected(loc.x1, loc.x2);
+            } else if (loc.x1 === loc.x2) {
+                audioImage.props.audioIntervalSelectionCanceled();
             }
         }
     });
