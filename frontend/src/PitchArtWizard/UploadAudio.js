@@ -75,7 +75,7 @@ class UploadAudio extends Component {
         </div>
         <form className="wizard-form" method="post">
             <div className="row">
-                <div className="input-field col s12">
+                <div className="input-field col s4">
                     <select value={this.state.audioFileName}
                             name="audioFileName"
                             onChange={this.handleInputChange}>

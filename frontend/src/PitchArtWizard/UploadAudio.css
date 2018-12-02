@@ -15,3 +15,10 @@
 .gender-selection {
     text-align: left;
 }
+
+/**
+ * Override materializecss styling.
+ */
+.dropdown-content {
+    max-height: 500px;
+}
