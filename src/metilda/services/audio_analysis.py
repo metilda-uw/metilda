@@ -80,6 +80,11 @@ def audio_analysis_image(upload_path,
     if output_path is not None:
         plt.savefig(output_path, format="png", dpi=400, figsize=(4, 3))
 
+    # Free up memory
+    plt.cla()
+    plt.clf()
+    plt.close('all')
+
     return image
 
 
