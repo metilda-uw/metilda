@@ -356,6 +356,7 @@ class TranscribeAudio extends Component {
             pitchArt = <PitchArt width={700}
                                  height={500}
                                  key={this.state.letterEditVersion}
+                                 uploadId={uploadId}
                                  pitches={sortedPitches}/>;
         }
 

@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
+import './PitchArt.css';
 import Konva from 'konva';
 import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
 
@@ -13,6 +14,7 @@ class PitchArt extends React.Component {
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
+        this.saveImage = this.saveImage.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.70;
@@ -79,6 +81,18 @@ class PitchArt extends React.Component {
                 this.lineStrokeColor = "black";
                 this.dotFillColor = "black";
         }
+    }
+
+    saveImage() {
+        // trip file extension from upload ID
+        let fileName = this.props.uploadId.split(".")[0] + ".png";
+
+        // follows example from:
+        // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
+        let dataURL = this.stageRef.getStage().toDataURL();
+        this.downloadRef.href = dataURL;
+        this.downloadRef.download = fileName;
+        this.downloadRef.click();
     }
 
     horzIndexToRectCoords(index) {
@@ -148,32 +162,39 @@ class PitchArt extends React.Component {
             pointPairs[this.maxPitchIndex][0],
             pointPairs[this.maxPitchIndex][1]);
         } catch(e) {
-            debugger;
         }
 
-
         return (
-            <Stage width={this.props.width} height={this.props.height}>
-                <Layer>
-                    <Rect width={this.props.width}
-                          height={this.props.height}
-                          fill="white" />
-                    <Line points={[this.innerBorderX0, this.innerBorderY0,
-                                   this.props.width - this.innerBorderX0, this.innerBorderY0,
-                                   this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                   this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                   this.innerBorderX0, this.innerBorderY0]}
-                          strokeWidth={this.borderWidth}
-                          stroke={this.lineStrokeColor}/>
-                    {accentedPoint}
-                </Layer>
-                <Layer>
-                    <Line points={points}
-                          strokeWidth={this.graphWidth}
-                          stroke={this.lineStrokeColor}/>
-                    {lineCircles}
-                </Layer>
-            </Stage>
+            <div>
+                <Stage ref={node => { this.stageRef = node}} width={this.props.width} height={this.props.height}>
+                    <Layer>
+                        <Rect width={this.props.width}
+                              height={this.props.height}
+                              fill="white" />
+                        <Line points={[this.innerBorderX0, this.innerBorderY0,
+                                       this.props.width - this.innerBorderX0, this.innerBorderY0,
+                                       this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
+                                       this.innerBorderX0, this.props.height - this.innerBorderY0,
+                                       this.innerBorderX0, this.innerBorderY0]}
+                              strokeWidth={this.borderWidth}
+                              stroke={this.lineStrokeColor}/>
+                        {accentedPoint}
+                    </Layer>
+                    <Layer>
+                        <Line points={points}
+                              strokeWidth={this.graphWidth}
+                              stroke={this.lineStrokeColor}/>
+                        {lineCircles}
+                    </Layer>
+                </Stage>
+                <a className="hide" ref={node => {this.downloadRef = node}}>
+                    Hidden Download Link
+                </a>
+                <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                        onClick={this.saveImage}>
+                    Save Image
+                </button>
+            </div>
         )
     }
 }
