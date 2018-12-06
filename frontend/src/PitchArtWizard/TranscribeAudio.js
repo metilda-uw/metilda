@@ -8,6 +8,7 @@ import AudioLetter from "./AudioLetter";
 import {Redirect} from "react-router-dom";
 import PitchArt from "./PitchArt";
 import {controls, Media, Player} from 'react-media-player';
+import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
@@ -351,13 +352,16 @@ class TranscribeAudio extends Component {
         let pitchArt;
         if (this.state.letters.length > 1) {
             let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
-            let sortedPitches = timesAndPitches.sort((a, b) => b[0] - a[0]).map(item => item[1]);
+            let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
+            let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
+            let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
 
-            pitchArt = <PitchArt width={700}
+            pitchArt = <PitchArtDrawingWindow width={700}
                                  height={500}
                                  key={this.state.letterEditVersion}
                                  uploadId={uploadId}
-                                 pitches={sortedPitches}/>;
+                                 pitches={sortedPitches}
+                                 times={sortedTimes}/>;
         }
 
         let letters = this.scaleIntervals();
