@@ -17,6 +17,8 @@ class PitchArtDrawingWindow extends React.Component {
         this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
         this.playSound = this.playSound.bind(this);
+        this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
+        this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -26,10 +28,14 @@ class PitchArtDrawingWindow extends React.Component {
         this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
         this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
+        // 94 quarter tones below A4
         this.minVertPitch = 30.0;
-        this.maxVertPitch = 600.0;
+
+        // 11 quarter tones above A4
+        this.maxVertPitch = 604.53;
+
         this.graphWidth = 5;
-        this.borderWidth = 10;
+        this.borderWidth = 15;
         this.circleRadius = 10;
         this.circleStrokeWidth = 10;
         this.accentedCircleRadius = 30;
@@ -54,6 +60,12 @@ class PitchArtDrawingWindow extends React.Component {
         synth.triggerAttackRelease(pitch, 0.5);
     }
 
+    imageBoundaryClicked() {
+        let yPos = this.stageRef.getStage().getPointerPosition().y;
+        let pitch = this.rectCoordsToVertValue(yPos);
+        this.playSound(pitch);
+    }
+
     horzIndexToRectCoords(index) {
         let time = this.props.times[index];
         let totalDuration = this.props.times[this.props.times.length - 1] - this.props.times[0];
@@ -67,6 +79,14 @@ class PitchArtDrawingWindow extends React.Component {
         let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
+    }
+
+    rectCoordsToVertValue(rectCoord) {
+        // scale the coordinate to be in the perceptual scale
+        let rectCoordPerc = (rectCoord - this.pointDy0) / (this.innerHeight - this.pointDy0);
+        let pitchInterval = this.maxVertPitch - this.minVertPitch;
+        let pitchHeight = pitchInterval * rectCoordPerc;
+        return pitchInterval - pitchHeight + this.minVertPitch;
     }
 
     accentedPoint(x, y) {
@@ -140,7 +160,8 @@ class PitchArtDrawingWindow extends React.Component {
                                        this.innerBorderX0, this.props.height - this.innerBorderY0,
                                        this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                              stroke={this.lineStrokeColor}/>
+                              stroke={this.lineStrokeColor}
+                              onClick={this.imageBoundaryClicked}/>
                         {accentedPoint}
                     </Layer>
                     <Layer>
