@@ -6,6 +6,7 @@ import Konva from 'konva';
 import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
 
 
+
 class PitchArtDrawingWindow extends React.Component {
     state = {};
 
@@ -49,10 +50,8 @@ class PitchArtDrawingWindow extends React.Component {
     }
 
     playSound(pitch) {
-        require(["Tone"], function(Tone){
-            let synth = new Tone.Synth().toMaster();
-            synth.triggerAttackRelease(pitch, 0.5);
-        });
+        let synth = new window.Tone.Synth().toMaster();
+        synth.triggerAttackRelease(pitch, 0.5);
     }
 
     horzIndexToRectCoords(index) {
