@@ -84,7 +84,15 @@ class PitchArt extends React.Component {
                                               maxPitchIndex={this.maxPitchIndex}/>;
 
         return (
-            pitchArt
+            <div>
+                <div className="hide">
+                    {pitchArt}
+                </div>
+                <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                        onClick={this.saveImage}>
+                    Save Image
+                </button>
+            </div>
         )
     }
 }

@@ -350,18 +350,26 @@ class TranscribeAudio extends Component {
         }
 
         let pitchArt;
-        if (true) {
-            // let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
-            // let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
-            // let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
-            // let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
+        if (this.state.letters.length > 1) {
+            let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
+            let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
+            let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
+            let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
 
-            pitchArt = <PitchArtDrawingWindow width={700}
+            pitchArt = <div>
+                <PitchArtDrawingWindow width={700}
                                  height={600}
                                  key={this.state.letterEditVersion}
                                  uploadId={uploadId}
-                                 pitches={[35, 40, 60]}
-                                 times={[0, 1, 2]}/>;
+                                 pitches={sortedPitches}
+                                 times={sortedTimes}/>
+                <PitchArt width={700}
+                                 height={600}
+                                 key={this.state.letterEditVersion + 1}
+                                 uploadId={uploadId}
+                                 pitches={sortedPitches}
+                                 times={sortedTimes}/>
+            </div>;
         }
 
         let letters = this.scaleIntervals();

@@ -17,7 +17,6 @@ class PitchArtDrawingWindow extends React.Component {
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
-        this.createAndSavePitchArt = this.createAndSavePitchArt.bind(this);
         this.playSound = this.playSound.bind(this);
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
@@ -57,10 +56,6 @@ class PitchArtDrawingWindow extends React.Component {
         this.downloadRef.href = dataURL;
         this.downloadRef.download = fileName;
         this.downloadRef.click();
-    }
-
-    createAndSavePitchArt() {
-        this.hiddenPitchArt.saveImage();
     }
 
     playSound(pitch) {
@@ -181,10 +176,6 @@ class PitchArtDrawingWindow extends React.Component {
                 <a className="hide" ref={node => {this.downloadRef = node}}>
                     Hidden Download Link
                 </a>
-                <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                        onClick={this.createAndSavePitchArt}>
-                    Save Image
-                </button>
             </div>
         )
     }
