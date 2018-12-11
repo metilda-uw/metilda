@@ -4,6 +4,7 @@ import 'materialize-css/dist/css/materialize.min.css';
 import './PitchArt.css';
 import Konva from 'konva';
 import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
+import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 
 
 class PitchArt extends React.Component {
@@ -11,24 +12,8 @@ class PitchArt extends React.Component {
 
     constructor(props) {
         super(props);
-        this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
-        this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
-        this.accentedPoint = this.accentedPoint.bind(this);
+
         this.saveImage = this.saveImage.bind(this);
-
-        this.innerWidth = this.props.width * 0.75;
-        this.innerHeight = this.props.height * 0.70;
-        this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
-        this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
-
-        this.innerBorderX0 = (this.props.width - this.props.width * 0.95) / 2.0;
-        this.innerBorderY0 = (this.props.height - this.props.height * 0.95) / 2.0;
-
-        this.graphWidth = 10;
-        this.borderWidth = 10;
-        this.circleRadius = 15;
-        this.circleStrokeWidth = 10;
-        this.accentedCircleRadius = 30;
 
         // determine color scheme
         this.maxPitchIndex = this.props.pitches.indexOf(Math.max(...this.props.pitches));
@@ -84,117 +69,22 @@ class PitchArt extends React.Component {
     }
 
     saveImage() {
-        // trip file extension from upload ID
-        let fileName = this.props.uploadId.split(".")[0] + ".png";
-
-        // follows example from:
-        // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
-        let dataURL = this.stageRef.getStage().toDataURL();
-        this.downloadRef.href = dataURL;
-        this.downloadRef.download = fileName;
-        this.downloadRef.click();
-    }
-
-    horzIndexToRectCoords(index) {
-        let pointDx = this.innerWidth / (this.props.pitches.length - 1);
-        return this.pointDx0 + (pointDx * index);
-    }
-
-    vertValueToRectCoords(value) {
-        // scale the coordinates to occupy the full height
-        let minPitch = Math.min(...this.props.pitches);
-        value = value - minPitch;
-        let rectHeight = this.innerHeight * (value / Math.max(...this.props.pitches.map(val => val - minPitch)));
-        return this.innerHeight - rectHeight + this.pointDy0;
-    }
-
-    accentedPoint(x, y) {
-        let accentedPoint =
-            <Circle x={x}
-                    y={y}
-                    fill={"#fcb040"}
-                    radius={this.accentedCircleRadius}
-            />;
-
-        let outlineCircles = [0, 1, 2].map(index =>
-            <Circle key={index}
-                    x={x}
-                    y={y}
-                    stroke={"#e38748"}
-                    radius={this.accentedCircleRadius + index * 8}
-            />
-        );
-
-        return (
-            <Group>
-                {accentedPoint}
-                {outlineCircles}
-            </Group>
-        );
+        this.pitchArtRef.saveImage();
     }
 
     render() {
-        let points = [];
-        let pointPairs = [];
-        let lineCircles = [];
-        for (let i = 0; i < this.props.pitches.length; i++) {
-            let x = this.horzIndexToRectCoords(i);
-            let y = this.vertValueToRectCoords(this.props.pitches[i]);
-
-            points.push(x);
-            points.push(y);
-            pointPairs.push([x, y]);
-
-            lineCircles.push(
-                <Circle x={x}
-                        y={y}
-                        fill={this.dotFillColor}
-                        stroke={this.lineStrokeColor}
-                        strokeWidth={this.circleStrokeWidth}
-                        radius={this.circleRadius}
-                        key={i}/>);
-        }
-
-        var accentedPoint;
-
-        try {
-            accentedPoint = this.accentedPoint(
-            pointPairs[this.maxPitchIndex][0],
-            pointPairs[this.maxPitchIndex][1]);
-        } catch(e) {
-        }
+        let pitchArt = <PitchArtDrawingWindow ref={node => { this.pitchArtRef = node}}
+                                              width={this.props.width}
+                                              height={this.props.height}
+                                              uploadId={this.props.uploadId}
+                                              pitches={this.props.pitches}
+                                              times={this.props.times}
+                                              lineStrokeColor={this.lineStrokeColor}
+                                              dotFillColor={this.dotFillColor}
+                                              maxPitchIndex={this.maxPitchIndex}/>;
 
         return (
-            <div>
-                <Stage ref={node => { this.stageRef = node}} width={this.props.width} height={this.props.height}>
-                    <Layer>
-                        <Rect width={this.props.width}
-                              height={this.props.height}
-                              fill="white" />
-                        <Line points={[this.innerBorderX0, this.innerBorderY0,
-                                       this.props.width - this.innerBorderX0, this.innerBorderY0,
-                                       this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                       this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                       this.innerBorderX0, this.innerBorderY0]}
-                              strokeWidth={this.borderWidth}
-                              stroke={this.lineStrokeColor}/>
-                        {accentedPoint}
-                    </Layer>
-                    <Layer>
-                        <Line points={points}
-                              strokeWidth={this.graphWidth}
-                              stroke={this.lineStrokeColor}/>
-                        {lineCircles}
-                    </Layer>
-                </Stage>
-                <a className="hide" ref={node => {this.downloadRef = node}}>
-                    Hidden Download Link
-                </a>
-                <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                        onClick={this.saveImage}>
-                    Save Image
-                </button>
-            </div>
+            pitchArt
         )
     }
 }

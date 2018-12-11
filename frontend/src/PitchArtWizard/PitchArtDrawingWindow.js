@@ -4,6 +4,7 @@ import 'materialize-css/dist/css/materialize.min.css';
 import './PitchArt.css';
 import Konva from 'konva';
 import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
+import PitchArt from "./PitchArt";
 
 
 
@@ -16,6 +17,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
+        this.createAndSavePitchArt = this.createAndSavePitchArt.bind(this);
         this.playSound = this.playSound.bind(this);
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
@@ -39,8 +41,10 @@ class PitchArtDrawingWindow extends React.Component {
         this.circleRadius = 10;
         this.circleStrokeWidth = 10;
         this.accentedCircleRadius = 30;
-        this.lineStrokeColor = "#497dba";
-        this.dotFillColor = "#497dba";
+
+        this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
+        this.dotFillColor = this.props.dotFillColor || "#497dba";
+        this.maxPitchIndex = this.props.maxPitchIndex || -1;
     }
 
     saveImage() {
@@ -53,6 +57,10 @@ class PitchArtDrawingWindow extends React.Component {
         this.downloadRef.href = dataURL;
         this.downloadRef.download = fileName;
         this.downloadRef.click();
+    }
+
+    createAndSavePitchArt() {
+        this.hiddenPitchArt.saveImage();
     }
 
     playSound(pitch) {
@@ -140,11 +148,10 @@ class PitchArtDrawingWindow extends React.Component {
 
         var accentedPoint;
 
-        try {
+        if (this.maxPitchIndex !== -1 && pointPairs.length >= 1) {
             accentedPoint = this.accentedPoint(
-            pointPairs[this.maxPitchIndex][0],
-            pointPairs[this.maxPitchIndex][1]);
-        } catch(e) {
+                pointPairs[this.maxPitchIndex][0],
+                pointPairs[this.maxPitchIndex][1]);
         }
 
         return (
@@ -175,7 +182,7 @@ class PitchArtDrawingWindow extends React.Component {
                     Hidden Download Link
                 </a>
                 <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                        onClick={this.saveImage}>
+                        onClick={this.createAndSavePitchArt}>
                     Save Image
                 </button>
             </div>
