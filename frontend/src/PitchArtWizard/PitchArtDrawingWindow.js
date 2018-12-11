@@ -79,9 +79,16 @@ class PitchArtDrawingWindow extends React.Component {
 
     vertValueToRectCoords(value) {
         // scale the coordinate to be in the perceptual scale
+        value = PitchArtDrawingWindow.roundToNearestQuarterNote(value);
         let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
+    }
+
+    static roundToNearestQuarterNote(pitch) {
+        let nearestQuarterTonePitchExp = Math.round(Math.log(pitch / 440.0) / Math.log(1.0293));
+        let quarterTone = 440.0 * Math.pow(1.0293, nearestQuarterTonePitchExp);
+        return quarterTone;
     }
 
     rectCoordsToVertValue(rectCoord) {
@@ -89,7 +96,8 @@ class PitchArtDrawingWindow extends React.Component {
         let rectCoordPerc = (rectCoord - this.pointDy0) / (this.innerHeight - this.pointDy0);
         let pitchInterval = this.maxVertPitch - this.minVertPitch;
         let pitchHeight = pitchInterval * rectCoordPerc;
-        return pitchInterval - pitchHeight + this.minVertPitch;
+        let pitch = pitchInterval - pitchHeight + this.minVertPitch;
+        return PitchArtDrawingWindow.roundToNearestQuarterNote(pitch);
     }
 
     accentedPoint(x, y) {
