@@ -50,7 +50,7 @@ class TranscribeAudio extends Component {
             minAudioTime: 0.0,
             maxAudioTime: -1.0,
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
-                            * TranscribeAudio.AUDIO_IMG_WIDTH,
+                * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null)
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
@@ -69,6 +69,12 @@ class TranscribeAudio extends Component {
         this.pitchArtClicked = this.pitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
+
+        // 94 quarter tones below A4
+        this.minVertPitch = 30.0;
+
+        // 11 quarter tones above A4
+        this.maxVertPitch = 604.53;
     }
 
     static formatImageUrl(uploadId, maxPitch, tmin, tmax) {
@@ -115,8 +121,10 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(function (data) {
-                controller.setState({soundLength: data["sound_length"],
-                                     maxAudioTime: data["sound_length"]});
+                controller.setState({
+                    soundLength: data["sound_length"],
+                    maxAudioTime: data["sound_length"]
+                });
             });
     }
 
@@ -149,6 +157,12 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(function (data) {
+                    let pitch = data[0];
+                    if (pitch < controller.minVertPitch || pitch > controller.maxVertPitch) {
+                        // the pitch outside the bounds of the window, omit it
+                        return
+                    }
+
                     controller.setState(prevState =>
                         ({
                             letters: prevState.letters.concat({
@@ -157,7 +171,7 @@ class TranscribeAudio extends Component {
                                 rightX: -1,
                                 t0: ts[0],
                                 t1: ts[1],
-                                pitch: data[0]
+                                pitch: pitch
                             }),
                             letterEditVersion: prevState.letterEditVersion + 1
                         })
@@ -170,7 +184,7 @@ class TranscribeAudio extends Component {
 
     pitchArtClicked() {
         this.imageIntervalSelected(this.state.minSelectX,
-                                   this.state.maxSelectX);
+            this.state.maxSelectX);
     }
 
     nextClicked() {
@@ -192,8 +206,10 @@ class TranscribeAudio extends Component {
     }
 
     onAudioImageLoaded(cancelCallback) {
-        this.setState({isAudioImageLoaded: true,
-                       closeImgSelectionCallback: cancelCallback});
+        this.setState({
+            isAudioImageLoaded: true,
+            closeImgSelectionCallback: cancelCallback
+        });
     }
 
     handleInputChange(event) {
@@ -357,26 +373,31 @@ class TranscribeAudio extends Component {
             let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
 
             pitchArt = <div>
-                <PitchArtDrawingWindow width={700}
-                                 height={600}
-                                 key={this.state.letterEditVersion}
-                                 uploadId={uploadId}
-                                 pitches={sortedPitches}
-                                 times={sortedTimes}/>
+                <PitchArtDrawingWindow
+                    width={700}
+                    height={600}
+                    key={this.state.letterEditVersion}
+                    minVertPitch={this.minVertPitch}
+                    maxVertPitch={this.maxVertPitch}
+                    uploadId={uploadId}
+                    pitches={sortedPitches}
+                    times={sortedTimes}/>
                 <PitchArt width={700}
-                                 height={600}
-                                 key={this.state.letterEditVersion + 1}
-                                 uploadId={uploadId}
-                                 pitches={sortedPitches}
-                                 times={sortedTimes}/>
+                          height={600}
+                          key={this.state.letterEditVersion + 1}
+                          minVertPitch={this.minVertPitch}
+                          maxVertPitch={this.maxVertPitch}
+                          uploadId={uploadId}
+                          pitches={sortedPitches}
+                          times={sortedTimes}/>
             </div>;
         }
 
         let letters = this.scaleIntervals();
         const isSelectionActive = this.state.minSelectX !== -1
-                               && this.state.maxSelectX !== -1;
+            && this.state.maxSelectX !== -1;
         const isAllShown = this.state.minAudioTime === 0
-                        && this.state.maxAudioTime === this.state.soundLength;
+            && this.state.maxAudioTime === this.state.soundLength;
 
         return (
             <div>
@@ -402,13 +423,16 @@ class TranscribeAudio extends Component {
                             <div id="metilda-audio-function-btns">
                                 <button className="waves-effect waves-light btn"
                                         onClick={this.showAllClicked}
-                                        disabled={isAllShown}>All</button>
+                                        disabled={isAllShown}>All
+                                </button>
                                 <button className="waves-effect waves-light btn"
                                         onClick={this.selectionIntervalClicked}
-                                        disabled={!isSelectionActive}>Sel</button>
+                                        disabled={!isSelectionActive}>Sel
+                                </button>
                                 <button className="waves-effect waves-light btn"
                                         onClick={this.pitchArtClicked}
-                                        disabled={!isSelectionActive}>Pch</button>
+                                        disabled={!isSelectionActive}>Pch
+                                </button>
                             </div>
                             <div>
                                 <Media>
@@ -418,7 +442,7 @@ class TranscribeAudio extends Component {
                                         </div>
                                         <div className="media-controls metilda-control-container">
                                             <div className="metilda-audio-analysis-image-col-1">
-                                                <PlayPause />
+                                                <PlayPause/>
                                             </div>
                                             <div className="metilda-audio-analysis-image-col-2 vert-center">
                                                 <SeekBar className="no-border"/>

@@ -30,10 +30,10 @@ class PitchArtDrawingWindow extends React.Component {
         this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
         // 94 quarter tones below A4
-        this.minVertPitch = 30.0;
+        this.minVertPitch = this.props.minVertPitch;
 
         // 11 quarter tones above A4
-        this.maxVertPitch = 604.53;
+        this.maxVertPitch = this.props.maxVertPitch;
 
         this.graphWidth = 5;
         this.borderWidth = 15;
