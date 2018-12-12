@@ -20,6 +20,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.playSound = this.playSound.bind(this);
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
+        this.setPointerEnabled = this.setPointerEnabled.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -125,6 +126,11 @@ class PitchArtDrawingWindow extends React.Component {
         );
     }
 
+    setPointerEnabled(isEnabled) {
+        this.stageRef.getStage().container().style.cursor
+            = isEnabled ? 'pointer' : 'default';
+    }
+
     render() {
         let points = [];
         let pointPairs = [];
@@ -146,6 +152,8 @@ class PitchArtDrawingWindow extends React.Component {
                         strokeWidth={this.circleStrokeWidth}
                         radius={this.circleRadius}
                         onClick={() => this.playSound(currPitch)}
+                        onMouseEnter={() => this.setPointerEnabled(true)}
+                        onMouseLeave={() => this.setPointerEnabled(false)}
                         key={i}/>);
         }
 
@@ -171,7 +179,9 @@ class PitchArtDrawingWindow extends React.Component {
                                        this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
                               stroke={this.lineStrokeColor}
-                              onClick={this.imageBoundaryClicked}/>
+                              onClick={this.imageBoundaryClicked}
+                              onMouseEnter={() => this.setPointerEnabled(true)}
+                              onMouseLeave={() => this.setPointerEnabled(false)}/>
                         {accentedPoint}
                     </Layer>
                     <Layer>
