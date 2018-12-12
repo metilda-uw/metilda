@@ -49,7 +49,8 @@ def audio(upload_id):
 @app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])
 def max_pitches(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-    pitches = audio_analysis.get_max_pitches(request.json['time_ranges'], sound_path)
+    max_pitch = request.args.get('max-pitch', float('inf'), type=float)
+    pitches = audio_analysis.get_max_pitches(request.json['time_ranges'], sound_path, max_pitch)
     return jsonify(pitches)
 
 

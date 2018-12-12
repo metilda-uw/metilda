@@ -147,7 +147,7 @@ class TranscribeAudio extends Component {
             "time_ranges": [ts]
         };
 
-        fetch("/api/max-pitches/" + uploadId, {
+        fetch("/api/max-pitches/" + uploadId + "?max-pitch=" + this.state.maxPitch, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
