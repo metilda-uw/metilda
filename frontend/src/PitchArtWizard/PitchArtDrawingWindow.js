@@ -98,6 +98,8 @@ class PitchArtDrawingWindow extends React.Component {
         let pitchInterval = this.maxVertPitch - this.minVertPitch;
         let pitchHeight = pitchInterval * rectCoordPerc;
         let pitch = pitchInterval - pitchHeight + this.minVertPitch;
+        pitch = Math.min(pitch, this.maxVertPitch);
+        pitch = Math.max(pitch, this.minVertPitch);
         return PitchArtDrawingWindow.roundToNearestQuarterNote(pitch);
     }
 
