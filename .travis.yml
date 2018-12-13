@@ -1,28 +1,28 @@
 jobs:
   include:
-    - stage: test backend
-      language: python
-      python:
-      - 2.7.15
-      install:
-      - pip install -r requirements.txt
-      script:
-      - bash runTests.sh --python
-    - stage: test frontend
-      language: node_js
-      node_js:
-      - "8.12.0"
-      install:
-      - (cd frontend && npm ci)
-      script:
-      - bash runTests.sh --nodejs
-    - stage: deploy
-      script: skip
-      deploy: &heroku
-        provider: heroku
-        api_key:
-          secure: Qn+IZdw70lTiObo8j0dNoyPB//ADe1rbMKbPMBeZgP5gBetOO+lGzrXza4bbd7CFNUuqrchbsmxN9Jx3PKwlRq8nWwggw5yV8qFVA9j6QSD7jZsCURPmKm6y9S0bIB8TPaiNbZAZWnrTK2tjXUk6gheQynUA6WI0sR+wb4bpWR41WVV19kjOs6BLELcgaZwAJA2sOTlP61kFkrBo5zizS1eM3GpHcBOGK081s3MSoWxvXBCQBv38N0yVtgH16MCCZtL9GSv/a69GJ2uYMkNdHZy6Vm9OwYoaBHqPWoj2ZKen1xHBN7vJqHY1F8Rp24X69EiCV55HWymWIbKkardUX3NgEUq9PvrGzabOVelaQIjN8IPUWBlsYZgQxpZzLbMdI3ra/9YDSA4vMWSfPjOSowydVlnhowONOhQwvFOkkkOX1J+/L2o4QWFHdbv5qwkMu9xiCtHfs64VlZm7OXD6nc6IbB9zX1QqaQi3HbueGYFSlDmW28NyxItrexyfkVFSo5hWSlu2H6pXcj+sUi8jtrHAyYITla7qism1py4IZjMqZBo73W1rEhjUhrcmSChCz8MYBZJg/nF1BftGjiGCv2F7ADPq3NkPqoZEmV6CfBTWzryHLbwsiVdbWRy68GINuiCT1PnD4vciXlj6J3wRC1s8/nYZ7UsPWRW7sgCqmTc=
-        app:
-          master: metilda-dev
-        on:
-          repo: mitchl2/metilda
+  - stage: test backend
+    language: python
+    python:
+    - 2.7.15
+    install:
+    - pip install -r requirements.txt
+    script:
+    - bash runTests.sh --python
+  - stage: test frontend
+    language: node_js
+    node_js:
+    - 8.12.0
+    install:
+    - "(cd frontend && npm ci)"
+    script:
+    - bash runTests.sh --nodejs
+  - stage: deploy
+    script: skip
+    deploy: &heroku
+      provider: heroku
+      api_key:
+        secure: RjhFKg6HLbM+WaZYUXN/e+lJQOYiECYCnxVkqxOzUhpLeOfCgBXMROQR2owzHLfVS3XYdg4pqVRscEFyQSwnpo32s81jt5lpN8PXA+iHKrQNQnvPkeui3kSRB8BpCp+oHraHHg/56/tPOrsw0yL+SnfKkvj/uaRP6ET1dVXgIFJmsF6fy3BVhM09nPg6KS8Bktx4aaTcAp6fUChGdpQ9BVLkxHr7grW6dW+pz9n5DAIXcW+P76wqRwjtA9XQr5IP+TaXF/HQwUcBcrnDm3YlvE2me25I0w/EaOp4ewgXBXGiVMN7sLB5pjbgxpCSLjMuckPkU8TOF2/AbEPDEuKKjVh3GmCvAaPkyb1rDjeJ2BCn05oKamLgIjqO9kuQdBywD/0FBDXguTjWgvJjxvzE2ryw86uFnHeYzzVe6LP9oosWAizRMZH5hXryEb479APMiwWYBbh60OCGw+zg6depMh7EgBK599bYLe38yA++8+i9gGAZSOB8A+sSyqhUtewABuShPz729rSYxrfhEctS2cn/ado1BpPja+pkMVWtgXERQSk9o0zyXn/5Ig52MvguQYMCQDahfVEumBFy0NCQSdyi3kPwI+Y0TxpMUSDAOptu0BIa7gE2/UzDEr5YESow91du6NPXyTe74P/oVoWKAMCzo4J7bWRZicV+zRiGYS4=
+      app:
+        master: metilda-dev
+      on:
+        repo: mitchl2/metilda
