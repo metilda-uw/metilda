@@ -15,9 +15,6 @@ class Header extends Component {
         <nav>
             <div id="metilda-navbar" className="row">
                 <a href="/" className="app-logo metilda-navbar-item">MeTILDA</a>
-                <ul className="metilda-navbar-item">
-                    <li><Link to="/pitchartwizard/1">Pitch Art Wizard</Link></li>
-                </ul>
             </div>
         </nav>
     );
