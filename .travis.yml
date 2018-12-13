@@ -5,7 +5,7 @@ jobs:
       python:
       - 2.7.15
       install:
-      - pip install -r requirements.txt
+      - (pip install -U pip && pip install -r requirements.txt)
       script:
       - bash runTests.sh --python
     - stage: test frontend
