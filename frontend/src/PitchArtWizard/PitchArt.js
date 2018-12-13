@@ -79,6 +79,8 @@ class PitchArt extends React.Component {
                                               uploadId={this.props.uploadId}
                                               pitches={this.props.pitches}
                                               times={this.props.times}
+                                              minVertPitch={this.props.minVertPitch}
+                                              maxVertPitch={this.props.maxVertPitch}
                                               lineStrokeColor={this.lineStrokeColor}
                                               dotFillColor={this.dotFillColor}
                                               maxPitchIndex={this.maxPitchIndex}/>;
