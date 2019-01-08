@@ -9,6 +9,8 @@ import {Redirect} from "react-router-dom";
 import PitchArt from "./PitchArt";
 import {controls, Media, Player} from 'react-media-player';
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
+import {connect} from "react-redux";
+import {audioSelectionAction} from "../actions/audioAnalysisActions";
 
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
@@ -520,4 +522,8 @@ class TranscribeAudio extends Component {
     }
 }
 
-export default TranscribeAudio;
+const mapStateToProps = (state) => ({
+    ...state
+});
+
+export default connect(mapStateToProps, null)(TranscribeAudio);

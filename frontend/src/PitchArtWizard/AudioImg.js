@@ -3,6 +3,8 @@ import React, {Component} from 'react';
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
 import '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
+import {audioSelectionAction} from "../actions/audioAnalysisActions";
+import {connect} from "react-redux";
 
 class AudioImg extends Component {
   state = {};
@@ -60,6 +62,7 @@ class AudioImg extends Component {
 
             if (loc.x1 < loc.x2) {
                 audioImage.props.audioIntervalSelected(loc.x1, loc.x2);
+                audioImage.props.audioSelectionAction(loc.x1, loc.x2);
             } else if (loc.x1 === loc.x2) {
                 audioImage.props.audioIntervalSelectionCanceled();
             }
@@ -69,7 +72,6 @@ class AudioImg extends Component {
 
   render() {
     const {src} = this.props;
-
     return (
       <img id="metilda-audio-analysis-image"
            className="metilda-audio-analysis-image"
@@ -78,4 +80,12 @@ class AudioImg extends Component {
   }
 }
 
-export default AudioImg;
+const mapStateToProps = state => ({
+    ...state
+});
+
+const mapDispatchToProps = dispatch => ({
+    audioSelectionAction: (leftX, rightX) => dispatch(audioSelectionAction(leftX, rightX))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(AudioImg);
