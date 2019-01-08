@@ -7,12 +7,10 @@ import AudioImgLoading from "./AudioImgLoading";
 import AudioLetter from "./AudioLetter";
 import {Redirect} from "react-router-dom";
 import PitchArt from "./PitchArt";
-import {controls, Media, Player} from 'react-media-player';
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 import {connect} from "react-redux";
 import {audioSelectionAction} from "../actions/audioAnalysisActions";
-
-const {PlayPause, MuteUnmute, SeekBar} = controls;
+import PlayerBar from "./AudioViewer/PlayerBar";
 
 
 class TranscribeAudio extends Component {
@@ -436,25 +434,7 @@ class TranscribeAudio extends Component {
                                         disabled={!isSelectionActive}>Pch
                                 </button>
                             </div>
-                            <div>
-                                <Media>
-                                    <div className="media">
-                                        <div className="media-player">
-                                            <Player src={this.state.audioUrl}/>
-                                        </div>
-                                        <div className="media-controls metilda-control-container">
-                                            <div className="metilda-audio-analysis-image-col-1">
-                                                <PlayPause/>
-                                            </div>
-                                            <div className="metilda-audio-analysis-image-col-2 vert-center">
-                                                <SeekBar className="no-border"/>
-                                            </div>
-                                            <div className="metilda-audio-analysis-image-col-3">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Media>
-                            </div>
+                            <PlayerBar audioUrl={this.state.audioUrl} />
                             <div>
                                 <div className="metilda-control-container">
                                     <div className="metilda-audio-analysis-image-col-1">
