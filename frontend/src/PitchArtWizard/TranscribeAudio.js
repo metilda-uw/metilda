@@ -11,6 +11,7 @@ import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 import {connect} from "react-redux";
 import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import PlayerBar from "./AudioViewer/PlayerBar";
+import MaxFrequencyBar from "./AudioViewer/MaxFrequencyBar";
 
 
 class TranscribeAudio extends Component {
@@ -435,23 +436,8 @@ class TranscribeAudio extends Component {
                                 </button>
                             </div>
                             <PlayerBar audioUrl={this.state.audioUrl} />
-                            <div>
-                                <div className="metilda-control-container">
-                                    <div className="metilda-audio-analysis-image-col-1">
-                                        Max Frequency
-                                    </div>
-                                    <div className="metilda-audio-analysis-image-col-2">
-                                        <input name="maxPitch"
-                                               onChange={this.handleInputChange}
-                                               placeholder="Max frequency (ex: 200)"
-                                               type="text"/>
-                                    </div>
-                                    <div className="metilda-audio-analysis-image-col-3">
-                                        <a className="waves-effect waves-light btn fill-parent vert-center"
-                                           onClick={this.applyMaxPitch}>Apply</a>
-                                    </div>
-                                </div>
-                            </div>
+                            <MaxFrequencyBar handleInputChange={this.handleInputChange}
+                                             applyMaxPitch={this.applyMaxPitch}/>
                             <div className="metilda-control-container">
                                 <div className="metilda-audio-analysis-image-col-1">
                                     <span>Letters</span>
