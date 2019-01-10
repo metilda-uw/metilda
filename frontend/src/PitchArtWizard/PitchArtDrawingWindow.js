@@ -80,16 +80,23 @@ class PitchArtDrawingWindow extends React.Component {
 
     vertValueToRectCoords(value) {
         // scale the coordinate to be in the perceptual scale
-        value = PitchArtDrawingWindow.roundToNearestQuarterNote(value);
+        value = PitchArtDrawingWindow.roundToNearestNote(value);
         let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
     }
 
-    static roundToNearestQuarterNote(pitch) {
-        let nearestQuarterTonePitchExp = Math.round(Math.log(pitch / 440.0) / Math.log(1.0293));
-        let quarterTone = 440.0 * Math.pow(1.0293, nearestQuarterTonePitchExp);
-        return quarterTone;
+    static roundToNearestNote(pitch) {
+        // Scale divisions determines how the scale is divided. Examples:
+        // - 2 makes all notes round to the nearest whole tone
+        // - 4 makes all notes round to the nearest quarter tone
+        // - 8 makes all notes round to the nearest eighth tone
+        let referenceNote = 440.0;
+        let scaleDivisions = 8.0;
+        let scaleBase = Math.pow(2, 1 / (12.0 * scaleDivisions / 2.0));
+        let nearestTonePitchExp = Math.round(Math.log(pitch / referenceNote) / Math.log(scaleBase));
+        let roundedTone = referenceNote * Math.pow(scaleBase, nearestTonePitchExp);
+        return roundedTone;
     }
 
     rectCoordsToVertValue(rectCoord) {
@@ -100,7 +107,7 @@ class PitchArtDrawingWindow extends React.Component {
         let pitch = pitchInterval - pitchHeight + this.minVertPitch;
         pitch = Math.min(pitch, this.maxVertPitch);
         pitch = Math.max(pitch, this.minVertPitch);
-        return PitchArtDrawingWindow.roundToNearestQuarterNote(pitch);
+        return PitchArtDrawingWindow.roundToNearestNote(pitch);
     }
 
     accentedPoint(x, y) {
