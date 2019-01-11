@@ -440,7 +440,7 @@ class TranscribeAudio extends Component {
                                              applyMaxPitch={this.applyMaxPitch}/>
                             <div className="metilda-control-container">
                                 <div className="metilda-audio-analysis-image-col-1">
-                                    <span>Letters</span>
+                                    <span>Target Pitch</span>
                                 </div>
                                 <div className="metilda-audio-analysis-image-col-2">
                                     {
