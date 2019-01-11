@@ -67,7 +67,8 @@ class TranscribeAudio extends Component {
         this.applyMaxPitch = this.applyMaxPitch.bind(this);
         this.showAllClicked = this.showAllClicked.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
-        this.pitchArtClicked = this.pitchArtClicked.bind(this);
+        this.praatPitchArtClicked = this.praatPitchArtClicked.bind(this);
+        this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
 
         // 94 quarter tones below A4
@@ -136,7 +137,7 @@ class TranscribeAudio extends Component {
         this.setState({minSelectX: leftX, maxSelectX: rightX});
     }
 
-    imageIntervalSelected(leftX, rightX) {
+    imageIntervalSelected(leftX, rightX, manualPitch) {
         let letter = "X";
 
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
@@ -146,6 +147,34 @@ class TranscribeAudio extends Component {
         let json = {
             "time_ranges": [ts]
         };
+
+        function addLetter(pitch) {
+            if (pitch < controller.minVertPitch || pitch > controller.maxVertPitch) {
+                // the pitch outside the bounds of the window, omit it
+                return
+            }
+
+            controller.setState(prevState =>
+                ({
+                    letters: prevState.letters.concat({
+                        letter: letter,
+                        leftX: -1,
+                        rightX: -1,
+                        t0: ts[0],
+                        t1: ts[1],
+                        pitch: pitch
+                    }),
+                    letterEditVersion: prevState.letterEditVersion + 1
+                })
+            )
+
+            controller.state.closeImgSelectionCallback();
+        }
+
+        if (manualPitch !== undefined) {
+            addLetter(manualPitch);
+            return;
+        }
 
         fetch("/api/max-pitches/" + uploadId + "?max-pitch=" + this.state.maxPitch, {
             method: "POST",
@@ -157,34 +186,52 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(function (data) {
-                    let pitch = data[0];
-                    if (pitch < controller.minVertPitch || pitch > controller.maxVertPitch) {
-                        // the pitch outside the bounds of the window, omit it
-                        return
-                    }
-
-                    controller.setState(prevState =>
-                        ({
-                            letters: prevState.letters.concat({
-                                letter: letter,
-                                leftX: -1,
-                                rightX: -1,
-                                t0: ts[0],
-                                t1: ts[1],
-                                pitch: pitch
-                            }),
-                            letterEditVersion: prevState.letterEditVersion + 1
-                        })
-                    )
+                    addLetter(data[0])
                 }
             )
-
-        this.state.closeImgSelectionCallback();
     }
 
-    pitchArtClicked() {
-        this.imageIntervalSelected(this.state.minSelectX,
+    praatPitchArtClicked() {
+        this.imageIntervalSelected(
+            this.state.minSelectX,
             this.state.maxSelectX);
+    }
+
+    manualPitchArtClicked() {
+        let manualPitch;
+        let isValidNumber = false;
+
+        while (!isValidNumber) {
+            let msg = `Enter pitch value between ${this.minVertPitch.toFixed(2)}Hz and ${this.maxVertPitch.toFixed(2)}Hz`;
+
+            manualPitch = prompt(msg);
+
+            if (manualPitch === null) {
+                // user cancelled manual input
+                this.state.closeImgSelectionCallback();
+                return;
+            }
+
+            manualPitch = parseFloat(manualPitch);
+
+            isValidNumber = !isNaN(manualPitch);
+
+            if (!isValidNumber) {
+                alert(`Invalid frequency, expected a number`);
+                continue;
+            }
+
+            debugger;
+            isValidNumber = !(manualPitch < this.minVertPitch || manualPitch > this.maxVertPitch);
+            if (!isValidNumber) {
+                alert(`${manualPitch}Hz is not between between ${this.minVertPitch.toFixed(2)}Hz and ${this.maxVertPitch.toFixed(2)}Hz`);
+            }
+        }
+
+        this.imageIntervalSelected(
+            this.state.minSelectX,
+            this.state.maxSelectX,
+            manualPitch);
     }
 
     nextClicked() {
@@ -194,8 +241,10 @@ class TranscribeAudio extends Component {
 
     removeLetter(index) {
         this.setState(prevState => (
-            {letters: prevState.letters.filter((_, i) => i !== index),
-             letterEditVersion: prevState.letterEditVersion + 1})
+            {
+                letters: prevState.letters.filter((_, i) => i !== index),
+                letterEditVersion: prevState.letterEditVersion + 1
+            })
         );
     }
 
@@ -388,11 +437,15 @@ class TranscribeAudio extends Component {
                                         disabled={!isSelectionActive}>Sel
                                 </button>
                                 <button className="waves-effect waves-light btn"
-                                        onClick={this.pitchArtClicked}
-                                        disabled={!isSelectionActive}>Pch
+                                        onClick={this.praatPitchArtClicked}
+                                        disabled={!isSelectionActive}>Praat Pch
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.manualPitchArtClicked}
+                                        disabled={!isSelectionActive}>Manual Pch
                                 </button>
                             </div>
-                            <PlayerBar audioUrl={this.state.audioUrl} />
+                            <PlayerBar audioUrl={this.state.audioUrl}/>
                             <MaxFrequencyBar handleInputChange={this.handleInputChange}
                                              applyMaxPitch={this.applyMaxPitch}/>
                             <TargetPitchBar letters={this.state.letters}
