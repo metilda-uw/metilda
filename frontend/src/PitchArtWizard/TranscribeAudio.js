@@ -12,6 +12,7 @@ import {connect} from "react-redux";
 import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import PlayerBar from "./AudioViewer/PlayerBar";
 import MaxFrequencyBar from "./AudioViewer/MaxFrequencyBar";
+import TargetPitchBar from "./TargetPitchBar";
 
 
 class TranscribeAudio extends Component {
@@ -438,45 +439,8 @@ class TranscribeAudio extends Component {
                             <PlayerBar audioUrl={this.state.audioUrl} />
                             <MaxFrequencyBar handleInputChange={this.handleInputChange}
                                              applyMaxPitch={this.applyMaxPitch}/>
-                            <div className="metilda-control-container">
-                                <div className="metilda-audio-analysis-image-col-1">
-                                    <span>Target Pitch</span>
-                                </div>
-                                <div className="metilda-audio-analysis-image-col-2">
-                                    {
-                                        letters.map(function (item, index) {
-                                            return <AudioLetter key={index}
-                                                                letter={item.letter}
-                                                                leftX={item.leftX}
-                                                                rightX={item.rightX}/>
-                                        })
-                                    }
-                                </div>
-                                <div className="metilda-audio-analysis-image-col-3">
-                                </div>
-                            </div>
-                        </div>
-                        <div className="right-align">
-                            <button className="btn waves-effect waves-light m-r-16"
-                                    type="submit"
-                                    name="action"
-                                    disabled={this.state.letters.length === 0}
-                                    onClick={this.removePrevious}>
-                                Remove Previous
-                            </button>
-                            <button className="btn waves-effect waves-light"
-                                    type="submit"
-                                    name="action"
-                                    disabled={this.state.letters.length === 0}
-                                    onClick={this.resetClicked}>
-                                Reset
-                            </button>
-                            {/*<button className="btn waves-effect waves-light"*/}
-                            {/*type="submit"*/}
-                            {/*name="action"*/}
-                            {/*onClick={this.nextClicked}>*/}
-                            {/*Next*/}
-                            {/*</button>*/}
+                            <TargetPitchBar letters={letters}
+                                            totalLetterCount={this.state.letters.length} />
                         </div>
                     </div>
                     <div className="metilda-audio-analysis-pitch-art">
