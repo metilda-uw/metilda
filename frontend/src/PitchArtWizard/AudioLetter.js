@@ -14,7 +14,8 @@ class AudioLetter extends Component {
     const {letter, leftX, rightX} = this.props;
 
     return (
-      <div className="metilda-transcribe-letter"
+      <div className={"metilda-transcribe-letter" + (this.props.isSelected ? ' selected': '')}
+           onClick={this.props.onClick}
            style={{left: leftX + 16, width: rightX - leftX}}>
           <p>{letter}</p>
       </div>

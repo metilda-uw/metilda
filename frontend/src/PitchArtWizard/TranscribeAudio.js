@@ -61,16 +61,14 @@ class TranscribeAudio extends Component {
         this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
 
         this.nextClicked = this.nextClicked.bind(this);
-        this.resetClicked = this.resetClicked.bind(this);
-        this.removePrevious = this.removePrevious.bind(this);
+        this.resetAllLetters = this.resetAllLetters.bind(this);
+        this.removeLetter = this.removeLetter.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.applyMaxPitch = this.applyMaxPitch.bind(this);
         this.showAllClicked = this.showAllClicked.bind(this);
-        this.scaleIntervals = this.scaleIntervals.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
         this.pitchArtClicked = this.pitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
-        this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
 
         // 94 quarter tones below A4
         this.minVertPitch = 30.0;
@@ -194,14 +192,14 @@ class TranscribeAudio extends Component {
         this.setState({redirectId: uploadId});
     }
 
-    removePrevious() {
-        let letters = this.state.letters.slice(0, this.state.letters.length - 1);
+    removeLetter(index) {
         this.setState(prevState => (
-            {letters: letters, letterEditVersion: prevState.letterEditVersion + 1})
+            {letters: prevState.letters.filter((_, i) => i !== index),
+             letterEditVersion: prevState.letterEditVersion + 1})
         );
     }
 
-    resetClicked() {
+    resetAllLetters() {
         this.setState(prevState => (
             {letters: [], letterEditVersion: prevState.letterEditVersion + 1})
         );
@@ -283,23 +281,6 @@ class TranscribeAudio extends Component {
         return [t0, t1];
     }
 
-    timeCoordToImageCoord(t) {
-        // clip times that lie beyond the image boundaries
-        if (t < this.state.minAudioTime) {
-            return this.state.minAudioX;
-        } else if (t > this.state.maxAudioTime) {
-            return this.state.maxAudioX;
-        }
-
-        let dt = this.state.maxAudioTime - this.state.minAudioTime;
-        let u0 = (t - this.state.minAudioTime) / dt;
-
-        let dx = this.state.maxAudioX - this.state.minAudioX;
-        let x0 = this.state.minAudioX + (u0 * dx);
-
-        return x0
-    }
-
     selectionIntervalClicked() {
         // Compute the new time scale
         let ts = this.imageIntervalToTimeInterval(
@@ -328,30 +309,6 @@ class TranscribeAudio extends Component {
         });
 
         this.state.closeImgSelectionCallback();
-    }
-
-    scaleIntervals() {
-        // Scale letter intervals to be within the range [0, 1], where
-        // 0 is the left side of the selection interval and 1 is the right
-        // side of the selection interval.
-        let state = this.state;
-        let intervalsInSelection = this.state.letters.filter(function (item) {
-            let tooFarLeft = item.t1 < state.minAudioTime;
-            let tooFarRight = item.t0 > state.maxAudioTime;
-            return !(tooFarLeft || tooFarRight);
-        });
-
-        let controller = this;
-        return intervalsInSelection.map(function (item) {
-            let itemCopy = Object.assign({}, item);
-
-            itemCopy.leftX = controller.timeCoordToImageCoord(itemCopy.t0);
-            itemCopy.rightX = controller.timeCoordToImageCoord(itemCopy.t1);
-
-            // transform letter interval into new time scale
-            // clip boundaries to prevent overflow
-            return itemCopy;
-        });
     }
 
     render() {
@@ -395,7 +352,6 @@ class TranscribeAudio extends Component {
             </div>;
         }
 
-        let letters = this.scaleIntervals();
         const isSelectionActive = this.state.minSelectX !== -1
             && this.state.maxSelectX !== -1;
         const isAllShown = this.state.minAudioTime === 0
@@ -439,8 +395,15 @@ class TranscribeAudio extends Component {
                             <PlayerBar audioUrl={this.state.audioUrl} />
                             <MaxFrequencyBar handleInputChange={this.handleInputChange}
                                              applyMaxPitch={this.applyMaxPitch}/>
-                            <TargetPitchBar letters={letters}
-                                            totalLetterCount={this.state.letters.length} />
+                            <TargetPitchBar letters={this.state.letters}
+                                            key={this.state.letterEditVersion}
+                                            letterEdit
+                                            removeLetter={this.removeLetter}
+                                            resetAllLetters={this.resetAllLetters}
+                                            minAudioX={this.state.minAudioX}
+                                            maxAudioX={this.state.maxAudioX}
+                                            minAudioTime={this.state.minAudioTime}
+                                            maxAudioTime={this.state.maxAudioTime}/>
                         </div>
                     </div>
                     <div className="metilda-audio-analysis-pitch-art">

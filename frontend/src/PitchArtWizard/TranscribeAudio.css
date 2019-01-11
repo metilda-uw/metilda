@@ -65,6 +65,11 @@
     position: absolute;
     background: lightblue;
     outline: 1px solid black;
+    cursor: pointer;
+}
+
+.metilda-transcribe-letter.selected {
+    background: lightyellow !important;
 }
 
 .metilda-audio-analysis-image-loading {
