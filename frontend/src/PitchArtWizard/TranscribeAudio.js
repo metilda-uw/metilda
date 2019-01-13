@@ -158,8 +158,7 @@ class TranscribeAudio extends Component {
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: -1,
-            maxSelectX: -1,
-            audioEditVersion: this.state.audioEditVersion + 1});
+            maxSelectX: -1});
     }
 
     audioIntervalSelected(leftX, rightX) {
@@ -167,8 +166,7 @@ class TranscribeAudio extends Component {
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: leftX,
-            maxSelectX: rightX,
-            audioEditVersion: this.state.audioEditVersion + 1});
+            maxSelectX: rightX});
     }
 
     imageIntervalSelected(leftX, rightX, manualPitch) {
@@ -474,7 +472,8 @@ class TranscribeAudio extends Component {
                                         disabled={!isSelectionActive}>Manual Pch
                                 </button>
                             </div>
-                            <PlayerBar audioUrl={this.state.audioUrl}/>
+                            <PlayerBar key={this.state.audioUrl}
+                                       audioUrl={this.state.audioUrl}/>
                             <MaxFrequencyBar handleInputChange={this.handleInputChange}
                                              applyMaxPitch={this.applyMaxPitch}/>
                             <TargetPitchBar letters={this.state.letters}
