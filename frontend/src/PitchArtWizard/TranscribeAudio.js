@@ -70,6 +70,7 @@ class TranscribeAudio extends Component {
         this.praatPitchArtClicked = this.praatPitchArtClicked.bind(this);
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
+        this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
 
         // 94 quarter tones below A4
         this.minVertPitch = 30.0;
@@ -129,12 +130,45 @@ class TranscribeAudio extends Component {
             });
     }
 
+    getAudioConfigForSelection(leftX, rightX) {
+        // Compute the new time scale
+        let ts;
+        if (leftX !== undefined && rightX !== undefined) {
+            ts = this.imageIntervalToTimeInterval(leftX, rightX);
+        } else {
+            ts = [this.state.minAudioTime, this.state.maxAudioTime];
+        }
+
+        const {uploadId} = this.props.match.params;
+
+        let newAudioUrl = TranscribeAudio.formatAudioUrl(
+            uploadId,
+            ts[0],
+            ts[1]);
+
+        return {
+            audioUrl: newAudioUrl,
+            minAudioTime: ts[0],
+            maxAudioTime: ts[1]
+        };
+    }
+
     audioIntervalSelectionCanceled() {
-        this.setState({minSelectX: -1, maxSelectX: -1});
+        let config = this.getAudioConfigForSelection();
+        this.setState({
+            audioUrl: config.audioUrl,
+            minSelectX: -1,
+            maxSelectX: -1,
+            audioEditVersion: this.state.audioEditVersion + 1});
     }
 
     audioIntervalSelected(leftX, rightX) {
-        this.setState({minSelectX: leftX, maxSelectX: rightX});
+        let config = this.getAudioConfigForSelection(leftX, rightX);
+        this.setState({
+            audioUrl: config.audioUrl,
+            minSelectX: leftX,
+            maxSelectX: rightX,
+            audioEditVersion: this.state.audioEditVersion + 1});
     }
 
     imageIntervalSelected(leftX, rightX, manualPitch) {
@@ -332,7 +366,7 @@ class TranscribeAudio extends Component {
 
     selectionIntervalClicked() {
         // Compute the new time scale
-        let ts = this.imageIntervalToTimeInterval(
+        let config = this.getAudioConfigForSelection(
             this.state.minSelectX,
             this.state.maxSelectX);
 
@@ -340,21 +374,16 @@ class TranscribeAudio extends Component {
         let newImageUrl = TranscribeAudio.formatImageUrl(
             uploadId,
             this.state.maxPitch,
-            ts[0],
-            ts[1]);
-
-        let newAudioUrl = TranscribeAudio.formatAudioUrl(
-            uploadId,
-            ts[0],
-            ts[1]);
+            config.minAudioTime,
+            config.maxAudioTime);
 
         this.setState({
             imageUrl: newImageUrl,
-            audioUrl: newAudioUrl,
+            audioUrl: config.audioUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minAudioTime: ts[0],
-            maxAudioTime: ts[1]
+            minAudioTime: config.minAudioTime,
+            maxAudioTime: config.maxAudioTime
         });
 
         this.state.closeImgSelectionCallback();
