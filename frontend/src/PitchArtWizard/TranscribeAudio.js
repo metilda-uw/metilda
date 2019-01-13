@@ -339,6 +339,8 @@ class TranscribeAudio extends Component {
             0,
             this.state.soundLength);
 
+        this.state.closeImgSelectionCallback();
+
         this.setState({
             imageUrl: newUrl,
             audioUrl: newAudioUrl,
@@ -347,7 +349,6 @@ class TranscribeAudio extends Component {
             minAudioTime: 0,
             maxAudioTime: this.state.soundLength
         });
-        this.state.closeImgSelectionCallback();
     }
 
     imageIntervalToTimeInterval(x1, x2) {
@@ -375,6 +376,8 @@ class TranscribeAudio extends Component {
             config.minAudioTime,
             config.maxAudioTime);
 
+        this.state.closeImgSelectionCallback();
+
         this.setState({
             imageUrl: newImageUrl,
             audioUrl: config.audioUrl,
@@ -383,8 +386,6 @@ class TranscribeAudio extends Component {
             minAudioTime: config.minAudioTime,
             maxAudioTime: config.maxAudioTime
         });
-
-        this.state.closeImgSelectionCallback();
     }
 
     render() {
