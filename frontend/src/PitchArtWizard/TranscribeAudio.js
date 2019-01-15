@@ -30,6 +30,16 @@ class TranscribeAudio extends Component {
         return 800;
     }
 
+    static get DEFAULT_MIN_VERT_PITCH() {
+        // 94 quarter tones below A4
+        return 30.0;
+    }
+
+    static get DEFAULT_MAX_VERT_PITCH() {
+        // 11 quarter tones above A4
+        return 604.53;
+    }
+
     constructor(props) {
         super(props);
 
@@ -53,6 +63,8 @@ class TranscribeAudio extends Component {
             maxAudioTime: -1.0,
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minVertPitch: TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
+            maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
             closeImgSelectionCallback: () => (null)
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
@@ -71,12 +83,6 @@ class TranscribeAudio extends Component {
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
-
-        // 94 quarter tones below A4
-        this.minVertPitch = 30.0;
-
-        // 11 quarter tones above A4
-        this.maxVertPitch = 604.53;
     }
 
     static formatImageUrl(uploadId, maxPitch, tmin, tmax) {
@@ -181,7 +187,7 @@ class TranscribeAudio extends Component {
         };
 
         function addLetter(pitch) {
-            if (pitch < controller.minVertPitch || pitch > controller.maxVertPitch) {
+            if (pitch < controller.minVertPitch || pitch > controller.state.maxVertPitch) {
                 // the pitch outside the bounds of the window, omit it
                 return
             }
@@ -234,7 +240,7 @@ class TranscribeAudio extends Component {
         let isValidNumber = false;
 
         while (!isValidNumber) {
-            let msg = `Enter pitch value between ${this.minVertPitch.toFixed(2)}Hz and ${this.maxVertPitch.toFixed(2)}Hz`;
+            let msg = `Enter pitch value between ${this.state.minVertPitch.toFixed(2)}Hz and ${this.state.maxVertPitch.toFixed(2)}Hz`;
 
             manualPitch = prompt(msg);
 
@@ -254,9 +260,9 @@ class TranscribeAudio extends Component {
             }
 
             debugger;
-            isValidNumber = !(manualPitch < this.minVertPitch || manualPitch > this.maxVertPitch);
+            isValidNumber = !(manualPitch < this.state.minVertPitch || manualPitch > this.state.maxVertPitch);
             if (!isValidNumber) {
-                alert(`${manualPitch}Hz is not between between ${this.minVertPitch.toFixed(2)}Hz and ${this.maxVertPitch.toFixed(2)}Hz`);
+                alert(`${manualPitch}Hz is not between between ${this.state.minVertPitch.toFixed(2)}Hz and ${this.state.maxVertPitch.toFixed(2)}Hz`);
             }
         }
 
@@ -322,7 +328,9 @@ class TranscribeAudio extends Component {
         this.setState({
             imageUrl: newUrl,
             isAudioImageLoaded: false,
-            audioEditVersion: this.state.audioEditVersion + 1
+            letterEditVersion: this.state.letterEditVersion + 1,
+            audioEditVersion: this.state.audioEditVersion + 1,
+            maxVertPitch: this.state.maxPitch !== "" ? this.state.maxPitch : TranscribeAudio.DEFAULT_MAX_VERT_PITCH
         });
     }
 
@@ -413,16 +421,16 @@ class TranscribeAudio extends Component {
                     width={700}
                     height={600}
                     key={this.state.letterEditVersion}
-                    minVertPitch={this.minVertPitch}
-                    maxVertPitch={this.maxVertPitch}
+                    minVertPitch={this.state.minVertPitch}
+                    maxVertPitch={this.state.maxVertPitch}
                     uploadId={uploadId}
                     pitches={sortedPitches}
                     times={sortedTimes}/>
                 <PitchArt width={700}
                           height={600}
                           key={this.state.letterEditVersion + 1}
-                          minVertPitch={this.minVertPitch}
-                          maxVertPitch={this.maxVertPitch}
+                          minVertPitch={this.state.minVertPitch}
+                          maxVertPitch={this.state.maxVertPitch}
                           uploadId={uploadId}
                           pitches={sortedPitches}
                           times={sortedTimes}/>
