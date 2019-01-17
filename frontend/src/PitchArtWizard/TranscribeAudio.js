@@ -449,55 +449,60 @@ class TranscribeAudio extends Component {
                     <h4>Transcribe Audio (step 2/2)</h4>
                 </div>
                 <div className="metilda-audio-analysis-layout">
-                    <div className="metilda-audio-analysis">
-                        <div>
-                            <div className="metilda-audio-analysis-image-container">
-                                {audioImageLoading}
-                                <AudioImg key={this.state.audioEditVersion}
-                                          uploadId={uploadId}
-                                          src={this.state.imageUrl}
-                                          ref="audioImage"
-                                          xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
-                                          xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
-                                          audioIntervalSelected={this.audioIntervalSelected}
-                                          audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                          onAudioImageLoaded={this.onAudioImageLoaded}/>
-                            </div>
-                            <div id="metilda-audio-function-btns">
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.showAllClicked}
-                                        disabled={isAllShown}>All
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.selectionIntervalClicked}
-                                        disabled={!isSelectionActive}>Sel
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.praatPitchArtClicked}
-                                        disabled={!isSelectionActive}>Praat Pch
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.manualPitchArtClicked}
-                                        disabled={!isSelectionActive}>Manual Pch
-                                </button>
-                            </div>
-                            <PlayerBar key={this.state.audioUrl}
-                                       audioUrl={this.state.audioUrl}/>
+                    <div className="row">
+                        <div className="metilda-audio-analysis-controls col s4">
                             <MaxFrequencyBar handleInputChange={this.handleInputChange}
                                              applyMaxPitch={this.applyMaxPitch}/>
-                            <TargetPitchBar letters={this.state.letters}
-                                            key={this.state.letterEditVersion}
-                                            letterEdit
-                                            removeLetter={this.removeLetter}
-                                            resetAllLetters={this.resetAllLetters}
-                                            minAudioX={this.state.minAudioX}
-                                            maxAudioX={this.state.maxAudioX}
-                                            minAudioTime={this.state.minAudioTime}
-                                            maxAudioTime={this.state.maxAudioTime}/>
                         </div>
-                    </div>
-                    <div className="metilda-audio-analysis-pitch-art">
-                        {pitchArt}
+                        <div className="metilda-audio-analysis col s8">
+                            <div>
+                                <div className="metilda-audio-analysis-image-container">
+                                    {audioImageLoading}
+                                    <AudioImg key={this.state.audioEditVersion}
+                                              uploadId={uploadId}
+                                              src={this.state.imageUrl}
+                                              ref="audioImage"
+                                              xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
+                                              xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
+                                              audioIntervalSelected={this.audioIntervalSelected}
+                                              audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                                              onAudioImageLoaded={this.onAudioImageLoaded}/>
+                                </div>
+                                <div id="metilda-audio-function-btns">
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.showAllClicked}
+                                            disabled={isAllShown}>All
+                                    </button>
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.selectionIntervalClicked}
+                                            disabled={!isSelectionActive}>Sel
+                                    </button>
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.praatPitchArtClicked}
+                                            disabled={!isSelectionActive}>Praat Pch
+                                    </button>
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.manualPitchArtClicked}
+                                            disabled={!isSelectionActive}>Manual Pch
+                                    </button>
+                                </div>
+                                <PlayerBar key={this.state.audioUrl}
+                                           audioUrl={this.state.audioUrl}/>
+
+                                <TargetPitchBar letters={this.state.letters}
+                                                key={this.state.letterEditVersion}
+                                                letterEdit
+                                                removeLetter={this.removeLetter}
+                                                resetAllLetters={this.resetAllLetters}
+                                                minAudioX={this.state.minAudioX}
+                                                maxAudioX={this.state.maxAudioX}
+                                                minAudioTime={this.state.minAudioTime}
+                                                maxAudioTime={this.state.maxAudioTime}/>
+                            </div>
+                        </div>
+                        <div className="metilda-audio-analysis-pitch-art">
+                            {pitchArt}
+                        </div>
                     </div>
                 </div>
             </div>

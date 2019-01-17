@@ -6,22 +6,26 @@ const {PlayPause, MuteUnmute, SeekBar} = controls;
 class MaxFrequencyBar extends Component {
     render() {
         return (
-            <div>
-                <div className="metilda-control-container">
-                    <div className="metilda-audio-analysis-image-col-1">
-                        Max Frequency
-                    </div>
-                    <div className="metilda-audio-analysis-image-col-2">
+            <div className="col s12">
+                <div className="row">
+                    <div className="input-field col s9">
                         <input name="maxPitch"
+                               id="maxPitch"
                                onChange={this.props.handleInputChange}
-                               placeholder="Max frequency (ex: 200)"
+                               placeholder="hertz"
+                               className="validate"
+                               pattern="(\d+)?(\.\d+)?"
                                type="text"/>
+                        <label htmlFor="maxPitch">Pitch Ceiling</label>
+                        <span className="helper-text" data-error="Must be a positive number"></span>
                     </div>
-                    <div className="metilda-audio-analysis-image-col-3">
-                        <a className="waves-effect waves-light btn fill-parent vert-center"
-                           onClick={this.props.applyMaxPitch}>Apply</a>
+                    <div className="input-field col s2">
+                        <button className="waves-effect waves-light btn"
+                           onClick={this.props.applyMaxPitch}>Apply</button>
                     </div>
                 </div>
+
+
             </div>
         );
     }
