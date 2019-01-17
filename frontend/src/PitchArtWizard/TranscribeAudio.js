@@ -27,7 +27,7 @@ class TranscribeAudio extends Component {
     }
 
     static get AUDIO_IMG_WIDTH() {
-        return 800;
+        return 845;
     }
 
     static get DEFAULT_MIN_VERT_PITCH() {
@@ -362,12 +362,11 @@ class TranscribeAudio extends Component {
     imageIntervalToTimeInterval(x1, x2) {
         let dt = this.state.maxAudioTime - this.state.minAudioTime;
         let dx = this.state.maxAudioX - this.state.minAudioX;
-        let u0 = (x1 - this.state.minAudioX) / dx;
-        let u1 = (x2 - this.state.minAudioX) / dx;
+        let u0 = x1 / dx;
+        let u1 = x2 / dx;
 
         let t0 = this.state.minAudioTime + (u0 * dt);
         let t1 = this.state.minAudioTime + (u1 * dt);
-
         return [t0, t1];
     }
 
@@ -462,6 +461,7 @@ class TranscribeAudio extends Component {
                                               uploadId={uploadId}
                                               src={this.state.imageUrl}
                                               ref="audioImage"
+                                              imageWidth={TranscribeAudio.AUDIO_IMG_WIDTH}
                                               xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
                                               xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
                                               audioIntervalSelected={this.audioIntervalSelected}

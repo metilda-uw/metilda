@@ -61,8 +61,9 @@ class AudioImg extends Component {
             cropAreaRightX = undefined;
 
             if (loc.x1 < loc.x2) {
-                audioImage.props.audioIntervalSelected(loc.x1, loc.x2);
-                audioImage.props.audioSelectionAction(loc.x1, loc.x2);
+                let startOffset = audioImage.props.imageWidth * audioImage.props.xminPerc;
+                audioImage.props.audioIntervalSelected(loc.x1 - startOffset,
+                                                       loc.x2 - startOffset);
             } else if (loc.x1 === loc.x2) {
                 audioImage.props.audioIntervalSelectionCanceled();
             }

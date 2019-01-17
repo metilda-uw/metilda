@@ -62,8 +62,12 @@
     align-items: center;
 }
 
+.metilda-audio-analysis-image-col-2.metilda-audio-analysis-letter-container {
+    display: flex;
+}
+
 .metilda-transcribe-letter {
-    position: absolute;
+    position: relative;
     background: lightblue;
     outline: 1px solid black;
     cursor: pointer;

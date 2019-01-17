@@ -27,7 +27,7 @@ class TargetPitchBar extends Component {
         let u0 = (t - this.props.minAudioTime) / dt;
 
         let dx = this.props.maxAudioX - this.props.minAudioX;
-        let x0 = this.props.minAudioX + (u0 * dx);
+        let x0 = u0 * dx;
 
         return x0
     }
@@ -44,15 +44,19 @@ class TargetPitchBar extends Component {
             return item;
         });
 
+        // Since the letters are relatively positioned, we need to decrement
+        // their positions based on all previous letters' widths.
+        let prevLetterWidths = 0.0;
         return intervalsInSelection.map(function (item) {
             if (!item.isShown) {
                 return item;
             }
 
             let itemCopy = Object.assign({}, item);
+            itemCopy.leftX = controller.timeCoordToImageCoord(itemCopy.t0) - prevLetterWidths;
+            itemCopy.rightX = controller.timeCoordToImageCoord(itemCopy.t1) - prevLetterWidths;
 
-            itemCopy.leftX = controller.timeCoordToImageCoord(itemCopy.t0);
-            itemCopy.rightX = controller.timeCoordToImageCoord(itemCopy.t1);
+            prevLetterWidths += itemCopy.rightX - itemCopy.leftX;
 
             // transform letter interval into new time scale
             // clip boundaries to prevent overflow
@@ -78,7 +82,7 @@ class TargetPitchBar extends Component {
                     <div className="metilda-audio-analysis-image-col-1">
                         <span>Target Pitch</span>
                     </div>
-                    <div className="metilda-audio-analysis-image-col-2">
+                    <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container">
                         {
                             letters.map(function (item, index) {
                                 if (!item.isShown) {
