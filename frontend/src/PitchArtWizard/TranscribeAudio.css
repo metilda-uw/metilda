@@ -15,7 +15,7 @@
 }
 
 .metilda-audio-analysis-image-container {
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 }
 
 .metilda-audio-analysis-image {
@@ -36,8 +36,8 @@
 .metilda-audio-analysis-image-col-3 {
     border: 1px solid black;
     height: 52px;
-    margin-top: 16px;
-    margin-bottom: 32px;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 .metilda-audio-analysis-image-col-1 {
@@ -117,7 +117,7 @@
 #metilda-audio-function-btns {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
 }
 
 #metilda-audio-function-btns button {
