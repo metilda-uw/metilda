@@ -53,13 +53,13 @@ def audio_analysis_image(upload_path,
     fig = plt.figure()
 
     title = os.path.basename(upload_path)
-    fig.suptitle(title, y=0.95)
+    # fig.suptitle(title, y=0.95)
 
     # Draw waveform
-    plt.subplot(2, 1, 1)
+    ax = plt.subplot(2, 1, 1)
     plt.plot(snd.xs(), snd.values.T)
     plt.xlim([snd.xmin, snd.xmax])
-    plt.xlabel("time [s]")
+    ax.set_xticklabels([])
     plt.ylabel("amplitude")
 
     # Draw spectogram
@@ -71,7 +71,7 @@ def audio_analysis_image(upload_path,
     draw_pitch(snd.to_pitch(), max_pitch)
     plt.xlim([snd.xmin, snd.xmax])
 
-    plt.subplots_adjust(hspace=0.5)
+    plt.subplots_adjust(hspace=0.1, top=0.95, bottom=0.1)
 
     image = io.BytesIO()
     plt.savefig(image, format="png", dpi=400, figsize=(4, 3))

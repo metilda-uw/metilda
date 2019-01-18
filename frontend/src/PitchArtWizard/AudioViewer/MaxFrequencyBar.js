@@ -1,4 +1,6 @@
 import React, {Component} from 'react';
+import 'materialize-css';
+import 'materialize-css/dist/css/materialize.min.css';
 import {controls, Media, Player} from 'react-media-player';
 
 const {PlayPause, MuteUnmute, SeekBar} = controls;
@@ -16,7 +18,7 @@ class MaxFrequencyBar extends Component {
                                className="validate"
                                pattern="(\d+)?(\.\d+)?"
                                type="text"/>
-                        <label htmlFor="maxPitch">Pitch Ceiling</label>
+                        <label className="active" htmlFor="maxPitch">Pitch Ceiling</label>
                         <span className="helper-text" data-error="Must be a positive number"></span>
                     </div>
                     <div className="input-field col s2">
