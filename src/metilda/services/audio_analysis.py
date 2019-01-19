@@ -50,20 +50,17 @@ def audio_analysis_image(upload_path,
         snd = snd.extract_part(from_time=tmin, to_time=tmax)
         snd.scale_times_to(tmin, tmax)
 
-    fig = plt.figure()
-
-    title = os.path.basename(upload_path)
-    # fig.suptitle(title, y=0.95)
+    fig, (ax1, ax2) = plt.subplots(ncols=1, nrows=2, figsize=(7, 4.75), dpi=400)
 
     # Draw waveform
-    ax = plt.subplot(2, 1, 1)
+    plt.sca(ax1)
     plt.plot(snd.xs(), snd.values.T)
     plt.xlim([snd.xmin, snd.xmax])
-    ax.set_xticklabels([])
+    ax1.set_xticklabels([])
     plt.ylabel("amplitude")
 
     # Draw spectogram
-    plt.subplot(2, 1, 2)
+    plt.sca(ax2)
     draw_spectrogram(snd.to_spectrogram())
 
     # Draw pitch
@@ -74,11 +71,11 @@ def audio_analysis_image(upload_path,
     plt.subplots_adjust(hspace=0.1, top=0.95, bottom=0.1)
 
     image = io.BytesIO()
-    plt.savefig(image, format="png", dpi=400, figsize=(4, 3))
+    plt.savefig(image, format="png")
     image.seek(0)
 
     if output_path is not None:
-        plt.savefig(output_path, format="png", dpi=400, figsize=(4, 3))
+        plt.savefig(output_path, format="png")
 
     # Free up memory
     plt.cla()

@@ -18,16 +18,27 @@ import TargetPitchBar from "./TargetPitchBar";
 class TranscribeAudio extends Component {
     state = {};
 
+    /**
+     * WARNING:
+     * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
+     * on the audio analysis image returned by the API. If the image
+     * content changes, then these values should change.
+     *
+     * Also, a weird bug popped up once in the imgareaselect library up
+     * that resulted in a infinite recursion. Once the dimensions
+     * below were altered slightly, the bug went away. Likely it
+     * was a result of a weird, undocumented edge case in that library.
+     */
     static get MIN_IMAGE_XPERC() {
-        return 320.0 / 2560.0;
+        return 351.0 / 2800.0;
     }
 
     static get MAX_IMAGE_XPERC() {
-        return 2306.0 / 2560.0;
+        return 2522.0 / 2800.0;
     }
 
     static get AUDIO_IMG_WIDTH() {
-        return 845;
+        return 653;
     }
 
     static get DEFAULT_MIN_VERT_PITCH() {
@@ -499,7 +510,9 @@ class TranscribeAudio extends Component {
                                                 maxAudioTime={this.state.maxAudioTime}/>
                             </div>
                         </div>
-                        <div className="metilda-audio-analysis-pitch-art">
+                    </div>
+                    <div className="row">
+                        <div className="col 8 push-s4">
                             {pitchArt}
                         </div>
                     </div>
