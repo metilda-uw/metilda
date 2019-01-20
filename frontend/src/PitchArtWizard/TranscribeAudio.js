@@ -455,7 +455,7 @@ class TranscribeAudio extends Component {
         return (
             <div>
                 <div className="wizard-header">
-                    <h4>Transcribe Audio - {this.props.match.params.uploadId}</h4>
+                    <h5>Transcribe Audio - {this.props.match.params.uploadId}</h5>
                 </div>
                 <div className="metilda-audio-analysis-layout">
                     <div className="row">

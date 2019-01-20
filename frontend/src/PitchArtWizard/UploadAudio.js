@@ -70,7 +70,7 @@ class UploadAudio extends Component {
     return (
       <div>
         <div className="wizard-header">
-            <h4>Choose Recording</h4>
+            <h5>Choose Recording</h5>
         </div>
         <form className="wizard-form" method="post">
             <div className="row">
