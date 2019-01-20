@@ -21,6 +21,11 @@ class AudioImg extends Component {
     let cropAreaRightX;
     let $el = $("#metilda-audio-analysis-image");
     let imgBox = {xminPerc, xmaxPerc};
+    let prevMaxWidth;
+
+    window.onresize = function() {
+        prevMaxWidth = undefined;
+    };
 
     let imgObj = $el.imgAreaSelect({
         instance: true,
@@ -51,7 +56,10 @@ class AudioImg extends Component {
                     maxWidth = graphRightX - loc.x1;
                 }
 
-                if (maxWidth !== undefined) {
+                // The prevMaxWidth check avoids an infinite loop bug for certain
+                // image sizes.
+                if (maxWidth !== undefined && prevMaxWidth !== maxWidth) {
+                    prevMaxWidth = maxWidth;
                     imgObj.setOptions({maxWidth: maxWidth});
                 }
             }
