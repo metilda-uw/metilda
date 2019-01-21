@@ -428,16 +428,16 @@ class TranscribeAudio extends Component {
 
             pitchArt = <div>
                 <PitchArtDrawingWindow
-                    width={700}
-                    height={600}
+                    width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                    height={442}
                     key={this.state.letterEditVersion}
                     minVertPitch={this.state.minVertPitch}
                     maxVertPitch={this.state.maxVertPitch}
                     uploadId={uploadId}
                     pitches={sortedPitches}
                     times={sortedTimes}/>
-                <PitchArt width={700}
-                          height={600}
+                <PitchArt width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                          height={442}
                           key={this.state.letterEditVersion + 1}
                           minVertPitch={this.state.minVertPitch}
                           maxVertPitch={this.state.maxVertPitch}
