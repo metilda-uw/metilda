@@ -126,3 +126,8 @@
 #metilda-audio-function-btns button {
     margin-right: 32px;
 }
+
+#metilda-pitch-art-btn-container {
+    display: flex;
+    justify-content: flex-end;
+}

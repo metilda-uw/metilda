@@ -90,10 +90,12 @@ class PitchArt extends React.Component {
                 <div className="hide">
                     {pitchArt}
                 </div>
-                <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                        onClick={this.saveImage}>
-                    Save Image
-                </button>
+                <div id="metilda-pitch-art-btn-container">
+                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                            onClick={this.saveImage}>
+                        Save Image
+                    </button>
+                </div>
             </div>
         )
     }
