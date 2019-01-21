@@ -198,7 +198,7 @@ class TranscribeAudio extends Component {
         };
 
         function addLetter(pitch) {
-            if (pitch < controller.minVertPitch || pitch > controller.state.maxVertPitch) {
+            if (pitch < controller.state.minVertPitch || pitch > controller.state.maxVertPitch) {
                 // the pitch outside the bounds of the window, omit it
                 return
             }
@@ -270,7 +270,6 @@ class TranscribeAudio extends Component {
                 continue;
             }
 
-            debugger;
             isValidNumber = !(manualPitch < this.state.minVertPitch || manualPitch > this.state.maxVertPitch);
             if (!isValidNumber) {
                 alert(`${manualPitch}Hz is not between between ${this.state.minVertPitch.toFixed(2)}Hz and ${this.state.maxVertPitch.toFixed(2)}Hz`);
