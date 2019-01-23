@@ -51,6 +51,14 @@ class TranscribeAudio extends Component {
         return 604.53;
     }
 
+    static get DEFAULT_MIN_ANALYSIS_PITCH() {
+        return "75"
+    }
+
+    static get DEFAULT_MAX_ANALYSIS_PITCH() {
+        return "500"
+    }
+
     constructor(props) {
         super(props);
 
@@ -62,9 +70,12 @@ class TranscribeAudio extends Component {
             selectionInterval: "Letter",
             letterEditVersion: 0,
             redirectId: null,
-            maxPitch: "500",
-            minPitch: "75",
-            imageUrl: TranscribeAudio.formatImageUrl(uploadId, "75", "500"),
+            maxPitch: TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
+            minPitch: TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+            imageUrl: TranscribeAudio.formatImageUrl(
+                uploadId,
+                TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+                TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH),
             audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
