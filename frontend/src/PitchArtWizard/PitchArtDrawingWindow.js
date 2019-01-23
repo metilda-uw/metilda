@@ -72,8 +72,15 @@ class PitchArtDrawingWindow extends React.Component {
 
     horzIndexToRectCoords(index) {
         let time = this.props.times[index];
-        let totalDuration = this.props.times[this.props.times.length - 1] - this.props.times[0];
-        let timePerc = (time - this.props.times[0]) / totalDuration;
+        let timePerc;
+
+        if (this.props.times.length === 1) {
+            timePerc = 0.1;
+        } else {
+            let totalDuration = this.props.times[this.props.times.length - 1] - this.props.times[0];
+            timePerc = (time - this.props.times[0]) / totalDuration;
+        }
+
         let pointDx = timePerc * this.innerWidth;
         return this.pointDx0 + pointDx;
     }

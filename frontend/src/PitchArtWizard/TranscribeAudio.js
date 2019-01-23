@@ -418,33 +418,30 @@ class TranscribeAudio extends Component {
             audioImageLoading = <AudioImgLoading/>
         }
 
-        let pitchArt;
-        if (this.state.letters.length > 1) {
-            let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
-            let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
-            let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
-            let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
+        let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
+        let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
+        let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
+        let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
 
-            pitchArt = <div>
-                <PitchArtDrawingWindow
-                    width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                    height={300}
-                    key={this.state.letterEditVersion}
-                    minVertPitch={this.state.minVertPitch}
-                    maxVertPitch={this.state.maxVertPitch}
-                    uploadId={uploadId}
-                    pitches={sortedPitches}
-                    times={sortedTimes}/>
-                <PitchArt width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                          height={300}
-                          key={this.state.letterEditVersion + 1}
-                          minVertPitch={this.state.minVertPitch}
-                          maxVertPitch={this.state.maxVertPitch}
-                          uploadId={uploadId}
-                          pitches={sortedPitches}
-                          times={sortedTimes}/>
-            </div>;
-        }
+        let pitchArt = <div>
+            <PitchArtDrawingWindow
+                width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                height={300}
+                key={this.state.letterEditVersion}
+                minVertPitch={this.state.minVertPitch}
+                maxVertPitch={this.state.maxVertPitch}
+                uploadId={uploadId}
+                pitches={sortedPitches}
+                times={sortedTimes}/>
+            <PitchArt width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                      height={300}
+                      key={this.state.letterEditVersion + 1}
+                      minVertPitch={this.state.minVertPitch}
+                      maxVertPitch={this.state.maxVertPitch}
+                      uploadId={uploadId}
+                      pitches={sortedPitches}
+                      times={sortedTimes}/>
+        </div>;
 
         const isSelectionActive = this.state.minSelectX !== -1
             && this.state.maxSelectX !== -1;
