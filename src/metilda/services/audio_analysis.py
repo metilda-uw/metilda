@@ -39,7 +39,8 @@ def draw_pitch(pitch, max_pitch):
 def audio_analysis_image(upload_path,
                          tmin=-1,
                          tmax=-1,
-                         max_pitch=float('inf'),
+                         min_pitch=75,
+                         max_pitch=500,
                          output_path=None):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
@@ -65,7 +66,7 @@ def audio_analysis_image(upload_path,
 
     # Draw pitch
     plt.twinx()
-    draw_pitch(snd.to_pitch(), max_pitch)
+    draw_pitch(snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch), max_pitch)
     plt.xlim([snd.xmin, snd.xmax])
 
     plt.subplots_adjust(hspace=0.1, top=0.95, bottom=0.1)

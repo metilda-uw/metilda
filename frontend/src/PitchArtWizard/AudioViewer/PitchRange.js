@@ -2,10 +2,11 @@ import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 import {controls, Media, Player} from 'react-media-player';
+import "../GlobalStyling.css";
 
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
-class MaxFrequencyBar extends Component {
+class PitchRange extends Component {
     constructor(props) {
         super(props);
         this.submitMaxPitch = this.submitMaxPitch.bind(this);
@@ -13,23 +14,37 @@ class MaxFrequencyBar extends Component {
 
     submitMaxPitch(event) {
         event.preventDefault();
-        this.props.applyMaxPitch();
+        this.props.applyPitchRange();
     }
 
     render() {
         return (
             <div className="col s12">
+                <label className="group-label">Pitch Range</label>
                 <div className="row">
                     <form onSubmit={this.submitMaxPitch}>
-                        <div className="input-field col s9">
-                            <input name="maxPitch"
-                                   id="maxPitch"
+                        <div className="input-field inline col s4">
+                            <input name="minPitch"
+                                   id="minPitch"
+                                   value={this.props.initMinPitch}
                                    onChange={this.props.handleInputChange}
-                                   placeholder="hertz"
+                                   placeholder="min Hz"
                                    className="validate"
                                    pattern="(\d+)?(\.\d+)?"
                                    type="text"/>
-                            <label className="active" htmlFor="maxPitch">Pitch Ceiling</label>
+                        </div>
+                        <div className="input-field inline col s1">
+                            <p>to</p>
+                        </div>
+                        <div className="input-field inline col s4">
+                            <input name="maxPitch"
+                                   id="maxPitch"
+                                   value={this.props.initMaxPitch}
+                                   onChange={this.props.handleInputChange}
+                                   placeholder="max Hz"
+                                   className="validate"
+                                   pattern="(\d+)?(\.\d+)?"
+                                   type="text"/>
                         </div>
                         <div className="input-field col s2">
                             <button className="waves-effect waves-light btn"
@@ -45,4 +60,4 @@ class MaxFrequencyBar extends Component {
     }
 }
 
-export default MaxFrequencyBar;
+export default PitchRange;

@@ -11,7 +11,7 @@ import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 import {connect} from "react-redux";
 import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import PlayerBar from "./AudioViewer/PlayerBar";
-import MaxFrequencyBar from "./AudioViewer/MaxFrequencyBar";
+import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
 
 
@@ -62,8 +62,9 @@ class TranscribeAudio extends Component {
             selectionInterval: "Letter",
             letterEditVersion: 0,
             redirectId: null,
-            maxPitch: "",
-            imageUrl: TranscribeAudio.formatImageUrl(uploadId),
+            maxPitch: "500",
+            minPitch: "75",
+            imageUrl: TranscribeAudio.formatImageUrl(uploadId, "75", "500"),
             audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
@@ -87,7 +88,7 @@ class TranscribeAudio extends Component {
         this.resetAllLetters = this.resetAllLetters.bind(this);
         this.removeLetter = this.removeLetter.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-        this.applyMaxPitch = this.applyMaxPitch.bind(this);
+        this.applyPitchRange = this.applyPitchRange.bind(this);
         this.showAllClicked = this.showAllClicked.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
         this.praatPitchArtClicked = this.praatPitchArtClicked.bind(this);
@@ -96,11 +97,15 @@ class TranscribeAudio extends Component {
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
     }
 
-    static formatImageUrl(uploadId, maxPitch, tmin, tmax) {
+    static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
         let url = `/api/audio-analysis-image/${uploadId}.png`;
         let urlOptions = [];
 
-        if (maxPitch !== undefined) {
+        if (minPitch !== undefined && minPitch.trim() !== "") {
+            urlOptions.push(`min-pitch=${minPitch}`);
+        }
+
+        if (maxPitch !== undefined && maxPitch.trim() !== "") {
             urlOptions.push(`max-pitch=${maxPitch}`);
         }
 
@@ -328,10 +333,11 @@ class TranscribeAudio extends Component {
         });
     }
 
-    applyMaxPitch() {
+    applyPitchRange() {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
+            this.state.minPitch,
             this.state.maxPitch,
             this.state.minAudioTime,
             this.state.maxAudioTime);
@@ -348,6 +354,7 @@ class TranscribeAudio extends Component {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
+            this.state.minPitch,
             this.state.maxPitch,
             0,
             this.state.soundLength);
@@ -389,6 +396,7 @@ class TranscribeAudio extends Component {
         const {uploadId} = this.props.match.params;
         let newImageUrl = TranscribeAudio.formatImageUrl(
             uploadId,
+            this.state.minPitch,
             this.state.maxPitch,
             config.minAudioTime,
             config.maxAudioTime);
@@ -456,8 +464,10 @@ class TranscribeAudio extends Component {
                 <div className="metilda-audio-analysis-layout">
                     <div className="row">
                         <div className="metilda-audio-analysis-controls col s4">
-                            <MaxFrequencyBar handleInputChange={this.handleInputChange}
-                                             applyMaxPitch={this.applyMaxPitch}/>
+                            <PitchRange handleInputChange={this.handleInputChange}
+                                        initMinPitch={this.state.minPitch}
+                                        initMaxPitch={this.state.maxPitch}
+                                        applyPitchRange={this.applyPitchRange}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
