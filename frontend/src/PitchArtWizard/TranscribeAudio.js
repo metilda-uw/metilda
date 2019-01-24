@@ -357,7 +357,7 @@ class TranscribeAudio extends Component {
             isAudioImageLoaded: false,
             letterEditVersion: this.state.letterEditVersion + 1,
             audioEditVersion: this.state.audioEditVersion + 1,
-            maxVertPitch: this.state.maxPitch !== "" ? this.state.maxPitch : TranscribeAudio.DEFAULT_MAX_VERT_PITCH
+            maxVertPitch: this.state.maxPitch !== "" ? parseFloat(this.state.maxPitch) : TranscribeAudio.DEFAULT_MAX_VERT_PITCH
         });
     }
 
