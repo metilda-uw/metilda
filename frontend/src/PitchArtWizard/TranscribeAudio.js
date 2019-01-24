@@ -13,6 +13,7 @@ import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import PlayerBar from "./AudioViewer/PlayerBar";
 import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
+import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
 
 
 class TranscribeAudio extends Component {
@@ -69,7 +70,6 @@ class TranscribeAudio extends Component {
             soundLength: -1,
             selectionInterval: "Letter",
             letterEditVersion: 0,
-            redirectId: null,
             maxPitch: TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
             minPitch: TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
             imageUrl: TranscribeAudio.formatImageUrl(
@@ -95,7 +95,6 @@ class TranscribeAudio extends Component {
         this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
         this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
 
-        this.nextClicked = this.nextClicked.bind(this);
         this.resetAllLetters = this.resetAllLetters.bind(this);
         this.removeLetter = this.removeLetter.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
@@ -191,7 +190,8 @@ class TranscribeAudio extends Component {
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: -1,
-            maxSelectX: -1});
+            maxSelectX: -1
+        });
     }
 
     audioIntervalSelected(leftX, rightX) {
@@ -199,7 +199,8 @@ class TranscribeAudio extends Component {
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: leftX,
-            maxSelectX: rightX});
+            maxSelectX: rightX
+        });
     }
 
     imageIntervalSelected(leftX, rightX, manualPitch) {
@@ -296,11 +297,6 @@ class TranscribeAudio extends Component {
             this.state.minSelectX,
             this.state.maxSelectX,
             manualPitch);
-    }
-
-    nextClicked() {
-        const {uploadId} = this.props.match.params;
-        this.setState({redirectId: uploadId});
     }
 
     removeLetter(index) {
@@ -425,42 +421,12 @@ class TranscribeAudio extends Component {
     }
 
     render() {
-        if (this.state.redirectId !== null) {
-            let pitchesString = this.state.letters.map(item => "p=" + item.pitch).join("&");
-            return <Redirect push to={"/pitchartwizard/4/" + this.state.redirectId + "?" + pitchesString}/>
-        }
-
         const {uploadId} = this.props.match.params;
 
         let audioImageLoading;
         if (!this.state.isAudioImageLoaded) {
             audioImageLoading = <AudioImgLoading/>
         }
-
-        let timesAndPitches = this.state.letters.map(item => [item.t0, item.pitch]);
-        let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
-        let sortedPitches = sortedTimesAndPitches.map(item => item[1]);
-        let sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.state.soundLength);
-
-        let pitchArt = <div>
-            <PitchArtDrawingWindow
-                width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                height={300}
-                key={this.state.letterEditVersion}
-                minVertPitch={this.state.minVertPitch}
-                maxVertPitch={this.state.maxVertPitch}
-                uploadId={uploadId}
-                pitches={sortedPitches}
-                times={sortedTimes}/>
-            <PitchArt width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                      height={300}
-                      key={this.state.letterEditVersion + 1}
-                      minVertPitch={this.state.minVertPitch}
-                      maxVertPitch={this.state.maxVertPitch}
-                      uploadId={uploadId}
-                      pitches={sortedPitches}
-                      times={sortedTimes}/>
-        </div>;
 
         const isSelectionActive = this.state.minSelectX !== -1
             && this.state.maxSelectX !== -1;
@@ -530,7 +496,15 @@ class TranscribeAudio extends Component {
                     </div>
                     <div className="row">
                         <div className="col 8 push-s4">
-                            {pitchArt}
+                            <PitchArtContainer
+                                letters={this.state.letters}
+                                soundLength={this.state.soundLength}
+                                width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                                height={300}
+                                key={this.state.letterEditVersion}
+                                minVertPitch={this.state.minVertPitch}
+                                maxVertPitch={this.state.maxVertPitch}
+                                uploadId={this.state.uploadId}/>
                         </div>
                     </div>
                 </div>
