@@ -6,4 +6,11 @@
 
 .top-label {
     margin-bottom: 8px;
+    display: flex;
+}
+
+.metilda-control-header {
+    display: flex;
+    margin-left: 12px;
+    margin-bottom: 16px;
 }

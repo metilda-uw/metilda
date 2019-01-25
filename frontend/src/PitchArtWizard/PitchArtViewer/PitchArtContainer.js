@@ -21,6 +21,7 @@ class PitchArtContainer extends Component {
         return (
             <div>
                 <div className="col s4">
+                    <h6 className="metilda-control-header">Pitch Art</h6>
                     <div className="metilda-pitch-art-container-controls col s12">
                         <AccentPitchToggle
                             onAccentPitchToggle={this.props.onAccentPitchToggle}

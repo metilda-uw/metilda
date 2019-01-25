@@ -6,7 +6,7 @@ class AccentPitchToggle extends Component {
         return (
             <div>
                 <div className="top-label">
-                    <label>Pitch Accent Symbol</label>
+                    <label>Accent Symbol</label>
                 </div>
                 <div className="switch">
                     <label>
