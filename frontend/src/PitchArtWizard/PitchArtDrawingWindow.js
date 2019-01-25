@@ -43,8 +43,10 @@ class PitchArtDrawingWindow extends React.Component {
         this.accentedCircleRadius = 30;
         this.pitchArtSoundLengthSeconds = 0.20;
 
+        // overrideable properties
         this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
-        this.dotFillColor = this.props.dotFillColor || "#497dba";
+        this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
+        this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
         this.maxPitchIndex = this.props.maxPitchIndex !== null
                            ? this.props.maxPitchIndex:  -1;
     }
@@ -161,12 +163,12 @@ class PitchArtDrawingWindow extends React.Component {
             points.push(x);
             points.push(y);
             pointPairs.push([x, y]);
-
+            console.log(this.props.letters[i].isManualPitch);
             lineCircles.push(
                 <Circle x={x}
                         y={y}
-                        fill={this.dotFillColor}
-                        stroke={this.lineStrokeColor}
+                        fill={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.praatDotFillColor}
+                        stroke={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.lineStrokeColor}
                         strokeWidth={this.circleStrokeWidth}
                         radius={this.circleRadius}
                         onClick={() => this.playSound(currPitch)}

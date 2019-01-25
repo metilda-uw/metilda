@@ -37,14 +37,16 @@ class PitchArtContainer extends Component {
                         uploadId={this.props.uploadId}
                         pitches={this.sortedPitches}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
-                        times={this.sortedTimes}/>
+                        times={this.sortedTimes}
+                        letters={this.props.letters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
                               minVertPitch={this.props.minVertPitch}
                               maxVertPitch={this.props.maxVertPitch}
                               uploadId={this.props.uploadId}
                               pitches={this.sortedPitches}
-                              times={this.sortedTimes}/>
+                              times={this.sortedTimes}
+                              letters={this.props.letters}/>
                 </div>
             </div>
         )

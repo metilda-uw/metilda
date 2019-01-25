@@ -22,11 +22,11 @@ class PitchArt extends React.Component {
                 switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#272264";
-                        this.dotFillColor = "#0ba14a";
+                        this.praatDotFillColor = "#0ba14a";
                         break;
                     case 1:
                         this.lineStrokeColor = "#71002b";
-                        this.dotFillColor = "#2e3192";
+                        this.praatDotFillColor = "#2e3192";
                         break;
                 }
                 break;
@@ -34,37 +34,37 @@ class PitchArt extends React.Component {
                 switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#92278f";
-                        this.dotFillColor = "#000000";
+                        this.praatDotFillColor = "#000000";
                         break;
                     case 1:
                         this.lineStrokeColor = "#056839";
-                        this.dotFillColor = "#be72b0";
+                        this.praatDotFillColor = "#be72b0";
                         break;
                     case 2:
                     default:
                         this.lineStrokeColor = "#5b4a42";
-                        this.dotFillColor = "#166e92";
+                        this.praatDotFillColor = "#166e92";
                 }
                 break;
             case 4:
                 switch (this.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#f1592a";
-                        this.dotFillColor = "#12a89d";
+                        this.praatDotFillColor = "#12a89d";
                         break;
                     case 1:
                         this.lineStrokeColor = "#283890";
-                        this.dotFillColor = "#8cc63e";
+                        this.praatDotFillColor = "#8cc63e";
                         break;
                     case 2:
                     default:
                         this.lineStrokeColor = "#9e1f62";
-                        this.dotFillColor = "#f7941d";
+                        this.praatDotFillColor = "#f7941d";
                 }
                 break;
             default:
                 this.lineStrokeColor = "black";
-                this.dotFillColor = "black";
+                this.praatDotFillColor = "black";
         }
     }
 
@@ -82,8 +82,9 @@ class PitchArt extends React.Component {
                                               minVertPitch={this.props.minVertPitch}
                                               maxVertPitch={this.props.maxVertPitch}
                                               lineStrokeColor={this.lineStrokeColor}
-                                              dotFillColor={this.dotFillColor}
-                                              maxPitchIndex={this.maxPitchIndex}/>;
+                                              praatDotFillColor={this.praatDotFillColor}
+                                              maxPitchIndex={this.maxPitchIndex}
+                                              letters={this.props.letters}/>;
 
         return (
             <div>

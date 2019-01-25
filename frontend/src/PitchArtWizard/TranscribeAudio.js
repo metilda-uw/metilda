@@ -230,7 +230,8 @@ class TranscribeAudio extends Component {
                         rightX: -1,
                         t0: ts[0],
                         t1: ts[1],
-                        pitch: pitch
+                        pitch: pitch,
+                        isManualPitch: manualPitch !== undefined
                     }),
                     letterEditVersion: prevState.letterEditVersion + 1
                 })
