@@ -44,7 +44,8 @@ class PitchArtDrawingWindow extends React.Component {
 
         this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
         this.dotFillColor = this.props.dotFillColor || "#497dba";
-        this.maxPitchIndex = this.props.maxPitchIndex || -1;
+        this.maxPitchIndex = this.props.maxPitchIndex !== null
+                           ? this.props.maxPitchIndex:  -1;
     }
 
     saveImage() {

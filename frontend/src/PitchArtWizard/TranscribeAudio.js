@@ -88,7 +88,8 @@ class TranscribeAudio extends Component {
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
             minVertPitch: TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
             maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
-            closeImgSelectionCallback: () => (null)
+            closeImgSelectionCallback: () => (null),
+            showAccentPitch: false
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -105,6 +106,7 @@ class TranscribeAudio extends Component {
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
+        this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
     }
 
     static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
@@ -420,6 +422,13 @@ class TranscribeAudio extends Component {
         });
     }
 
+    onAccentPitchToggle(event) {
+        this.setState({
+            showAccentPitch: event.target.checked,
+            letterEditVersion: this.state.letterEditVersion + 1
+        });
+    }
+
     render() {
         const {uploadId} = this.props.match.params;
 
@@ -484,7 +493,6 @@ class TranscribeAudio extends Component {
 
                                 <TargetPitchBar letters={this.state.letters}
                                                 key={this.state.letterEditVersion}
-                                                letterEdit
                                                 removeLetter={this.removeLetter}
                                                 resetAllLetters={this.resetAllLetters}
                                                 minAudioX={this.state.minAudioX}
@@ -495,17 +503,17 @@ class TranscribeAudio extends Component {
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col 8 push-s4">
-                            <PitchArtContainer
-                                letters={this.state.letters}
-                                soundLength={this.state.soundLength}
-                                width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                                height={300}
-                                key={this.state.letterEditVersion}
-                                minVertPitch={this.state.minVertPitch}
-                                maxVertPitch={this.state.maxVertPitch}
-                                uploadId={this.state.uploadId}/>
-                        </div>
+                        <PitchArtContainer
+                            showAccentPitch={this.state.showAccentPitch}
+                            letters={this.state.letters}
+                            soundLength={this.state.soundLength}
+                            width={TranscribeAudio.AUDIO_IMG_WIDTH}
+                            height={300}
+                            key={this.state.letterEditVersion}
+                            onAccentPitchToggle={this.onAccentPitchToggle}
+                            minVertPitch={this.state.minVertPitch}
+                            maxVertPitch={this.state.maxVertPitch}
+                            uploadId={uploadId}/>
                     </div>
                 </div>
             </div>
