@@ -16,8 +16,7 @@ class PitchArt extends React.Component {
         this.saveImage = this.saveImage.bind(this);
 
         // determine color scheme
-        this.maxPitchIndex = this.props.pitches.indexOf(Math.max(...this.props.pitches));
-        switch (this.props.pitches.length) {
+        switch (this.props.letters.length) {
             case 2:
                 switch (this.maxPitchIndex) {
                     case 0:
@@ -77,13 +76,11 @@ class PitchArt extends React.Component {
                                               width={this.props.width}
                                               height={this.props.height}
                                               uploadId={this.props.uploadId}
-                                              pitches={this.props.pitches}
-                                              times={this.props.times}
                                               minVertPitch={this.props.minVertPitch}
                                               maxVertPitch={this.props.maxVertPitch}
                                               lineStrokeColor={this.lineStrokeColor}
                                               praatDotFillColor={this.praatDotFillColor}
-                                              maxPitchIndex={this.maxPitchIndex}
+                                              maxPitchIndex={this.props.maxPitchIndex}
                                               manualPitchChange={this.props.manualPitchChange}
                                               letters={this.props.letters}/>;
 

@@ -48,7 +48,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
         this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
         this.maxPitchIndex = this.props.maxPitchIndex !== null
-            ? this.props.maxPitchIndex : -1;
+                            ? this.props.maxPitchIndex : -1;
     }
 
     saveImage() {
@@ -75,14 +75,14 @@ class PitchArtDrawingWindow extends React.Component {
     }
 
     horzIndexToRectCoords(index) {
-        let time = this.props.times[index];
+        let time = this.props.letters[index].startTime;
         let timePerc;
 
-        if (this.props.times.length === 1) {
+        if (this.props.letters.length === 1) {
             timePerc = 0.1;
         } else {
-            let totalDuration = this.props.times[this.props.times.length - 1] - this.props.times[0];
-            timePerc = (time - this.props.times[0]) / totalDuration;
+            let totalDuration = this.props.letters[this.props.letters.length - 1].startTime - this.props.letters[0].startTime;
+            timePerc = (time - this.props.letters[0].startTime) / totalDuration;
         }
 
         let pointDx = timePerc * this.innerWidth;
@@ -163,8 +163,8 @@ class PitchArtDrawingWindow extends React.Component {
         let pointPairs = [];
         let lineCircles = [];
         let controller = this;
-        for (let i = 0; i < this.props.pitches.length; i++) {
-            let currPitch = this.props.pitches[i];
+        for (let i = 0; i < this.props.letters.length; i++) {
+            let currPitch = this.props.letters[i].pitch;
             let x = this.horzIndexToRectCoords(i);
             let y = this.vertValueToRectCoords(currPitch);
 

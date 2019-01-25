@@ -10,11 +10,9 @@ class PitchArtContainer extends Component {
 
     constructor(props) {
         super(props);
-        let timesAndPitches = this.props.letters.map(item => [item.t0, item.pitch]);
-        let sortedTimesAndPitches = timesAndPitches.sort((a, b) => a[0] - b[0]);
-        this.sortedPitches = sortedTimesAndPitches.map(item => item[1]);
-        this.sortedTimes = sortedTimesAndPitches.map(item => item[0] * this.props.soundLength);
-        this.maxPitchIndex = this.sortedPitches.indexOf(Math.max(...this.sortedPitches));
+        this.pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item));
+        let sortedPitches = this.pitchArtLetters.map(item => item.pitch);
+        this.maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
     }
 
     render() {
@@ -37,18 +35,15 @@ class PitchArtContainer extends Component {
                         uploadId={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
-                        pitches={this.sortedPitches}
-                        times={this.sortedTimes}
-                        letters={this.props.letters}/>
+                        letters={this.pitchArtLetters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
                               minVertPitch={this.props.minVertPitch}
                               maxVertPitch={this.props.maxVertPitch}
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
-                              pitches={this.sortedPitches}
-                              times={this.sortedTimes}
-                              letters={this.props.letters}/>
+                              maxPitchIndex={this.maxPitchIndex}
+                              letters={this.pitchArtLetters}/>
                 </div>
             </div>
         )

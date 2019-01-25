@@ -224,20 +224,25 @@ class TranscribeAudio extends Component {
                 return
             }
 
+            let newLetter = {
+                letter: letter,
+                leftX: -1,
+                rightX: -1,
+                t0: ts[0],
+                t1: ts[1],
+                pitch: pitch,
+                isManualPitch: manualPitch !== undefined
+            };
+
+            let newLettersList = controller.state.letters.concat(newLetter);
+            newLettersList = newLettersList.sort((a, b) => a.t0 - b.t0);
+
             controller.setState(prevState =>
                 ({
-                    letters: prevState.letters.concat({
-                        letter: letter,
-                        leftX: -1,
-                        rightX: -1,
-                        t0: ts[0],
-                        t1: ts[1],
-                        pitch: pitch,
-                        isManualPitch: manualPitch !== undefined
-                    }),
+                    letters: newLettersList,
                     letterEditVersion: prevState.letterEditVersion + 1
                 })
-            )
+            );
 
             controller.state.closeImgSelectionCallback();
         }
