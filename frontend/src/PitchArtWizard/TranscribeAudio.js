@@ -14,6 +14,7 @@ import PlayerBar from "./AudioViewer/PlayerBar";
 import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
 import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
+import update from 'immutability-helper';
 
 
 class TranscribeAudio extends Component {
@@ -107,6 +108,7 @@ class TranscribeAudio extends Component {
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
         this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
+        this.manualPitchChange = this.manualPitchChange.bind(this);
     }
 
     static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
@@ -264,6 +266,13 @@ class TranscribeAudio extends Component {
         this.imageIntervalSelected(
             this.state.minSelectX,
             this.state.maxSelectX);
+    }
+
+    manualPitchChange(index, newPitch) {
+        this.setState({
+            letterEditVersion: this.state.letterEditVersion + 1,
+            letters: update(this.state.letters, {[index]: {pitch: {$set: newPitch}}})
+        });
     }
 
     manualPitchArtClicked() {
@@ -515,6 +524,7 @@ class TranscribeAudio extends Component {
                             onAccentPitchToggle={this.onAccentPitchToggle}
                             minVertPitch={this.state.minVertPitch}
                             maxVertPitch={this.state.maxVertPitch}
+                            manualPitchChange={this.manualPitchChange}
                             uploadId={uploadId}/>
                     </div>
                 </div>

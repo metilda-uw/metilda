@@ -3,9 +3,8 @@ import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 import './PitchArt.css';
 import Konva from 'konva';
-import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
+import {Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
 import PitchArt from "./PitchArt";
-
 
 
 class PitchArtDrawingWindow extends React.Component {
@@ -21,6 +20,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
+        this.pitchArtDragged = this.pitchArtDragged.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -48,7 +48,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
         this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
         this.maxPitchIndex = this.props.maxPitchIndex !== null
-                           ? this.props.maxPitchIndex:  -1;
+            ? this.props.maxPitchIndex : -1;
     }
 
     saveImage() {
@@ -151,10 +151,18 @@ class PitchArtDrawingWindow extends React.Component {
             = isEnabled ? 'pointer' : 'default';
     }
 
+    pitchArtDragged(pos) {
+        return {
+            x: this.getAbsolutePosition().x,
+            y: pos.y
+        }
+    }
+
     render() {
         let points = [];
         let pointPairs = [];
         let lineCircles = [];
+        let controller = this;
         for (let i = 0; i < this.props.pitches.length; i++) {
             let currPitch = this.props.pitches[i];
             let x = this.horzIndexToRectCoords(i);
@@ -164,7 +172,8 @@ class PitchArtDrawingWindow extends React.Component {
             points.push(y);
             pointPairs.push([x, y]);
             lineCircles.push(
-                <Circle x={x}
+                <Circle key={i}
+                        x={x}
                         y={y}
                         fill={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.praatDotFillColor}
                         stroke={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.lineStrokeColor}
@@ -173,7 +182,25 @@ class PitchArtDrawingWindow extends React.Component {
                         onClick={() => this.playSound(currPitch)}
                         onMouseEnter={() => this.setPointerEnabled(true)}
                         onMouseLeave={() => this.setPointerEnabled(false)}
-                        key={i}/>);
+                        draggable={this.props.letters[i].isManualPitch}
+                        dragDistance={5}
+                        dragBoundFunc={function (pos) {
+                                if (!this.isDragging()) {
+                                    return pos;
+                                }
+
+                                let newPitch = controller.rectCoordsToVertValue(pos.y)
+                                return {
+                                    x: this.getAbsolutePosition().x,
+                                    y:  controller.vertValueToRectCoords(newPitch)
+                                };
+                            }
+                        }
+                        onDragEnd={function() {
+                                let newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
+                                controller.props.manualPitchChange(i, newPitch);
+                            }
+                        }/>);
         }
 
         var accentedPoint;
@@ -186,16 +213,18 @@ class PitchArtDrawingWindow extends React.Component {
 
         return (
             <div>
-                <Stage ref={node => { this.stageRef = node}} width={this.props.width} height={this.props.height}>
+                <Stage ref={node => {
+                    this.stageRef = node
+                }} width={this.props.width} height={this.props.height}>
                     <Layer>
                         <Rect width={this.props.width}
                               height={this.props.height}
-                              fill="white" />
+                              fill="white"/>
                         <Line points={[this.innerBorderX0, this.innerBorderY0,
-                                       this.props.width - this.innerBorderX0, this.innerBorderY0,
-                                       this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                       this.innerBorderX0, this.props.height - this.innerBorderY0,
-                                       this.innerBorderX0, this.innerBorderY0]}
+                            this.props.width - this.innerBorderX0, this.innerBorderY0,
+                            this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
+                            this.innerBorderX0, this.props.height - this.innerBorderY0,
+                            this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
                               stroke={this.lineStrokeColor}
                               onClick={this.imageBoundaryClicked}
@@ -210,7 +239,9 @@ class PitchArtDrawingWindow extends React.Component {
                         {lineCircles}
                     </Layer>
                 </Stage>
-                <a className="hide" ref={node => {this.downloadRef = node}}>
+                <a className="hide" ref={node => {
+                    this.downloadRef = node
+                }}>
                     Hidden Download Link
                 </a>
             </div>

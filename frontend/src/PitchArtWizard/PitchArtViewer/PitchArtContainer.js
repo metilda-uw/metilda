@@ -35,8 +35,9 @@ class PitchArtContainer extends Component {
                         minVertPitch={this.props.minVertPitch}
                         maxVertPitch={this.props.maxVertPitch}
                         uploadId={this.props.uploadId}
-                        pitches={this.sortedPitches}
+                        manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
+                        pitches={this.sortedPitches}
                         times={this.sortedTimes}
                         letters={this.props.letters}/>
                     <PitchArt width={this.props.width}
@@ -44,6 +45,7 @@ class PitchArtContainer extends Component {
                               minVertPitch={this.props.minVertPitch}
                               maxVertPitch={this.props.maxVertPitch}
                               uploadId={this.props.uploadId}
+                              manualPitchChange={this.props.manualPitchChange}
                               pitches={this.sortedPitches}
                               times={this.sortedTimes}
                               letters={this.props.letters}/>
