@@ -163,7 +163,6 @@ class PitchArtDrawingWindow extends React.Component {
             points.push(x);
             points.push(y);
             pointPairs.push([x, y]);
-            console.log(this.props.letters[i].isManualPitch);
             lineCircles.push(
                 <Circle x={x}
                         y={y}
