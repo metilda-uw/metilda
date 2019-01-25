@@ -41,6 +41,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.circleRadius = 10;
         this.circleStrokeWidth = 10;
         this.accentedCircleRadius = 30;
+        this.pitchArtSoundLengthSeconds = 0.20;
 
         this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
         this.dotFillColor = this.props.dotFillColor || "#497dba";
@@ -62,7 +63,7 @@ class PitchArtDrawingWindow extends React.Component {
 
     playSound(pitch) {
         let synth = new window.Tone.Synth().toMaster();
-        synth.triggerAttackRelease(pitch, 0.5);
+        synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
     imageBoundaryClicked() {
