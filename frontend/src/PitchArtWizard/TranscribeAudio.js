@@ -322,7 +322,8 @@ class TranscribeAudio extends Component {
 
     setLetterSyllable(index, syllable) {
         this.setState({
-            letters: update(this.state.letters, {[index]: {letter: {$set: syllable}}})
+            letters: update(this.state.letters, {[index]: {letter: {$set: syllable}}}),
+            letterEditVersion: this.state.letterEditVersion + 1
         })
     }
 

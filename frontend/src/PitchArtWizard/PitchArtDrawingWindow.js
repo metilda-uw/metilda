@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 import './PitchArt.css';
-import Konva from 'konva';
-import {Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';
+import {Stage, Layer, Rect, Line, Circle, Group, Text} from 'react-konva';
 import PitchArt from "./PitchArt";
 
 
@@ -42,6 +41,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.circleStrokeWidth = 10;
         this.accentedCircleRadius = 30;
         this.pitchArtSoundLengthSeconds = 0.20;
+        this.fontSize = 16;
 
         // overrideable properties
         this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
@@ -163,10 +163,25 @@ class PitchArtDrawingWindow extends React.Component {
         let pointPairs = [];
         let lineCircles = [];
         let controller = this;
+        let letterSyllables = [];
         for (let i = 0; i < this.props.letters.length; i++) {
             let currPitch = this.props.letters[i].pitch;
             let x = this.horzIndexToRectCoords(i);
             let y = this.vertValueToRectCoords(currPitch);
+
+            // The 'align' property is not working with the current version of
+            // react-konva that's used. As a result, we're manually shifting
+            // the text to be centered.
+            let konvaFontSizeAsPixels = this.fontSize * 0.65;
+            let text = this.props.letters[i].letter;
+
+            letterSyllables.push(
+                <Text key={i}
+                      x={x - (konvaFontSizeAsPixels * text.length / 2.0 )}
+                      y={y + this.circleRadius * 1.9}  // position text below the pitch circle
+                      fontSize={this.fontSize}
+                      text={text}/>
+            );
 
             points.push(x);
             points.push(y);
@@ -189,7 +204,7 @@ class PitchArtDrawingWindow extends React.Component {
                                     return pos;
                                 }
 
-                                let newPitch = controller.rectCoordsToVertValue(pos.y)
+                                let newPitch = controller.rectCoordsToVertValue(pos.y);
                                 return {
                                     x: this.getAbsolutePosition().x,
                                     y:  controller.vertValueToRectCoords(newPitch)
@@ -237,6 +252,9 @@ class PitchArtDrawingWindow extends React.Component {
                               strokeWidth={this.graphWidth}
                               stroke={this.lineStrokeColor}/>
                         {lineCircles}
+                    </Layer>
+                    <Layer>
+                        {letterSyllables}
                     </Layer>
                 </Stage>
                 <a className="hide" ref={node => {
