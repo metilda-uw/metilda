@@ -13,6 +13,7 @@ class TargetPitchBar extends Component {
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
         this.scaleIntervals = this.scaleIntervals.bind(this);
         this.removeLetterEvent = this.removeLetterEvent.bind(this);
+        this.setLetterSyllableEvent = this.setLetterSyllableEvent.bind(this);
     }
 
     timeCoordToImageCoord(t) {
@@ -73,6 +74,30 @@ class TargetPitchBar extends Component {
         this.setState({selectedIndex: -1});
     }
 
+    setLetterSyllableEvent() {
+        let isValidInput = false;
+        let syllable = "";
+
+        while (!isValidInput) {
+            let response = prompt("Enter syllable text", "X");
+
+            if (response == null) {
+                // user canceled input
+                return
+            }
+
+            syllable = response.trim();
+            if (syllable.length === 0) {
+                alert("Syllable should contain at least one character");
+            } else {
+                isValidInput = true;
+            }
+        }
+
+        this.props.setLetterSyllable(this.state.selectedIndex, syllable);
+        this.setState({selectedIndex: -1});
+    }
+
     render() {
         let controller = this;
         let letters = this.scaleIntervals();
@@ -102,6 +127,13 @@ class TargetPitchBar extends Component {
                     </div>
                 </div>
                 <div className="right-align">
+                    <button className="btn waves-effect waves-light m-r-16"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.selectedIndex === -1}
+                            onClick={this.setLetterSyllableEvent}>
+                        Set Syllable
+                    </button>
                     <button className="btn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"

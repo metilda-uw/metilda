@@ -54,11 +54,15 @@ class TranscribeAudio extends Component {
     }
 
     static get DEFAULT_MIN_ANALYSIS_PITCH() {
-        return "75"
+        return "75";
     }
 
     static get DEFAULT_MAX_ANALYSIS_PITCH() {
-        return "500"
+        return "500";
+    }
+
+    static get DEFAULT_SYLLABLE_TEXT() {
+        return "X";
     }
 
     constructor(props) {
@@ -98,6 +102,7 @@ class TranscribeAudio extends Component {
         this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
 
         this.resetAllLetters = this.resetAllLetters.bind(this);
+        this.setLetterSyllable = this.setLetterSyllable.bind(this);
         this.removeLetter = this.removeLetter.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.applyPitchRange = this.applyPitchRange.bind(this);
@@ -208,8 +213,6 @@ class TranscribeAudio extends Component {
     }
 
     imageIntervalSelected(leftX, rightX, manualPitch) {
-        let letter = "X";
-
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
         const controller = this;
@@ -218,7 +221,7 @@ class TranscribeAudio extends Component {
             "time_ranges": [ts]
         };
 
-        function addLetter(pitch) {
+        function addLetter(pitch, letter) {
             if (pitch < controller.state.minVertPitch || pitch > controller.state.maxVertPitch) {
                 // the pitch outside the bounds of the window, omit it
                 return
@@ -231,6 +234,7 @@ class TranscribeAudio extends Component {
                 t0: ts[0],
                 t1: ts[1],
                 pitch: pitch,
+                syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
                 isManualPitch: manualPitch !== undefined
             };
 
@@ -248,7 +252,7 @@ class TranscribeAudio extends Component {
         }
 
         if (manualPitch !== undefined) {
-            addLetter(manualPitch);
+            addLetter(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT);
             return;
         }
 
@@ -262,7 +266,7 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(function (data) {
-                    addLetter(data[0])
+                    addLetter(data[0], TranscribeAudio.DEFAULT_SYLLABLE_TEXT)
                 }
             )
     }
@@ -314,6 +318,12 @@ class TranscribeAudio extends Component {
             this.state.minSelectX,
             this.state.maxSelectX,
             manualPitch);
+    }
+
+    setLetterSyllable(index, syllable) {
+        this.setState({
+            letters: update(this.state.letters, {[index]: {letter: {$set: syllable}}})
+        })
     }
 
     removeLetter(index) {
@@ -514,7 +524,8 @@ class TranscribeAudio extends Component {
                                                 minAudioX={this.state.minAudioX}
                                                 maxAudioX={this.state.maxAudioX}
                                                 minAudioTime={this.state.minAudioTime}
-                                                maxAudioTime={this.state.maxAudioTime}/>
+                                                maxAudioTime={this.state.maxAudioTime}
+                                                setLetterSyllable={this.setLetterSyllable}/>
                             </div>
                         </div>
                     </div>
