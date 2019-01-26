@@ -1,19 +1,19 @@
 import React, {Component} from 'react';
 import "../GlobalStyling.css";
 
-class AccentPitchToggle extends Component {
+class SyllableToggle extends Component {
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item">
                 <div className="top-label">
-                    <label>Accent Symbol</label>
+                    <label>Syllable Text</label>
                 </div>
                 <div className="switch">
                     <label>
                         Hide
                         <input type="checkbox"
-                               checked={this.props.showAccentPitch}
-                               onChange={this.props.onAccentPitchToggle}/>
+                               checked={this.props.showSyllableText}
+                               onChange={this.props.onSyllableTextToggle}/>
                         <span className="lever"></span>
                         Show
                     </label>
@@ -23,4 +23,4 @@ class AccentPitchToggle extends Component {
     }
 }
 
-export default AccentPitchToggle;
+export default SyllableToggle;

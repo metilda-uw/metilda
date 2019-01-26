@@ -82,6 +82,7 @@ class PitchArt extends React.Component {
                                               praatDotFillColor={this.praatDotFillColor}
                                               maxPitchIndex={this.props.maxPitchIndex}
                                               manualPitchChange={this.props.manualPitchChange}
+                                              showSyllableText={this.props.showSyllableText}
                                               letters={this.props.letters}/>;
 
         return (

@@ -4,6 +4,7 @@ import PitchArt from "../PitchArt";
 import TranscribeAudio from "../TranscribeAudio";
 import AccentPitchToggle from "./AccentPitchToggle";
 import "./PitchArtContainer.css";
+import SyllableToggle from "./SyllableToggle";
 
 class PitchArtContainer extends Component {
     state = {};
@@ -20,10 +21,13 @@ class PitchArtContainer extends Component {
             <div>
                 <div className="col s4">
                     <h6 className="metilda-control-header">Pitch Art</h6>
-                    <div className="metilda-pitch-art-container-controls col s12">
+                    <div className="metilda-pitch-art-container-control-list col s12">
                         <AccentPitchToggle
                             onAccentPitchToggle={this.props.onAccentPitchToggle}
                             showAccentPitch={this.props.showAccentPitch}/>
+                        <SyllableToggle
+                            onSyllableTextToggle={this.props.onSyllableTextToggle}
+                            showSyllableText={this.props.showSyllableText}/>
                     </div>
                 </div>
                 <div className="col s8">
@@ -35,6 +39,7 @@ class PitchArtContainer extends Component {
                         uploadId={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
+                        showSyllableText={this.props.showSyllableText}
                         letters={this.pitchArtLetters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
@@ -43,6 +48,7 @@ class PitchArtContainer extends Component {
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
                               maxPitchIndex={this.maxPitchIndex}
+                              showSyllableText={this.props.showSyllableText}
                               letters={this.pitchArtLetters}/>
                 </div>
             </div>

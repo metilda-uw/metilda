@@ -94,7 +94,8 @@ class TranscribeAudio extends Component {
             minVertPitch: TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
             maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
             closeImgSelectionCallback: () => (null),
-            showAccentPitch: false
+            showAccentPitch: false,
+            showSyllableText: false
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -113,6 +114,7 @@ class TranscribeAudio extends Component {
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
         this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
+        this.onSyllableTextToggle = this.onSyllableTextToggle.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
     }
 
@@ -455,6 +457,13 @@ class TranscribeAudio extends Component {
         });
     }
 
+    onSyllableTextToggle(event) {
+        this.setState({
+            showSyllableText: event.target.checked,
+            letterEditVersion: this.state.letterEditVersion + 1
+        });
+    }
+
     render() {
         const {uploadId} = this.props.match.params;
 
@@ -539,6 +548,8 @@ class TranscribeAudio extends Component {
                             height={300}
                             key={this.state.letterEditVersion}
                             onAccentPitchToggle={this.onAccentPitchToggle}
+                            onSyllableTextToggle={this.onSyllableTextToggle}
+                            showSyllableText={this.state.showSyllableText}
                             minVertPitch={this.state.minVertPitch}
                             maxVertPitch={this.state.maxVertPitch}
                             manualPitchChange={this.manualPitchChange}

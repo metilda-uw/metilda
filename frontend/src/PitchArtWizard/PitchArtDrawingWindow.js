@@ -254,7 +254,7 @@ class PitchArtDrawingWindow extends React.Component {
                         {lineCircles}
                     </Layer>
                     <Layer>
-                        {letterSyllables}
+                        {this.props.showSyllableText ? letterSyllables: []}
                     </Layer>
                 </Stage>
                 <a className="hide" ref={node => {
