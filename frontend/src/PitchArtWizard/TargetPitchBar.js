@@ -19,9 +19,9 @@ class TargetPitchBar extends Component {
     timeCoordToImageCoord(t) {
         // clip times that lie beyond the image boundaries
         if (t < this.props.minAudioTime) {
-            return this.props.minAudioX;
+            return 0;
         } else if (t > this.props.maxAudioTime) {
-            return this.props.maxAudioX;
+            return this.props.maxAudioX - this.props.minAudioX;
         }
 
         let dt = this.props.maxAudioTime - this.props.minAudioTime;

@@ -13,6 +13,7 @@ import base64
 import seaborn as sns
 
 # sns.set()  # Use seaborn's default style to make attractive graph
+from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 
 
 def draw_spectrogram(spectrogram, dynamic_range=70):
@@ -90,15 +91,22 @@ def get_pitches_in_range(tmin, tmax, snd_pitch):
     tmin = max(tmin, snd_pitch.xmin)
     tmax = min(tmax, snd_pitch.xmax)
     pitch_samples = [(t, snd_pitch.get_value_at_time(t)) for t in snd_pitch.xs() if tmin <= t <= tmax]
-    return [p for _, p in pitch_samples if not isnan(p)]
+    return [(t, p) for t, p in pitch_samples if not isnan(p)]
 
 
-def get_max_pitches(time_ranges, upload_path, max_pitch=float('inf')):
+def get_max_pitches(time_ranges, upload_path, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch()
-    pitch_ranges = [get_pitches_in_range(t0, t1, snd_pitch) for t0, t1 in time_ranges]
+    pitch_ranges = [get_pitches_in_range(t0, t1, snd_pitch)[1] for t0, t1 in time_ranges]
     pitch_ranges = [[min(max_pitch, p) for p in pitches] for pitches in pitch_ranges]
     return [max(pitches) if len(pitches) > 0 else -1 for pitches in pitch_ranges]
+
+
+def get_all_pitches(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
+    snd = parselmouth.Sound(upload_path)
+    snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
+    t0, t1 = time_range
+    return get_pitches_in_range(t0, t1, snd_pitch)
 
 
 def get_sound_length(upload_path):

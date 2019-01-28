@@ -3,6 +3,7 @@ import os
 from flask import request, jsonify, send_file
 
 from metilda import app
+from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
 
 
@@ -22,8 +23,8 @@ def audio_analysis_image(upload_id):
 
     tmin = request.args.get('tmin', -1, type=float)
     tmax = request.args.get('tmax', -1, type=float)
-    min_pitch = request.args.get('min-pitch', 75, type=float)
-    max_pitch = request.args.get('max-pitch', 500, type=float)
+    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
+    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
 
     image_binary = audio_analysis.audio_analysis_image(
         image_path,
@@ -53,6 +54,15 @@ def max_pitches(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     max_pitch = request.args.get('max-pitch', float('inf'), type=float)
     pitches = audio_analysis.get_max_pitches(request.json['time_ranges'], sound_path, max_pitch)
+    return jsonify(pitches)
+
+
+@app.route('/api/all-pitches/<string:upload_id>', methods=["POST"])
+def all_pitches(upload_id):
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
+    min_pitch = request.args.get('max-pitch', MIN_PITCH_HZ, type=float)
+    pitches = audio_analysis.get_all_pitches(request.json['time_range'], sound_path, min_pitch, max_pitch)
     return jsonify(pitches)
 
 

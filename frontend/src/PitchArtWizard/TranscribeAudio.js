@@ -109,6 +109,7 @@ class TranscribeAudio extends Component {
         this.applyPitchRange = this.applyPitchRange.bind(this);
         this.showAllClicked = this.showAllClicked.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
+        this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
         this.praatPitchArtClicked = this.praatPitchArtClicked.bind(this);
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
@@ -116,6 +117,7 @@ class TranscribeAudio extends Component {
         this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
         this.onSyllableTextToggle = this.onSyllableTextToggle.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
+        this.addPitch = this.addPitch.bind(this);
     }
 
     static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
@@ -214,47 +216,53 @@ class TranscribeAudio extends Component {
         });
     }
 
+    addPitch(pitch, letter, ts, manualPitch) {
+        debugger;
+        if (pitch < this.state.minVertPitch || pitch > this.state.maxVertPitch) {
+            // the pitch outside the bounds of the window, omit it
+            return
+        }
+
+        if (ts[0] === ts[1]) {
+            // add buffer to avoid adding a very narrow box to Target Pitch
+            ts[0] = Math.max(ts[0] - 0.1, 0);
+            ts[1] = Math.min(ts[1] + 0.1, this.state.soundLength);
+        }
+
+        let newLetter = {
+            letter: letter,
+            leftX: -1,
+            rightX: -1,
+            t0: ts[0],
+            t1: ts[1],
+            pitch: pitch,
+            syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+            isManualPitch: manualPitch !== undefined
+        };
+
+        let newLettersList = this.state.letters.concat(newLetter);
+        newLettersList = newLettersList.sort((a, b) => a.t0 - b.t0);
+
+        this.setState(prevState =>
+            ({
+                letters: newLettersList,
+                letterEditVersion: prevState.letterEditVersion + 1
+            })
+        );
+
+        this.state.closeImgSelectionCallback();
+    }
+
     imageIntervalSelected(leftX, rightX, manualPitch) {
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
-        const controller = this;
         const {uploadId} = this.props.match.params;
         let json = {
             "time_ranges": [ts]
         };
 
-        function addLetter(pitch, letter) {
-            if (pitch < controller.state.minVertPitch || pitch > controller.state.maxVertPitch) {
-                // the pitch outside the bounds of the window, omit it
-                return
-            }
-
-            let newLetter = {
-                letter: letter,
-                leftX: -1,
-                rightX: -1,
-                t0: ts[0],
-                t1: ts[1],
-                pitch: pitch,
-                syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-                isManualPitch: manualPitch !== undefined
-            };
-
-            let newLettersList = controller.state.letters.concat(newLetter);
-            newLettersList = newLettersList.sort((a, b) => a.t0 - b.t0);
-
-            controller.setState(prevState =>
-                ({
-                    letters: newLettersList,
-                    letterEditVersion: prevState.letterEditVersion + 1
-                })
-            );
-
-            controller.state.closeImgSelectionCallback();
-        }
-
         if (manualPitch !== undefined) {
-            addLetter(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT);
+            this.addPitch(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT);
             return;
         }
 
@@ -267,9 +275,33 @@ class TranscribeAudio extends Component {
             body: JSON.stringify(json)
         })
             .then(response => response.json())
-            .then(function (data) {
-                    addLetter(data[0], TranscribeAudio.DEFAULT_SYLLABLE_TEXT)
-                }
+            .then(data => this.addPitch(data[0], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, manualPitch)
+            )
+    }
+
+    pitchArtRangeClicked() {
+        let ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+
+        const {uploadId} = this.props.match.params;
+        let json = {
+            "time_range": ts
+        };
+
+        fetch("/api/all-pitches/"
+            + uploadId + "?max-pitch="
+            + this.state.maxPitch
+            + "?min-pitch=" + this.state.minPitch, {
+            method: "POST",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(json)
+        })
+            .then(response => response.json())
+            .then(data => data.map(item => this.addPitch(item[1],
+                                                         TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+                                                         [item[0], item[0]]))
             )
     }
 
@@ -514,6 +546,10 @@ class TranscribeAudio extends Component {
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.selectionIntervalClicked}
                                             disabled={!isSelectionActive}>Sel
+                                    </button>
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.pitchArtRangeClicked}
+                                            disabled={!isSelectionActive}>Range Pch
                                     </button>
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.praatPitchArtClicked}
