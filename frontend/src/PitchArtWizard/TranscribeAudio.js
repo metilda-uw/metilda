@@ -217,7 +217,6 @@ class TranscribeAudio extends Component {
     }
 
     addPitch(pitch, letter, ts, manualPitch) {
-        debugger;
         if (pitch < this.state.minVertPitch || pitch > this.state.maxVertPitch) {
             // the pitch outside the bounds of the window, omit it
             return
@@ -225,8 +224,8 @@ class TranscribeAudio extends Component {
 
         if (ts[0] === ts[1]) {
             // add buffer to avoid adding a very narrow box to Target Pitch
-            ts[0] = Math.max(ts[0] - 0.1, 0);
-            ts[1] = Math.min(ts[1] + 0.1, this.state.soundLength);
+            ts[0] = Math.max(ts[0] - 0.001, 0);
+            ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
         }
 
         let newLetter = {
