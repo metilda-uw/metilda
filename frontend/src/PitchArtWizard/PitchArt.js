@@ -18,7 +18,7 @@ class PitchArt extends React.Component {
         // determine color scheme
         switch (this.props.letters.length) {
             case 2:
-                switch (this.maxPitchIndex) {
+                switch (this.props.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#272264";
                         this.praatDotFillColor = "#0ba14a";
@@ -30,7 +30,7 @@ class PitchArt extends React.Component {
                 }
                 break;
             case 3:
-                switch (this.maxPitchIndex) {
+                switch (this.props.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#92278f";
                         this.praatDotFillColor = "#000000";
@@ -46,7 +46,7 @@ class PitchArt extends React.Component {
                 }
                 break;
             case 4:
-                switch (this.maxPitchIndex) {
+                switch (this.props.maxPitchIndex) {
                     case 0:
                         this.lineStrokeColor = "#f1592a";
                         this.praatDotFillColor = "#12a89d";
