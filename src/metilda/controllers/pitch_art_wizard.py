@@ -33,7 +33,7 @@ def audio_analysis_image(upload_id):
         tmin=tmin,
         tmax=tmax)
 
-    return send_file(image_binary, mimetype="imaZge/png")
+    return send_file(image_binary, mimetype="image/png")
     # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
     # file_name = os.path.splitext(upload_id)[0]
     # image_path = os.path.join(app.config["PICTURES"], file_name + ".png")
