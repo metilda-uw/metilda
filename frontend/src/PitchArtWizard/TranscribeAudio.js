@@ -216,7 +216,7 @@ class TranscribeAudio extends Component {
         });
     }
 
-    addPitch(pitch, letter, ts, manualPitch) {
+    addPitch(pitch, letter, ts, isManualPitch) {
         if (pitch < this.state.minVertPitch || pitch > this.state.maxVertPitch) {
             // the pitch outside the bounds of the window, omit it
             return
@@ -236,7 +236,7 @@ class TranscribeAudio extends Component {
             t1: ts[1],
             pitch: pitch,
             syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-            isManualPitch: manualPitch !== undefined
+            isManualPitch: isManualPitch
         };
 
         let newLettersList = this.state.letters.concat(newLetter);
@@ -261,7 +261,7 @@ class TranscribeAudio extends Component {
         };
 
         if (manualPitch !== undefined) {
-            this.addPitch(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT);
+            this.addPitch(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, true);
             return;
         }
 
@@ -277,7 +277,7 @@ class TranscribeAudio extends Component {
             body: JSON.stringify(json)
         })
             .then(response => response.json())
-            .then(data => this.addPitch(data["avg_pitch"], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, manualPitch)
+            .then(data => this.addPitch(data["avg_pitch"], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, false)
             )
     }
 
