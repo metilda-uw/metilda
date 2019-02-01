@@ -97,7 +97,7 @@ def get_pitches_in_range(tmin, tmax, snd_pitch):
 def get_max_pitches(time_ranges, upload_path, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch()
-    pitch_ranges = [get_pitches_in_range(t0, t1, snd_pitch)[1] for t0, t1 in time_ranges]
+    pitch_ranges = [zip(*get_pitches_in_range(t0, t1, snd_pitch))[1] for t0, t1 in time_ranges]
     pitch_ranges = [[min(max_pitch, p) for p in pitches] for pitches in pitch_ranges]
     return [max(pitches) if len(pitches) > 0 else -1 for pitches in pitch_ranges]
 
