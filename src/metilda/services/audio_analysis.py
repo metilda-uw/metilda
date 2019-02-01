@@ -98,11 +98,12 @@ def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
     t0, t1 = time_range
-    pitches = zip(*get_pitches_in_range(t0, t1, snd_pitch))[1]
+    pitch_samples = get_pitches_in_range(t0, t1, snd_pitch)
 
-    if len(pitches) == 0:
+    if len(pitch_samples) == 0:
         return -1
     else:
+        pitches = zip(*pitch_samples)[1]
         return sum(pitches) / len(pitches)
 
 
