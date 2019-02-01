@@ -94,12 +94,16 @@ def get_pitches_in_range(tmin, tmax, snd_pitch):
     return [(t, p) for t, p in pitch_samples if not isnan(p)]
 
 
-def get_max_pitches(time_ranges, upload_path, max_pitch=MAX_PITCH_HZ):
+def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
-    snd_pitch = snd.to_pitch()
-    pitch_ranges = [zip(*get_pitches_in_range(t0, t1, snd_pitch))[1] for t0, t1 in time_ranges]
-    pitch_ranges = [[min(max_pitch, p) for p in pitches] for pitches in pitch_ranges]
-    return [max(pitches) if len(pitches) > 0 else -1 for pitches in pitch_ranges]
+    snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
+    t0, t1 = time_range
+    pitches = zip(*get_pitches_in_range(t0, t1, snd_pitch))[1]
+
+    if len(pitches) == 0:
+        return -1
+    else:
+        return sum(pitches) / len(pitches)
 
 
 def get_all_pitches(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):

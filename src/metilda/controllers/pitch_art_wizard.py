@@ -49,19 +49,20 @@ def audio(upload_id):
     return send_file(file_bytes, mimetype="audio/wav")
 
 
-@app.route('/api/max-pitches/<string:upload_id>', methods=["POST"])
-def max_pitches(upload_id):
+@app.route('/api/avg-pitch/<string:upload_id>', methods=["POST"])
+def avg_pitch(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-    max_pitch = request.args.get('max-pitch', float('inf'), type=float)
-    pitches = audio_analysis.get_max_pitches(request.json['time_ranges'], sound_path, max_pitch)
-    return jsonify(pitches)
+    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
+    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
+    result = audio_analysis.get_avg_pitch(request.json['time_range'], sound_path, min_pitch, max_pitch)
+    return jsonify({"avg_pitch": result})
 
 
 @app.route('/api/all-pitches/<string:upload_id>', methods=["POST"])
 def all_pitches(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
-    min_pitch = request.args.get('max-pitch', MIN_PITCH_HZ, type=float)
+    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
     pitches = audio_analysis.get_all_pitches(request.json['time_range'], sound_path, min_pitch, max_pitch)
     return jsonify(pitches)
 

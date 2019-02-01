@@ -110,7 +110,7 @@ class TranscribeAudio extends Component {
         this.showAllClicked = this.showAllClicked.bind(this);
         this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
         this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
-        this.praatPitchArtClicked = this.praatPitchArtClicked.bind(this);
+        this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
@@ -257,7 +257,7 @@ class TranscribeAudio extends Component {
 
         const {uploadId} = this.props.match.params;
         let json = {
-            "time_ranges": [ts]
+            "time_range": ts
         };
 
         if (manualPitch !== undefined) {
@@ -265,7 +265,10 @@ class TranscribeAudio extends Component {
             return;
         }
 
-        fetch("/api/max-pitches/" + uploadId + "?max-pitch=" + this.state.maxPitch, {
+        fetch("/api/avg-pitch/"
+            + uploadId
+            + "?max-pitch=" + this.state.maxPitch
+            + "?min-pitch=" + this.state.minPitch, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
@@ -274,7 +277,7 @@ class TranscribeAudio extends Component {
             body: JSON.stringify(json)
         })
             .then(response => response.json())
-            .then(data => this.addPitch(data[0], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, manualPitch)
+            .then(data => this.addPitch(data["avg_pitch"], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, manualPitch)
             )
     }
 
@@ -304,7 +307,7 @@ class TranscribeAudio extends Component {
             )
     }
 
-    praatPitchArtClicked() {
+    averagePitchArtClicked() {
         this.imageIntervalSelected(
             this.state.minSelectX,
             this.state.maxSelectX);
@@ -551,12 +554,12 @@ class TranscribeAudio extends Component {
                                             {/*disabled={!isSelectionActive}>Range Pch*/}
                                     {/*</button>*/}
                                     <button className="waves-effect waves-light btn"
-                                            onClick={this.praatPitchArtClicked}
-                                            disabled={!isSelectionActive}>Praat Pch
+                                            onClick={this.averagePitchArtClicked}
+                                            disabled={!isSelectionActive}>Average Pitch
                                     </button>
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.manualPitchArtClicked}
-                                            disabled={!isSelectionActive}>Manual Pch
+                                            disabled={!isSelectionActive}>Manual Pitch
                                     </button>
                                 </div>
                                 <PlayerBar key={this.state.audioUrl}
