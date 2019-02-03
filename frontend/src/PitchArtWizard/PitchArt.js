@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import './PitchArt.css';
 import Konva from 'konva';
 import { Stage, Layer, Rect, Line, Circle, Group} from 'react-konva';

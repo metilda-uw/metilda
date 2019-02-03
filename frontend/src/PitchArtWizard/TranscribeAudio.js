@@ -1,15 +1,8 @@
 import React, {Component} from 'react';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import './UploadAudio.css';
 import AudioImg from "./AudioImg";
 import AudioImgLoading from "./AudioImgLoading";
-import AudioLetter from "./AudioLetter";
-import {Redirect} from "react-router-dom";
-import PitchArt from "./PitchArt";
-import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 import {connect} from "react-redux";
-import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import PlayerBar from "./AudioViewer/PlayerBar";
 import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
@@ -302,8 +295,8 @@ class TranscribeAudio extends Component {
         })
             .then(response => response.json())
             .then(data => data.map(item => this.addPitch(item[1],
-                                                         TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-                                                         [item[0], item[0]]))
+                TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+                [item[0], item[0]]))
             )
     }
 
@@ -551,8 +544,8 @@ class TranscribeAudio extends Component {
                                             disabled={!isSelectionActive}>Sel
                                     </button>
                                     {/*<button className="waves-effect waves-light btn"*/}
-                                            {/*onClick={this.pitchArtRangeClicked}*/}
-                                            {/*disabled={!isSelectionActive}>Range Pch*/}
+                                    {/*onClick={this.pitchArtRangeClicked}*/}
+                                    {/*disabled={!isSelectionActive}>Range Pch*/}
                                     {/*</button>*/}
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.averagePitchArtClicked}

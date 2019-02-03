@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import '../App.css';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import './Header.css'
 import {Link} from "react-router-dom";
 

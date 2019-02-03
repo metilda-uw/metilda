@@ -1,9 +1,7 @@
 import React, {Component} from 'react';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
-import M from 'materialize-css/dist/js/materialize.min.js'
 import './UploadAudio.css'
 import {Redirect} from "react-router-dom";
+import M from 'materialize-css/dist/js/materialize.min.js'
 
 class UploadAudio extends Component {
   state = {};

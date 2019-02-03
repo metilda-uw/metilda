@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import queryString from 'query-string';
 import PitchArt from "./PitchArt";
 import "./ReviewPitchArt.css"

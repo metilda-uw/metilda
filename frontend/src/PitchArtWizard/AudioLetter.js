@@ -1,6 +1,4 @@
 import React, {Component} from 'react';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import styles from "./TranscribeAudio.css";
 
 class AudioLetter extends Component {

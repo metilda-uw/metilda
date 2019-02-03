@@ -3,7 +3,7 @@ import Header from './Layout/Header.js';
 import UploadAudio from "./PitchArtWizard/UploadAudio";
 import {Route} from "react-router-dom";
 import TranscribeAudio from "./PitchArtWizard/TranscribeAudio";
-import ReviewPitchArt from "./PitchArtWizard/ReviewPitchArt";
+import 'materialize-css/dist/css/materialize.min.css';
 
 class App extends Component {
   state = {};
