@@ -5,12 +5,16 @@ import '../Lib/imgareaselect/css/imgareaselect-default.css';
 import '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
 import {audioSelectionAction} from "../actions/audioAnalysisActions";
 import {connect} from "react-redux";
+import "./GlobalStyling.css";
 
 class AudioImg extends Component {
   state = {};
 
   constructor(props) {
       super(props);
+      this.state  = {
+          isLoaded: false
+      }
   }
 
   componentDidMount() {
@@ -33,6 +37,7 @@ class AudioImg extends Component {
         onInit: function() {
             imgObj.setOptions({minHeight: $el.height()});
             audioImage.props.onAudioImageLoaded(imgObj.cancelSelection);
+            audioImage.setState({isLoaded: true});
         },
         onSelectStart: function(img, loc) {
             if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
@@ -83,7 +88,7 @@ class AudioImg extends Component {
     const {src} = this.props;
     return (
       <img id="metilda-audio-analysis-image"
-           className="metilda-audio-analysis-image"
+           className={"metilda-audio-analysis-image " + this.state.isLoaded ? "hide": ""}
            src={src} />
     );
   }

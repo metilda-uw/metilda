@@ -8,6 +8,8 @@ import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
 import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
 import update from 'immutability-helper';
+import UploadAudio from "./UploadAudio";
+import AudioImgDefault from "./AudioImgDefault";
 
 
 class TranscribeAudio extends Component {
@@ -150,22 +152,24 @@ class TranscribeAudio extends Component {
 
     componentDidMount() {
         const {uploadId} = this.props.match.params;
-        var controller = this;
-        fetch("/api/sound-length/" + uploadId, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: {uploadId: uploadId}
-        })
-            .then(response => response.json())
-            .then(function (data) {
-                controller.setState({
-                    soundLength: data["sound_length"],
-                    maxAudioTime: data["sound_length"]
+        if (uploadId) {
+            var controller = this;
+            fetch("/api/sound-length/" + uploadId, {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: {uploadId: uploadId}
+            })
+                .then(response => response.json())
+                .then(function (data) {
+                    controller.setState({
+                        soundLength: data["sound_length"],
+                        maxAudioTime: data["sound_length"]
+                    });
                 });
-            });
+        }
     }
 
     getAudioConfigForSelection(leftX, rightX) {
@@ -495,9 +499,11 @@ class TranscribeAudio extends Component {
     render() {
         const {uploadId} = this.props.match.params;
 
-        let audioImageLoading;
-        if (!this.state.isAudioImageLoaded) {
-            audioImageLoading = <AudioImgLoading/>
+        let nonAudioImg;
+        if (!uploadId) {
+            nonAudioImg = <AudioImgDefault />;
+        } else if (!this.state.isAudioImageLoaded) {
+            nonAudioImg = <AudioImgLoading/>;
         }
 
         const isSelectionActive = this.state.minSelectX !== -1
@@ -514,6 +520,7 @@ class TranscribeAudio extends Component {
                     <div className="row">
                         <div className="metilda-audio-analysis-controls col s4">
                             <h6 className="metilda-control-header">Audio Analysis</h6>
+                            <UploadAudio/>
                             <PitchRange handleInputChange={this.handleInputChange}
                                         initMinPitch={this.state.minPitch}
                                         initMaxPitch={this.state.maxPitch}
@@ -522,7 +529,7 @@ class TranscribeAudio extends Component {
                         <div className="metilda-audio-analysis col s8">
                             <div>
                                 <div className="metilda-audio-analysis-image-container">
-                                    {audioImageLoading}
+                                    {nonAudioImg}
                                     <AudioImg key={this.state.audioEditVersion}
                                               uploadId={uploadId}
                                               src={this.state.imageUrl}

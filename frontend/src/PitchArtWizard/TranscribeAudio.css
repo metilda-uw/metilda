@@ -80,7 +80,8 @@
     background: lightyellow !important;
 }
 
-.metilda-audio-analysis-image-loading {
+.metilda-audio-analysis-image-loading,
+.metilda-audio-analysis-image-default {
     width: 653px;
     height: 443px;
     display: flex;
