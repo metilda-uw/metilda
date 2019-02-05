@@ -552,10 +552,10 @@ class TranscribeAudio extends Component {
                                             onClick={this.selectionIntervalClicked}
                                             disabled={!isSelectionActive}>Sel
                                     </button>
-                                    {/*<button className="waves-effect waves-light btn"*/}
-                                    {/*onClick={this.pitchArtRangeClicked}*/}
-                                    {/*disabled={!isSelectionActive}>Range Pch*/}
-                                    {/*</button>*/}
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.pitchArtRangeClicked}
+                                            disabled={!isSelectionActive}>Range Pitch
+                                    </button>
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.averagePitchArtClicked}
                                             disabled={!isSelectionActive}>Average Pitch
