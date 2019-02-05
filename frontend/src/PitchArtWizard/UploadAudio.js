@@ -10,16 +10,10 @@ class UploadAudio extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            audioFile: null,
-            audioFileName: "",
-            description: null,
-            gender: null,
-            redirectId: null,
             availableFiles: []
-        }
+        };
 
         this.sendFormSubmit = this.sendFormSubmit.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     componentDidMount() {
@@ -35,34 +29,22 @@ class UploadAudio extends Component {
 
     sendFormSubmit(event) {
         event.preventDefault();
-        this.setState({redirectId: this.state.audioFileName});
-    }
 
-    handleInputChange(event) {
-        const target = event.target;
+        if (this.props.initFileName) {
+            let isOk = window.confirm(
+                "Selecting a new file will reload the " +
+                "page, do you want to continue?");
 
-        let value = null;
-        if (target.type === "checkbox") {
-            value = target.checked;
-        } else if (target.type === "file") {
-            value = target.files[0];
-        } else {
-            value = target.value;
+            if (!isOk) {
+                return false;
+            }
         }
 
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
+        const fileName = event.target.value;
+        window.location.href = "/pitchartwizard/" + fileName;
     }
 
     render() {
-        if (this.state.redirectId !== null) {
-            window.location.href = "/pitchartwizard/" + this.state.redirectId;
-            return;
-        }
-
         const availableFilesList = this.state.availableFiles.map(item =>
             <option key={item}>{item}</option>
         );
@@ -71,21 +53,13 @@ class UploadAudio extends Component {
             <div className="col s12">
                 <label className="group-label">Audio File</label>
                 <div className="row">
-                    <div className="input-field inline col s9">
-                        <select value={this.state.audioFileName || this.props.uploadId || ""}
+                    <div className="input-field inline col s12">
+                        <select value={this.props.initFileName || ""}
                                 name="audioFileName"
-                                onChange={this.handleInputChange}>
+                                onChange={this.sendFormSubmit}>
                             <option value="" disabled="disabled">Choose audio file</option>
                             {availableFilesList}
                         </select>
-                    </div>
-                    <div className="input-field inline col s2">
-                        <button className="btn waves-effect waves-light"
-                                type="submit"
-                                onClick={this.sendFormSubmit}
-                                name="action">
-                            Load
-                        </button>
                     </div>
                 </div>
             </div>
