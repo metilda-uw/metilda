@@ -9,7 +9,7 @@ class PlayerBar extends Component {
                 <Media>
                     <div className="media">
                         <div className="media-player">
-                            <Player src={this.props.audioUrl}/>
+                            <Player src={this.props.audioUrl} vendor="audio"/>
                         </div>
                         <div className="media-controls metilda-control-container">
                             <div className="metilda-audio-analysis-image-col-1">
