@@ -529,7 +529,7 @@ class TranscribeAudio extends Component {
                     <div className="row">
                         <div className="metilda-audio-analysis-controls col s4">
                             <h6 className="metilda-control-header">Audio Analysis</h6>
-                            <UploadAudio/>
+                            <UploadAudio uploadId={uploadId}/>
                             <PitchRange handleInputChange={this.handleInputChange}
                                         initMinPitch={this.state.minPitch}
                                         initMaxPitch={this.state.maxPitch}

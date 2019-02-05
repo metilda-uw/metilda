@@ -59,7 +59,8 @@ class UploadAudio extends Component {
 
     render() {
         if (this.state.redirectId !== null) {
-            return <Redirect push to={"/pitchartwizard/2/" + this.state.redirectId}/>
+            window.location.href = "/pitchartwizard/" + this.state.redirectId;
+            return;
         }
 
         const availableFilesList = this.state.availableFiles.map(item =>
@@ -71,7 +72,7 @@ class UploadAudio extends Component {
                 <label className="group-label">Audio File</label>
                 <div className="row">
                     <div className="input-field inline col s9">
-                        <select value={this.state.audioFileName}
+                        <select value={this.state.audioFileName || this.props.uploadId || ""}
                                 name="audioFileName"
                                 onChange={this.handleInputChange}>
                             <option value="" disabled="disabled">Choose audio file</option>

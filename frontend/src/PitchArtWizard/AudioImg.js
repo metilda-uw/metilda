@@ -88,7 +88,7 @@ class AudioImg extends Component {
     const {src} = this.props;
     return (
       <img id="metilda-audio-analysis-image"
-           className={"metilda-audio-analysis-image " + this.state.isLoaded ? "hide": ""}
+           className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "": "hide")}
            src={src} />
     );
   }
