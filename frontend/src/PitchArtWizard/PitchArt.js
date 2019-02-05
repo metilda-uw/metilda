@@ -81,6 +81,7 @@ class PitchArt extends React.Component {
                                               maxPitchIndex={this.props.maxPitchIndex}
                                               manualPitchChange={this.props.manualPitchChange}
                                               showSyllableText={this.props.showSyllableText}
+                                              showPitchArtLines={this.props.showPitchArtLines}
                                               letters={this.props.letters}/>;
 
         return (
