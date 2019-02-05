@@ -5,6 +5,7 @@ import TranscribeAudio from "../TranscribeAudio";
 import AccentPitchToggle from "./AccentPitchToggle";
 import "./PitchArtContainer.css";
 import SyllableToggle from "./SyllableToggle";
+import PitchArtLinesToggle from "./PitchArtLinesToggle";
 
 class PitchArtContainer extends Component {
     state = {};
@@ -28,6 +29,9 @@ class PitchArtContainer extends Component {
                         <SyllableToggle
                             onSyllableTextToggle={this.props.onSyllableTextToggle}
                             showSyllableText={this.props.showSyllableText}/>
+                        <PitchArtLinesToggle
+                            onPitchArtLinesToggle={this.props.onPitchArtLinesToggle}
+                            showPitchArtLines={this.props.showPitchArtLines}/>
                     </div>
                 </div>
                 <div className="col s8">
@@ -40,6 +44,7 @@ class PitchArtContainer extends Component {
                         manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
                         showSyllableText={this.props.showSyllableText}
+                        showPitchArtLines={this.props.showPitchArtLines}
                         letters={this.pitchArtLetters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
@@ -49,6 +54,7 @@ class PitchArtContainer extends Component {
                               manualPitchChange={this.props.manualPitchChange}
                               maxPitchIndex={this.maxPitchIndex}
                               showSyllableText={this.props.showSyllableText}
+                              showPitchArtLines={this.props.showPitchArtLines}
                               letters={this.pitchArtLetters}/>
                 </div>
             </div>

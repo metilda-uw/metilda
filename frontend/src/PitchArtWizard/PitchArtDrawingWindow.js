@@ -246,9 +246,13 @@ class PitchArtDrawingWindow extends React.Component {
                         {accentedPoint}
                     </Layer>
                     <Layer>
-                        <Line points={points}
-                              strokeWidth={this.graphWidth}
-                              stroke={this.lineStrokeColor}/>
+                        {
+                            this.props.showPitchArtLines ?
+                                <Line points={points}
+                                      strokeWidth={this.graphWidth}
+                                      stroke={this.lineStrokeColor}/>
+                                : []
+                        }
                         {lineCircles}
                     </Layer>
                     <Layer>

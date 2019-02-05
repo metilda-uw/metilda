@@ -90,7 +90,8 @@ class TranscribeAudio extends Component {
             maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
             closeImgSelectionCallback: () => (null),
             showAccentPitch: false,
-            showSyllableText: false
+            showSyllableText: false,
+            showPitchArtLines: true
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -111,6 +112,7 @@ class TranscribeAudio extends Component {
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
         this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
         this.onSyllableTextToggle = this.onSyllableTextToggle.bind(this);
+        this.onPitchArtLinesToggle = this.onPitchArtLinesToggle.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
     }
@@ -496,6 +498,13 @@ class TranscribeAudio extends Component {
         });
     }
 
+    onPitchArtLinesToggle(event) {
+        this.setState({
+            showPitchArtLines: event.target.checked,
+            letterEditVersion: this.state.letterEditVersion + 1
+        });
+    }
+
     render() {
         const {uploadId} = this.props.match.params;
 
@@ -550,10 +559,10 @@ class TranscribeAudio extends Component {
                                             onClick={this.selectionIntervalClicked}
                                             disabled={!isSelectionActive}>Sel
                                     </button>
-                                    {/*<button className="waves-effect waves-light btn"*/}
-                                    {/*onClick={this.pitchArtRangeClicked}*/}
-                                    {/*disabled={!isSelectionActive}>Range Pch*/}
-                                    {/*</button>*/}
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.pitchArtRangeClicked}
+                                            disabled={!isSelectionActive}>Range Pitch
+                                    </button>
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.averagePitchArtClicked}
                                             disabled={!isSelectionActive}>Average Pitch
@@ -588,7 +597,9 @@ class TranscribeAudio extends Component {
                             key={this.state.letterEditVersion}
                             onAccentPitchToggle={this.onAccentPitchToggle}
                             onSyllableTextToggle={this.onSyllableTextToggle}
+                            onPitchArtLinesToggle={this.onPitchArtLinesToggle}
                             showSyllableText={this.state.showSyllableText}
+                            showPitchArtLines={this.state.showPitchArtLines}
                             minVertPitch={this.state.minVertPitch}
                             maxVertPitch={this.state.maxVertPitch}
                             manualPitchChange={this.manualPitchChange}
