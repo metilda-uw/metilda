@@ -42,6 +42,11 @@ def audio_analysis_image(upload_id):
 
 @app.route('/api/audio/<string:upload_id>', methods=["GET"])
 def audio(upload_id):
+    if upload_id == "undefined":
+        # This is the case when the page load and a file has
+        # not been selected
+        return "", 204
+
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     tmin = request.args.get('tmin', -1, type=float)
     tmax = request.args.get('tmax', -1, type=float)

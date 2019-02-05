@@ -510,7 +510,7 @@ class TranscribeAudio extends Component {
 
         let nonAudioImg;
         if (!uploadId) {
-            nonAudioImg = <AudioImgDefault />;
+            nonAudioImg = <AudioImgDefault/>;
         } else if (!this.state.isAudioImageLoaded) {
             nonAudioImg = <AudioImgLoading/>;
         }
@@ -539,16 +539,20 @@ class TranscribeAudio extends Component {
                             <div>
                                 <div className="metilda-audio-analysis-image-container">
                                     {nonAudioImg}
-                                    <AudioImg key={this.state.audioEditVersion}
-                                              uploadId={uploadId}
-                                              src={this.state.imageUrl}
-                                              ref="audioImage"
-                                              imageWidth={TranscribeAudio.AUDIO_IMG_WIDTH}
-                                              xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
-                                              xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
-                                              audioIntervalSelected={this.audioIntervalSelected}
-                                              audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                              onAudioImageLoaded={this.onAudioImageLoaded}/>
+                                    {
+                                        uploadId ?
+                                            <AudioImg key={this.state.audioEditVersion}
+                                                      uploadId={uploadId}
+                                                      src={this.state.imageUrl}
+                                                      ref="audioImage"
+                                                      imageWidth={TranscribeAudio.AUDIO_IMG_WIDTH}
+                                                      xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
+                                                      xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
+                                                      audioIntervalSelected={this.audioIntervalSelected}
+                                                      audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                                                      onAudioImageLoaded={this.onAudioImageLoaded}/>
+                                            : []
+                                    }
                                 </div>
                                 <div id="metilda-audio-function-btns">
                                     <button className="waves-effect waves-light btn"
