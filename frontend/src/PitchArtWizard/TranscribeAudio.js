@@ -520,10 +520,15 @@ class TranscribeAudio extends Component {
         const isAllShown = this.state.minAudioTime === 0
             && this.state.maxAudioTime === this.state.soundLength;
 
+        let title = "";
+        if (this.props.match.params.uploadId) {
+            title = "- " + this.props.match.params.uploadId;
+        }
+
         return (
             <div>
                 <div className="wizard-header">
-                    <h5>Transcribe Audio - {this.props.match.params.uploadId}</h5>
+                    <h5>Transcribe Audio {title}</h5>
                 </div>
                 <div className="metilda-audio-analysis-layout">
                     <div className="row">
