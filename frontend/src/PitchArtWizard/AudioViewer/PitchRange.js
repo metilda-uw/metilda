@@ -17,7 +17,7 @@ class PitchRange extends Component {
 
     render() {
         return (
-            <div className="col s12">
+            <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Pitch Range</label>
                 <div className="row">
                     <form onSubmit={this.submitMaxPitch}>

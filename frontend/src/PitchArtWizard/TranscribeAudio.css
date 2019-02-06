@@ -6,8 +6,12 @@
     width: 1016px;
 }
 
-.metilda-audio-analysis-controls {
+.metilda-audio-analysis-controls-list {
 
+}
+
+.metilda-audio-analysis-controls-list-item {
+    margin-bottom: -32px;
 }
 
 .metilda-audio-analysis {

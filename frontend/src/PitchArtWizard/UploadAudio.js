@@ -50,7 +50,7 @@ class UploadAudio extends Component {
         );
 
         return (
-            <div className="col s12">
+            <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Audio File</label>
                 <div className="row">
                     <div className="input-field inline col s12">
