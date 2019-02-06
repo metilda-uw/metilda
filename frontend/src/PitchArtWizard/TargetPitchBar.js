@@ -67,11 +67,13 @@ class TargetPitchBar extends Component {
 
     targetPitchSelected(index) {
         this.setState({selectedIndex: index});
+        this.props.targetPitchSelected(index);
     }
 
     removeLetterEvent() {
         this.props.removeLetter(this.state.selectedIndex);
         this.setState({selectedIndex: -1});
+        this.props.targetPitchSelected(-1);
     }
 
     setLetterSyllableEvent() {
@@ -96,6 +98,7 @@ class TargetPitchBar extends Component {
 
         this.props.setLetterSyllable(this.state.selectedIndex, syllable);
         this.setState({selectedIndex: -1});
+        this.props.targetPitchSelected(-1);
     }
 
     render() {

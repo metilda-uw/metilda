@@ -89,6 +89,7 @@ class TranscribeAudio extends Component {
             minVertPitch: TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
             maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
             closeImgSelectionCallback: () => (null),
+            selectionCallback: (t1, t2) => (null),
             showAccentPitch: false,
             showSyllableText: false,
             showPitchArtLines: true
@@ -115,6 +116,7 @@ class TranscribeAudio extends Component {
         this.onPitchArtLinesToggle = this.onPitchArtLinesToggle.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
+        this.targetPitchSelected = this.targetPitchSelected.bind(this);
     }
 
     static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
@@ -195,6 +197,25 @@ class TranscribeAudio extends Component {
             minAudioTime: ts[0],
             maxAudioTime: ts[1]
         };
+    }
+
+    targetPitchSelected(index) {
+        this.state.closeImgSelectionCallback();
+
+        if (index !== -1) {
+            let letter = this.state.letters[index];
+            this.state.selectionCallback(letter.t0, letter.t1);
+
+            const {uploadId} = this.props.match.params;
+            let newAudioUrl = TranscribeAudio.formatAudioUrl(
+                uploadId,
+                letter.t0,
+                letter.t1);
+
+            this.setState({
+                audioUrl: newAudioUrl
+            });
+        }
     }
 
     audioIntervalSelectionCanceled() {
@@ -377,10 +398,11 @@ class TranscribeAudio extends Component {
         );
     }
 
-    onAudioImageLoaded(cancelCallback) {
+    onAudioImageLoaded(cancelCallback, selectionCallback) {
         this.setState({
             isAudioImageLoaded: true,
-            closeImgSelectionCallback: cancelCallback
+            closeImgSelectionCallback: cancelCallback,
+            selectionCallback: selectionCallback
         });
     }
 
@@ -555,7 +577,11 @@ class TranscribeAudio extends Component {
                                                       xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
                                                       audioIntervalSelected={this.audioIntervalSelected}
                                                       audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                                      onAudioImageLoaded={this.onAudioImageLoaded}/>
+                                                      onAudioImageLoaded={this.onAudioImageLoaded}
+                                                      minAudioX={this.state.minAudioX}
+                                                      maxAudioX={this.state.maxAudioX}
+                                                      minAudioTime={this.state.minAudioTime}
+                                                      maxAudioTime={this.state.maxAudioTime}/>
                                             : []
                                     }
                                 </div>
@@ -592,7 +618,8 @@ class TranscribeAudio extends Component {
                                                 maxAudioX={this.state.maxAudioX}
                                                 minAudioTime={this.state.minAudioTime}
                                                 maxAudioTime={this.state.maxAudioTime}
-                                                setLetterSyllable={this.setLetterSyllable}/>
+                                                setLetterSyllable={this.setLetterSyllable}
+                                                targetPitchSelected={this.targetPitchSelected}/>
                             </div>
                         </div>
                     </div>
