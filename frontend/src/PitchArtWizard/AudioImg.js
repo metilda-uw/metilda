@@ -35,9 +35,10 @@ class AudioImg extends Component {
         instance: true,
         handles: true,
         onInit: function() {
-            imgObj.setOptions({minHeight: $el.height()});
+            audioImage.setState({isLoaded: true}, function() {
+                imgObj.setOptions({minHeight: $el.height()});
+            });
             audioImage.props.onAudioImageLoaded(imgObj.cancelSelection);
-            audioImage.setState({isLoaded: true});
         },
         onSelectStart: function(img, loc) {
             if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
