@@ -18,7 +18,7 @@ import metilda.controllers.pitch_art_wizard
 
 @app.route('/')
 @app.route('/<path:path>')
-def homepage(path=None):
+def react_app(path=None):
     return render_template("index.html")
 
 
