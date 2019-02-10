@@ -38,8 +38,8 @@ class PitchArtContainer extends Component {
                     <PitchArtDrawingWindow
                         width={this.props.width}
                         height={this.props.height}
-                        minVertPitch={this.props.minVertPitch}
-                        maxVertPitch={this.props.maxVertPitch}
+                        minPitch={this.props.minPitch}
+                        maxPitch={this.props.maxPitch}
                         uploadId={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
@@ -48,8 +48,8 @@ class PitchArtContainer extends Component {
                         letters={this.pitchArtLetters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
-                              minVertPitch={this.props.minVertPitch}
-                              maxVertPitch={this.props.maxVertPitch}
+                              minPitch={this.props.minPitch}
+                              maxPitch={this.props.maxPitch}
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
                               maxPitchIndex={this.maxPitchIndex}

@@ -28,8 +28,8 @@ class PitchArtDrawingWindow extends React.Component {
         this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
         this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
-        this.minVertPitch = this.props.minVertPitch;
-        this.maxVertPitch = this.props.maxVertPitch;
+        this.minPitch = this.props.minPitch;
+        this.maxPitch = this.props.maxPitch;
 
         this.graphWidth = 5;
         this.borderWidth = 15;
@@ -87,8 +87,8 @@ class PitchArtDrawingWindow extends React.Component {
 
     vertValueToRectCoords(pitch) {
         let refExp = referenceExponent(pitch);
-        let pitchIntervalSteps = referenceExponent(this.maxVertPitch) - referenceExponent(this.minVertPitch);
-        let valuePerc = (refExp - referenceExponent(this.minVertPitch)) / pitchIntervalSteps;
+        let pitchIntervalSteps = referenceExponent(this.maxPitch) - referenceExponent(this.minPitch);
+        let valuePerc = (refExp - referenceExponent(this.minPitch)) / pitchIntervalSteps;
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
     }
@@ -100,12 +100,12 @@ class PitchArtDrawingWindow extends React.Component {
         rectCoordPerc = 1.0 - rectCoordPerc; // invert so 0.0 is lowest frequency and 1.0 is highest frequency
 
         // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
-        let pitchIntervalSteps = referenceExponent(this.maxVertPitch) - referenceExponent(this.minVertPitch);
+        let pitchIntervalSteps = referenceExponent(this.maxPitch) - referenceExponent(this.minPitch);
         let rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
-        let rectCoordPitch = exponentToNote(referenceExponent(this.minVertPitch) + rectCoordStepOffset);
+        let rectCoordPitch = exponentToNote(referenceExponent(this.minPitch) + rectCoordStepOffset);
 
-        rectCoordPitch = Math.min(rectCoordPitch, this.maxVertPitch);
-        rectCoordPitch = Math.max(rectCoordPitch, this.minVertPitch);
+        rectCoordPitch = Math.min(rectCoordPitch, this.maxPitch);
+        rectCoordPitch = Math.max(rectCoordPitch, this.minPitch);
         return rectCoordPitch;
     }
 

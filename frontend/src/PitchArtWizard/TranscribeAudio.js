@@ -38,22 +38,12 @@ class TranscribeAudio extends Component {
         return 653;
     }
 
-    static get DEFAULT_MIN_VERT_PITCH() {
-        // 94 quarter tones below A4
-        return 30.0;
-    }
-
-    static get DEFAULT_MAX_VERT_PITCH() {
-        // 11 quarter tones above A4
-        return 604.53;
-    }
-
     static get DEFAULT_MIN_ANALYSIS_PITCH() {
-        return "75";
+        return 75.0;
     }
 
     static get DEFAULT_MAX_ANALYSIS_PITCH() {
-        return "500";
+        return 500.0;
     }
 
     static get DEFAULT_SYLLABLE_TEXT() {
@@ -86,8 +76,6 @@ class TranscribeAudio extends Component {
             maxAudioTime: -1.0,
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
-            minVertPitch: TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
-            maxVertPitch: TranscribeAudio.DEFAULT_MAX_VERT_PITCH,
             closeImgSelectionCallback: () => (null),
             selectionCallback: (t1, t2) => (null),
             showAccentPitch: false,
@@ -123,11 +111,11 @@ class TranscribeAudio extends Component {
         let url = `/api/audio-analysis-image/${uploadId}.png`;
         let urlOptions = [];
 
-        if (minPitch !== undefined && minPitch.trim() !== "") {
+        if (minPitch !== undefined) {
             urlOptions.push(`min-pitch=${minPitch}`);
         }
 
-        if (maxPitch !== undefined && maxPitch.trim() !== "") {
+        if (maxPitch !== undefined) {
             urlOptions.push(`max-pitch=${maxPitch}`);
         }
 
@@ -237,7 +225,7 @@ class TranscribeAudio extends Component {
     }
 
     addPitch(pitch, letter, ts, isManualPitch) {
-        if (pitch < this.state.minVertPitch || pitch > this.state.maxVertPitch) {
+        if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
             // the pitch outside the bounds of the window, omit it
             return
         }
@@ -345,7 +333,7 @@ class TranscribeAudio extends Component {
         let isValidNumber = false;
 
         while (!isValidNumber) {
-            let msg = `Enter pitch value between ${this.state.minVertPitch.toFixed(2)}Hz and ${this.state.maxVertPitch.toFixed(2)}Hz`;
+            let msg = `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz and ${this.state.maxPitch.toFixed(2)}Hz`;
 
             manualPitch = prompt(msg);
 
@@ -364,9 +352,9 @@ class TranscribeAudio extends Component {
                 continue;
             }
 
-            isValidNumber = !(manualPitch < this.state.minVertPitch || manualPitch > this.state.maxVertPitch);
+            isValidNumber = !(manualPitch < this.state.minPitch || manualPitch > this.state.maxPitch);
             if (!isValidNumber) {
-                alert(`${manualPitch}Hz is not between between ${this.state.minVertPitch.toFixed(2)}Hz and ${this.state.maxVertPitch.toFixed(2)}Hz`);
+                alert(`${manualPitch}Hz is not between between ${this.state.minPitch.toFixed(2)}Hz and ${this.state.maxPitch.toFixed(2)}Hz`);
             }
         }
 
@@ -438,8 +426,8 @@ class TranscribeAudio extends Component {
             isAudioImageLoaded: false,
             letterEditVersion: this.state.letterEditVersion + 1,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minVertPitch: this.state.minPitch !== "" ? parseFloat(this.state.minPitch) : TranscribeAudio.DEFAULT_MIN_VERT_PITCH,
-            maxVertPitch: this.state.maxPitch !== "" ? parseFloat(this.state.maxPitch) : TranscribeAudio.DEFAULT_MAX_VERT_PITCH
+            minPitch: this.state.minPitch !== "" ? parseFloat(this.state.minPitch) : TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: this.state.maxPitch !== "" ? parseFloat(this.state.maxPitch) : TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
         });
     }
 
@@ -547,98 +535,6 @@ class TranscribeAudio extends Component {
             title = "- " + this.props.match.params.uploadId;
         }
 
-        // let newLetter1 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 1,
-        //     t1: 1.1,
-        //     pitch: 85,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter2 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 2,
-        //     t1: 2.1,
-        //     pitch: 105,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter3 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 3,
-        //     t1: 3.1,
-        //     pitch: 70,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter4 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 4,
-        //     t1: 4.1,
-        //     pitch: 59,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter5 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 1,
-        //     t1: 1.1,
-        //     pitch: 223,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter6 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 2,
-        //     t1: 2.1,
-        //     pitch: 249,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter7 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 3,
-        //     t1: 3.1,
-        //     pitch: 214,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let newLetter8 = {
-        //     letter: "X",
-        //     leftX: -1,
-        //     rightX: -1,
-        //     t0: 4,
-        //     t1: 4.1,
-        //     pitch: 200,
-        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-        //     isManualPitch: false
-        // };
-        //
-        // let testLetters = [
-        //     newLetter1, newLetter2, newLetter3, newLetter4,
-        //     newLetter5, newLetter6, newLetter7, newLetter8];
-
         return (
             <div>
                 <div className="wizard-header">
@@ -728,8 +624,8 @@ class TranscribeAudio extends Component {
                             onPitchArtLinesToggle={this.onPitchArtLinesToggle}
                             showSyllableText={this.state.showSyllableText}
                             showPitchArtLines={this.state.showPitchArtLines}
-                            minVertPitch={this.state.minVertPitch}
-                            maxVertPitch={this.state.maxVertPitch}
+                            minPitch={this.state.minPitch}
+                            maxPitch={this.state.maxPitch}
                             manualPitchChange={this.manualPitchChange}
                             uploadId={uploadId}/>
                     </div>

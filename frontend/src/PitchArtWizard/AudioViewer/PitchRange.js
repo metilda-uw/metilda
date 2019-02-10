@@ -8,11 +8,22 @@ class PitchRange extends Component {
     constructor(props) {
         super(props);
         this.submitMaxPitch = this.submitMaxPitch.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     submitMaxPitch(event) {
         event.preventDefault();
         this.props.applyPitchRange();
+    }
+
+    handleInputChange(event) {
+        try {
+            event.target.value = parseFloat(event.target.value);
+        } catch(e) {
+            console.log("parse error: "  + e);
+        }
+
+        this.props.handleInputChange(event);
     }
 
     render() {
