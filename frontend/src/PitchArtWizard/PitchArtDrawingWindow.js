@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import './PitchArt.css';
 import {Stage, Layer, Rect, Line, Circle, Group, Text} from 'react-konva';
 import PitchArt from "./PitchArt";
+import {roundToNearestNote} from "./PitchArtViewer/PitchArtScale";
 
 
 class PitchArtDrawingWindow extends React.Component {
@@ -90,23 +91,10 @@ class PitchArtDrawingWindow extends React.Component {
     vertValueToRectCoords(value) {
         // TODO: Fix this logic. It's doing a linear interpolation, instead we want to do discrete assignment.
         // scale the coordinate to be in the perceptual scale
-        value = PitchArtDrawingWindow.roundToNearestNote(value);
+        value = roundToNearestNote(value);
         let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
-    }
-
-    static roundToNearestNote(pitch) {
-        // Scale divisions determines how the scale is divided. Examples:
-        // - 2 makes all notes round to the nearest whole tone
-        // - 4 makes all notes round to the nearest quarter tone
-        // - 8 makes all notes round to the nearest eighth tone
-        let referenceNote = 440.0;
-        let scaleDivisions = 8.0;
-        let scaleBase = Math.pow(2, 1 / (12.0 * scaleDivisions / 2.0));
-        let nearestTonePitchExp = Math.round(Math.log(pitch / referenceNote) / Math.log(scaleBase));
-        let roundedTone = referenceNote * Math.pow(scaleBase, nearestTonePitchExp);
-        return roundedTone;
     }
 
     rectCoordsToVertValue(rectCoord) {
@@ -117,7 +105,7 @@ class PitchArtDrawingWindow extends React.Component {
         let pitch = pitchInterval - pitchHeight + this.minVertPitch;
         pitch = Math.min(pitch, this.maxVertPitch);
         pitch = Math.max(pitch, this.minVertPitch);
-        return PitchArtDrawingWindow.roundToNearestNote(pitch);
+        return roundToNearestNote(pitch);
     }
 
     accentedPoint(x, y) {
