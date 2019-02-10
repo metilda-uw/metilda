@@ -88,6 +88,7 @@ class PitchArtDrawingWindow extends React.Component {
     }
 
     vertValueToRectCoords(value) {
+        // TODO: Fix this logic. It's doing a linear interpolation, instead we want to do discrete assignment.
         // scale the coordinate to be in the perceptual scale
         value = PitchArtDrawingWindow.roundToNearestNote(value);
         let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
