@@ -39,7 +39,8 @@ class PitchRange extends Component {
                                    onChange={this.props.handleInputChange}
                                    placeholder="min Hz"
                                    className="validate"
-                                   pattern="(\d+)?(\.\d+)?"
+                                   pattern="(\d+)(\.\d+)?"
+                                   required={true}
                                    type="text"/>
                         </div>
                         <div className="input-field inline col s1">
@@ -52,7 +53,8 @@ class PitchRange extends Component {
                                    onChange={this.props.handleInputChange}
                                    placeholder="max Hz"
                                    className="validate"
-                                   pattern="(\d+)?(\.\d+)?"
+                                   pattern="(\d+)(\.\d+)?"
+                                   required={true}
                                    type="text"/>
                         </div>
                         <div className="input-field col s2">
