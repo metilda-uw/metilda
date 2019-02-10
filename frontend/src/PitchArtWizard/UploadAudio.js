@@ -56,7 +56,7 @@ class UploadAudio extends Component {
         }
 
         const fileName = event.target.value;
-        window.location.href = "/" + fileName;
+        window.location.href = "/pitchartwizard/" + fileName;
     }
 
     render() {
