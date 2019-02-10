@@ -15,8 +15,10 @@ app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
 
 import metilda.controllers.pitch_art_wizard
 
+
 @app.route('/')
-def homepage():
+@app.route('/<path:path>')
+def homepage(path=None):
     return render_template("index.html")
 
 
