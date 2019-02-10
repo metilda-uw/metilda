@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './PitchArt.css';
 import {Stage, Layer, Rect, Line, Circle, Group, Text} from 'react-konva';
 import PitchArt from "./PitchArt";
-import {roundToNearestNote} from "./PitchArtViewer/PitchArtScale";
+import {roundToNearestNote, referenceExponent, exponentToNote} from "./PitchArtViewer/PitchArtScale";
 
 
 class PitchArtDrawingWindow extends React.Component {
@@ -28,10 +28,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
         this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
-        // 94 quarter tones below A4
         this.minVertPitch = this.props.minVertPitch;
-
-        // 11 quarter tones above A4
         this.maxVertPitch = this.props.maxVertPitch;
 
         this.graphWidth = 5;
@@ -88,24 +85,28 @@ class PitchArtDrawingWindow extends React.Component {
         return this.pointDx0 + pointDx;
     }
 
-    vertValueToRectCoords(value) {
-        // TODO: Fix this logic. It's doing a linear interpolation, instead we want to do discrete assignment.
-        // scale the coordinate to be in the perceptual scale
-        value = roundToNearestNote(value);
-        let valuePerc = (value - this.minVertPitch) / (this.maxVertPitch - this.minVertPitch);
+    vertValueToRectCoords(pitch) {
+        let refExp = referenceExponent(pitch);
+        let pitchIntervalSteps = referenceExponent(this.maxVertPitch) - referenceExponent(this.minVertPitch);
+        let valuePerc = (refExp - referenceExponent(this.minVertPitch)) / pitchIntervalSteps;
         let rectHeight = this.innerHeight * valuePerc;
         return this.innerHeight - rectHeight + this.pointDy0;
     }
 
     rectCoordsToVertValue(rectCoord) {
-        // scale the coordinate to be in the perceptual scale
         let rectCoordPerc = (rectCoord - this.pointDy0) / (this.innerHeight - this.pointDy0);
-        let pitchInterval = this.maxVertPitch - this.minVertPitch;
-        let pitchHeight = pitchInterval * rectCoordPerc;
-        let pitch = pitchInterval - pitchHeight + this.minVertPitch;
-        pitch = Math.min(pitch, this.maxVertPitch);
-        pitch = Math.max(pitch, this.minVertPitch);
-        return roundToNearestNote(pitch);
+        rectCoordPerc = Math.min(rectCoordPerc, 1.0);
+        rectCoordPerc = Math.max(rectCoordPerc, 0.0);
+        rectCoordPerc = 1.0 - rectCoordPerc; // invert so 0.0 is lowest frequency and 1.0 is highest frequency
+
+        // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
+        let pitchIntervalSteps = referenceExponent(this.maxVertPitch) - referenceExponent(this.minVertPitch);
+        let rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
+        let rectCoordPitch = exponentToNote(referenceExponent(this.minVertPitch) + rectCoordStepOffset);
+
+        rectCoordPitch = Math.min(rectCoordPitch, this.maxVertPitch);
+        rectCoordPitch = Math.max(rectCoordPitch, this.minVertPitch);
+        return rectCoordPitch;
     }
 
     accentedPoint(x, y) {

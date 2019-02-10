@@ -547,6 +547,98 @@ class TranscribeAudio extends Component {
             title = "- " + this.props.match.params.uploadId;
         }
 
+        // let newLetter1 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 1,
+        //     t1: 1.1,
+        //     pitch: 85,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter2 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 2,
+        //     t1: 2.1,
+        //     pitch: 105,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter3 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 3,
+        //     t1: 3.1,
+        //     pitch: 70,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter4 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 4,
+        //     t1: 4.1,
+        //     pitch: 59,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter5 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 1,
+        //     t1: 1.1,
+        //     pitch: 223,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter6 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 2,
+        //     t1: 2.1,
+        //     pitch: 249,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter7 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 3,
+        //     t1: 3.1,
+        //     pitch: 214,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let newLetter8 = {
+        //     letter: "X",
+        //     leftX: -1,
+        //     rightX: -1,
+        //     t0: 4,
+        //     t1: 4.1,
+        //     pitch: 200,
+        //     syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
+        //     isManualPitch: false
+        // };
+        //
+        // let testLetters = [
+        //     newLetter1, newLetter2, newLetter3, newLetter4,
+        //     newLetter5, newLetter6, newLetter7, newLetter8];
+
         return (
             <div>
                 <div className="wizard-header">
@@ -629,7 +721,7 @@ class TranscribeAudio extends Component {
                             letters={this.state.letters}
                             soundLength={this.state.soundLength}
                             width={TranscribeAudio.AUDIO_IMG_WIDTH}
-                            height={300}
+                            height={600}
                             key={this.state.letterEditVersion}
                             onAccentPitchToggle={this.onAccentPitchToggle}
                             onSyllableTextToggle={this.onSyllableTextToggle}
