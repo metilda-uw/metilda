@@ -140,9 +140,12 @@ def get_audio(upload_path, tmin=-1, tmax=-1):
 
 
 if __name__ == "__main__":
-    get_audio(
-        r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds\PHEOP001 apaniiwa.wav",
-        r"C:\Users\Mitchell\Downloads\output.wav")
+    p = get_avg_pitch(
+        (1.45,2.03),
+        r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds\EOP-AF-saahkomaapiwa_mono.wav",
+        50,
+        500)
+    print(p)
     # import glob
     # sdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds"
     # pdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\pictures"

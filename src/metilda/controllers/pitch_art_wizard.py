@@ -54,12 +54,14 @@ def audio(upload_id):
     return send_file(file_bytes, mimetype="audio/wav")
 
 
-@app.route('/api/avg-pitch/<string:upload_id>', methods=["POST"])
+@app.route('/api/avg-pitch/<string:upload_id>', methods=["GET"])
 def avg_pitch(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    t0 = request.args.get('t0', type=float)
+    t1 = request.args.get('t1', type=float)
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
-    result = audio_analysis.get_avg_pitch(request.json['time_range'], sound_path, min_pitch, max_pitch)
+    result = audio_analysis.get_avg_pitch((t0, t1), sound_path, min_pitch, max_pitch)
     return jsonify({"avg_pitch": result})
 
 

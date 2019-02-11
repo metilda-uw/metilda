@@ -264,10 +264,6 @@ class TranscribeAudio extends Component {
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
         const {uploadId} = this.props.match.params;
-        let json = {
-            "time_range": ts
-        };
-
         if (manualPitch !== undefined) {
             this.addPitch(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, true);
             return;
@@ -275,14 +271,15 @@ class TranscribeAudio extends Component {
 
         fetch("/api/avg-pitch/"
             + uploadId
-            + "?max-pitch=" + this.state.maxPitch
-            + "?min-pitch=" + this.state.minPitch, {
-            method: "POST",
+            + "?t0=" + ts[0]
+            + "&t1=" + ts[1]
+            + "&max-pitch=" + this.state.maxPitch
+            + "&min-pitch=" + this.state.minPitch, {
+            method: "GET",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(json)
+            }
         })
             .then(response => response.json())
             .then(data => this.addPitch(data["avg_pitch"], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, false)
@@ -300,7 +297,7 @@ class TranscribeAudio extends Component {
         fetch("/api/all-pitches/"
             + uploadId + "?max-pitch="
             + this.state.maxPitch
-            + "?min-pitch=" + this.state.minPitch, {
+            + "&min-pitch=" + this.state.minPitch, {
             method: "POST",
             headers: {
                 'Accept': 'application/json',
