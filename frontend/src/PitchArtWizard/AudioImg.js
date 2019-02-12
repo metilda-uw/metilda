@@ -48,6 +48,7 @@ class AudioImg extends Component {
         let $el = $("#metilda-audio-analysis-image");
         let imgBox = {xminPerc, xmaxPerc};
         let prevMaxWidth;
+        let isProgrammaticSelection = false;
 
         window.onresize = function () {
             prevMaxWidth = undefined;
@@ -61,19 +62,30 @@ class AudioImg extends Component {
                     imgObj.setOptions({minHeight: $el.height()});
                 });
                 audioImage.props.onAudioImageLoaded(imgObj.cancelSelection, function (t1, t2) {
+                    isProgrammaticSelection = true;
                     // clear existing selections
                     imgObj.cancelSelection();
 
                     let leftX = audioImage.timeCoordToImageCoord(t1);
                     let rightX = audioImage.timeCoordToImageCoord(t2);
                     if (leftX < rightX) {
-                        imgObj.setSelection(leftX, 0, rightX, imgObj.getOptions().minHeight, true);
+                        // The y1 and y2 values are intentionally set such that the resulting
+                        // height of the selection is less than the image height. This is
+                        // done on purpose to avoid a weird resize bug that results in the
+                        // wrong selection being shown.
+                        let y1 = imgObj.getOptions().minHeight * 0.002;
+                        let y2 = imgObj.getOptions().minHeight * 0.998;
+                        imgObj.setSelection(leftX, y1, rightX, y2, true);
                         imgObj.setOptions({show: true});
                         imgObj.update();
                     }
+                    isProgrammaticSelection = false;
                 });
             },
             onSelectStart: function (img, loc) {
+                if (isProgrammaticSelection) {
+                    return;
+                }
                 if (loc.x1 < imgBox.xminPerc * img.width || loc.x2 > imgBox.xmaxPerc * img.width) {
                     imgObj.cancelSelection();
                 } else {
@@ -82,6 +94,9 @@ class AudioImg extends Component {
                 }
             },
             onSelectChange: function (img, loc) {
+                if (isProgrammaticSelection) {
+                    return;
+                }
                 if (cropAreaLeftX !== undefined && cropAreaRightX !== undefined) {
                     let isLeftEdgeMovingLeft = loc.x1 < cropAreaLeftX;
                     let isRightEdgeMovingRight = loc.x2 > cropAreaRightX;
@@ -104,6 +119,9 @@ class AudioImg extends Component {
                 }
             },
             onSelectEnd: function (img, loc) {
+                if (isProgrammaticSelection) {
+                    return;
+                }
                 cropAreaLeftX = undefined;
                 cropAreaRightX = undefined;
 

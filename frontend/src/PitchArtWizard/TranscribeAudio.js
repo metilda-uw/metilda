@@ -188,8 +188,6 @@ class TranscribeAudio extends Component {
     }
 
     targetPitchSelected(index) {
-        this.state.closeImgSelectionCallback();
-
         if (index !== -1) {
             let letter = this.state.letters[index];
             this.state.selectionCallback(letter.t0, letter.t1);
