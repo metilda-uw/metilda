@@ -416,6 +416,9 @@ class TranscribeAudio extends Component {
             this.state.maxPitch,
             this.state.minAudioTime,
             this.state.maxAudioTime);
+
+        this.state.closeImgSelectionCallback();
+
         this.setState({
             imageUrl: newUrl,
             isAudioImageLoaded: false,
