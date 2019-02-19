@@ -12,6 +12,7 @@ class PitchArt extends React.Component {
         super(props);
 
         this.saveImage = this.saveImage.bind(this);
+        this.playPitchArt = this.playPitchArt.bind(this);
 
         // determine color scheme
         switch (this.props.letters.length) {
@@ -69,6 +70,10 @@ class PitchArt extends React.Component {
         this.pitchArtRef.saveImage();
     }
 
+    playPitchArt() {
+        this.pitchArtRef.playPitchArt();
+    }
+
     render() {
         let pitchArt = <PitchArtDrawingWindow ref={node => { this.pitchArtRef = node}}
                                               width={this.props.width}
@@ -90,6 +95,10 @@ class PitchArt extends React.Component {
                     {pitchArt}
                 </div>
                 <div id="metilda-pitch-art-btn-container">
+                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                            onClick={this.playPitchArt}>
+                        Play
+                    </button>
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
                             onClick={this.saveImage}>
                         Save Image

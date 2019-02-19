@@ -14,6 +14,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
+        this.playPitchArt = this.playPitchArt.bind(this);
         this.playSound = this.playSound.bind(this);
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
@@ -44,7 +45,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
         this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
         this.maxPitchIndex = this.props.maxPitchIndex !== null
-                            ? this.props.maxPitchIndex : -1;
+            ? this.props.maxPitchIndex : -1;
     }
 
     saveImage() {
@@ -57,6 +58,30 @@ class PitchArtDrawingWindow extends React.Component {
         this.downloadRef.href = dataURL;
         this.downloadRef.download = fileName;
         this.downloadRef.click();
+    }
+
+    playPitchArt() {
+        var env = new window.Tone.AmplitudeEnvelope({
+            "attack": 0.001,
+            "decay": 0.001,
+            "sustain": 0.001,
+            "release": 0.001
+        }).toMaster();
+
+        var filter = new window.Tone.Filter({type: "highpass", frequency: 50, rolloff: -48}).toMaster();
+
+        //var synth = new window.Tone.Synth().toMaster().chain(filter, env);
+        var synth = new window.Tone.Synth().toMaster().chain(filter, env);
+
+        let tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
+        let notes = this.props.letters.map((item) => (
+            {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch}));
+
+        let midiPart = new window.Tone.Part(function (time, note) {
+            synth.triggerAttackRelease(note.pitch, note.duration, time);
+        }, notes).start();
+
+        window.Tone.Transport.start();
     }
 
     playSound(pitch) {
@@ -165,7 +190,7 @@ class PitchArtDrawingWindow extends React.Component {
 
             letterSyllables.push(
                 <Text key={i}
-                      x={x - (konvaFontSizeAsPixels * text.length / 2.0 )}
+                      x={x - (konvaFontSizeAsPixels * text.length / 2.0)}
                       y={y + this.circleRadius * 1.9}  // position text below the pitch circle
                       fontSize={this.fontSize}
                       text={text}/>
@@ -188,21 +213,21 @@ class PitchArtDrawingWindow extends React.Component {
                         draggable={this.props.letters[i].isManualPitch}
                         dragDistance={5}
                         dragBoundFunc={function (pos) {
-                                if (!this.isDragging()) {
-                                    return pos;
-                                }
+                            if (!this.isDragging()) {
+                                return pos;
+                            }
 
-                                let newPitch = controller.rectCoordsToVertValue(pos.y);
-                                return {
-                                    x: this.getAbsolutePosition().x,
-                                    y:  controller.vertValueToRectCoords(newPitch)
-                                };
-                            }
+                            let newPitch = controller.rectCoordsToVertValue(pos.y);
+                            return {
+                                x: this.getAbsolutePosition().x,
+                                y: controller.vertValueToRectCoords(newPitch)
+                            };
                         }
-                        onDragEnd={function() {
-                                let newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
-                                controller.props.manualPitchChange(i, newPitch);
-                            }
+                        }
+                        onDragEnd={function () {
+                            let newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
+                            controller.props.manualPitchChange(i, newPitch);
+                        }
                         }/>);
         }
 
@@ -246,7 +271,7 @@ class PitchArtDrawingWindow extends React.Component {
                         {lineCircles}
                     </Layer>
                     <Layer>
-                        {this.props.showSyllableText ? letterSyllables: []}
+                        {this.props.showSyllableText ? letterSyllables : []}
                     </Layer>
                 </Stage>
                 <a className="hide" ref={node => {
