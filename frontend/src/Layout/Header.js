@@ -12,7 +12,7 @@ class Header extends Component {
     return (
         <nav>
             <div id="metilda-navbar" className="row">
-                <a href="/" className="app-logo metilda-navbar-item">MeTILDA</a>
+                <a href="/pitchartwizard" className="app-logo metilda-navbar-item">MeTILDA</a>
             </div>
         </nav>
     );
