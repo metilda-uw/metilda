@@ -80,7 +80,8 @@ class TranscribeAudio extends Component {
             selectionCallback: (t1, t2) => (null),
             showAccentPitch: false,
             showSyllableText: false,
-            showPitchArtLines: true
+            showPitchArtLines: true,
+            activePlayIndex: -1
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -102,6 +103,7 @@ class TranscribeAudio extends Component {
         this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
         this.onSyllableTextToggle = this.onSyllableTextToggle.bind(this);
         this.onPitchArtLinesToggle = this.onPitchArtLinesToggle.bind(this);
+        this.onActivePlayIndex = this.onActivePlayIndex.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -513,6 +515,13 @@ class TranscribeAudio extends Component {
         });
     }
 
+    onActivePlayIndex(index) {
+        this.setState({
+            activePlayIndex: index,
+            letterEditVersion: this.state.letterEditVersion + 1
+        });
+    }
+
     render() {
         const {uploadId} = this.props.match.params;
 
@@ -620,8 +629,10 @@ class TranscribeAudio extends Component {
                             onAccentPitchToggle={this.onAccentPitchToggle}
                             onSyllableTextToggle={this.onSyllableTextToggle}
                             onPitchArtLinesToggle={this.onPitchArtLinesToggle}
+                            onActivePlayIndex={this.onActivePlayIndex}
                             showSyllableText={this.state.showSyllableText}
                             showPitchArtLines={this.state.showPitchArtLines}
+                            activePlayIndex={this.state.activePlayIndex}
                             minPitch={this.state.minPitch}
                             maxPitch={this.state.maxPitch}
                             manualPitchChange={this.manualPitchChange}

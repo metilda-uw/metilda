@@ -67,15 +67,30 @@ class PitchArt extends React.Component {
     }
 
     saveImage() {
-        this.pitchArtRef.saveImage();
+        this.hiddenRef.saveImage();
     }
 
     playPitchArt() {
-        this.pitchArtRef.playPitchArt();
+        this.visibleRef.playPitchArt();
     }
 
     render() {
-        let pitchArt = <PitchArtDrawingWindow ref={node => { this.pitchArtRef = node}}
+          let visiblePitchArt =
+              <PitchArtDrawingWindow
+                        ref={node => { this.visibleRef = node}}
+                        width={this.props.width}
+                        height={this.props.height}
+                        minPitch={this.props.minPitch}
+                        maxPitch={this.props.maxPitch}
+                        uploadId={this.props.uploadId}
+                        manualPitchChange={this.props.manualPitchChange}
+                        maxPitchIndex={this.props.showAccentPitch ? this.props.maxPitchIndex : null}
+                        showSyllableText={this.props.showSyllableText}
+                        showPitchArtLines={this.props.showPitchArtLines}
+                        activePlayIndex={this.props.activePlayIndex}
+                        onActivePlayIndex={this.props.onActivePlayIndex}
+                        letters={this.props.letters}/>;
+        let hiddenPitchArt = <PitchArtDrawingWindow ref={node => { this.hiddenRef = node}}
                                               width={this.props.width}
                                               height={this.props.height}
                                               uploadId={this.props.uploadId}
@@ -87,12 +102,18 @@ class PitchArt extends React.Component {
                                               manualPitchChange={this.props.manualPitchChange}
                                               showSyllableText={this.props.showSyllableText}
                                               showPitchArtLines={this.props.showPitchArtLines}
+                                              activePlayColor={this.activePlayColor}
+                                              activePlayIndex={-1}
+                                              onActivePlayIndex={this.props.onActivePlayIndex}
                                               letters={this.props.letters}/>;
 
         return (
             <div>
+                <div>
+                    {visiblePitchArt}
+                </div>
                 <div className="hide">
-                    {pitchArt}
+                    {hiddenPitchArt}
                 </div>
                 <div id="metilda-pitch-art-btn-container">
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"

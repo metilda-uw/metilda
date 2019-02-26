@@ -35,17 +35,6 @@ class PitchArtContainer extends Component {
                     </div>
                 </div>
                 <div className="col s8">
-                    <PitchArtDrawingWindow
-                        width={this.props.width}
-                        height={this.props.height}
-                        minPitch={this.props.minPitch}
-                        maxPitch={this.props.maxPitch}
-                        uploadId={this.props.uploadId}
-                        manualPitchChange={this.props.manualPitchChange}
-                        maxPitchIndex={this.props.showAccentPitch ? this.maxPitchIndex : null}
-                        showSyllableText={this.props.showSyllableText}
-                        showPitchArtLines={this.props.showPitchArtLines}
-                        letters={this.pitchArtLetters}/>
                     <PitchArt width={this.props.width}
                               height={this.props.height}
                               minPitch={this.props.minPitch}
@@ -53,8 +42,11 @@ class PitchArtContainer extends Component {
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
                               maxPitchIndex={this.maxPitchIndex}
+                              showAccentPitch={this.props.showAccentPitch}
                               showSyllableText={this.props.showSyllableText}
                               showPitchArtLines={this.props.showPitchArtLines}
+                              activePlayIndex={this.props.activePlayIndex}
+                              onActivePlayIndex={this.props.onActivePlayIndex}
                               letters={this.pitchArtLetters}/>
                 </div>
             </div>

@@ -42,6 +42,7 @@ class PitchArtDrawingWindow extends React.Component {
 
         // overrideable properties
         this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
+        this.activePlayColor = "#e8e82e";
         this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
         this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
         this.maxPitchIndex = this.props.maxPitchIndex !== null
@@ -74,11 +75,18 @@ class PitchArtDrawingWindow extends React.Component {
         var synth = new window.Tone.Synth().toMaster().chain(filter, env);
 
         let tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
-        let notes = this.props.letters.map((item) => (
-            {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch}));
-
+        let tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
+        let notes = this.props.letters.map(function (item, index) {
+                return {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch, index: index};
+            }
+        );
+        notes.push({time: tEnd, duration: 1, pitch: 1, index: -1});
+        let controller = this;
         let midiPart = new window.Tone.Part(function (time, note) {
-            synth.triggerAttackRelease(note.pitch, note.duration, time);
+            controller.props.onActivePlayIndex(note.index);
+            if (note.index !== -1) {
+                synth.triggerAttackRelease(note.pitch, note.duration, time);
+            }
         }, notes).start();
 
         window.Tone.Transport.start();
@@ -196,15 +204,20 @@ class PitchArtDrawingWindow extends React.Component {
                       text={text}/>
             );
 
+            let circleFill = this.props.activePlayIndex === i ? this.activePlayColor
+                : (this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.praatDotFillColor);
+            let circleStroke = this.props.activePlayIndex === i ? this.activePlayColor
+                : (this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.lineStrokeColor);
+
             points.push(x);
             points.push(y);
             pointPairs.push([x, y]);
             lineCircles.push(
-                <Circle key={i}
+                <Circle key={i + circleFill + circleStroke}
                         x={x}
                         y={y}
-                        fill={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.praatDotFillColor}
-                        stroke={this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.lineStrokeColor}
+                        fill={circleFill}
+                        stroke={circleStroke}
                         strokeWidth={this.circleStrokeWidth}
                         radius={this.circleRadius}
                         onClick={() => this.playSound(currPitch)}
