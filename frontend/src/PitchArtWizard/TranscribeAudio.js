@@ -59,7 +59,6 @@ class TranscribeAudio extends Component {
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
-            letterEditVersion: 0,
             maxPitch: TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
             minPitch: TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
             imageUrl: TranscribeAudio.formatImageUrl(
@@ -244,8 +243,7 @@ class TranscribeAudio extends Component {
 
         this.setState(prevState =>
             ({
-                letters: newLettersList,
-                letterEditVersion: prevState.letterEditVersion + 1
+                letters: newLettersList
             })
         );
 
@@ -312,7 +310,6 @@ class TranscribeAudio extends Component {
 
     manualPitchChange(index, newPitch) {
         this.setState({
-            letterEditVersion: this.state.letterEditVersion + 1,
             letters: update(this.state.letters, {[index]: {pitch: {$set: newPitch}}})
         });
     }
@@ -356,22 +353,20 @@ class TranscribeAudio extends Component {
     setLetterSyllable(index, syllable) {
         this.setState({
             letters: update(this.state.letters, {[index]: {letter: {$set: syllable}}}),
-            letterEditVersion: this.state.letterEditVersion + 1
         })
     }
 
     removeLetter(index) {
         this.setState(prevState => (
             {
-                letters: prevState.letters.filter((_, i) => i !== index),
-                letterEditVersion: prevState.letterEditVersion + 1
+                letters: prevState.letters.filter((_, i) => i !== index)
             })
         );
     }
 
     resetAllLetters() {
         this.setState(prevState => (
-            {letters: [], letterEditVersion: prevState.letterEditVersion + 1})
+            {letters: []})
         );
     }
 
@@ -416,7 +411,6 @@ class TranscribeAudio extends Component {
         this.setState({
             imageUrl: newUrl,
             isAudioImageLoaded: false,
-            letterEditVersion: this.state.letterEditVersion + 1,
             audioEditVersion: this.state.audioEditVersion + 1,
             minPitch: this.state.minPitch !== "" ? parseFloat(this.state.minPitch) : TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
             maxPitch: this.state.maxPitch !== "" ? parseFloat(this.state.maxPitch) : TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
@@ -570,7 +564,6 @@ class TranscribeAudio extends Component {
                                            audioUrl={this.state.audioUrl}/>
 
                                 <TargetPitchBar letters={this.state.letters}
-                                                key={this.state.letterEditVersion}
                                                 removeLetter={this.removeLetter}
                                                 resetAllLetters={this.resetAllLetters}
                                                 minAudioX={this.state.minAudioX}
