@@ -15,7 +15,7 @@ class PitchArtContainer extends Component {
         this.state = {
             showAccentPitch: false,
             showSyllableText: false,
-            showPitchArtLines: true,
+            showPitchArtLines: true
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -70,8 +70,6 @@ class PitchArtContainer extends Component {
                               showAccentPitch={this.state.showAccentPitch}
                               showSyllableText={this.state.showSyllableText}
                               showPitchArtLines={this.state.showPitchArtLines}
-                              activePlayIndex={this.props.activePlayIndex}
-                              onActivePlayIndex={this.props.onActivePlayIndex}
                               letters={pitchArtLetters}/>
                 </div>
             </div>

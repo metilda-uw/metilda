@@ -10,6 +10,9 @@ class PitchArtDrawingWindow extends React.Component {
 
     constructor(props) {
         super(props);
+        this.state = {
+            activePlayIndex: -1
+        };
         this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
         this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
@@ -20,6 +23,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
         this.pitchArtDragged = this.pitchArtDragged.bind(this);
+        this.colorScheme = this.colorScheme.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -75,7 +79,7 @@ class PitchArtDrawingWindow extends React.Component {
         notes.push({time: tEnd, duration: 1, pitch: 1, index: -1});
         let controller = this;
         let midiPart = new window.Tone.Part(function (time, note) {
-            controller.props.onActivePlayIndex(note.index);
+            controller.setState({activePlayIndex: note.index});
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
             }
@@ -171,11 +175,78 @@ class PitchArtDrawingWindow extends React.Component {
         }
     }
 
+    colorScheme(isVisible) {
+        if (isVisible) {
+            return {
+                lineStrokeColor: "#497dba",
+                praatDotFillColor: "#497dba",
+                activePlayColor: "#e8e82e",
+                manualDotFillColor: "#af0008"
+            };
+        }
+
+        let lineStrokeColor = null;
+        let praatDotFillColor = null;
+
+        // determine color scheme
+        switch (this.props.letters.length) {
+            case 2:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#272264";
+                        praatDotFillColor = "#0ba14a";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#71002b";
+                        praatDotFillColor = "#2e3192";
+                        break;
+                }
+                break;
+            case 3:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#92278f";
+                        praatDotFillColor = "#000000";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#056839";
+                        praatDotFillColor = "#be72b0";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#5b4a42";
+                        praatDotFillColor = "#166e92";
+                }
+                break;
+            case 4:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#f1592a";
+                        praatDotFillColor = "#12a89d";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#283890";
+                        praatDotFillColor = "#8cc63e";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#9e1f62";
+                        praatDotFillColor = "#f7941d";
+                }
+                break;
+            default:
+                lineStrokeColor = "black";
+                praatDotFillColor = "black";
+        }
+
+        return {lineStrokeColor: lineStrokeColor,
+                praatDotFillColor: praatDotFillColor,
+                activePlayColor: null,
+                manualDotFillColor: null};
+    }
+
     render() {
-        let lineStrokeColor = this.props.lineStrokeColor || "#497dba";
-        let activePlayColor = "#e8e82e";
-        let praatDotFillColor = this.props.praatDotFillColor || "#497dba";
-        let manualDotFillColor = this.props.manualDotFillColor || "#af0008";
+        let colorScheme = this.colorScheme(this.props.isVisible);
 
         let points = [];
         let pointPairs = [];
@@ -201,10 +272,24 @@ class PitchArtDrawingWindow extends React.Component {
                       text={text}/>
             );
 
-            let circleFill = this.props.activePlayIndex === i ? activePlayColor
-                : (this.props.letters[i].isManualPitch ? manualDotFillColor : praatDotFillColor);
-            let circleStroke = this.props.activePlayIndex === i ? activePlayColor
-                : (this.props.letters[i].isManualPitch ? manualDotFillColor : lineStrokeColor);
+            let circleFill = null;
+            let circleStroke = null;
+
+            if (this.props.isVisible) {
+                if (this.state.activePlayIndex === i) {
+                    circleFill = colorScheme.activePlayColor;
+                    circleStroke = colorScheme.activePlayColor;
+                } else if (this.props.letters[i].isManualPitch)  {
+                    circleFill = colorScheme.manualDotFillColor;
+                    circleStroke = colorScheme.manualDotFillColor;
+                } else {
+                    circleFill = colorScheme.praatDotFillColor;
+                    circleStroke = colorScheme.lineStrokeColor;
+                }
+            } else {
+                circleFill = colorScheme.praatDotFillColor;
+                circleStroke = colorScheme.lineStrokeColor;
+            }
 
             points.push(x);
             points.push(y);
@@ -266,7 +351,7 @@ class PitchArtDrawingWindow extends React.Component {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                              stroke={lineStrokeColor}
+                              stroke={colorScheme.lineStrokeColor}
                               onClick={this.imageBoundaryClicked}
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
@@ -277,7 +362,7 @@ class PitchArtDrawingWindow extends React.Component {
                             this.props.showPitchArtLines ?
                                 <Line points={points}
                                       strokeWidth={this.graphWidth}
-                                      stroke={lineStrokeColor}/>
+                                      stroke={colorScheme.lineStrokeColor}/>
                                 : []
                         }
                         {lineCircles}

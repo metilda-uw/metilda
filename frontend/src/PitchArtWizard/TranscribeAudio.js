@@ -77,8 +77,7 @@ class TranscribeAudio extends Component {
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null),
-            selectionCallback: (t1, t2) => (null),
-            activePlayIndex: -1
+            selectionCallback: (t1, t2) => (null)
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -97,7 +96,6 @@ class TranscribeAudio extends Component {
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
-        this.onActivePlayIndex = this.onActivePlayIndex.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -485,13 +483,6 @@ class TranscribeAudio extends Component {
             audioEditVersion: this.state.audioEditVersion + 1,
             minAudioTime: config.minAudioTime,
             maxAudioTime: config.maxAudioTime
-        });
-    }
-
-    onActivePlayIndex(index) {
-        this.setState({
-            activePlayIndex: index,
-            letterEditVersion: this.state.letterEditVersion + 1
         });
     }
 
