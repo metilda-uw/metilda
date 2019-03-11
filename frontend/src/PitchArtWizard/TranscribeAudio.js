@@ -78,9 +78,6 @@ class TranscribeAudio extends Component {
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null),
             selectionCallback: (t1, t2) => (null),
-            showAccentPitch: false,
-            showSyllableText: false,
-            showPitchArtLines: true,
             activePlayIndex: -1
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
@@ -100,9 +97,6 @@ class TranscribeAudio extends Component {
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
-        this.onAccentPitchToggle = this.onAccentPitchToggle.bind(this);
-        this.onSyllableTextToggle = this.onSyllableTextToggle.bind(this);
-        this.onPitchArtLinesToggle = this.onPitchArtLinesToggle.bind(this);
         this.onActivePlayIndex = this.onActivePlayIndex.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
@@ -494,27 +488,6 @@ class TranscribeAudio extends Component {
         });
     }
 
-    onAccentPitchToggle(event) {
-        this.setState({
-            showAccentPitch: event.target.checked,
-            letterEditVersion: this.state.letterEditVersion + 1
-        });
-    }
-
-    onSyllableTextToggle(event) {
-        this.setState({
-            showSyllableText: event.target.checked,
-            letterEditVersion: this.state.letterEditVersion + 1
-        });
-    }
-
-    onPitchArtLinesToggle(event) {
-        this.setState({
-            showPitchArtLines: event.target.checked,
-            letterEditVersion: this.state.letterEditVersion + 1
-        });
-    }
-
     onActivePlayIndex(index) {
         this.setState({
             activePlayIndex: index,
@@ -620,19 +593,10 @@ class TranscribeAudio extends Component {
                     </div>
                     <div className="row">
                         <PitchArtContainer
-                            showAccentPitch={this.state.showAccentPitch}
                             letters={this.state.letters}
                             soundLength={this.state.soundLength}
                             width={TranscribeAudio.AUDIO_IMG_WIDTH}
                             height={600}
-                            key={this.state.letterEditVersion}
-                            onAccentPitchToggle={this.onAccentPitchToggle}
-                            onSyllableTextToggle={this.onSyllableTextToggle}
-                            onPitchArtLinesToggle={this.onPitchArtLinesToggle}
-                            onActivePlayIndex={this.onActivePlayIndex}
-                            showSyllableText={this.state.showSyllableText}
-                            showPitchArtLines={this.state.showPitchArtLines}
-                            activePlayIndex={this.state.activePlayIndex}
                             minPitch={this.state.minPitch}
                             maxPitch={this.state.maxPitch}
                             manualPitchChange={this.manualPitchChange}

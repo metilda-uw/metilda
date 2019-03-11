@@ -12,26 +12,51 @@ class PitchArtContainer extends Component {
 
     constructor(props) {
         super(props);
-        this.pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item));
-        let sortedPitches = this.pitchArtLetters.map(item => item.pitch);
-        this.maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
+        this.state = {
+            showAccentPitch: false,
+            showSyllableText: false,
+            showPitchArtLines: true,
+        };
+        this.handleInputChange = this.handleInputChange.bind(this);
+    }
+
+    handleInputChange(event) {
+        const target = event.target;
+
+        let value = null;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else if (target.type === "file") {
+            value = target.files[0];
+        } else {
+            value = target.value;
+        }
+
+        const name = target.name;
+
+        this.setState({
+            [name]: value
+        });
     }
 
     render() {
+        let pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item));
+        let sortedPitches = pitchArtLetters.map(item => item.pitch);
+        let maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
         return (
             <div>
                 <div className="col s4">
                     <h6 className="metilda-control-header">Pitch Art</h6>
                     <div className="metilda-pitch-art-container-control-list col s12">
                         <AccentPitchToggle
-                            onAccentPitchToggle={this.props.onAccentPitchToggle}
-                            showAccentPitch={this.props.showAccentPitch}/>
+                            handleInputChange={this.handleInputChange}
+                            showAccentPitch={this.state.showAccentPitch}/>
                         <SyllableToggle
-                            onSyllableTextToggle={this.props.onSyllableTextToggle}
-                            showSyllableText={this.props.showSyllableText}/>
+                            handleInputChange={this.handleInputChange}
+                            showSyllableText={this.state.showSyllableText}/>
                         <PitchArtLinesToggle
-                            onPitchArtLinesToggle={this.props.onPitchArtLinesToggle}
-                            showPitchArtLines={this.props.showPitchArtLines}/>
+                            handleInputChange={this.handleInputChange}
+                            showPitchArtLines={this.state.showPitchArtLines}/>
                     </div>
                 </div>
                 <div className="col s8">
@@ -41,13 +66,13 @@ class PitchArtContainer extends Component {
                               maxPitch={this.props.maxPitch}
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
-                              maxPitchIndex={this.maxPitchIndex}
-                              showAccentPitch={this.props.showAccentPitch}
-                              showSyllableText={this.props.showSyllableText}
-                              showPitchArtLines={this.props.showPitchArtLines}
+                              maxPitchIndex={maxPitchIndex}
+                              showAccentPitch={this.state.showAccentPitch}
+                              showSyllableText={this.state.showSyllableText}
+                              showPitchArtLines={this.state.showPitchArtLines}
                               activePlayIndex={this.props.activePlayIndex}
                               onActivePlayIndex={this.props.onActivePlayIndex}
-                              letters={this.pitchArtLetters}/>
+                              letters={pitchArtLetters}/>
                 </div>
             </div>
         )

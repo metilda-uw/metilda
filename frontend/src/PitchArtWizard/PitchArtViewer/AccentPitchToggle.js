@@ -13,7 +13,8 @@ class AccentPitchToggle extends Component {
                         Hide
                         <input type="checkbox"
                                checked={this.props.showAccentPitch}
-                               onChange={this.props.onAccentPitchToggle}/>
+                               onChange={this.props.handleInputChange}
+                               name="showAccentPitch"/>
                         <span className="lever"></span>
                         Show
                     </label>

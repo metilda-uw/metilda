@@ -39,14 +39,6 @@ class PitchArtDrawingWindow extends React.Component {
         this.accentedCircleRadius = 30;
         this.pitchArtSoundLengthSeconds = 0.20;
         this.fontSize = 16;
-
-        // overrideable properties
-        this.lineStrokeColor = this.props.lineStrokeColor || "#497dba";
-        this.activePlayColor = "#e8e82e";
-        this.praatDotFillColor = this.props.praatDotFillColor || "#497dba";
-        this.manualDotFillColor = this.props.manualDotFillColor || "#af0008";
-        this.maxPitchIndex = this.props.maxPitchIndex !== null
-            ? this.props.maxPitchIndex : -1;
     }
 
     saveImage() {
@@ -180,6 +172,11 @@ class PitchArtDrawingWindow extends React.Component {
     }
 
     render() {
+        let lineStrokeColor = this.props.lineStrokeColor || "#497dba";
+        let activePlayColor = "#e8e82e";
+        let praatDotFillColor = this.props.praatDotFillColor || "#497dba";
+        let manualDotFillColor = this.props.manualDotFillColor || "#af0008";
+
         let points = [];
         let pointPairs = [];
         let lineCircles = [];
@@ -204,10 +201,10 @@ class PitchArtDrawingWindow extends React.Component {
                       text={text}/>
             );
 
-            let circleFill = this.props.activePlayIndex === i ? this.activePlayColor
-                : (this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.praatDotFillColor);
-            let circleStroke = this.props.activePlayIndex === i ? this.activePlayColor
-                : (this.props.letters[i].isManualPitch ? this.manualDotFillColor : this.lineStrokeColor);
+            let circleFill = this.props.activePlayIndex === i ? activePlayColor
+                : (this.props.letters[i].isManualPitch ? manualDotFillColor : praatDotFillColor);
+            let circleStroke = this.props.activePlayIndex === i ? activePlayColor
+                : (this.props.letters[i].isManualPitch ? manualDotFillColor : lineStrokeColor);
 
             points.push(x);
             points.push(y);
@@ -246,10 +243,12 @@ class PitchArtDrawingWindow extends React.Component {
 
         var accentedPoint;
 
-        if (this.maxPitchIndex !== -1 && pointPairs.length >= 1) {
+        if (this.props.showAccentPitch
+            && this.props.maxPitchIndex !== null
+            && pointPairs.length >= 1) {
             accentedPoint = this.accentedPoint(
-                pointPairs[this.maxPitchIndex][0],
-                pointPairs[this.maxPitchIndex][1]);
+                pointPairs[this.props.maxPitchIndex][0],
+                pointPairs[this.props.maxPitchIndex][1]);
         }
 
         return (
@@ -267,7 +266,7 @@ class PitchArtDrawingWindow extends React.Component {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                              stroke={this.lineStrokeColor}
+                              stroke={lineStrokeColor}
                               onClick={this.imageBoundaryClicked}
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
@@ -278,7 +277,7 @@ class PitchArtDrawingWindow extends React.Component {
                             this.props.showPitchArtLines ?
                                 <Line points={points}
                                       strokeWidth={this.graphWidth}
-                                      stroke={this.lineStrokeColor}/>
+                                      stroke={lineStrokeColor}/>
                                 : []
                         }
                         {lineCircles}

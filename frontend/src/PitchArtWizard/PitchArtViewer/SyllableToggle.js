@@ -13,7 +13,8 @@ class SyllableToggle extends Component {
                         Hide
                         <input type="checkbox"
                                checked={this.props.showSyllableText}
-                               onChange={this.props.onSyllableTextToggle}/>
+                               onChange={this.props.handleInputChange}
+                               name="showSyllableText"/>
                         <span className="lever"></span>
                         Show
                     </label>

@@ -13,7 +13,8 @@ class PitchArtLinesToggle extends Component {
                         Hide
                         <input type="checkbox"
                                checked={this.props.showPitchArtLines}
-                               onChange={this.props.onPitchArtLinesToggle}/>
+                               onChange={this.props.handleInputChange}
+                               name="showPitchArtLines"/>
                         <span className="lever"></span>
                         Show
                     </label>

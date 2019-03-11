@@ -13,57 +13,7 @@ class PitchArt extends React.Component {
 
         this.saveImage = this.saveImage.bind(this);
         this.playPitchArt = this.playPitchArt.bind(this);
-
-        // determine color scheme
-        switch (this.props.letters.length) {
-            case 2:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        this.lineStrokeColor = "#272264";
-                        this.praatDotFillColor = "#0ba14a";
-                        break;
-                    case 1:
-                        this.lineStrokeColor = "#71002b";
-                        this.praatDotFillColor = "#2e3192";
-                        break;
-                }
-                break;
-            case 3:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        this.lineStrokeColor = "#92278f";
-                        this.praatDotFillColor = "#000000";
-                        break;
-                    case 1:
-                        this.lineStrokeColor = "#056839";
-                        this.praatDotFillColor = "#be72b0";
-                        break;
-                    case 2:
-                    default:
-                        this.lineStrokeColor = "#5b4a42";
-                        this.praatDotFillColor = "#166e92";
-                }
-                break;
-            case 4:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        this.lineStrokeColor = "#f1592a";
-                        this.praatDotFillColor = "#12a89d";
-                        break;
-                    case 1:
-                        this.lineStrokeColor = "#283890";
-                        this.praatDotFillColor = "#8cc63e";
-                        break;
-                    case 2:
-                    default:
-                        this.lineStrokeColor = "#9e1f62";
-                        this.praatDotFillColor = "#f7941d";
-                }
-                break;
-            default:
-                this.lineStrokeColor = "black";
-                this.praatDotFillColor = "black";
-        }
+        this.colorScheme = this.colorScheme.bind(this);
     }
 
     saveImage() {
@@ -74,8 +24,69 @@ class PitchArt extends React.Component {
         this.visibleRef.playPitchArt();
     }
 
+    colorScheme() {
+        let lineStrokeColor = null;
+        let praatDotFillColor = null;
+
+        // determine color scheme
+        switch (this.props.letters.length) {
+            case 2:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#272264";
+                        praatDotFillColor = "#0ba14a";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#71002b";
+                        praatDotFillColor = "#2e3192";
+                        break;
+                }
+                break;
+            case 3:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#92278f";
+                        praatDotFillColor = "#000000";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#056839";
+                        praatDotFillColor = "#be72b0";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#5b4a42";
+                        praatDotFillColor = "#166e92";
+                }
+                break;
+            case 4:
+                switch (this.props.maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#f1592a";
+                        praatDotFillColor = "#12a89d";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#283890";
+                        praatDotFillColor = "#8cc63e";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#9e1f62";
+                        praatDotFillColor = "#f7941d";
+                }
+                break;
+            default:
+                lineStrokeColor = "black";
+                praatDotFillColor = "black";
+        }
+
+        return {lineStrokeColor: lineStrokeColor,
+                praatDotFillColor: praatDotFillColor}
+    }
+
     render() {
-          let visiblePitchArt =
+        let colorScheme = this.colorScheme();
+
+        let visiblePitchArt =
               <PitchArtDrawingWindow
                         ref={node => { this.visibleRef = node}}
                         width={this.props.width}
@@ -84,7 +95,8 @@ class PitchArt extends React.Component {
                         maxPitch={this.props.maxPitch}
                         uploadId={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
-                        maxPitchIndex={this.props.showAccentPitch ? this.props.maxPitchIndex : null}
+                        maxPitchIndex={this.props.maxPitchIndex}
+                        showAccentPitch={this.props.showAccentPitch}
                         showSyllableText={this.props.showSyllableText}
                         showPitchArtLines={this.props.showPitchArtLines}
                         activePlayIndex={this.props.activePlayIndex}
@@ -96,10 +108,11 @@ class PitchArt extends React.Component {
                                               uploadId={this.props.uploadId}
                                               minPitch={this.props.minPitch}
                                               maxPitch={this.props.maxPitch}
-                                              lineStrokeColor={this.lineStrokeColor}
-                                              praatDotFillColor={this.praatDotFillColor}
+                                              lineStrokeColor={colorScheme.lineStrokeColor}
+                                              praatDotFillColor={colorScheme.praatDotFillColor}
                                               maxPitchIndex={this.props.maxPitchIndex}
                                               manualPitchChange={this.props.manualPitchChange}
+                                              showAccentPitch={true}
                                               showSyllableText={this.props.showSyllableText}
                                               showPitchArtLines={this.props.showPitchArtLines}
                                               activePlayColor={this.activePlayColor}
