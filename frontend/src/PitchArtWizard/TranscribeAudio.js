@@ -554,7 +554,6 @@ class TranscribeAudio extends Component {
                     <div className="row">
                         <PitchArtContainer
                             letters={this.props.letters}
-                            letters={this.props.letters}
                             soundLength={this.state.soundLength}
                             width={TranscribeAudio.AUDIO_IMG_WIDTH}
                             height={600}

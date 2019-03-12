@@ -7,6 +7,7 @@ import "./PitchArtContainer.css";
 import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
+import PitchArtCenterToggle from "./PitchArtCenterToggle";
 
 class PitchArtContainer extends Component {
     state = {};
@@ -16,6 +17,7 @@ class PitchArtContainer extends Component {
         this.state = {
             showAccentPitch: false,
             showSyllableText: false,
+            showVerticallyCentered: false,
             showPitchArtLines: true,
             showLargeCircles: true
         };
@@ -56,6 +58,9 @@ class PitchArtContainer extends Component {
                         <SyllableToggle
                             handleInputChange={this.handleInputChange}
                             showSyllableText={this.state.showSyllableText}/>
+                        <PitchArtCenterToggle
+                            handleInputChange={this.handleInputChange}
+                            showVerticallyCentered={this.state.showVerticallyCentered}/>
                         <PitchArtLinesToggle
                             handleInputChange={this.handleInputChange}
                             showPitchArtLines={this.state.showPitchArtLines}/>
@@ -74,6 +79,7 @@ class PitchArtContainer extends Component {
                               maxPitchIndex={maxPitchIndex}
                               showAccentPitch={this.state.showAccentPitch}
                               showSyllableText={this.state.showSyllableText}
+                              showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
                               letters={pitchArtLetters}/>

@@ -24,6 +24,7 @@ class PitchArtDrawingWindow extends React.Component {
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
         this.pitchArtDragged = this.pitchArtDragged.bind(this);
         this.colorScheme = this.colorScheme.bind(this);
+        this.centerOffset = this.centerOffset.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -32,9 +33,6 @@ class PitchArtDrawingWindow extends React.Component {
 
         this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
         this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
-
-        this.minPitch = this.props.minPitch;
-        this.maxPitch = this.props.maxPitch;
 
         this.graphWidth = 5;
         this.borderWidth = 15;
@@ -115,12 +113,12 @@ class PitchArtDrawingWindow extends React.Component {
         return this.pointDx0 + pointDx;
     }
 
-    vertValueToRectCoords(pitch) {
+    vertValueToRectCoords(pitch, vertOffset=0) {
         let refExp = referenceExponent(pitch);
-        let pitchIntervalSteps = referenceExponent(this.maxPitch) - referenceExponent(this.minPitch);
-        let valuePerc = (refExp - referenceExponent(this.minPitch)) / pitchIntervalSteps;
+        let pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
+        let valuePerc = (refExp - referenceExponent(this.props.minPitch)) / pitchIntervalSteps;
         let rectHeight = this.innerHeight * valuePerc;
-        return this.innerHeight - rectHeight + this.pointDy0;
+        return this.innerHeight - rectHeight + this.pointDy0 - vertOffset;
     }
 
     rectCoordsToVertValue(rectCoord) {
@@ -130,12 +128,12 @@ class PitchArtDrawingWindow extends React.Component {
         rectCoordPerc = 1.0 - rectCoordPerc; // invert so 0.0 is lowest frequency and 1.0 is highest frequency
 
         // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
-        let pitchIntervalSteps = referenceExponent(this.maxPitch) - referenceExponent(this.minPitch);
+        let pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
         let rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
-        let rectCoordPitch = exponentToNote(referenceExponent(this.minPitch) + rectCoordStepOffset);
+        let rectCoordPitch = exponentToNote(referenceExponent(this.props.minPitch) + rectCoordStepOffset);
 
-        rectCoordPitch = Math.min(rectCoordPitch, this.maxPitch);
-        rectCoordPitch = Math.max(rectCoordPitch, this.minPitch);
+        rectCoordPitch = Math.min(rectCoordPitch, this.props.maxPitch);
+        rectCoordPitch = Math.max(rectCoordPitch, this.props.minPitch);
         return rectCoordPitch;
     }
 
@@ -246,10 +244,28 @@ class PitchArtDrawingWindow extends React.Component {
                 manualDotFillColor: null};
     }
 
+    centerOffset() {
+        if (this.props.letters.length < 1) {
+            return 0.0;
+        }
+
+        let coords = this.props.letters.map(
+            letter => this.vertValueToRectCoords(letter.pitch));
+
+        let figureHeight = Math.max(...coords) - Math.min(...coords);
+        let figureCenterY = Math.min(...coords) + (figureHeight / 2.0);
+        let windowCenterY = this.pointDy0 + (this.innerHeight / 2.0);
+
+        return figureCenterY - windowCenterY;
+    }
+
     render() {
         let colorScheme = this.colorScheme(this.props.isVisible);
+
         let circleRadius = this.props.showLargeCircles ?
             this.largeCircleRadius : this.smallCircleRadius;
+
+        let vertOffset = this.props.showVerticallyCentered ? this.centerOffset(): 0.0;
 
         let points = [];
         let pointPairs = [];
@@ -259,7 +275,7 @@ class PitchArtDrawingWindow extends React.Component {
         for (let i = 0; i < this.props.letters.length; i++) {
             let currPitch = this.props.letters[i].pitch;
             let x = this.horzIndexToRectCoords(i);
-            let y = this.vertValueToRectCoords(currPitch);
+            let y = this.vertValueToRectCoords(currPitch, vertOffset);
 
             // The 'align' property is not working with the current version of
             // react-konva that's used. As a result, we're manually shifting
