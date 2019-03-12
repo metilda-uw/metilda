@@ -10,7 +10,7 @@ import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
 import update from 'immutability-helper';
 import UploadAudio from "./UploadAudio";
 import AudioImgDefault from "./AudioImgDefault";
-import {addLetter, audioSelectionAction, setLetterSyllable} from "../actions/audioAnalysisActions";
+import {addLetter, audioSelectionAction, setLetterPitch, setLetterSyllable} from "../actions/audioAnalysisActions";
 import audioAnalysisReducer from "../reducers/audioAnalysisReducers";
 
 
@@ -308,9 +308,7 @@ class TranscribeAudio extends Component {
     }
 
     manualPitchChange(index, newPitch) {
-        this.setState({
-            letters: update(this.state.letters, {[index]: {pitch: {$set: newPitch}}})
-        });
+        this.props.setLetterPitch(index, newPitch);
     }
 
     manualPitchArtClicked() {
@@ -573,7 +571,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    addLetter: (newLetter) => dispatch(addLetter(newLetter))
+    addLetter: (newLetter) => dispatch(addLetter(newLetter)),
+    setLetterPitch: (index, newPitch) => dispatch(setLetterPitch(index, newPitch))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TranscribeAudio);

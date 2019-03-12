@@ -24,6 +24,8 @@ export default (state = defaultState, action) => {
             return letterAction(state, action);
         case actions.SET_LETTER_SYLLABLE:
             return letterAction(state, action);
+        case actions.MANUAL_PITCH_ADJUST:
+            return letterAction(state, action);
         default:
             return state;
     }

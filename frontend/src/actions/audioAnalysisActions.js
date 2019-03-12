@@ -7,7 +7,8 @@ export const actions = {
     REMOVE_LETTER: "REMOVE_LETTER",
     RESET_LETTERS: "RESET_LETTERS",
     SET_LETTER_SYLLABLE: "SET_LETTER_SYLLABLE",
-    SET_ACTIVE_LETTER: "SET_ACTIVE_LETTER"
+    SET_ACTIVE_LETTER: "SET_ACTIVE_LETTER",
+    MANUAL_PITCH_ADJUST: "MANUAL_PITCH_ADJUST"
 };
 
 export const audioSelectionAction = (leftX, rightX) => dispatch => {
@@ -51,6 +52,16 @@ export const setLetterSyllable = (index, syllable) => (dispatch, getState) => {
 
     dispatch({
         type: actions.SET_LETTER_SYLLABLE,
+        letters: newLetters
+    })
+};
+
+export const setLetterPitch = (index, newPitch) => (dispatch, getState) => {
+    let letters = getState().audioAnalysisReducer.letters;
+    let newLetters = update(letters, {[index]: {pitch: {$set: newPitch}}});
+
+    dispatch({
+        type: actions.MANUAL_PITCH_ADJUST,
         letters: newLetters
     })
 };
