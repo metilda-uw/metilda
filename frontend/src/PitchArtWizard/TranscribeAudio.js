@@ -374,12 +374,12 @@ class TranscribeAudio extends Component {
         });
     }
 
-    applyPitchRange() {
+    applyPitchRange(minPitch, maxPitch) {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
-            this.state.minPitch,
-            this.state.maxPitch,
+            minPitch,
+            maxPitch,
             this.state.minAudioTime,
             this.state.maxAudioTime);
 
@@ -389,8 +389,8 @@ class TranscribeAudio extends Component {
             imageUrl: newUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minPitch: this.state.minPitch !== "" ? parseFloat(this.state.minPitch) : TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: this.state.maxPitch !== "" ? parseFloat(this.state.maxPitch) : TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
+            minPitch: minPitch !== "" ? parseFloat(minPitch) : TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: maxPitch !== "" ? parseFloat(maxPitch) : TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
         });
     }
 
@@ -487,8 +487,7 @@ class TranscribeAudio extends Component {
                         <div className="metilda-audio-analysis-controls-list col s4">
                             <h6 className="metilda-control-header">Audio Analysis</h6>
                             <UploadAudio initFileName={uploadId}/>
-                            <PitchRange handleInputChange={this.handleInputChange}
-                                        initMinPitch={this.state.minPitch}
+                            <PitchRange initMinPitch={this.state.minPitch}
                                         initMaxPitch={this.state.maxPitch}
                                         applyPitchRange={this.applyPitchRange}/>
                         </div>

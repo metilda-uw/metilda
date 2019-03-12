@@ -7,26 +7,43 @@ const {PlayPause, MuteUnmute, SeekBar} = controls;
 class PitchRange extends Component {
     constructor(props) {
         super(props);
+        this.state = {
+            minPitch: null,
+            maxPitch: null,
+            isMinDirty: false,
+            isMaxDirty: false
+        };
         this.submitMaxPitch = this.submitMaxPitch.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     submitMaxPitch(event) {
         event.preventDefault();
-        this.props.applyPitchRange();
+        this.props.applyPitchRange(this.state.minPitch, this.state.maxPitch);
     }
 
     handleInputChange(event) {
-        try {
-            event.target.value = parseFloat(event.target.value);
-        } catch(e) {
-            console.log("parse error: "  + e);
-        }
+        const name = event.target.name;
+        this.setState({[name]: event.target.value});
 
-        this.props.handleInputChange(event);
+        if (name === 'minPitch') {
+            this.setState({isMinDirty: true});
+        } else if (name === 'maxPitch') {
+            this.setState({isMaxDirty: true});
+        }
     }
 
     render() {
+        let minValue = this.props.initMinPitch;
+        if (this.state.isMinDirty) {
+            minValue = this.state.minPitch;
+        }
+
+        let maxValue = this.props.initMaxPitch;
+        if (this.state.isMaxDirty) {
+            maxValue = this.state.maxPitch;
+        }
+
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Pitch Range</label>
@@ -35,8 +52,8 @@ class PitchRange extends Component {
                         <div className="input-field inline col s4">
                             <input name="minPitch"
                                    id="minPitch"
-                                   value={this.props.initMinPitch}
-                                   onChange={this.props.handleInputChange}
+                                   value={minValue}
+                                   onChange={this.handleInputChange}
                                    placeholder="min Hz"
                                    className="validate"
                                    pattern="(\d+)(\.\d+)?"
@@ -49,8 +66,8 @@ class PitchRange extends Component {
                         <div className="input-field inline col s4">
                             <input name="maxPitch"
                                    id="maxPitch"
-                                   value={this.props.initMaxPitch}
-                                   onChange={this.props.handleInputChange}
+                                   value={maxValue}
+                                   onChange={this.handleInputChange}
                                    placeholder="max Hz"
                                    className="validate"
                                    pattern="(\d+)(\.\d+)?"
