@@ -1,5 +1,7 @@
 import React, {Component} from 'react';
 import AudioLetter from "./AudioLetter";
+import {removeLetter, resetLetters, setLetterSyllable} from "../actions/audioAnalysisActions";
+import {connect} from "react-redux";
 
 class TargetPitchBar extends Component {
     state = {};
@@ -13,7 +15,12 @@ class TargetPitchBar extends Component {
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
         this.scaleIntervals = this.scaleIntervals.bind(this);
         this.removeLetterEvent = this.removeLetterEvent.bind(this);
+        this.resetAllLettersEvent = this.resetAllLettersEvent.bind(this);
         this.setLetterSyllableEvent = this.setLetterSyllableEvent.bind(this);
+    }
+
+    resetAllLettersEvent() {
+        this.props.resetLetters();
     }
 
     timeCoordToImageCoord(t) {
@@ -148,7 +155,7 @@ class TargetPitchBar extends Component {
                             type="submit"
                             name="action"
                             disabled={this.props.letters.length === 0}
-                            onClick={this.props.resetAllLetters}>
+                            onClick={this.resetAllLettersEvent}>
                         Reset
                     </button>
                 </div>
@@ -158,4 +165,14 @@ class TargetPitchBar extends Component {
     }
 }
 
-export default TargetPitchBar;
+const mapStateToProps = (state) => ({
+    letters: state.audioAnalysisReducer.letters
+});
+
+const mapDispatchToProps = dispatch => ({
+    removeLetter: (index) => dispatch(removeLetter(index)),
+    resetLetters: () => dispatch(resetLetters()),
+    setLetterSyllable: (index, syllable) => dispatch(setLetterSyllable(index, syllable))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);

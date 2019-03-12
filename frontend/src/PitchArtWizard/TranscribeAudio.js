@@ -10,6 +10,8 @@ import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
 import update from 'immutability-helper';
 import UploadAudio from "./UploadAudio";
 import AudioImgDefault from "./AudioImgDefault";
+import {addLetter, audioSelectionAction, setLetterSyllable} from "../actions/audioAnalysisActions";
+import audioAnalysisReducer from "../reducers/audioAnalysisReducers";
 
 
 class TranscribeAudio extends Component {
@@ -82,10 +84,6 @@ class TranscribeAudio extends Component {
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
         this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
         this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
-
-        this.resetAllLetters = this.resetAllLetters.bind(this);
-        this.setLetterSyllable = this.setLetterSyllable.bind(this);
-        this.removeLetter = this.removeLetter.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
         this.applyPitchRange = this.applyPitchRange.bind(this);
         this.showAllClicked = this.showAllClicked.bind(this);
@@ -247,6 +245,7 @@ class TranscribeAudio extends Component {
             })
         );
 
+        this.props.addLetter(newLetter);
         this.state.closeImgSelectionCallback();
     }
 
@@ -348,26 +347,6 @@ class TranscribeAudio extends Component {
             this.state.minSelectX,
             this.state.maxSelectX,
             manualPitch);
-    }
-
-    setLetterSyllable(index, syllable) {
-        this.setState({
-            letters: update(this.state.letters, {[index]: {letter: {$set: syllable}}}),
-        })
-    }
-
-    removeLetter(index) {
-        this.setState(prevState => (
-            {
-                letters: prevState.letters.filter((_, i) => i !== index)
-            })
-        );
-    }
-
-    resetAllLetters() {
-        this.setState(prevState => (
-            {letters: []})
-        );
     }
 
     onAudioImageLoaded(cancelCallback, selectionCallback) {
@@ -563,21 +542,19 @@ class TranscribeAudio extends Component {
                                 <PlayerBar key={this.state.audioUrl}
                                            audioUrl={this.state.audioUrl}/>
 
-                                <TargetPitchBar letters={this.state.letters}
-                                                removeLetter={this.removeLetter}
-                                                resetAllLetters={this.resetAllLetters}
+                                <TargetPitchBar letters={this.props.letters}
                                                 minAudioX={this.state.minAudioX}
                                                 maxAudioX={this.state.maxAudioX}
                                                 minAudioTime={this.state.minAudioTime}
                                                 maxAudioTime={this.state.maxAudioTime}
-                                                setLetterSyllable={this.setLetterSyllable}
                                                 targetPitchSelected={this.targetPitchSelected}/>
                             </div>
                         </div>
                     </div>
                     <div className="row">
                         <PitchArtContainer
-                            letters={this.state.letters}
+                            letters={this.props.letters}
+                            letters={this.props.letters}
                             soundLength={this.state.soundLength}
                             width={TranscribeAudio.AUDIO_IMG_WIDTH}
                             height={600}
@@ -593,7 +570,11 @@ class TranscribeAudio extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    ...state
+    letters: state.audioAnalysisReducer.letters
 });
 
-export default connect(mapStateToProps, null)(TranscribeAudio);
+const mapDispatchToProps = dispatch => ({
+    addLetter: (newLetter) => dispatch(addLetter(newLetter))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TranscribeAudio);
