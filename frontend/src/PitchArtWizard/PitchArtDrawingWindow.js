@@ -38,7 +38,8 @@ class PitchArtDrawingWindow extends React.Component {
 
         this.graphWidth = 5;
         this.borderWidth = 15;
-        this.circleRadius = 10;
+        this.smallCircleRadius = 4;
+        this.largeCircleRadius = 10;
         this.circleStrokeWidth = 10;
         this.accentedCircleRadius = 30;
         this.pitchArtSoundLengthSeconds = 0.20;
@@ -247,6 +248,8 @@ class PitchArtDrawingWindow extends React.Component {
 
     render() {
         let colorScheme = this.colorScheme(this.props.isVisible);
+        let circleRadius = this.props.showLargeCircles ?
+            this.largeCircleRadius : this.smallCircleRadius;
 
         let points = [];
         let pointPairs = [];
@@ -267,7 +270,7 @@ class PitchArtDrawingWindow extends React.Component {
             letterSyllables.push(
                 <Text key={i}
                       x={x - (konvaFontSizeAsPixels * text.length / 2.0)}
-                      y={y + this.circleRadius * 1.9}  // position text below the pitch circle
+                      y={y + circleRadius * 1.9}  // position text below the pitch circle
                       fontSize={this.fontSize}
                       text={text}/>
             );
@@ -301,7 +304,7 @@ class PitchArtDrawingWindow extends React.Component {
                         fill={circleFill}
                         stroke={circleStroke}
                         strokeWidth={this.circleStrokeWidth}
-                        radius={this.circleRadius}
+                        radius={circleRadius}
                         onClick={() => this.playSound(currPitch)}
                         onMouseEnter={() => this.setPointerEnabled(true)}
                         onMouseLeave={() => this.setPointerEnabled(false)}

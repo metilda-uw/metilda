@@ -38,6 +38,7 @@ class PitchArt extends React.Component {
                         showAccentPitch={this.props.showAccentPitch}
                         showSyllableText={this.props.showSyllableText}
                         showPitchArtLines={this.props.showPitchArtLines}
+                        showLargeCircles={this.props.showLargeCircles}
                         letters={this.props.letters}/>);
     }
 

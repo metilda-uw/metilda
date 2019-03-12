@@ -6,6 +6,7 @@ import AccentPitchToggle from "./AccentPitchToggle";
 import "./PitchArtContainer.css";
 import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
+import PitchArtCircleToggle from "./PitchArtCircleToggle";
 
 class PitchArtContainer extends Component {
     state = {};
@@ -15,7 +16,8 @@ class PitchArtContainer extends Component {
         this.state = {
             showAccentPitch: false,
             showSyllableText: false,
-            showPitchArtLines: true
+            showPitchArtLines: true,
+            showLargeCircles: true
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -57,6 +59,9 @@ class PitchArtContainer extends Component {
                         <PitchArtLinesToggle
                             handleInputChange={this.handleInputChange}
                             showPitchArtLines={this.state.showPitchArtLines}/>
+                        <PitchArtCircleToggle
+                            handleInputChange={this.handleInputChange}
+                            showLargeCircles={this.state.showLargeCircles}/>
                     </div>
                 </div>
                 <div className="col s8">
@@ -70,6 +75,7 @@ class PitchArtContainer extends Component {
                               showAccentPitch={this.state.showAccentPitch}
                               showSyllableText={this.state.showSyllableText}
                               showPitchArtLines={this.state.showPitchArtLines}
+                              showLargeCircles={this.state.showLargeCircles}
                               letters={pitchArtLetters}/>
                 </div>
             </div>
