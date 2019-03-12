@@ -19,7 +19,8 @@ class PitchRange extends Component {
 
     submitMaxPitch(event) {
         event.preventDefault();
-        this.props.applyPitchRange(this.state.minPitch, this.state.maxPitch);
+        this.props.applyPitchRange(this.state.minPitch || this.props.initMinPitch,
+                                   this.state.maxPitch || this.props.initMaxPitch);
     }
 
     handleInputChange(event) {
