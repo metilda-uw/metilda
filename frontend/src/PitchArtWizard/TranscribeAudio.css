@@ -128,12 +128,12 @@
 
 #metilda-audio-function-btns {
     display: flex;
-    justify-content: flex-start;
+    justify-content: space-between;
     margin-bottom: 8px;
 }
 
 #metilda-audio-function-btns button {
-    margin-right: 8px;
+
 }
 
 #metilda-pitch-art-btn-container {

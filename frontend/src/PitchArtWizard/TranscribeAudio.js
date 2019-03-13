@@ -95,7 +95,7 @@ class TranscribeAudio extends Component {
         this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
         this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
-        this.wordSeperatorClicked = this.wordSeperatorClicked.bind(this);
+        this.wordSplitClicked = this.wordSplitClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
@@ -320,7 +320,7 @@ class TranscribeAudio extends Component {
             this.state.maxSelectX);
     }
 
-    wordSeperatorClicked() {
+    wordSplitClicked() {
         this.imageIntervalSelected(
             this.state.minSelectX,
             this.state.maxSelectX,
@@ -557,8 +557,8 @@ class TranscribeAudio extends Component {
                                             disabled={!isSelectionActive}>Manual Pitch
                                     </button>
                                     <button className="waves-effect waves-light btn"
-                                            onClick={this.wordSeperatorClicked}
-                                            disabled={!isSelectionActive}>Separator
+                                            onClick={this.wordSplitClicked}
+                                            disabled={!isSelectionActive}>Split
                                     </button>
                                 </div>
                                 <PlayerBar key={this.state.audioUrl}
