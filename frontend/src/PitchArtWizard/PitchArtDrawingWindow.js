@@ -272,7 +272,21 @@ class PitchArtDrawingWindow extends React.Component {
         let lineCircles = [];
         let controller = this;
         let letterSyllables = [];
+        let lines = [];
+        let currLinePoints = [];
         for (let i = 0; i < this.props.letters.length; i++) {
+            if (this.props.letters[i].isWordSep) {
+                if (currLinePoints.length > 0) {
+                    lines.push(
+                        <Line points={currLinePoints}
+                              strokeWidth={this.graphWidth}
+                              stroke={colorScheme.lineStrokeColor}/>
+                    );
+                    currLinePoints = [];
+                }
+                continue;
+            }
+
             let currPitch = this.props.letters[i].pitch;
             let x = this.horzIndexToRectCoords(i);
             let y = this.vertValueToRectCoords(currPitch, vertOffset);
@@ -312,6 +326,8 @@ class PitchArtDrawingWindow extends React.Component {
 
             points.push(x);
             points.push(y);
+            currLinePoints.push(x);
+            currLinePoints.push(y);
             pointPairs.push([x, y]);
             lineCircles.push(
                 <Circle key={i + circleFill + circleStroke}
@@ -343,6 +359,14 @@ class PitchArtDrawingWindow extends React.Component {
                             controller.props.manualPitchChange(i, newPitch);
                         }
                         }/>);
+        }
+
+        if (currLinePoints.length > 0) {
+            lines.push(
+                <Line points={currLinePoints}
+                      strokeWidth={this.graphWidth}
+                      stroke={colorScheme.lineStrokeColor}/>
+            );
         }
 
         var accentedPoint;
@@ -378,11 +402,7 @@ class PitchArtDrawingWindow extends React.Component {
                     </Layer>
                     <Layer>
                         {
-                            this.props.showPitchArtLines ?
-                                <Line points={points}
-                                      strokeWidth={this.graphWidth}
-                                      stroke={colorScheme.lineStrokeColor}/>
-                                : []
+                            this.props.showPitchArtLines ? lines : []
                         }
                         {lineCircles}
                     </Layer>

@@ -52,6 +52,10 @@ class TranscribeAudio extends Component {
         return "X";
     }
 
+    static get DEFAULT_SEPARATOR_TEXT() {
+        return "";
+    }
+
     constructor(props) {
         super(props);
 
@@ -91,6 +95,7 @@ class TranscribeAudio extends Component {
         this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
         this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
         this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
+        this.wordSeperatorClicked = this.wordSeperatorClicked.bind(this);
         this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
         this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
         this.manualPitchChange = this.manualPitchChange.bind(this);
@@ -213,10 +218,12 @@ class TranscribeAudio extends Component {
         });
     }
 
-    addPitch(pitch, letter, ts, isManualPitch) {
-        if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
-            // the pitch outside the bounds of the window, omit it
-            return
+    addPitch(pitch, letter, ts, isManualPitch, isWordSep) {
+        if (!isWordSep) {
+            if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
+                // the pitch outside the bounds of the window, omit it
+                return
+            }
         }
 
         if (ts[0] === ts[1]) {
@@ -233,7 +240,8 @@ class TranscribeAudio extends Component {
             t1: ts[1],
             pitch: pitch,
             syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-            isManualPitch: isManualPitch
+            isManualPitch: isManualPitch,
+            isWordSep: isWordSep
         };
 
         let newLettersList = this.state.letters.concat(newLetter);
@@ -249,12 +257,17 @@ class TranscribeAudio extends Component {
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX, rightX, manualPitch) {
+    imageIntervalSelected(leftX, rightX, manualPitch, isWordSep=false) {
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
         const {uploadId} = this.props.match.params;
         if (manualPitch !== undefined) {
             this.addPitch(manualPitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, true);
+            return;
+        }
+
+        if (isWordSep) {
+            this.addPitch(-1, TranscribeAudio.DEFAULT_SEPARATOR_TEXT, ts, false, true);
             return;
         }
 
@@ -305,6 +318,14 @@ class TranscribeAudio extends Component {
         this.imageIntervalSelected(
             this.state.minSelectX,
             this.state.maxSelectX);
+    }
+
+    wordSeperatorClicked() {
+        this.imageIntervalSelected(
+            this.state.minSelectX,
+            this.state.maxSelectX,
+            undefined,
+            true);
     }
 
     manualPitchChange(index, newPitch) {
@@ -534,6 +555,10 @@ class TranscribeAudio extends Component {
                                     <button className="waves-effect waves-light btn"
                                             onClick={this.manualPitchArtClicked}
                                             disabled={!isSelectionActive}>Manual Pitch
+                                    </button>
+                                    <button className="waves-effect waves-light btn"
+                                            onClick={this.wordSeperatorClicked}
+                                            disabled={!isSelectionActive}>Separator
                                     </button>
                                 </div>
                                 <PlayerBar key={this.state.audioUrl}

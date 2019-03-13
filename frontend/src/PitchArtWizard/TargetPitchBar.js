@@ -129,6 +129,7 @@ class TargetPitchBar extends Component {
                                                     leftX={item.leftX}
                                                     rightX={item.rightX}
                                                     isSelected={index === controller.state.selectedIndex}
+                                                    isWordSep={item.isWordSep}
                                                     onClick={() => controller.targetPitchSelected(index)}/>
                             })
                         }
