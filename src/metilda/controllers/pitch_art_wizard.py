@@ -1,4 +1,6 @@
 import os
+import shutil
+import tempfile
 
 from flask import request, jsonify, send_file
 
@@ -65,12 +67,27 @@ def avg_pitch(upload_id):
     return jsonify({"avg_pitch": result})
 
 
+@app.route('/api/all-pitches', defaults={'upload_id': None}, methods=["POST"])
 @app.route('/api/all-pitches/<string:upload_id>', methods=["POST"])
 def all_pitches(upload_id):
-    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
-    pitches = audio_analysis.get_all_pitches(request.json['time_range'], sound_path, min_pitch, max_pitch)
+    time_range = [float(x) for x in request.args.get('time_range', "0, inf").split(",")]
+    temp_dir = None
+
+    if 'file' in request.files:
+        temp_dir = tempfile.mkdtemp()
+        audio_file = request.files['file']
+        sound_path = os.path.join(temp_dir, "audio.wav")
+        audio_file.save(sound_path)
+    else:
+        sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+
+    pitches = audio_analysis.get_all_pitches(time_range, sound_path, min_pitch, max_pitch)
+
+    if temp_dir is not None:
+        shutil.rmtree(temp_dir)
+
     return jsonify(pitches)
 
 
