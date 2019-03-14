@@ -82,8 +82,7 @@ class TranscribeAudio extends Component {
             audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
                 * TranscribeAudio.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null),
-            selectionCallback: (t1, t2) => (null),
-            uploadFile: null
+            selectionCallback: (t1, t2) => (null)
         };
         this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
         this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -102,7 +101,6 @@ class TranscribeAudio extends Component {
         this.manualPitchChange = this.manualPitchChange.bind(this);
         this.addPitch = this.addPitch.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
-        this.fileUploadTest = this.fileUploadTest.bind(this);
     }
 
     static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
@@ -160,20 +158,6 @@ class TranscribeAudio extends Component {
                     });
                 });
         }
-    }
-
-    fileUploadTest() {
-        const formData = new FormData();
-        formData.append('file', this.state.uploadFile);
-        fetch(`/api/all-pitches`, {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json'
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => console.log(data));
     }
 
     getAudioConfigForSelection(leftX, rightX) {
@@ -589,8 +573,6 @@ class TranscribeAudio extends Component {
                             </div>
                         </div>
                     </div>
-                    <input type="file" name="uploadFile" onChange={this.handleInputChange} />
-                    <input type="button" onClick={this.fileUploadTest} value="Submit" />
                     <div className="row">
                         <PitchArtContainer
                             letters={this.props.letters}
