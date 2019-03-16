@@ -16,7 +16,15 @@ import {RouteComponentProps} from "react-router";
 
 interface Letter {
     // TODO
-    pitch: number
+    letter: string,
+    leftX: number,
+    rightX: number,
+    t0: number,
+    t1: number,
+    pitch: number,
+    syllable: string,
+    isManualPitch: boolean,
+    isWordSep: boolean
 }
 
 interface MatchParams  {
@@ -24,12 +32,27 @@ interface MatchParams  {
 }
 export interface Props extends RouteComponentProps<MatchParams> {}
 interface State {
-    // TODO
+    letters: Array<Letter>,
+    isAudioImageLoaded: boolean,
+    soundLength: number,
+    selectionInterval: string,
+    maxPitch: number,
+    minPitch: number,
+    imageUrl: string,
+    audioUrl: string,
+    audioEditVersion: number,
+    minSelectX: number,
+    maxSelectX: number,
+    minAudioX: number,
+    maxAudioX: number,
+    minAudioTime: number,
+    maxAudioTime: number,
+    audioImgWidth: number,
+    closeImgSelectionCallback: () => void,
+    selectionCallback: (t1: number, t2: number) => void
 }
 
 class TranscribeAudio extends React.Component<Props, State> {
-    state = {};
-
     /**
      * WARNING:
      * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
@@ -41,35 +64,35 @@ class TranscribeAudio extends React.Component<Props, State> {
      * below were altered slightly, the bug went away. Likely it
      * was a result of a weird, undocumented edge case in that library.
      */
-    static get MIN_IMAGE_XPERC() {
+    static get MIN_IMAGE_XPERC(): number {
         return 351.0 / 2800.0;
     }
 
-    static get MAX_IMAGE_XPERC() {
+    static get MAX_IMAGE_XPERC(): number {
         return 2522.0 / 2800.0;
     }
 
-    static get AUDIO_IMG_WIDTH() {
+    static get AUDIO_IMG_WIDTH(): number {
         return 653;
     }
 
-    static get DEFAULT_MIN_ANALYSIS_PITCH() {
+    static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
         return 75.0;
     }
 
-    static get DEFAULT_MAX_ANALYSIS_PITCH() {
+    static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
         return 500.0;
     }
 
-    static get DEFAULT_SYLLABLE_TEXT() {
+    static get DEFAULT_SYLLABLE_TEXT(): string {
         return "X";
     }
 
-    static get DEFAULT_SEPARATOR_TEXT() {
+    static get DEFAULT_SEPARATOR_TEXT(): string {
         return "";
     }
 
-    constructor(props) {
+    constructor(props: Props) {
         super(props);
 
         const {uploadId} = this.props.match.params;
@@ -155,14 +178,15 @@ class TranscribeAudio extends React.Component<Props, State> {
         const {uploadId} = this.props.match.params;
         if (uploadId) {
             var controller = this;
-            fetch("/api/sound-length/" + uploadId, {
+            let request: RequestInit = {
                 method: "POST",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: {uploadId: uploadId}
-            })
+                body: JSON.stringify({uploadId: uploadId})
+            };
+            fetch("/api/sound-length/" + uploadId, request)
                 .then(response => response.json())
                 .then(function (data: any) {
                     controller.setState({
@@ -196,7 +220,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         };
     }
 
-    targetPitchSelected(index) {
+    targetPitchSelected(index: number) {
         if (index !== -1) {
             let letter = this.state.letters[index];
             this.state.selectionCallback(letter.t0, letter.t1);
@@ -222,7 +246,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    audioIntervalSelected(leftX, rightX) {
+    audioIntervalSelected(leftX: number, rightX: number) {
         let config = this.getAudioConfigForSelection(leftX, rightX);
         this.setState({
             audioUrl: config.audioUrl,
@@ -231,7 +255,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    addPitch(pitch, letter, ts, isManualPitch, isWordSep) {
+    addPitch(pitch: number, letter: string, ts: Array<number>, isManualPitch?: boolean, isWordSep?: boolean) {
         if (!isWordSep) {
             if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
                 // the pitch outside the bounds of the window, omit it
@@ -257,20 +281,11 @@ class TranscribeAudio extends React.Component<Props, State> {
             isWordSep: isWordSep
         };
 
-        let newLettersList = this.state.letters.concat(newLetter);
-        newLettersList = newLettersList.sort((a, b) => a.t0 - b.t0);
-
-        this.setState(prevState =>
-            ({
-                letters: newLettersList
-            })
-        );
-
         this.props.addLetter(newLetter);
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX, rightX, manualPitch, isWordSep=false) {
+    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean=false) {
         let ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
         const {uploadId} = this.props.match.params;
@@ -341,7 +356,7 @@ class TranscribeAudio extends React.Component<Props, State> {
             true);
     }
 
-    manualPitchChange(index, newPitch) {
+    manualPitchChange(index: number, newPitch: number) {
         this.props.setLetterPitch(index, newPitch);
     }
 
@@ -381,7 +396,7 @@ class TranscribeAudio extends React.Component<Props, State> {
             manualPitch);
     }
 
-    onAudioImageLoaded(cancelCallback, selectionCallback) {
+    onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
         this.setState({
             isAudioImageLoaded: true,
             closeImgSelectionCallback: cancelCallback,
@@ -408,7 +423,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    applyPitchRange(minPitch, maxPitch) {
+    applyPitchRange(minPitch: number, maxPitch: number) {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
@@ -454,7 +469,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    imageIntervalToTimeInterval(x1, x2) {
+    imageIntervalToTimeInterval(x1: number, x2: number) {
         let dt = this.state.maxAudioTime - this.state.minAudioTime;
         let dx = this.state.maxAudioX - this.state.minAudioX;
         let u0 = x1 / dx;
