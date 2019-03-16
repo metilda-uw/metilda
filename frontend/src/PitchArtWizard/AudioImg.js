@@ -2,9 +2,7 @@ import React, {Component} from 'react';
 
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
-import '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
-import {audioSelectionAction} from "../store/audio/actions/audioAnalysisActions";
-import {connect} from "react-redux";
+import * as ImgAreaSelect from '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
 import "./GlobalStyling.css";
 
 class AudioImg extends Component {
@@ -146,12 +144,4 @@ class AudioImg extends Component {
     }
 }
 
-const mapStateToProps = state => ({
-    ...state
-});
-
-const mapDispatchToProps = dispatch => ({
-    audioSelectionAction: (leftX, rightX) => dispatch(audioSelectionAction(leftX, rightX))
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(AudioImg);
+export default AudioImg;

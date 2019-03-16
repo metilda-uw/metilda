@@ -220,7 +220,7 @@ class TranscribeAudio extends React.Component<Props, State> {
 
     targetPitchSelected(index: number) {
         if (index !== -1) {
-            let letter = this.state.letters[index];
+            let letter = this.props.letters[index];
             this.state.selectionCallback(letter.t0, letter.t1);
 
             const {uploadId} = this.props.match.params;

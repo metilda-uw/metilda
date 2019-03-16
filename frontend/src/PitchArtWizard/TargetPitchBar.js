@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import AudioLetter from "./AudioLetter";
-import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions/audioAnalysisActions";
+import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions";
 import {connect} from "react-redux";
 
 class TargetPitchBar extends Component {
@@ -167,7 +167,7 @@ class TargetPitchBar extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    letters: state.audioAnalysisReducer.letters
+    letters: state.audio.letters
 });
 
 const mapDispatchToProps = dispatch => ({
