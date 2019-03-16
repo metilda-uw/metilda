@@ -1,11 +1,14 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import Header from './Layout/Header.js';
 import UploadAudio from "./PitchArtWizard/UploadAudio";
 import {Route} from "react-router-dom";
 import TranscribeAudio from "./PitchArtWizard/TranscribeAudio";
 import 'materialize-css/dist/css/materialize.min.css';
 
-class App extends Component {
+export interface Props {}
+interface State {}
+
+class App extends React.Component<Props, State> {
   state = {};
 
   render() {

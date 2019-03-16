@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import './UploadAudio.css';
 import AudioImg from "./AudioImg";
 import AudioImgLoading from "./AudioImgLoading";
@@ -12,9 +12,22 @@ import UploadAudio from "./UploadAudio";
 import AudioImgDefault from "./AudioImgDefault";
 import {addLetter, audioSelectionAction, setLetterPitch, setLetterSyllable} from "../actions/audioAnalysisActions";
 import audioAnalysisReducer from "../reducers/audioAnalysisReducers";
+import {RouteComponentProps} from "react-router";
 
+interface Letter {
+    // TODO
+    pitch: number
+}
 
-class TranscribeAudio extends Component {
+interface MatchParams  {
+    uploadId: string
+}
+export interface Props extends RouteComponentProps<MatchParams> {}
+interface State {
+    // TODO
+}
+
+class TranscribeAudio extends React.Component<Props, State> {
     state = {};
 
     /**
@@ -103,7 +116,7 @@ class TranscribeAudio extends Component {
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
     }
 
-    static formatImageUrl(uploadId, minPitch, maxPitch, tmin, tmax) {
+    static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
         let url = `/api/audio-analysis-image/${uploadId}.png`;
         let urlOptions = [];
 
@@ -130,7 +143,7 @@ class TranscribeAudio extends Component {
         return url;
     }
 
-    static formatAudioUrl(uploadId, tmin, tmax) {
+    static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
         if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
             return `/api/audio/${uploadId}?tmin=${tmin}&tmax=${tmax}`;
         } else {
@@ -151,7 +164,7 @@ class TranscribeAudio extends Component {
                 body: {uploadId: uploadId}
             })
                 .then(response => response.json())
-                .then(function (data) {
+                .then(function (data: any) {
                     controller.setState({
                         soundLength: data["sound_length"],
                         maxAudioTime: data["sound_length"]
@@ -160,7 +173,7 @@ class TranscribeAudio extends Component {
         }
     }
 
-    getAudioConfigForSelection(leftX, rightX) {
+    getAudioConfigForSelection(leftX?: number, rightX?: number) {
         // Compute the new time scale
         let ts;
         if (leftX !== undefined && rightX !== undefined) {
