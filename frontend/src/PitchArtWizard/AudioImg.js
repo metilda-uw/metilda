@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
 import '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
-import {audioSelectionAction} from "../actions/audioAnalysisActions";
+import {audioSelectionAction} from "../store/audio/actions/audioAnalysisActions";
 import {connect} from "react-redux";
 import "./GlobalStyling.css";
 

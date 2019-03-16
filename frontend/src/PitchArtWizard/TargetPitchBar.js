@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import AudioLetter from "./AudioLetter";
-import {removeLetter, resetLetters, setLetterSyllable} from "../actions/audioAnalysisActions";
+import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions/audioAnalysisActions";
 import {connect} from "react-redux";
 
 class TargetPitchBar extends Component {

@@ -10,27 +10,25 @@ import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
 import update from 'immutability-helper';
 import UploadAudio from "./UploadAudio";
 import AudioImgDefault from "./AudioImgDefault";
-import {addLetter, audioSelectionAction, setLetterPitch, setLetterSyllable} from "../actions/audioAnalysisActions";
-import audioAnalysisReducer from "../reducers/audioAnalysisReducers";
+import {
+    addLetter,
+    setLetterPitch
+} from "../store/audio/actions";
 import {RouteComponentProps} from "react-router";
-
-interface Letter {
-    // TODO
-    letter: string,
-    leftX: number,
-    rightX: number,
-    t0: number,
-    t1: number,
-    pitch: number,
-    syllable: string,
-    isManualPitch: boolean,
-    isWordSep: boolean
-}
+import {Letter} from "../types/types";
+import {AppState} from "../store";
+import {Action, AnyAction, Dispatch} from "redux";
+import {AudioAction} from "../store/audio/types";
+import {ThunkDispatch} from "redux-thunk";
 
 interface MatchParams  {
     uploadId: string
 }
-export interface Props extends RouteComponentProps<MatchParams> {}
+export interface Props extends RouteComponentProps<MatchParams> {
+    letters: Array<Letter>,
+    addLetter: (letter: Letter) => void,
+    setLetterPitch: (index: number, pitch: number) => void,
+}
 interface State {
     letters: Array<Letter>,
     isAudioImageLoaded: boolean,
@@ -255,7 +253,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    addPitch(pitch: number, letter: string, ts: Array<number>, isManualPitch?: boolean, isWordSep?: boolean) {
+    addPitch(pitch: number, letter: string, ts: Array<number>, isManualPitch: boolean=false, isWordSep: boolean=false) {
         if (!isWordSep) {
             if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
                 // the pitch outside the bounds of the window, omit it
@@ -324,6 +322,8 @@ class TranscribeAudio extends React.Component<Props, State> {
             "time_range": ts
         };
 
+        type ApiResult = Array<Array<number>>;
+
         fetch("/api/all-pitches/"
             + uploadId + "?max-pitch="
             + this.state.maxPitch
@@ -336,7 +336,7 @@ class TranscribeAudio extends React.Component<Props, State> {
             body: JSON.stringify(json)
         })
             .then(response => response.json())
-            .then(data => data.map(item => this.addPitch(item[1],
+            .then(data => (data as ApiResult).map(item => this.addPitch(item[1],
                 TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
                 [item[0], item[0]]))
             )
@@ -404,26 +404,24 @@ class TranscribeAudio extends React.Component<Props, State> {
         });
     }
 
-    handleInputChange(event) {
-        const target = event.target;
+    handleInputChange(event: Event) {
+        const target = event.target as HTMLInputElement;
 
-        let value = null;
+        let value: boolean | File | string;
         if (target.type === "checkbox") {
             value = target.checked;
         } else if (target.type === "file") {
-            value = target.files[0];
+            value = target.files![0];
         } else {
             value = target.value;
         }
 
         const name = target.name;
 
-        this.setState({
-            [name]: value
-        });
+        this.setState({[name]: value} as any);
     }
 
-    applyPitchRange(minPitch: number, maxPitch: number) {
+    applyPitchRange(minPitch?: number, maxPitch?: number) {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
@@ -438,8 +436,8 @@ class TranscribeAudio extends React.Component<Props, State> {
             imageUrl: newUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minPitch: minPitch !== "" ? parseFloat(minPitch) : TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: maxPitch !== "" ? parseFloat(maxPitch) : TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
+            minPitch: minPitch || TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: maxPitch || TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
         });
     }
 
@@ -618,13 +616,13 @@ class TranscribeAudio extends React.Component<Props, State> {
     }
 }
 
-const mapStateToProps = (state) => ({
-    letters: state.audioAnalysisReducer.letters
+const mapStateToProps = (state: AppState) => ({
+    letters: state.audio.letters
 });
 
-const mapDispatchToProps = dispatch => ({
-    addLetter: (newLetter) => dispatch(addLetter(newLetter)),
-    setLetterPitch: (index, newPitch) => dispatch(setLetterPitch(index, newPitch))
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    addLetter: (newLetter: Letter) => dispatch(addLetter(newLetter)),
+    setLetterPitch: (index: number, newPitch: number) => dispatch(setLetterPitch(index, newPitch))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TranscribeAudio);
