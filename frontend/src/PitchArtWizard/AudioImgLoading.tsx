@@ -1,10 +1,9 @@
-import React, {Component} from 'react';
-import styles from "./TranscribeAudio.css";
+import * as React from 'react';
 
-class AudioImgLoading extends React.Component {
-    state = {};
+interface Props {}
 
-    constructor(props) {
+class AudioImgLoading extends React.Component<Props> {
+    constructor(props: Props) {
         super(props);
     }
 
