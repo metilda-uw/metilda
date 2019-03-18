@@ -1,20 +1,26 @@
-import React, {Component} from 'react';
+import * as React from "react";
 import "../GlobalStyling.css";
+import {ChangeEvent} from "react";
 
-class PitchArtLinesToggle extends Component {
+interface Props {
+    showSyllableText: boolean,
+    handleInputChange: (event: ChangeEvent) => void
+}
+
+class SyllableToggle extends React.Component<Props> {
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item">
                 <div className="top-label">
-                    <label>Lines</label>
+                    <label>Syllable Text</label>
                 </div>
                 <div className="switch">
                     <label>
                         Hide
                         <input type="checkbox"
-                               checked={this.props.showPitchArtLines}
+                               checked={this.props.showSyllableText}
                                onChange={this.props.handleInputChange}
-                               name="showPitchArtLines"/>
+                               name="showSyllableText"/>
                         <span className="lever"></span>
                         Show
                     </label>
@@ -24,4 +30,4 @@ class PitchArtLinesToggle extends Component {
     }
 }
 
-export default PitchArtLinesToggle;
+export default SyllableToggle;

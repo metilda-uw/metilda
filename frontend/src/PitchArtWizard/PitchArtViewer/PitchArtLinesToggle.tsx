@@ -1,22 +1,28 @@
-import React, {Component} from 'react';
+import * as React from "react";
 import "../GlobalStyling.css";
+import {ChangeEvent} from "react";
 
-class PitchArtCenterToggle extends Component {
+interface Props {
+    showPitchArtLines: boolean,
+    handleInputChange: (event: ChangeEvent) => void
+}
+
+class PitchArtLinesToggle extends React.Component<Props> {
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item">
                 <div className="top-label">
-                    <label>Vertically Center</label>
+                    <label>Lines</label>
                 </div>
                 <div className="switch">
                     <label>
-                        No
+                        Hide
                         <input type="checkbox"
-                               checked={this.props.showVerticallyCentered}
+                               checked={this.props.showPitchArtLines}
                                onChange={this.props.handleInputChange}
-                               name="showVerticallyCentered"/>
+                               name="showPitchArtLines"/>
                         <span className="lever"></span>
-                        Yes
+                        Show
                     </label>
                 </div>
             </div>
@@ -24,4 +30,4 @@ class PitchArtCenterToggle extends Component {
     }
 }
 
-export default PitchArtCenterToggle;
+export default PitchArtLinesToggle;

@@ -1,22 +1,29 @@
-import React, {Component} from 'react';
+import * as React from "react";
 import "../GlobalStyling.css";
+import {ChangeEvent} from "react";
 
-class PitchArtCircleToggle extends Component {
+interface Props {
+    showAccentPitch: boolean,
+    handleInputChange: (event: ChangeEvent) => void
+}
+
+
+class AccentPitchToggle extends React.Component<Props> {
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item">
                 <div className="top-label">
-                    <label>Circle Size</label>
+                    <label>Accent Symbol</label>
                 </div>
                 <div className="switch">
                     <label>
-                        Small
+                        Hide
                         <input type="checkbox"
-                               checked={this.props.showLargeCircles}
+                               checked={this.props.showAccentPitch}
                                onChange={this.props.handleInputChange}
-                               name="showLargeCircles"/>
+                               name="showAccentPitch"/>
                         <span className="lever"></span>
-                        Large
+                        Show
                     </label>
                 </div>
             </div>
@@ -24,4 +31,4 @@ class PitchArtCircleToggle extends Component {
     }
 }
 
-export default PitchArtCircleToggle;
+export default AccentPitchToggle;

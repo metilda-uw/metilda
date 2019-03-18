@@ -1,22 +1,28 @@
-import React, {Component} from 'react';
+import * as React from "react";
 import "../GlobalStyling.css";
+import {ChangeEvent} from "react";
 
-class SyllableToggle extends Component {
+interface Props {
+    showLargeCircles: boolean,
+    handleInputChange: (event: ChangeEvent) => void
+}
+
+class PitchArtCircleToggle extends React.Component<Props> {
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item">
                 <div className="top-label">
-                    <label>Syllable Text</label>
+                    <label>Circle Size</label>
                 </div>
                 <div className="switch">
                     <label>
-                        Hide
+                        Small
                         <input type="checkbox"
-                               checked={this.props.showSyllableText}
+                               checked={this.props.showLargeCircles}
                                onChange={this.props.handleInputChange}
-                               name="showSyllableText"/>
+                               name="showLargeCircles"/>
                         <span className="lever"></span>
-                        Show
+                        Large
                     </label>
                 </div>
             </div>
@@ -24,4 +30,4 @@ class SyllableToggle extends Component {
     }
 }
 
-export default SyllableToggle;
+export default PitchArtCircleToggle;
