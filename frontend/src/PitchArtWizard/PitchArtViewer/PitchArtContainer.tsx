@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import * as React from "react";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import PitchArt from "../PitchArt";
 import TranscribeAudio from "../TranscribeAudio";
@@ -8,11 +8,36 @@ import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
+import {ChangeEvent} from "react";
 
-class PitchArtContainer extends Component {
-    state = {};
+interface Letter {
+    // TODO: Replace this with real Letter interface
+    t0: number,
+    pitch: number
+}
 
-    constructor(props) {
+interface Props {
+    letters: Array<Letter>,
+    soundLength: number,
+    width: number,
+    height: number,
+    minPitch: number,
+    maxPitch: number,
+    uploadId: number,
+    manualPitchChange: number,
+    handleInputChange: (event: ChangeEvent) => void
+}
+
+interface State {
+    showAccentPitch: boolean,
+    showSyllableText: boolean,
+    showVerticallyCentered: boolean,
+    showPitchArtLines: boolean,
+    showLargeCircles: boolean
+}
+
+class PitchArtContainer extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
         this.state = {
             showAccentPitch: false,
@@ -24,23 +49,8 @@ class PitchArtContainer extends Component {
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event) {
-        const target = event.target;
-
-        let value = null;
-        if (target.type === "checkbox") {
-            value = target.checked;
-        } else if (target.type === "file") {
-            value = target.files[0];
-        } else {
-            value = target.value;
-        }
-
-        const name = target.name;
-
-        this.setState({
-            [name]: value
-        });
+    handleInputChange(event: ChangeEvent) {
+        // TODO: replace with expected implementation
     }
 
     render() {
