@@ -1,10 +1,10 @@
-import React, {Component, createRef} from 'react';
+import React, {createRef} from 'react';
 import './PitchArt.css';
-import {Stage, Layer, Rect, Line, Circle, Group, Text} from 'react-konva';
-import PitchArt from "./PitchArt";
-import {roundToNearestNote, referenceExponent, exponentToNote} from "./PitchArtViewer/PitchArtScale";
-import {Letter, PitchArtLetter} from "../types/types";
-
+import {Circle, Group, Layer, Line, Rect, Stage, Text} from 'react-konva';
+import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale";
+import {PitchArtLetter} from "../types/types";
+import * as Tone from 'tone';
+import {Encoding} from 'tone';
 
 interface Props {
     letters: Array<PitchArtLetter>,
@@ -94,38 +94,46 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     playPitchArt() {
-        var env = new window.Tone.AmplitudeEnvelope({
+        var env = new Tone.AmplitudeEnvelope({
             "attack": 0.001,
             "decay": 0.001,
             "sustain": 0.001,
             "release": 0.001
         }).toMaster();
 
-        var filter = new window.Tone.Filter({type: "highpass", frequency: 50, rolloff: -48}).toMaster();
+        var filter = new Tone.Filter({type: "highpass", frequency: 50, rolloff: -48}).toMaster();
 
         //var synth = new window.Tone.Synth().toMaster().chain(filter, env);
-        var synth = new window.Tone.Synth().toMaster().chain(filter, env);
+        var synth = new Tone.Synth().toMaster().chain(filter, env);
 
         let tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
         let tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
+        interface PitchArtNote {
+            time: number,
+            index: number,
+            duration: number,
+            pitch: number
+        }
         let notes = this.props.letters.map(function (item, index) {
-                return {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch, index: index};
+                return {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch, index: index} as PitchArtNote;
             }
         );
         notes.push({time: tEnd, duration: 1, pitch: 1, index: -1});
         let controller = this;
-        let midiPart = new window.Tone.Part(function (time, note) {
+
+        // @ts-ignore
+        let midiPart = new Tone.Part(function (time: Encoding.Time, note: PitchArtNote) {
             controller.setState({activePlayIndex: note.index});
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
             }
         }, notes).start();
 
-        window.Tone.Transport.start();
+        Tone.Transport.start();
     }
 
     playSound(pitch: number) {
-        let synth = new window.Tone.Synth().toMaster();
+        let synth = new Tone.Synth().toMaster();
         synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
@@ -310,6 +318,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     lines.push(
                         <Line points={currLinePoints}
                               strokeWidth={this.graphWidth}
+                              // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}/>
                     );
                     currLinePoints = [];
@@ -357,10 +366,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             currLinePoints.push(y);
             pointPairs.push([x, y]);
             lineCircles.push(
+                // @ts-ignore
                 <Circle key={i + circleFill + circleStroke}
                         x={x}
                         y={y}
+                        // @ts-ignore
                         fill={circleFill}
+                        // @ts-ignore
                         stroke={circleStroke}
                         strokeWidth={this.circleStrokeWidth}
                         radius={circleRadius}
@@ -370,12 +382,14 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                         draggable={this.props.letters[i].isManualPitch}
                         dragDistance={5}
                         dragBoundFunc={function (pos) {
+                            // @ts-ignore
                             if (!this.isDragging()) {
                                 return pos;
                             }
 
                             let newPitch = controller.rectCoordsToVertValue(pos.y);
                             return {
+                                // @ts-ignore
                                 x: this.getAbsolutePosition().x,
                                 y: controller.vertValueToRectCoords(newPitch)
                             };
@@ -393,6 +407,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             lines.push(
                 <Line points={currLinePoints}
                       strokeWidth={this.graphWidth}
+                      // @ts-ignore
                       stroke={colorScheme.lineStrokeColor}/>
             );
         }
@@ -420,6 +435,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
+                              // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}
                               onClick={this.imageBoundaryClicked}
                               onMouseEnter={() => this.setPointerEnabled(true)}
