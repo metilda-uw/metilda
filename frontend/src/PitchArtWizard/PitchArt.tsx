@@ -1,18 +1,17 @@
 import * as React from "react";
 import './PitchArt.css';
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
+import {Letter} from "../types/types";
+import {createRef} from "react";
 
-interface Letter {
-    // TODO: replace with actual implementation
-}
 
 interface Props {
     width: number,
     height: number
     minPitch: number
     maxPitch: number
-    uploadId: number
-    manualPitchChange: number
+    uploadId: string
+    manualPitchChange: (index: number, newPitch: number) => void,
     maxPitchIndex: number
     showAccentPitch: boolean
     showSyllableText: boolean
@@ -24,8 +23,8 @@ interface Props {
 
 
 class PitchArt extends React.Component<Props> {
-    hiddenRef?: PitchArtDrawingWindow;
-    visibleRef?: PitchArtDrawingWindow;
+    private hiddenRef = createRef<PitchArtDrawingWindow>();
+    private visibleRef = createRef<PitchArtDrawingWindow>();
 
     constructor(props: Props) {
         super(props);
@@ -36,16 +35,16 @@ class PitchArt extends React.Component<Props> {
     }
 
     saveImage() {
-        this.hiddenRef!.saveImage();
+        this.hiddenRef.current!.saveImage();
     }
 
     playPitchArt() {
-        this.visibleRef!.playPitchArt();
+        this.visibleRef.current!.playPitchArt();
     }
 
-    createPitchArt(isVisible: boolean, refName: string) {
+    createPitchArt(isVisible: boolean) {
         return (<PitchArtDrawingWindow
-                        //ref={node => { this[refName] = node}}
+                        ref={isVisible ? this.visibleRef : this.hiddenRef}
                         isVisible={isVisible}
                         width={this.props.width}
                         height={this.props.height}
@@ -63,12 +62,8 @@ class PitchArt extends React.Component<Props> {
     }
 
     render() {
-        // TODO: Check that this new ref lookup works
-        let visiblePitchArt = this.createPitchArt(true, 'visibleRef');
-        this.visibleRef = visiblePitchArt.props.ref;
-
-        let hiddenPitchArt = this.createPitchArt(false, 'hiddenRef');
-        this.hiddenRef = hiddenPitchArt.props.ref;
+        let visiblePitchArt = this.createPitchArt(true);
+        let hiddenPitchArt = this.createPitchArt(false);
 
         return (
             <div>

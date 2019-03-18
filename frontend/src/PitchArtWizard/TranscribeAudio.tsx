@@ -7,17 +7,12 @@ import PlayerBar from "./AudioViewer/PlayerBar";
 import PitchRange from "./AudioViewer/PitchRange";
 import TargetPitchBar from "./TargetPitchBar";
 import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
-import update from 'immutability-helper';
 import UploadAudio from "./UploadAudio";
 import AudioImgDefault from "./AudioImgDefault";
-import {
-    addLetter,
-    setLetterPitch
-} from "../store/audio/actions";
+import {addLetter, setLetterPitch} from "../store/audio/actions";
 import {RouteComponentProps} from "react-router";
 import {Letter} from "../types/types";
 import {AppState} from "../store";
-import {Action, AnyAction, Dispatch} from "redux";
 import {AudioAction} from "../store/audio/types";
 import {ThunkDispatch} from "redux-thunk";
 

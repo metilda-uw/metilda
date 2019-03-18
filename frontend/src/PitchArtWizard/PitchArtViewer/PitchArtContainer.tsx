@@ -1,20 +1,15 @@
 import * as React from "react";
-import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
+import {ChangeEvent} from "react";
 import PitchArt from "../PitchArt";
-import TranscribeAudio from "../TranscribeAudio";
 import AccentPitchToggle from "./AccentPitchToggle";
 import "./PitchArtContainer.css";
 import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
-import {ChangeEvent} from "react";
+import {Letter} from "../../types/types";
+import {SyntheticEvent} from "react";
 
-interface Letter {
-    // TODO: Replace this with real Letter interface
-    t0: number,
-    pitch: number
-}
 
 interface Props {
     letters: Array<Letter>,
@@ -23,9 +18,8 @@ interface Props {
     height: number,
     minPitch: number,
     maxPitch: number,
-    uploadId: number,
-    manualPitchChange: number,
-    handleInputChange: (event: ChangeEvent) => void
+    uploadId: string,
+    manualPitchChange: (index: number, newPitch: number) => void
 }
 
 interface State {
@@ -49,8 +43,21 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
-    handleInputChange(event: ChangeEvent) {
-        // TODO: replace with expected implementation
+    handleInputChange(event: SyntheticEvent) {
+        const target = event.target as HTMLInputElement;
+
+        let value: boolean | File | string;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else if (target.type === "file") {
+            value = target.files![0];
+        } else {
+            value = target.value;
+        }
+
+        const name = target.name;
+
+        this.setState({[name]: value} as any);
     }
 
     render() {
