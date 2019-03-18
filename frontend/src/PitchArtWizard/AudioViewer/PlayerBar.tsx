@@ -1,8 +1,12 @@
-import React, {Component} from 'react';
+import * as React from 'react';
 import {controls, Media, Player} from 'react-media-player';
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
-class PlayerBar extends Component {
+interface Props {
+    audioUrl: string
+}
+
+class PlayerBar extends React.Component<Props> {
     render() {
         return (
             <div>
