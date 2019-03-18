@@ -9,3 +9,7 @@ export interface Letter {
     isManualPitch: boolean,
     isWordSep: boolean
 }
+
+export interface PitchArtLetter extends Letter {
+    startTime: number
+}

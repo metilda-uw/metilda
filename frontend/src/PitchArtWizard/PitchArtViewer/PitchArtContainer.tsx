@@ -7,7 +7,7 @@ import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
-import {Letter} from "../../types/types";
+import {Letter, PitchArtLetter} from "../../types/types";
 import {SyntheticEvent} from "react";
 
 
@@ -61,7 +61,7 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     render() {
-        let pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item));
+        let pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item) as PitchArtLetter);
         let sortedPitches = pitchArtLetters.map(item => item.pitch);
         let maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
         return (
