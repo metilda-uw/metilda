@@ -27,6 +27,12 @@ interface State {
     activePlayIndex: number
 }
 
+/**
+ * NOTE: There are a number of places throughout this component that
+ * have not fully been converted over to TypeScript, these areas
+ * are marked with "// @ts-ignore". These are functional parts of
+ * the code, they just don't have explicit types yet.
+ */
 class PitchArtDrawingWindow extends React.Component<Props, State> {
     private readonly innerWidth: number;
     private readonly innerHeight: number;
