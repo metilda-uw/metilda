@@ -287,7 +287,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             return 0.0;
         }
 
-        let coords = this.props.letters.map(
+        let coords = this.props.letters.filter(data => !data.isWordSep).map(
             letter => this.vertValueToRectCoords(letter.pitch));
 
         let figureHeight = Math.max(...coords) - Math.min(...coords);
