@@ -10,6 +10,11 @@ export interface Letter {
     isWordSep: boolean
 }
 
-export interface PitchArtLetter extends Letter {
-    startTime: number
+export interface PitchArtLetter {
+    letter: string
+    t0: number,
+    t1: number
+    pitch: number,
+    isManualPitch: boolean,
+    isWordSep: boolean
 }

@@ -50,7 +50,7 @@ class PitchArt extends React.Component<Props> {
                         height={this.props.height}
                         minPitch={this.props.minPitch}
                         maxPitch={this.props.maxPitch}
-                        uploadId={this.props.uploadId}
+                        fileName={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
                         maxPitchIndex={this.props.maxPitchIndex}
                         showAccentPitch={this.props.showAccentPitch}

@@ -1,9 +1,8 @@
 import * as React from 'react';
 import './WordSyllableReview.css';
 import {MetildaWord} from "./types";
-import update from "immutability-helper";
 import {RouteComponentProps} from "react-router";
-import {Letter} from "../../types/types";
+import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 
 interface MatchParams  {
     numSyllables: string
@@ -17,19 +16,85 @@ interface State {
 }
 
 class WordSyllableReview extends React.Component<Props, State> {
+    static get AUDIO_IMG_WIDTH(): number {
+        return 653;
+    }
+
+    static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
+        return 75.0;
+    }
+
+    static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
+        return 500.0;
+    }
+
     constructor(props: Props) {
         super(props);
         this.state = {
-            activeWordIndex: -1,
+            activeWordIndex: 0,
             words: [
                 {
-                    text: "Onni"
+                    text: "Onni",
+                    letters: [
+                        {
+                            letter: "ON",
+                            t0: 1,
+                            t1: 1.1,
+                            pitch: 80.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "NI",
+                            t0: 2,
+                            t1: 2.3,
+                            pitch: 70.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        }
+                    ]
                 },
                 {
-                    text: "Isska"
+                    text: "Isska",
+                    letters: [
+                        {
+                            letter: "IS",
+                            t0: 1,
+                            t1: 1.1,
+                            pitch: 90.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "SKA",
+                            t0: 2,
+                            t1: 2.3,
+                            pitch: 60.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        }
+                    ]
                 },
                 {
-                    text: "Kayiis"
+                    text: "Kayiis",
+                    letters: [
+                        {
+                            letter: "KAY",
+                            t0: 1,
+                            t1: 1.1,
+                            pitch: 120.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "IIS",
+                            t0: 2,
+                            t1: 2.3,
+                            pitch: 60.0,
+                            isManualPitch: false,
+                            isWordSep: false
+                        }
+                    ]
                 }
             ]
         };
@@ -67,6 +132,25 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     )
                                 }
                             </ul>
+                        </div>
+                        <div className="col s8">
+                            <div className="metilda-syllable-pitch-art">
+                                <PitchArtDrawingWindow
+                                    isVisible={true}
+                                    width={WordSyllableReview.AUDIO_IMG_WIDTH}
+                                    height={600}
+                                    minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
+                                    maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
+                                    fileName={this.state.words[this.state.activeWordIndex].text}
+                                    manualPitchChange={(x, y) => (null)}
+                                    maxPitchIndex={-1}
+                                    showAccentPitch={false}
+                                    showSyllableText={true}
+                                    showVerticallyCentered={true}
+                                    showPitchArtLines={true}
+                                    showLargeCircles={true}
+                                    letters={this.state.words[this.state.activeWordIndex].letters}/>
+                            </div>
                         </div>
                     </div>
                 </div>

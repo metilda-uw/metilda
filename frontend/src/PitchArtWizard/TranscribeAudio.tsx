@@ -597,7 +597,6 @@ class TranscribeAudio extends React.Component<Props, State> {
                     <div className="row">
                         <PitchArtContainer
                             letters={this.props.letters}
-                            soundLength={this.state.soundLength}
                             width={TranscribeAudio.AUDIO_IMG_WIDTH}
                             height={600}
                             minPitch={this.state.minPitch}

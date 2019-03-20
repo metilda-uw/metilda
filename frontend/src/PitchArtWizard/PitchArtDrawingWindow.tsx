@@ -13,7 +13,7 @@ interface Props {
     minPitch: number,
     maxPitch: number,
     maxPitchIndex: number,
-    uploadId: string,
+    fileName: string,
     manualPitchChange: (index: number, newPitch: number) => void,
     isVisible: boolean,
     showPitchArtLines: boolean,
@@ -88,7 +88,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
     saveImage() {
         // trip file extension from upload ID
-        let fileName = this.props.uploadId.split(".")[0] + ".png";
+        let fileName = this.props.fileName.split(".")[0] + ".png";
 
         // follows example from:
         // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
@@ -150,14 +150,14 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     horzIndexToRectCoords(index: number) {
-        let time = this.props.letters[index].startTime;
+        let time = this.props.letters[index].t0;
         let timePerc;
 
         if (this.props.letters.length === 1) {
             timePerc = 0.1;
         } else {
-            let totalDuration = this.props.letters[this.props.letters.length - 1].startTime - this.props.letters[0].startTime;
-            timePerc = (time - this.props.letters[0].startTime) / totalDuration;
+            let totalDuration = this.props.letters[this.props.letters.length - 1].t0 - this.props.letters[0].t0;
+            timePerc = (time - this.props.letters[0].t0) / totalDuration;
         }
 
         let pointDx = timePerc * this.innerWidth;

@@ -13,7 +13,6 @@ import {SyntheticEvent} from "react";
 
 interface Props {
     letters: Array<Letter>,
-    soundLength: number,
     width: number,
     height: number,
     minPitch: number,
@@ -61,8 +60,7 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     render() {
-        let pitchArtLetters = this.props.letters.map(item => Object.assign({startTime: item.t0 * this.props.soundLength}, item) as PitchArtLetter);
-        let sortedPitches = pitchArtLetters.map(item => item.pitch);
+        let sortedPitches = this.props.letters.map(item => item.pitch);
         let maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
         return (
             <div>
@@ -99,7 +97,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
-                              letters={pitchArtLetters}/>
+                              letters={this.props.letters}/>
                 </div>
             </div>
         )

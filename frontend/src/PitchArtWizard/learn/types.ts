@@ -1,3 +1,6 @@
+import {Letter, PitchArtLetter} from "../../types/types";
+
 export interface MetildaWord {
-    text: string
+    text: string,
+    letters: Array<PitchArtLetter>
 }
