@@ -299,7 +299,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             if (this.props.letters[i].isWordSep) {
                 if (currLinePoints.length > 0) {
                     lines.push(
-                        <Line points={currLinePoints}
+                        <Line key={i + "_pa_line"}
+                              points={currLinePoints}
                               strokeWidth={this.graphWidth}
                               // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}/>
@@ -388,7 +389,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
         if (currLinePoints.length > 0) {
             lines.push(
-                <Line points={currLinePoints}
+                <Line key={"last_pa_line"}
+                      points={currLinePoints}
                       strokeWidth={this.graphWidth}
                       // @ts-ignore
                       stroke={colorScheme.lineStrokeColor}/>
