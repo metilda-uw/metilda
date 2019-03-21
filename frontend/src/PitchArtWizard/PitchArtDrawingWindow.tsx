@@ -5,6 +5,9 @@ import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale"
 import {PitchArtLetter} from "../types/types";
 import * as Tone from 'tone';
 import {Encoding} from 'tone';
+import UserPitchView from "./PitchArtViewer/UserPitchView";
+import {RawPitchValue} from "./PitchArtViewer/types";
+import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
 
 interface Props {
     letters: Array<PitchArtLetter>,
@@ -20,7 +23,8 @@ interface Props {
     showLargeCircles: boolean,
     showVerticallyCentered: boolean,
     showAccentPitch: boolean,
-    showSyllableText: boolean
+    showSyllableText: boolean,
+    rawPitchValues?: Array<RawPitchValue>
 }
 
 interface State {
@@ -56,8 +60,6 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         this.state = {
             activePlayIndex: -1
         };
-        this.horzIndexToRectCoords = this.horzIndexToRectCoords.bind(this);
-        this.vertValueToRectCoords = this.vertValueToRectCoords.bind(this);
         this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
         this.playPitchArt = this.playPitchArt.bind(this);
@@ -66,7 +68,6 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
         this.colorScheme = this.colorScheme.bind(this);
-        this.centerOffset = this.centerOffset.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -147,29 +148,6 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         let yPos = this.stageRef.current!.getStage().getPointerPosition().y;
         let pitch = this.rectCoordsToVertValue(yPos);
         this.playSound(pitch);
-    }
-
-    horzIndexToRectCoords(index: number) {
-        let time = this.props.letters[index].t0;
-        let timePerc;
-
-        if (this.props.letters.length === 1) {
-            timePerc = 0.1;
-        } else {
-            let totalDuration = this.props.letters[this.props.letters.length - 1].t0 - this.props.letters[0].t0;
-            timePerc = (time - this.props.letters[0].t0) / totalDuration;
-        }
-
-        let pointDx = timePerc * this.innerWidth;
-        return this.pointDx0 + pointDx;
-    }
-
-    vertValueToRectCoords(pitch: number, vertOffset: number=0) {
-        let refExp = referenceExponent(pitch);
-        let pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
-        let valuePerc = (refExp - referenceExponent(this.props.minPitch)) / pitchIntervalSteps;
-        let rectHeight = this.innerHeight * valuePerc;
-        return this.innerHeight - rectHeight + this.pointDy0 - vertOffset;
     }
 
     rectCoordsToVertValue(rectCoord: number) {
@@ -288,28 +266,27 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 manualDotFillColor: null};
     }
 
-    centerOffset() {
-        if (this.props.letters.length < 1) {
-            return 0.0;
-        }
-
-        let coords = this.props.letters.filter(data => !data.isWordSep).map(
-            letter => this.vertValueToRectCoords(letter.pitch));
-
-        let figureHeight = Math.max(...coords) - Math.min(...coords);
-        let figureCenterY = Math.min(...coords) + (figureHeight / 2.0);
-        let windowCenterY = this.pointDy0 + (this.innerHeight / 2.0);
-
-        return figureCenterY - windowCenterY;
-    }
-
     render() {
         let colorScheme = this.colorScheme(this.props.isVisible);
 
         let circleRadius = this.props.showLargeCircles ?
             this.largeCircleRadius : this.smallCircleRadius;
 
-        let vertOffset = this.props.showVerticallyCentered ? this.centerOffset(): 0.0;
+        let pitchValues: Array<RawPitchValue> = this.props.letters.filter(data => !data.isWordSep);
+
+        let windowConfig = {
+                innerHeight: this.innerHeight,
+                innerWidth: this.innerWidth,
+                y0: this.pointDy0,
+                x0: this.pointDx0,
+                dMin: this.props.minPitch,
+                dMax: this.props.maxPitch
+            };
+        let coordConverter = new PitchArtCoordConverter(
+            windowConfig,
+            pitchValues,
+            this.props.showVerticallyCentered
+        );
 
         let points = [];
         let pointPairs = [];
@@ -333,8 +310,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             }
 
             let currPitch = this.props.letters[i].pitch;
-            let x = this.horzIndexToRectCoords(i);
-            let y = this.vertValueToRectCoords(currPitch, vertOffset);
+            let x = coordConverter.horzIndexToRectCoords(this.props.letters[i].t0);
+            let y = coordConverter.vertValueToRectCoords(this.props.letters[i].pitch);
 
             // The 'align' property is not working with the current version of
             // react-konva that's used. As a result, we're manually shifting
@@ -397,7 +374,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             return {
                                 // @ts-ignore
                                 x: this.getAbsolutePosition().x,
-                                y: controller.vertValueToRectCoords(newPitch)
+                                y: coordConverter.vertValueToRectCoords(newPitch)
                             };
                         }
                         }
@@ -457,6 +434,12 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     <Layer>
                         {this.props.showSyllableText ? letterSyllables : []}
                     </Layer>
+                    {
+                        this.props.rawPitchValues &&
+                            <UserPitchView pitchValues={this.props.rawPitchValues}
+                                           windowConfig={windowConfig}
+                                           showVerticallyCentered={this.props.showVerticallyCentered}/>
+                    }
                 </Stage>
                 <a className="hide" ref={this.downloadRef}>
                     Hidden Download Link

@@ -3,6 +3,7 @@ import './WordSyllableReview.css';
 import {MetildaWord} from "./types";
 import {RouteComponentProps} from "react-router";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
+import {RawPitchValue} from "../PitchArtViewer/types";
 
 interface MatchParams  {
     numSyllables: string
@@ -105,6 +106,11 @@ class WordSyllableReview extends React.Component<Props, State> {
     };
 
     render() {
+        let rawPitchValues: Array<RawPitchValue> = [
+            {t0: 1.0, t1: 1.2, pitch: 80},
+            {t0: 2.3, t1: 2.5, pitch: 70},
+        ];
+
         return (
             <div>
                 <ol className="metilda-breadcrumb-list">
@@ -149,7 +155,9 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     showVerticallyCentered={true}
                                     showPitchArtLines={true}
                                     showLargeCircles={true}
-                                    letters={this.state.words[this.state.activeWordIndex].letters}/>
+                                    letters={this.state.words[this.state.activeWordIndex].letters}
+                                    rawPitchValues={rawPitchValues}
+                                    />
                             </div>
                         </div>
                     </div>
