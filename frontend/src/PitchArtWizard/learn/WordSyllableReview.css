@@ -17,3 +17,13 @@
 .metilda-syllable-pitch-art {
     margin-left: 48px;
 }
+
+.pitch-art-btn-container {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.metilda-btn {
+    margin-top: 16px;
+    margin-left: 16px;
+}

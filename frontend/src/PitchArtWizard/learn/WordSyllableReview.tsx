@@ -4,15 +4,18 @@ import {MetildaWord} from "./types";
 import {RouteComponentProps} from "react-router";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
+import Recorder from 'recorder-js';
 
-interface MatchParams  {
+interface MatchParams {
     numSyllables: string
 }
 
-interface Props extends RouteComponentProps<MatchParams> {}
+interface Props extends RouteComponentProps<MatchParams> {
+}
 
 interface State {
-    activeWordIndex: number;
+    activeWordIndex: number,
+    userPitchValues: Array<RawPitchValue>,
     words: Array<MetildaWord>
 }
 
@@ -29,10 +32,13 @@ class WordSyllableReview extends React.Component<Props, State> {
         return 500.0;
     }
 
+    private recorder: any;
+
     constructor(props: Props) {
         super(props);
         this.state = {
             activeWordIndex: 0,
+            userPitchValues: [],
             words: [
                 {
                     text: "Onni",
@@ -41,7 +47,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                             letter: "ON",
                             t0: 1,
                             t1: 1.1,
-                            pitch: 80.0,
+                            pitch: 90.0,
                             isManualPitch: false,
                             isWordSep: false
                         },
@@ -105,18 +111,48 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.setState({activeWordIndex: index});
     };
 
+    toggleRecord = () => {
+        const audioClass =  (window as any).AudioContext || (window as any).webkitAudioContext;
+        const audioContext = new audioClass();
+
+        if (this.recorder == null) {
+            this.recorder = new Recorder(audioContext);
+            navigator.mediaDevices.getUserMedia({audio: true})
+              .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
+              .catch(err => console.log('Unable to initiate recording', err));
+            this.setState({userPitchValues: []});
+        } else {
+            let controller = this;
+            this.recorder.stop().then((result: any) => {
+                const formData = new FormData();
+                formData.append('file', result.blob);
+                fetch(`/api/all-pitches`, {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(function(data) {
+                    let pitchValues = (data as Array<Array<number>>).map(
+                        item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
+                    );
+                    controller.recorder = null;
+                    controller.setState({userPitchValues: pitchValues});
+                });
+            });
+        }
+    };
+
     render() {
-        let rawPitchValues: Array<RawPitchValue> = [
-            {t0: 1.0, t1: 1.2, pitch: 80},
-            {t0: 2.3, t1: 2.5, pitch: 70},
-        ];
 
         return (
             <div>
                 <ol className="metilda-breadcrumb-list">
-                   <li className="metilda-breadcrumb-list-item">
+                    <li className="metilda-breadcrumb-list-item">
                         Blackfoot Syllables
-                   </li>
+                    </li>
                     <li className="metilda-breadcrumb-list-item">
                         >
                     </li>
@@ -131,7 +167,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                 {
                                     this.state.words.map((word, index) =>
                                         <li key={"metilda-word-" + index}
-                                            className={"collection-item " + (index == this.state.activeWordIndex ? "active": "")}
+                                            className={"collection-item " + (index == this.state.activeWordIndex ? "active" : "")}
                                             onClick={() => (this.wordClicked(index))}>
                                             {word.text}
                                         </li>
@@ -156,8 +192,14 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     showPitchArtLines={true}
                                     showLargeCircles={true}
                                     letters={this.state.words[this.state.activeWordIndex].letters}
-                                    rawPitchValues={rawPitchValues}
-                                    />
+                                    rawPitchValues={this.state.userPitchValues}
+                                />
+                                <div className="pitch-art-btn-container">
+                                    <button className="waves-effect waves-light btn metilda-btn"
+                                            onClick={this.toggleRecord}>
+                                        {this.recorder == null ? 'Start Record': 'Stop Record'}
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
