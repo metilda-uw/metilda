@@ -1,5 +1,6 @@
 import * as React from 'react';
 import './WordSyllableReview.css';
+import '../GlobalStyling.css';
 import {MetildaWord} from "./types";
 import {RouteComponentProps} from "react-router";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
@@ -21,7 +22,7 @@ interface State {
 
 class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
-        return 653;
+        return 635;
     }
 
     static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
@@ -102,6 +103,43 @@ class WordSyllableReview extends React.Component<Props, State> {
                             isWordSep: false
                         }
                     ]
+                },
+                {
+                    text: "Saaakohmappiwa",
+                    letters: [
+                        {
+                            letter: "SAH",
+                            t0: 0.5715557612244353,
+                            t1: 0.5715557612244353,
+                            pitch: 79.4,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "KOH",
+                            t0: 1.011578934170736,
+                            t1: 1.011578934170736,
+                            pitch: 99.26,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "MAP",
+                            t0: 1.2641848297510196,
+                            t1: 1.2641848297510196,
+                            pitch: 67.96,
+                            isManualPitch: false,
+                            isWordSep: false
+                        },
+                        {
+                            letter: "PI",
+                            t0: 1.5982764980991369,
+                            t1: 1.5982764980991369,
+                            pitch: 65.64,
+                            isManualPitch: false,
+                            isWordSep: false
+                        }
+                    ]
                 }
             ]
         };
@@ -148,7 +186,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     render() {
 
         return (
-            <div>
+            <div className="metilda-audio-analysis-layout">
                 <ol className="metilda-breadcrumb-list">
                     <li className="metilda-breadcrumb-list-item">
                         Blackfoot Syllables
