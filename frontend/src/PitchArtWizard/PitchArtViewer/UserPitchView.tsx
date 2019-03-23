@@ -1,6 +1,6 @@
 import * as React from 'react';
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
-import {Layer, Line} from "react-konva";
+import {Layer, Line, Circle} from "react-konva";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
 
 interface Props {
@@ -12,11 +12,13 @@ interface Props {
 class UserPitchView extends React.Component<Props> {
     private readonly lineWidth: number;
     private readonly lineColor: string;
+    private readonly circleRadius: number;
 
     constructor(props: Props) {
         super(props);
         this.lineWidth = 3;
         this.lineColor = "#FF0000";
+        this.circleRadius = 3;
     }
 
     render() {
@@ -27,16 +29,30 @@ class UserPitchView extends React.Component<Props> {
         );
 
         let points: Array<number> = [];
-        this.props.pitchValues.forEach(function(value) {
-            points.push(coordConverter.horzIndexToRectCoords(value.t0));
-            points.push(coordConverter.vertValueToRectCoords(value.pitch));
+        let circles: Array<any> = [];
+        let circleRadius = this.circleRadius;
+        let lineColor = this.lineColor;
+        this.props.pitchValues.forEach(function(value, index) {
+            let x = coordConverter.horzIndexToRectCoords(value.t0);
+            let y = coordConverter.vertValueToRectCoords(value.pitch);
+            circles.push(
+                <Circle key={index}
+                        radius={circleRadius}
+                        x={x}
+                        y={y}
+                        fill={lineColor}
+                />
+            );
+            points.push(x);
+            points.push(y);
         });
 
         return (
             <Layer>
-                <Line points={points}
-                      strokeWidth={this.lineWidth}
-                      stroke={this.lineColor} />
+                {/*<Line points={points}*/}
+                      {/*strokeWidth={this.lineWidth}*/}
+                      {/*stroke={this.lineColor} />*/}
+                {circles}
             </Layer>
         );
     }

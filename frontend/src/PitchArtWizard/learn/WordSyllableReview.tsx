@@ -162,9 +162,10 @@ class WordSyllableReview extends React.Component<Props, State> {
         } else {
             let controller = this;
             this.recorder.stop().then((result: any) => {
+                console.log(result);
                 const formData = new FormData();
                 formData.append('file', result.blob);
-                fetch(`/api/all-pitches`, {
+                fetch(`/api/all-pitches?min-pitch=30.0&max-pitch=300.0`, {
                     method: "POST",
                     headers: {
                         'Accept': 'application/json'
@@ -176,6 +177,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                     let pitchValues = (data as Array<Array<number>>).map(
                         item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                     );
+                    console.log(JSON.stringify(data));
                     controller.recorder = null;
                     controller.setState({userPitchValues: pitchValues});
                 });
