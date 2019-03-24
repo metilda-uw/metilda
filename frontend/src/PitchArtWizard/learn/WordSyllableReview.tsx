@@ -6,6 +6,7 @@ import {RouteComponentProps} from "react-router";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
 import Recorder from 'recorder-js';
+import StaticWordSyallableData from './StaticWordSyallableData';
 import {createRef} from "react";
 
 interface MatchParams {
@@ -42,108 +43,7 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.state = {
             activeWordIndex: 0,
             userPitchValues: [],
-            words: [
-                {
-                    text: "Onni",
-                    letters: [
-                        {
-                            letter: "ON",
-                            t0: 1,
-                            t1: 1.1,
-                            pitch: 90.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "NI",
-                            t0: 2,
-                            t1: 2.3,
-                            pitch: 70.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        }
-                    ]
-                },
-                {
-                    text: "Isska",
-                    letters: [
-                        {
-                            letter: "IS",
-                            t0: 1,
-                            t1: 1.1,
-                            pitch: 90.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "SKA",
-                            t0: 2,
-                            t1: 2.3,
-                            pitch: 60.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        }
-                    ]
-                },
-                {
-                    text: "Kayiis",
-                    letters: [
-                        {
-                            letter: "KAY",
-                            t0: 1,
-                            t1: 1.1,
-                            pitch: 120.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "IIS",
-                            t0: 2,
-                            t1: 2.3,
-                            pitch: 60.0,
-                            isManualPitch: false,
-                            isWordSep: false
-                        }
-                    ]
-                },
-                {
-                    text: "Saaakohmappiwa",
-                    letters: [
-                        {
-                            letter: "SAH",
-                            t0: 0.5715557612244353,
-                            t1: 0.5715557612244353,
-                            pitch: 79.4,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "KOH",
-                            t0: 1.011578934170736,
-                            t1: 1.011578934170736,
-                            pitch: 99.26,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "MAP",
-                            t0: 1.2641848297510196,
-                            t1: 1.2641848297510196,
-                            pitch: 67.96,
-                            isManualPitch: false,
-                            isWordSep: false
-                        },
-                        {
-                            letter: "PI",
-                            t0: 1.5982764980991369,
-                            t1: 1.5982764980991369,
-                            pitch: 65.64,
-                            isManualPitch: false,
-                            isWordSep: false
-                        }
-                    ]
-                }
-            ]
+            words: new StaticWordSyallableData().getData(parseFloat(this.props.match.params.numSyllables))
         };
     }
 
