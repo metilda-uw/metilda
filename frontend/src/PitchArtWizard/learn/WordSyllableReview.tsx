@@ -150,7 +150,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                             <li key={"metilda-word-" + index}
                                                 className={"collection-item " + (index == this.state.activeWordIndex ? "active" : "")}
                                                 onClick={() => (this.wordClicked(index))}>
-                                                {word.text}
+                                                {word.uploadId}
                                             </li>
                                         )
                                     }
@@ -168,7 +168,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         height={600}
                                         minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
                                         maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
-                                        fileName={this.state.words[this.state.activeWordIndex].text}
+                                        fileName={this.state.words[this.state.activeWordIndex].uploadId}
                                         manualPitchChange={(x, y) => (null)}
                                         maxPitchIndex={-1}
                                         showAccentPitch={false}
@@ -181,7 +181,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     />
                                 }
                                 <PlayerBar audioUrl={TranscribeAudio.formatAudioUrl(
-                                    this.state.words[this.state.activeWordIndex].text,
+                                    this.state.words[this.state.activeWordIndex].uploadId,
                                     this.minPitchArtTime(),
                                     this.maxPitchArtTime()
                                 )}/>

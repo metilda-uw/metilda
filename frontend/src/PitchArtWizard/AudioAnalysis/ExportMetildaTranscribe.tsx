@@ -20,7 +20,7 @@ class ExportMetildaTranscribe extends React.Component<Props> {
     state = {};
 
     exportToJson = () => {
-        let metildaWord = {text : this.props.word, letters: this.props.letters} as MetildaWord;
+        let metildaWord = {uploadId : this.props.word, letters: this.props.letters} as MetildaWord;
         let timeStamp = moment().format('MM-DD-YYYY_hh_mm_ss');
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
     };

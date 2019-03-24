@@ -48,7 +48,7 @@ interface WordLookup {
 const WORDS: WordLookup = {
     pitchArt21: [
         {
-            "text": "PHEOP019 onni.wav",
+            "uploadId": "PHEOP019 onni.wav",
             "letters": [
                 {
                     "syllable": "ON",
@@ -69,7 +69,7 @@ const WORDS: WordLookup = {
             ]
         },
         {
-            "text": "PHEOP011 isska.wav",
+            "uploadId": "PHEOP011 isska.wav",
             "letters": [
                 {
                     "syllable": "ISS",
@@ -92,7 +92,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt22: [
         {
-            "text": "PHEOP002 aakiiwa.wav",
+            "uploadId": "PHEOP002 aakiiwa.wav",
             "letters": [
                 {
                     "syllable": "AAK",
@@ -115,7 +115,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt31: [
         {
-            "text": "PHEOP151 awakaasiwa.wav",
+            "uploadId": "PHEOP151 awakaasiwa.wav",
             "letters": [
                 {
                     "syllable": "A",
@@ -146,7 +146,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt32: [
         {
-            "text": "EOP-RS-NC-makoyi.wav",
+            "uploadId": "EOP-RS-NC-makoyi.wav",
             "letters": [
                 {
                     "syllable": "MA",
@@ -177,7 +177,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt33: [
         {
-            "text": "PHEOP014 ponokawa.wav",
+            "uploadId": "PHEOP014 ponokawa.wav",
             "letters": [
                 {
                     "syllable": "PO",
@@ -208,7 +208,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt41: [
         {
-            "text": "PHEOP163 nikso'kowaksi.wav",
+            "uploadId": "PHEOP163 nikso'kowaksi.wav",
             "letters": [
                 {
                     "syllable": "NIK",
@@ -247,7 +247,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt42: [
         {
-            "text": "EOP-AF-saahkomaapiwa_mono.wav",
+            "uploadId": "EOP-AF-saahkomaapiwa_mono.wav",
             "letters": [
                 {
                     "syllable": "SAAH",
@@ -286,7 +286,7 @@ const WORDS: WordLookup = {
     ],
     pitchArt43: [
         {
-            "text": "PHEOP066 nottoana.wav",
+            "uploadId": "PHEOP066 nottoana.wav",
             "letters": [
                 {
                     "syllable": "NOT",
