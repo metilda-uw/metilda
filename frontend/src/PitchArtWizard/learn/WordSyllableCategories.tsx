@@ -54,7 +54,7 @@ export default class WordSyllableCategories extends React.Component<Props, State
                     </h5>
                 </div>
                 <div className="metilda-page-content">
-                    <div className="row">
+                    <div className="row syllable-selection-row">
                         <div className="col s4">
                             <div id="syllable-selection" className="col s12">
                                 <p className="inline-btns-label">Number of syllables</p>
