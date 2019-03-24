@@ -103,7 +103,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
-                            <div className="col s12">
+                            <div id="metilda-word-list" className="col s12">
                                 <ul className="collection">
                                     {
                                         this.state.words.map((word, index) =>
