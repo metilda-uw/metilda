@@ -16,6 +16,7 @@ import {AppState} from "../store";
 import {AudioAction} from "../store/audio/types";
 import {ThunkDispatch} from "redux-thunk";
 import "./GlobalStyling.css";
+import ExportMetildaTranscribe from "./AudioAnalysis/ExportMetildaTranscribe";
 
 interface MatchParams  {
     uploadId: string
@@ -533,6 +534,9 @@ class TranscribeAudio extends React.Component<Props, State> {
                             <PitchRange initMinPitch={this.state.minPitch}
                                         initMaxPitch={this.state.maxPitch}
                                         applyPitchRange={this.applyPitchRange}/>
+                            <ExportMetildaTranscribe
+                                word={this.props.match.params.uploadId}
+                                disabled={this.props.letters.length === 0}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
