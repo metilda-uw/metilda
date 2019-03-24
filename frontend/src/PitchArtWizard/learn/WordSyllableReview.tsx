@@ -42,7 +42,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     // Amount of time to add at the start and end of a word
     // when playing its audio clip
     static get AUDIO_BUFFER_TIME(): number {
-        return 0.25
+        return 0.2
     }
 
     private recorder: any;
@@ -149,6 +149,16 @@ class WordSyllableReview extends React.Component<Props, State> {
     };
 
     render() {
+        let maxPitchIndex = -1;
+        if (this.state.words[this.state.activeWordIndex].letters.length > 1) {
+            let letters = this.state.words[this.state.activeWordIndex].letters;
+
+            if (!letters.some(item => item.isWordSep)) {
+                let maxValue = Math.max(...letters.map(item => item.pitch));
+                maxPitchIndex = letters.map(item => item.pitch).indexOf(maxValue);
+            }
+        }
+
         return (
             <div>
                 <div className="metilda-page-header">
@@ -179,15 +189,16 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     this.state.words.length >= 1 &&
                                     <PitchArtDrawingWindow
                                         ref={this.pitchArtRef}
-                                        isVisible={true}
+                                        showArtDesign={true}
+                                        showDynamicContent={true}
                                         width={WordSyllableReview.AUDIO_IMG_WIDTH}
                                         height={600}
                                         minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
                                         maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
                                         fileName={this.state.words[this.state.activeWordIndex].uploadId}
                                         manualPitchChange={(x, y) => (null)}
-                                        maxPitchIndex={-1}
-                                        showAccentPitch={false}
+                                        maxPitchIndex={maxPitchIndex}
+                                        showAccentPitch={true}
                                         showSyllableText={true}
                                         showVerticallyCentered={true}
                                         showPitchArtLines={true}

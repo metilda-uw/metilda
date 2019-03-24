@@ -18,7 +18,8 @@ interface Props {
     maxPitchIndex: number,
     fileName: string,
     manualPitchChange: (index: number, newPitch: number) => void,
-    isVisible: boolean,
+    showDynamicContent: boolean,
+    showArtDesign: boolean,
     showPitchArtLines: boolean,
     showLargeCircles: boolean,
     showVerticallyCentered: boolean,
@@ -196,8 +197,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             = isEnabled ? 'pointer' : 'default';
     }
 
-    colorScheme(isVisible: boolean) {
-        if (isVisible) {
+    colorScheme(showArtDesign: boolean) {
+        if (!showArtDesign) {
             return {
                 lineStrokeColor: "#497dba",
                 praatDotFillColor: "#497dba",
@@ -262,12 +263,12 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
         return {lineStrokeColor: lineStrokeColor,
                 praatDotFillColor: praatDotFillColor,
-                activePlayColor: null,
-                manualDotFillColor: null};
+                activePlayColor: "#e8e82e",
+                manualDotFillColor: "#af0008"};
     }
 
     render() {
-        let colorScheme = this.colorScheme(this.props.isVisible);
+        let colorScheme = this.colorScheme(this.props.showArtDesign);
 
         let circleRadius = this.props.showLargeCircles ?
             this.largeCircleRadius : this.smallCircleRadius;
@@ -331,7 +332,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             let circleFill = colorScheme.praatDotFillColor;
             let circleStroke = colorScheme.lineStrokeColor;
 
-            if (this.props.isVisible) {
+            if (this.props.showDynamicContent) {
                 if (this.state.activePlayIndex === i) {
                     circleFill = colorScheme.activePlayColor;
                     circleStroke = colorScheme.activePlayColor;

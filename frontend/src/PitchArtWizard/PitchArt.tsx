@@ -45,7 +45,8 @@ class PitchArt extends React.Component<Props> {
     createPitchArt(isVisible: boolean) {
         return (<PitchArtDrawingWindow
                         ref={isVisible ? this.visibleRef : this.hiddenRef}
-                        isVisible={isVisible}
+                        showArtDesign={!isVisible}
+                        showDynamicContent={isVisible}
                         width={this.props.width}
                         height={this.props.height}
                         minPitch={this.props.minPitch}
