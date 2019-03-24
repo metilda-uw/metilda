@@ -13,6 +13,10 @@ class Header extends Component {
         <nav>
             <div id="metilda-navbar" className="row">
                 <a href="/pitchartwizard" className="app-logo metilda-navbar-item">MeTILDA</a>
+                <ul id="nav-mobile" className="right hide-on-med-and-down">
+                    <li><a href="/pitchartwizard">Create</a></li>
+                    <li><a href="/learn/words/syllables">Learn</a></li>
+                </ul>
             </div>
         </nav>
     );
