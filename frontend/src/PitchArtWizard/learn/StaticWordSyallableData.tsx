@@ -48,6 +48,51 @@ interface WordLookup {
 const WORDS: WordLookup = {
     pitchArt21: [
         {
+  "uploadId": "PHEOP019 onni.wav",
+  "letters": [
+    {
+      "t0": 0.527230539917854,
+      "t1": 0.6297502591306802,
+      "pitch": 107.06482514244517,
+      "syllable": "ON",
+      "isManualPitch": false,
+      "isWordSep": false
+    },
+    {
+      "t0": 0.7322699783435062,
+      "t1": 0.8604196273595388,
+      "pitch": 88.3085725004791,
+      "syllable": "NI",
+      "isManualPitch": false,
+      "isWordSep": false
+    },
+    {
+      "t0": 1.4242780830300823,
+      "t1": 1.6293175214557347,
+      "pitch": -1,
+      "syllable": "X",
+      "isManualPitch": false,
+      "isWordSep": true
+    },
+    {
+      "t0": 2.2828807314375013,
+      "t1": 2.3854004506503275,
+      "pitch": 101.1223602197953,
+      "syllable": "ON",
+      "isManualPitch": false,
+      "isWordSep": false
+    },
+    {
+      "t0": 2.51355009966636,
+      "t1": 2.6801446433872025,
+      "pitch": 90.35063281271275,
+      "syllable": "NI",
+      "isManualPitch": false,
+      "isWordSep": false
+    }
+  ]
+},
+        {
             "uploadId": "PHEOP019 onni.wav",
             "letters": [
                 {

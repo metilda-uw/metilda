@@ -533,7 +533,9 @@ class TranscribeAudio extends React.Component<Props, State> {
                                         applyPitchRange={this.applyPitchRange}/>
                             <ExportMetildaTranscribe
                                 word={this.props.match.params.uploadId}
-                                disabled={this.props.letters.length === 0 || this.props.letters.some(item => item.syllable === "X")}/>
+                                disabled={this.props.letters.length === 0
+                                       || this.props.letters.filter(item => !item.isWordSep)
+                                                            .some(item => item.syllable === "X")}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
