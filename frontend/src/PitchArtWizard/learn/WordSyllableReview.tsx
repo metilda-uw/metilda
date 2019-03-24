@@ -9,6 +9,8 @@ import Recorder from 'recorder-js';
 import StaticWordSyallableData from './StaticWordSyallableData';
 import {createRef} from "react";
 import * as queryString from "query-string";
+import PlayerBar from "../AudioViewer/PlayerBar";
+import TranscribeAudio from "../TranscribeAudio";
 
 interface MatchParams {
     numSyllables: string
@@ -35,6 +37,12 @@ class WordSyllableReview extends React.Component<Props, State> {
 
     static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
         return 500.0;
+    }
+
+    // Amount of time to add at the start and end of a word
+    // when playing its audio clip
+    static get AUDIO_BUFFER_TIME(): number {
+        return 0.25
     }
 
     private recorder: any;
@@ -99,6 +107,28 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.pitchArtRef.current!.playPitchArt();
     };
 
+    minPitchArtTime = () => {
+        if (this.state.words.length === 0
+         || this.state.words[this.state.activeWordIndex].letters.length === 0) {
+            return 0;
+        }
+
+        return Math.max(
+            this.state.words[this.state.activeWordIndex].letters[0].t0 - WordSyllableReview.AUDIO_BUFFER_TIME,
+            0);
+    };
+
+    maxPitchArtTime = () => {
+        if (this.state.words.length === 0
+         || this.state.words[this.state.activeWordIndex].letters.length === 0) {
+            return 0;
+        }
+
+        let numLetters = this.state.words[this.state.activeWordIndex].letters.length;
+        return (this.state.words[this.state.activeWordIndex].letters[numLetters - 1].t1
+              + WordSyllableReview.AUDIO_BUFFER_TIME);
+    };
+
     render() {
         const values = queryString.parse(this.props.location.search);
         let accentIndex = parseFloat(values['accentIndex'] as string);
@@ -150,6 +180,11 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         rawPitchValues={this.state.userPitchValues}
                                     />
                                 }
+                                <PlayerBar audioUrl={TranscribeAudio.formatAudioUrl(
+                                    this.state.words[this.state.activeWordIndex].text,
+                                    this.minPitchArtTime(),
+                                    this.maxPitchArtTime()
+                                )}/>
                                 <div className="pitch-art-btn-container">
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.toggleRecord}>
