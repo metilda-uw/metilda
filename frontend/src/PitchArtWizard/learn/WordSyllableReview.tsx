@@ -129,15 +129,31 @@ class WordSyllableReview extends React.Component<Props, State> {
               + WordSyllableReview.AUDIO_BUFFER_TIME);
     };
 
-    render() {
+    pageTitle = () => {
+        let syllableStr = `${this.props.match.params.numSyllables} Syllables`;
+
         const values = queryString.parse(this.props.location.search);
         let accentIndex = parseFloat(values['accentIndex'] as string);
+        let accentSuffix: string = "";
 
+        if (accentIndex == 0) {
+            accentSuffix = "st"
+        } else if (accentIndex == 1) {
+            accentSuffix = "nd"
+        } else if (accentIndex == 2) {
+            accentSuffix = "rd"
+        }
+
+        let accentStr = "Accent " + (accentIndex + 1) + accentSuffix + " syllable";
+        return syllableStr + ", " + accentStr;
+    };
+
+    render() {
         return (
             <div>
                 <div className="metilda-page-header">
                     <h5>
-                        Blackfoot Words > {this.props.match.params.numSyllables} Syllables, Accent {accentIndex + 1}
+                        Blackfoot Words > {this.pageTitle()}
                     </h5>
                 </div>
                 <div className="metilda-page-content">
