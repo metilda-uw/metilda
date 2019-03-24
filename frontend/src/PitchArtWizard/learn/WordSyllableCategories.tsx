@@ -9,21 +9,20 @@ import pitchArt33 from "./images/Pitch Art - 33-01.jpg";
 import pitchArt41 from "./images/Pitch Art - 41-01.jpg";
 import pitchArt42 from "./images/Pitch Art - 42-01.jpg";
 import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
+import {Link, RouteComponentProps} from "react-router-dom";
+import * as queryString from "query-string";
 
-interface Props {
 
+interface Props extends RouteComponentProps {
 }
 
 interface State {
-    numSyllables: number
+
 }
 
 export default class WordSyllableCategories extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
-        this.state = {
-            numSyllables: 2
-        };
     }
 
     handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -32,8 +31,19 @@ export default class WordSyllableCategories extends React.Component<Props, State
         this.setState({[name]: parseFloat(value)} as any);
     };
 
+    getNumSyllables = (): number => {
+        const values = queryString.parse(this.props.location.search);
+        let numSyllables = values['numSyllables'] as string;
+
+        if (!numSyllables) {
+            return 2;
+        }
+
+        return parseFloat(numSyllables);
+    };
+
     imageSrcList = () => {
-        switch (this.state.numSyllables) {
+        switch (this.getNumSyllables()) {
             case 2:
                 return [pitchArt21, pitchArt22];
             case 3:
@@ -46,6 +56,7 @@ export default class WordSyllableCategories extends React.Component<Props, State
     };
 
     render() {
+        let numSyllables = this.getNumSyllables();
         return (
             <div>
                 <div className="metilda-page-header">
@@ -59,36 +70,42 @@ export default class WordSyllableCategories extends React.Component<Props, State
                             <div id="syllable-selection" className="col s12">
                                 <p className="inline-btns-label">Number of syllables</p>
                                 <div className="inline-btns">
-                                    <p>
-                                        <label>
-                                            <input name="numSyllables"
-                                                   type="radio"
-                                                   value="2"
-                                                   onChange={this.handleInputChange}
-                                                   checked={this.state.numSyllables === 2}/>
-                                            <span>2</span>
-                                        </label>
-                                    </p>
-                                    <p>
-                                        <label>
-                                            <input name="numSyllables"
-                                                   type="radio"
-                                                   value="3"
-                                                   onChange={this.handleInputChange}
-                                                   checked={this.state.numSyllables === 3}/>
-                                            <span>3</span>
-                                        </label>
-                                    </p>
-                                    <p>
-                                        <label>
-                                            <input name="numSyllables"
-                                                   type="radio"
-                                                   value="4"
-                                                   onChange={this.handleInputChange}
-                                                   checked={this.state.numSyllables === 4}/>
-                                            <span>4</span>
-                                        </label>
-                                    </p>
+                                    <Link to="/learn/words/syllables?numSyllables=2">
+                                        <p>
+                                            <label>
+                                                <input name="numSyllables"
+                                                       type="radio"
+                                                       value="2"
+                                                       onChange={this.handleInputChange}
+                                                       checked={numSyllables === 2}/>
+                                                <span>2</span>
+                                            </label>
+                                        </p>
+                                    </Link>
+                                    <Link to="/learn/words/syllables?numSyllables=3">
+                                        <p>
+                                            <label>
+                                                <input name="numSyllables"
+                                                       type="radio"
+                                                       value="3"
+                                                       onChange={this.handleInputChange}
+                                                       checked={numSyllables === 3}/>
+                                                <span>3</span>
+                                            </label>
+                                        </p>
+                                    </Link>
+                                    <Link to="/learn/words/syllables?numSyllables=4">
+                                        <p>
+                                            <label>
+                                                <input name="numSyllables"
+                                                       type="radio"
+                                                       value="4"
+                                                       onChange={this.handleInputChange}
+                                                       checked={numSyllables === 4}/>
+                                                <span>4</span>
+                                            </label>
+                                        </p>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
@@ -96,12 +113,12 @@ export default class WordSyllableCategories extends React.Component<Props, State
                     <div className="row">
                         <div className="col s6">
                             <div className="col s12 pitch-art-img-list">
-                                { this.imageSrcList().map((item, index) =>
-                                    <a href={"/learn/words/syllables/" + this.state.numSyllables + "?accentIndex=" + index}>
+                                {this.imageSrcList().map((item, index) =>
+                                    <Link to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
                                              className="pitch-art-img-list-item"/>
-                                    </a>
+                                    </Link>
                                 )}
                             </div>
                         </div>
