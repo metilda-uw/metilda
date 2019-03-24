@@ -318,7 +318,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             // react-konva that's used. As a result, we're manually shifting
             // the text to be centered.
             let konvaFontSizeAsPixels = this.fontSize * 0.65;
-            let text = this.props.letters[i].letter;
+            let text = this.props.letters[i].syllable;
 
             letterSyllables.push(
                 <Text key={i}

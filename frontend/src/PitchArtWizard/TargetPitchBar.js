@@ -126,7 +126,7 @@ class TargetPitchBar extends Component {
                                 }
 
                                 return <AudioLetter key={index}
-                                                    letter={item.letter}
+                                                    letter={item.syllable}
                                                     leftX={item.leftX}
                                                     rightX={item.rightX}
                                                     isSelected={index === controller.state.selectedIndex}

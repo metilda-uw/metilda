@@ -39,7 +39,7 @@ export const resetLetters = (): ActionReturn => (dispatch: Dispatch) => {
 
 export const setLetterSyllable = (index: number, syllable: string): ActionReturn => (dispatch: Dispatch, getState) => {
     let letters = getState().audio.letters;
-    let newLetters = update(letters, {[index]: {letter: {$set: syllable}}});
+    let newLetters = update(letters, {[index]: {syllable: {$set: syllable}}});
 
     dispatch({
         type: constants.SET_LETTER_SYLLABLE,
