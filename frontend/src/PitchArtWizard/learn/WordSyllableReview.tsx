@@ -6,6 +6,7 @@ import {RouteComponentProps} from "react-router";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
 import Recorder from 'recorder-js';
+import {createRef} from "react";
 
 interface MatchParams {
     numSyllables: string
@@ -34,6 +35,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 
     private recorder: any;
+    private pitchArtRef = createRef<PitchArtDrawingWindow>();
 
     constructor(props: Props) {
         super(props);
@@ -185,6 +187,10 @@ class WordSyllableReview extends React.Component<Props, State> {
         }
     };
 
+    playPitchArt = () => {
+        this.pitchArtRef.current!.playPitchArt();
+    };
+
     render() {
 
         return (
@@ -218,6 +224,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                         <div className="col s8">
                             <div className="metilda-syllable-pitch-art">
                                 <PitchArtDrawingWindow
+                                    ref={this.pitchArtRef}
                                     isVisible={true}
                                     width={WordSyllableReview.AUDIO_IMG_WIDTH}
                                     height={600}
@@ -238,6 +245,10 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.toggleRecord}>
                                         {this.recorder == null ? 'Start Record': 'Stop Record'}
+                                    </button>
+                                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                                            onClick={this.playPitchArt}>
+                                        Play
                                     </button>
                                 </div>
                             </div>
