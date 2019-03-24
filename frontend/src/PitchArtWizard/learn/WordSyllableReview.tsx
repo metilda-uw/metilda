@@ -23,7 +23,7 @@ interface State {
 
 class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
-        return 635;
+        return 653;
     }
 
     static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
@@ -152,14 +152,14 @@ class WordSyllableReview extends React.Component<Props, State> {
     };
 
     toggleRecord = () => {
-        const audioClass =  (window as any).AudioContext || (window as any).webkitAudioContext;
+        const audioClass = (window as any).AudioContext || (window as any).webkitAudioContext;
         const audioContext = new audioClass();
 
         if (this.recorder == null) {
             this.recorder = new Recorder(audioContext);
             navigator.mediaDevices.getUserMedia({audio: true})
-              .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
-              .catch(err => console.log('Unable to initiate recording', err));
+                .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
+                .catch(err => console.log('Unable to initiate recording', err));
             this.setState({userPitchValues: []});
         } else {
             let controller = this;
@@ -174,15 +174,15 @@ class WordSyllableReview extends React.Component<Props, State> {
                     },
                     body: formData
                 })
-                .then(response => response.json())
-                .then(function(data) {
-                    let pitchValues = (data as Array<Array<number>>).map(
-                        item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
-                    );
-                    console.log(JSON.stringify(data));
-                    controller.recorder = null;
-                    controller.setState({userPitchValues: pitchValues});
-                });
+                    .then(response => response.json())
+                    .then(function (data) {
+                        let pitchValues = (data as Array<Array<number>>).map(
+                            item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
+                        );
+                        console.log(JSON.stringify(data));
+                        controller.recorder = null;
+                        controller.setState({userPitchValues: pitchValues});
+                    });
             });
         }
     };
@@ -194,32 +194,28 @@ class WordSyllableReview extends React.Component<Props, State> {
     render() {
 
         return (
-            <div className="metilda-audio-analysis-layout">
-                <ol className="metilda-breadcrumb-list">
-                    <li className="metilda-breadcrumb-list-item">
-                        Blackfoot Syllables
-                    </li>
-                    <li className="metilda-breadcrumb-list-item">
-                        >
-                    </li>
-                    <li className="metilda-breadcrumb-list-item">
-                        {this.props.match.params.numSyllables} Syllables
-                    </li>
-                </ol>
-                <div id="metilda-syllable-view">
+            <div>
+                <div className="metilda-page-header">
+                    <h5>
+                        Blackfoot Syllables > {this.props.match.params.numSyllables} Syllables
+                    </h5>
+                </div>
+                <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
-                            <ul className="collection">
-                                {
-                                    this.state.words.map((word, index) =>
-                                        <li key={"metilda-word-" + index}
-                                            className={"collection-item " + (index == this.state.activeWordIndex ? "active" : "")}
-                                            onClick={() => (this.wordClicked(index))}>
-                                            {word.text}
-                                        </li>
-                                    )
-                                }
-                            </ul>
+                            <div className="col s12">
+                                <ul className="collection">
+                                    {
+                                        this.state.words.map((word, index) =>
+                                            <li key={"metilda-word-" + index}
+                                                className={"collection-item " + (index == this.state.activeWordIndex ? "active" : "")}
+                                                onClick={() => (this.wordClicked(index))}>
+                                                {word.text}
+                                            </li>
+                                        )
+                                    }
+                                </ul>
+                            </div>
                         </div>
                         <div className="col s8">
                             <div className="metilda-syllable-pitch-art">
@@ -244,9 +240,9 @@ class WordSyllableReview extends React.Component<Props, State> {
                                 <div className="pitch-art-btn-container">
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.toggleRecord}>
-                                        {this.recorder == null ? 'Start Record': 'Stop Record'}
+                                        {this.recorder == null ? 'Start Record' : 'Stop Record'}
                                     </button>
-                                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                                    <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.playPitchArt}>
                                         Play
                                     </button>

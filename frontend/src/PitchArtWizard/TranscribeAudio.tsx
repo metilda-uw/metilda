@@ -15,6 +15,7 @@ import {Letter} from "../types/types";
 import {AppState} from "../store";
 import {AudioAction} from "../store/audio/types";
 import {ThunkDispatch} from "redux-thunk";
+import "./GlobalStyling.css";
 
 interface MatchParams  {
     uploadId: string
@@ -521,10 +522,10 @@ class TranscribeAudio extends React.Component<Props, State> {
 
         return (
             <div>
-                <div className="wizard-header">
+                <div className="metilda-page-header">
                     <h5>Transcribe Audio {title}</h5>
                 </div>
-                <div className="metilda-audio-analysis-layout">
+                <div className="metilda-page-content">
                     <div className="row">
                         <div className="metilda-audio-analysis-controls-list col s4">
                             <h6 className="metilda-control-header">Audio Analysis</h6>

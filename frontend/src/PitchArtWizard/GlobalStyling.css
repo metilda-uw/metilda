@@ -19,6 +19,16 @@
     display: none;
 }
 
-.metilda-audio-analysis-layout {
+.metilda-page-content {
     width: 1016px;
+}
+
+.metilda-page-header {
+    margin-bottom: 30px;
+}
+
+.metilda-page-header h5 {
+    position: relative;
+    margin-left: 24px;
+    text-align: left;
 }

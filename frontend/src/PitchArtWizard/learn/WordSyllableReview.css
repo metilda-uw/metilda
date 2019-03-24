@@ -4,14 +4,10 @@
 }
 
 .metilda-breadcrumb-list-item {
-    font-size: 32px;
+    font-size: 1.64rem;
     list-style: none;
     display: inline;
     margin-right: 16px;
-}
-
-#metilda-syllable-view {
-    margin-left: 32px;
 }
 
 .metilda-syllable-pitch-art {
