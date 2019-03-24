@@ -7,7 +7,7 @@ import SyllableToggle from "./SyllableToggle";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
-import {Letter, PitchArtLetter} from "../../types/types";
+import {Letter} from "../../types/types";
 import {SyntheticEvent} from "react";
 
 

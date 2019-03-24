@@ -2,7 +2,7 @@ import React, {createRef} from 'react';
 import './PitchArt.css';
 import {Circle, Group, Layer, Line, Rect, Stage, Text} from 'react-konva';
 import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale";
-import {PitchArtLetter} from "../types/types";
+import {Letter} from "../types/types";
 import * as Tone from 'tone';
 import {Encoding} from 'tone';
 import UserPitchView from "./PitchArtViewer/UserPitchView";
@@ -10,7 +10,7 @@ import {RawPitchValue} from "./PitchArtViewer/types";
 import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
 
 interface Props {
-    letters: Array<PitchArtLetter>,
+    letters: Array<Letter>,
     width: number,
     height: number,
     minPitch: number,

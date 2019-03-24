@@ -48,122 +48,83 @@ interface WordLookup {
 const WORDS: WordLookup = {
     pitchArt21: [
         {
-            text: "Onni",
-            letters: [
+            "text": "PHEOP019 onni.wav",
+            "letters": [
                 {
-                    letter: "ON",
-                    t0: 1,
-                    t1: 1.1,
-                    pitch: 90.0,
-                    isManualPitch: false,
-                    isWordSep: false
+                    "letter": "ON",
+                    "t0": 0.5703882232235339,
+                    "t1": 0.7036232238391321,
+                    "pitch": 106.1081048153841,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
                 },
                 {
-                    letter: "NI",
-                    t0: 2,
-                    t1: 2.3,
-                    pitch: 70.0,
-                    isManualPitch: false,
-                    isWordSep: false
+                    "letter": "NI",
+                    "t0": 0.70243362561935,
+                    "t1": 0.9915059930264069,
+                    "pitch": 90.95704281719073,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
+                }
+            ]
+        },
+        {
+            "text": "PHEOP011 isska.wav",
+            "letters": [
+                {
+                    "letter": "ISS",
+                    "t0": 0.4749116999992116,
+                    "t1": 0.6468954553263592,
+                    "pitch": 114.53712084993575,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
+                },
+                {
+                    "letter": "KA",
+                    "t0": 0.9550330169541649,
+                    "t1": 1.2130086499448858,
+                    "pitch": 77.26587110531462,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
                 }
             ]
         }
     ],
     pitchArt22: [
         {
-            text: "Aohkiwa",
-            letters: [
+            "text": "PHEOP002 aakiiwa.wav",
+            "letters": [
                 {
-                    letter: "AOH",
-                    t0: 1,
-                    t1: 1.1,
-                    pitch: 60.0,
-                    isManualPitch: false,
-                    isWordSep: false
+                    "letter": "AAK",
+                    "t0": 4.6757559811288205,
+                    "t1": 5.024208672770138,
+                    "pitch": 72.34960285118446,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
                 },
                 {
-                    letter: "KIWA",
-                    t0: 2,
-                    t1: 2.3,
-                    pitch: 90.0,
-                    isManualPitch: false,
-                    isWordSep: false
+                    "letter": "IIWA",
+                    "t0": 5.211472364196425,
+                    "t1": 5.517257379310235,
+                    "pitch": 80.20179997985323,
+                    "syllable": "X",
+                    "isManualPitch": false,
+                    "isWordSep": false
                 }
             ]
         }
     ],
     pitchArt31: [
-        {
-            text: "Aottakiwa",
-            letters: [
-                {
-                    letter: "AOT",
-                    t0: 1,
-                    t1: 1.1,
-                    pitch: 120.0,
-                    isManualPitch: false,
-                    isWordSep: false
-                },
-                {
-                    letter: "TAK",
-                    t0: 2,
-                    t1: 2.3,
-                    pitch: 90.0,
-                    isManualPitch: false,
-                    isWordSep: false
-                },
-                                {
-                    letter: "IWA",
-                    t0: 3,
-                    t1: 3.3,
-                    pitch: 80.0,
-                    isManualPitch: false,
-                    isWordSep: false
-                }
-            ]
-        }
+
     ],
     pitchArt32: [],
     pitchArt33: [],
     pitchArt41: [],
-    pitchArt42: [
-        {
-            text: "Saaakohmappiwa",
-            letters: [
-                {
-                    letter: "SAH",
-                    t0: 0.5715557612244353,
-                    t1: 0.5715557612244353,
-                    pitch: 79.4,
-                    isManualPitch: false,
-                    isWordSep: false
-                },
-                {
-                    letter: "KOH",
-                    t0: 1.011578934170736,
-                    t1: 1.011578934170736,
-                    pitch: 99.26,
-                    isManualPitch: false,
-                    isWordSep: false
-                },
-                {
-                    letter: "MAP",
-                    t0: 1.2641848297510196,
-                    t1: 1.2641848297510196,
-                    pitch: 67.96,
-                    isManualPitch: false,
-                    isWordSep: false
-                },
-                {
-                    letter: "PI",
-                    t0: 1.5982764980991369,
-                    t1: 1.5982764980991369,
-                    pitch: 65.64,
-                    isManualPitch: false,
-                    isWordSep: false
-                }
-            ]
-        },
-    ],
+    pitchArt42: [],
     pitchArt43: []
 };

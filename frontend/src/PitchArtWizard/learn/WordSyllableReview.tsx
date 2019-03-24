@@ -23,6 +23,7 @@ interface State {
     words: Array<MetildaWord>
 }
 
+
 class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
         return 653;

@@ -46,6 +46,7 @@ class TargetPitchBar extends Component {
         // side of the selection interval.
         let controller = this;
         let intervalsInSelection = this.props.letters.map(function (item) {
+            item = Object.assign({}, item);
             let tooFarLeft = item.t1 < controller.props.minAudioTime;
             let tooFarRight = item.t0 > controller.props.maxAudioTime;
             item.isShown = !(tooFarLeft || tooFarRight)

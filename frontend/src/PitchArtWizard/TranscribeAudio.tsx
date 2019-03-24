@@ -266,8 +266,6 @@ class TranscribeAudio extends React.Component<Props, State> {
 
         let newLetter = {
             letter: letter,
-            leftX: -1,
-            rightX: -1,
             t0: ts[0],
             t1: ts[1],
             pitch: pitch,

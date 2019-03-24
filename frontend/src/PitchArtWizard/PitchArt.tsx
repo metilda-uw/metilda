@@ -1,7 +1,7 @@
 import * as React from "react";
 import './PitchArt.css';
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
-import {Letter, PitchArtLetter} from "../types/types";
+import {Letter} from "../types/types";
 import {createRef} from "react";
 
 
@@ -18,7 +18,7 @@ interface Props {
     showVerticallyCentered: boolean
     showPitchArtLines: boolean
     showLargeCircles: boolean
-    letters: Array<PitchArtLetter>
+    letters: Array<Letter>
 }
 
 

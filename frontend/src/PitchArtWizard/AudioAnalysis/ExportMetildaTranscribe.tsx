@@ -7,7 +7,7 @@ import {AppState} from "../../store";
 import {connect} from "react-redux";
 import fileDownload from "js-file-download";
 import {MetildaWord} from "../learn/types";
-import {Letter, PitchArtLetter} from "../../types/types";
+import {Letter} from "../../types/types";
 import moment from 'moment';
 
 interface Props extends RouteComponentProps {
@@ -20,8 +20,7 @@ class ExportMetildaTranscribe extends React.Component<Props> {
     state = {};
 
     exportToJson = () => {
-        let pitchArtLetters = this.props.letters.map(item => item as PitchArtLetter);
-        let metildaWord = {text : this.props.word, letters: pitchArtLetters} as MetildaWord;
+        let metildaWord = {text : this.props.word, letters: this.props.letters} as MetildaWord;
         let timeStamp = moment().format('MM-DD-YYYY_hh_mm_ss');
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
     };
