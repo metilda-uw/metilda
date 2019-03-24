@@ -24,6 +24,7 @@
     height: 250px;
     margin-left: -6px;
     margin-right: 24px;
+    cursor: pointer;
 }
 
 .metilda-page-content .row {
