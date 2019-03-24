@@ -97,7 +97,7 @@ export default class WordSyllableCategories extends React.Component<Props, State
                         <div className="col s6">
                             <div className="col s12 pitch-art-img-list">
                                 { this.imageSrcList().map((item, index) =>
-                                    <a href={"/learn/words/syllables/" + this.state.numSyllables}>
+                                    <a href={"/learn/words/syllables/" + this.state.numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
                                              className="pitch-art-img-list-item"/>

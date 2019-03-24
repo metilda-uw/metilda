@@ -1,22 +1,52 @@
 import {MetildaWord} from "./types";
 
 export default class StaticWordSyallableData {
-    getData = (numSyllables: number): Array<MetildaWord> => {
-        switch(numSyllables) {
+    getData = (numSyllables: number, accentIndex: number): Array<MetildaWord> => {
+        switch (numSyllables) {
             case 2:
-                return WORDS.twoSyllables;
+                switch (accentIndex) {
+                    case 0:
+                        return WORDS.pitchArt21;
+                    case 1:
+                        return WORDS.pitchArt22;
+                }
+            case 3:
+                switch (accentIndex) {
+                    case 0:
+                        return WORDS.pitchArt31;
+                    case 1:
+                        return WORDS.pitchArt32;
+                    case 2:
+                        return WORDS.pitchArt33;
+                }
+            case 4:
+                switch (accentIndex) {
+                    case 0:
+                        return WORDS.pitchArt41;
+                    case 1:
+                        return WORDS.pitchArt42;
+                    case 2:
+                        return WORDS.pitchArt43;
+                }
             default:
-                return WORDS.twoSyllables;
+                return WORDS.pitchArt21;
         }
     };
 }
 
 interface WordLookup {
-    twoSyllables: Array<MetildaWord>
+    pitchArt21: Array<MetildaWord>,
+    pitchArt22: Array<MetildaWord>,
+    pitchArt31: Array<MetildaWord>,
+    pitchArt32: Array<MetildaWord>,
+    pitchArt33: Array<MetildaWord>,
+    pitchArt41: Array<MetildaWord>,
+    pitchArt42: Array<MetildaWord>,
+    pitchArt43: Array<MetildaWord>,
 }
 
 const WORDS: WordLookup = {
-    twoSyllables: [
+    pitchArt21: [
         {
             text: "Onni",
             letters: [
@@ -37,33 +67,37 @@ const WORDS: WordLookup = {
                     isWordSep: false
                 }
             ]
-        },
+        }
+    ],
+    pitchArt22: [
         {
-            text: "Isska",
+            text: "Aohkiwa",
             letters: [
                 {
-                    letter: "IS",
+                    letter: "AOH",
                     t0: 1,
                     t1: 1.1,
-                    pitch: 90.0,
+                    pitch: 60.0,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
-                    letter: "SKA",
+                    letter: "KIWA",
                     t0: 2,
                     t1: 2.3,
-                    pitch: 60.0,
+                    pitch: 90.0,
                     isManualPitch: false,
                     isWordSep: false
                 }
             ]
-        },
+        }
+    ],
+    pitchArt31: [
         {
-            text: "Kayiis",
+            text: "Aottakiwa",
             letters: [
                 {
-                    letter: "KAY",
+                    letter: "AOT",
                     t0: 1,
                     t1: 1.1,
                     pitch: 120.0,
@@ -71,15 +105,28 @@ const WORDS: WordLookup = {
                     isWordSep: false
                 },
                 {
-                    letter: "IIS",
+                    letter: "TAK",
                     t0: 2,
                     t1: 2.3,
-                    pitch: 60.0,
+                    pitch: 90.0,
+                    isManualPitch: false,
+                    isWordSep: false
+                },
+                                {
+                    letter: "IWA",
+                    t0: 3,
+                    t1: 3.3,
+                    pitch: 80.0,
                     isManualPitch: false,
                     isWordSep: false
                 }
             ]
-        },
+        }
+    ],
+    pitchArt32: [],
+    pitchArt33: [],
+    pitchArt41: [],
+    pitchArt42: [
         {
             text: "Saaakohmappiwa",
             letters: [
@@ -116,6 +163,7 @@ const WORDS: WordLookup = {
                     isWordSep: false
                 }
             ]
-        }
-    ]
+        },
+    ],
+    pitchArt43: []
 };

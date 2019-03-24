@@ -8,6 +8,7 @@ import {RawPitchValue} from "../PitchArtViewer/types";
 import Recorder from 'recorder-js';
 import StaticWordSyallableData from './StaticWordSyallableData';
 import {createRef} from "react";
+import * as queryString from "query-string";
 
 interface MatchParams {
     numSyllables: string
@@ -40,10 +41,16 @@ class WordSyllableReview extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
+        const values = queryString.parse(this.props.location.search);
+        let accentIndex = values['accentIndex'];
+
         this.state = {
             activeWordIndex: 0,
             userPitchValues: [],
-            words: new StaticWordSyallableData().getData(parseFloat(this.props.match.params.numSyllables))
+            words: new StaticWordSyallableData().getData(
+                parseFloat(this.props.match.params.numSyllables),
+                parseFloat(accentIndex as string)
+            )
         };
     }
 
@@ -119,24 +126,27 @@ class WordSyllableReview extends React.Component<Props, State> {
                         </div>
                         <div className="col s8">
                             <div className="metilda-syllable-pitch-art">
-                                <PitchArtDrawingWindow
-                                    ref={this.pitchArtRef}
-                                    isVisible={true}
-                                    width={WordSyllableReview.AUDIO_IMG_WIDTH}
-                                    height={600}
-                                    minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
-                                    maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
-                                    fileName={this.state.words[this.state.activeWordIndex].text}
-                                    manualPitchChange={(x, y) => (null)}
-                                    maxPitchIndex={-1}
-                                    showAccentPitch={false}
-                                    showSyllableText={true}
-                                    showVerticallyCentered={true}
-                                    showPitchArtLines={true}
-                                    showLargeCircles={true}
-                                    letters={this.state.words[this.state.activeWordIndex].letters}
-                                    rawPitchValues={this.state.userPitchValues}
-                                />
+                                {
+                                    this.state.words.length >= 1 &&
+                                    <PitchArtDrawingWindow
+                                        ref={this.pitchArtRef}
+                                        isVisible={true}
+                                        width={WordSyllableReview.AUDIO_IMG_WIDTH}
+                                        height={600}
+                                        minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
+                                        maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
+                                        fileName={this.state.words[this.state.activeWordIndex].text}
+                                        manualPitchChange={(x, y) => (null)}
+                                        maxPitchIndex={-1}
+                                        showAccentPitch={false}
+                                        showSyllableText={true}
+                                        showVerticallyCentered={true}
+                                        showPitchArtLines={true}
+                                        showLargeCircles={true}
+                                        letters={this.state.words[this.state.activeWordIndex].letters}
+                                        rawPitchValues={this.state.userPitchValues}
+                                    />
+                                }
                                 <div className="pitch-art-btn-container">
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.toggleRecord}>
