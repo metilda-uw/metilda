@@ -416,7 +416,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         this.setState({[name]: value} as any);
     }
 
-    applyPitchRange(minPitch?: number, maxPitch?: number) {
+    applyPitchRange(minPitch: number, maxPitch: number) {
         const {uploadId} = this.props.match.params;
         let newUrl = TranscribeAudio.formatImageUrl(
             uploadId,

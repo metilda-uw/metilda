@@ -25,7 +25,7 @@ class PitchRange extends Component {
 
     handleInputChange(event) {
         const name = event.target.name;
-        this.setState({[name]: event.target.value});
+        this.setState({[name]: parseFloat(event.target.value)});
 
         if (name === 'minPitch') {
             this.setState({isMinDirty: true});
