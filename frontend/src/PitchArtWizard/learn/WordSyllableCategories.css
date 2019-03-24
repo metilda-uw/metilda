@@ -15,3 +15,17 @@
 .inline-btns p {
     margin-right: 16px;
 }
+
+.pitch-art-img-list {
+    display: flex;
+}
+
+.pitch-art-img-list-item {
+    height: 250px;
+    margin-left: -6px;
+    margin-right: 24px;
+}
+
+.metilda-page-content .row {
+    margin-bottom: 0;
+}
