@@ -100,12 +100,14 @@ class WordSyllableReview extends React.Component<Props, State> {
     };
 
     render() {
+        const values = queryString.parse(this.props.location.search);
+        let accentIndex = parseFloat(values['accentIndex'] as string);
 
         return (
             <div>
                 <div className="metilda-page-header">
                     <h5>
-                        Blackfoot Words > {this.props.match.params.numSyllables} Syllables
+                        Blackfoot Words > {this.props.match.params.numSyllables} Syllables, Accent {accentIndex + 1}
                     </h5>
                 </div>
                 <div className="metilda-page-content">
