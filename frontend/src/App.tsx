@@ -5,6 +5,7 @@ import {Route} from "react-router-dom";
 import TranscribeAudio from "./PitchArtWizard/TranscribeAudio";
 import 'materialize-css/dist/css/materialize.min.css';
 import WordSyllableReview from "./PitchArtWizard/learn/WordSyllableReview";
+import WordSyllableCategories from "./PitchArtWizard/learn/WordSyllableCategories";
 
 export interface Props {}
 interface State {}
@@ -17,7 +18,8 @@ class App extends React.Component<Props, State> {
       <div className="App">
         <Header />
         <Route path="/pitchartwizard/:uploadId?" component={TranscribeAudio} />
-        <Route path="/learn/words/syllables/:numSyllables?" component={WordSyllableReview} />
+        <Route exact path="/learn/words/syllables" component={WordSyllableCategories} />
+        <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
       </div>
     );
   }

@@ -1,0 +1,17 @@
+#syllable-selection {
+    display: flex;
+}
+
+.inline-btns-label {
+    white-space: nowrap;
+    margin-right: 16px;
+}
+
+.inline-btns {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.inline-btns p {
+    margin-right: 16px;
+}

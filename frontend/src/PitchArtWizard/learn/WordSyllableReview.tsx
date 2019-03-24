@@ -97,7 +97,7 @@ class WordSyllableReview extends React.Component<Props, State> {
             <div>
                 <div className="metilda-page-header">
                     <h5>
-                        Blackfoot Syllables > {this.props.match.params.numSyllables} Syllables
+                        Blackfoot Words > {this.props.match.params.numSyllables} Syllables
                     </h5>
                 </div>
                 <div className="metilda-page-content">
