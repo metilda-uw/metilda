@@ -29,3 +29,7 @@
     overflow: hidden;
     overflow-y: auto;
 }
+
+#metilda-word-list ul li {
+    cursor: pointer;
+}
