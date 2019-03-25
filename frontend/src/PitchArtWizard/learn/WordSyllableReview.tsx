@@ -118,7 +118,6 @@ class WordSyllableReview extends React.Component<Props, State> {
                         let pitchValues = (data as Array<Array<number>>).map(
                             item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                         );
-                        console.log(JSON.stringify(data));
                         controller.recorder = null;
                         controller.setState({userPitchValues: pitchValues, isLoadingPitchResults: false});
                     });
