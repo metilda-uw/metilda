@@ -246,11 +246,13 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         {this.recorder == null ? 'Start Record' : 'Stop Record'}
                                     </button>
                                     <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.playPitchArt}>
+                                            onClick={this.playPitchArt}
+                                            disabled={this.recorder != null}>
                                         Play Tones
                                     </button>
                                     <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.saveImage}>
+                                            onClick={this.saveImage}
+                                            disabled={this.recorder != null}>
                                         Save Image
                                     </button>
                                 </div>
