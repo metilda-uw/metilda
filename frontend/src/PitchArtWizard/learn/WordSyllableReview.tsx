@@ -107,6 +107,10 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.pitchArtRef.current!.playPitchArt();
     };
 
+    saveImage = () => {
+        this.pitchArtRef.current!.saveImage();
+    };
+
     minPitchArtTime = () => {
         if (this.state.words.length === 0
          || this.state.words[this.state.activeWordIndex].letters.length === 0) {
@@ -220,6 +224,10 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.playPitchArt}>
                                         Play Tones
+                                    </button>
+                                    <button className="waves-effect waves-light btn metilda-btn"
+                                            onClick={this.saveImage}>
+                                        Save Image
                                     </button>
                                 </div>
                             </div>
