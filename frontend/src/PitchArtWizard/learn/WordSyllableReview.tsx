@@ -119,7 +119,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                             item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                         );
                         controller.recorder = null;
-                        controller.setState({userPitchValues: pitchValues, isLoadingPitchResults: false});
+                        controller.setState({userPitchValues: pitchValues,
+                                                   isLoadingPitchResults: false});
                     });
             });
         }
@@ -242,7 +243,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                                 )}/>
                                 <div className="pitch-art-btn-container">
                                     <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.toggleRecord}>
+                                            onClick={this.toggleRecord}
+                                            disabled={this.state.isLoadingPitchResults}>
                                         {this.recorder == null ? 'Start Record' : 'Stop Record'}
                                     </button>
                                     <button className="waves-effect waves-light btn metilda-btn"
