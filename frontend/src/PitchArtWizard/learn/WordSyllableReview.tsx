@@ -219,7 +219,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     </button>
                                     <button className="waves-effect waves-light btn metilda-btn"
                                             onClick={this.playPitchArt}>
-                                        Play
+                                        Play Tones
                                     </button>
                                 </div>
                             </div>

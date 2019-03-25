@@ -78,7 +78,7 @@ class PitchArt extends React.Component<Props> {
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
                             disabled={this.props.letters.length === 0}
                             onClick={this.playPitchArt}>
-                        Play
+                        Play Tones
                     </button>
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
                             disabled={this.props.letters.length === 0}
