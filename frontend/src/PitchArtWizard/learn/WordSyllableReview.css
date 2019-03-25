@@ -27,5 +27,5 @@
 #metilda-word-list {
     max-height: 400px;
     overflow: hidden;
-    overflow-y: scroll;
+    overflow-y: auto;
 }
