@@ -11,7 +11,7 @@
 }
 
 .metilda-syllable-pitch-art {
-
+    position: relative;
 }
 
 .pitch-art-btn-container {
@@ -32,4 +32,19 @@
 
 #metilda-word-list ul li {
     cursor: pointer;
+}
+
+.metilda-pitch-art-image-loading {
+    position: absolute;
+    width: 653px;
+    height: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+}
+
+.metilda-pitch-art-image-loading .preloader-wrapper.big {
+    width: 160px;
+    height: 160px;
 }

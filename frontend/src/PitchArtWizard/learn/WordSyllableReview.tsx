@@ -11,6 +11,7 @@ import {createRef} from "react";
 import * as queryString from "query-string";
 import PlayerBar from "../AudioViewer/PlayerBar";
 import TranscribeAudio from "../TranscribeAudio";
+import AudioImgLoading from "../AudioImgLoading";
 
 interface MatchParams {
     numSyllables: string
@@ -22,9 +23,30 @@ interface Props extends RouteComponentProps<MatchParams> {
 interface State {
     activeWordIndex: number,
     userPitchValues: Array<RawPitchValue>,
-    words: Array<MetildaWord>
+    words: Array<MetildaWord>,
+    isLoadingPitchResults: boolean
 }
 
+
+function spinner() {
+    return (
+        <div className="metilda-pitch-art-image-loading">
+            <div className="preloader-wrapper big active">
+                <div className="spinner-layer spinner-blue-only">
+                    <div className="circle-clipper left">
+                        <div className="circle"></div>
+                    </div>
+                    <div className="gap-patch">
+                        <div className="circle"></div>
+                    </div>
+                    <div className="circle-clipper right">
+                        <div className="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
@@ -59,7 +81,8 @@ class WordSyllableReview extends React.Component<Props, State> {
             words: new StaticWordSyallableData().getData(
                 parseFloat(this.props.match.params.numSyllables),
                 parseFloat(accentIndex as string)
-            )
+            ),
+            isLoadingPitchResults: false
         };
     }
 
@@ -80,7 +103,7 @@ class WordSyllableReview extends React.Component<Props, State> {
         } else {
             let controller = this;
             this.recorder.stop().then((result: any) => {
-                console.log(result);
+                controller.setState({isLoadingPitchResults: true});
                 const formData = new FormData();
                 formData.append('file', result.blob);
                 fetch(`/api/all-pitches?min-pitch=30.0&max-pitch=300.0`, {
@@ -97,7 +120,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                         );
                         console.log(JSON.stringify(data));
                         controller.recorder = null;
-                        controller.setState({userPitchValues: pitchValues});
+                        controller.setState({userPitchValues: pitchValues, isLoadingPitchResults: false});
                     });
             });
         }
@@ -113,7 +136,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
     minPitchArtTime = () => {
         if (this.state.words.length === 0
-         || this.state.words[this.state.activeWordIndex].letters.length === 0) {
+            || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
         }
 
@@ -124,13 +147,13 @@ class WordSyllableReview extends React.Component<Props, State> {
 
     maxPitchArtTime = () => {
         if (this.state.words.length === 0
-         || this.state.words[this.state.activeWordIndex].letters.length === 0) {
+            || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
         }
 
         let numLetters = this.state.words[this.state.activeWordIndex].letters.length;
         return (this.state.words[this.state.activeWordIndex].letters[numLetters - 1].t1
-              + WordSyllableReview.AUDIO_BUFFER_TIME);
+            + WordSyllableReview.AUDIO_BUFFER_TIME);
     };
 
     pageTitle = () => {
@@ -210,7 +233,9 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         letters={this.state.words[this.state.activeWordIndex].letters}
                                         rawPitchValues={this.state.userPitchValues}
                                     />
+
                                 }
+                                {this.state.isLoadingPitchResults && spinner()}
                                 <PlayerBar audioUrl={TranscribeAudio.formatAudioUrl(
                                     this.state.words[this.state.activeWordIndex].uploadId,
                                     this.minPitchArtTime(),
