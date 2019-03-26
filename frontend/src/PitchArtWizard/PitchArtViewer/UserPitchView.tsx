@@ -6,18 +6,20 @@ import PitchArtCoordConverter from "./PitchArtCoordConverter";
 interface Props {
     pitchValues: Array<RawPitchValue>,
     windowConfig: PitchArtWindowConfig,
-    showVerticallyCentered: boolean
+    showVerticallyCentered: boolean,
+    fillColor?: string,
+    opacity?: number
 }
 
 class UserPitchView extends React.Component<Props> {
     private readonly lineWidth: number;
-    private readonly lineColor: string;
+    private readonly fillColor: string;
     private readonly circleRadius: number;
 
     constructor(props: Props) {
         super(props);
         this.lineWidth = 3;
-        this.lineColor = "#FF0000";
+        this.fillColor = "#FF0000";
         this.circleRadius = 3;
     }
 
@@ -31,7 +33,9 @@ class UserPitchView extends React.Component<Props> {
         let points: Array<number> = [];
         let circles: Array<any> = [];
         let circleRadius = this.circleRadius;
-        let lineColor = this.lineColor;
+        let lineColor = this.props.fillColor || this.fillColor;
+        let opacity = this.props.opacity || 1.0;
+
         this.props.pitchValues.forEach(function(value, index) {
             let x = coordConverter.horzIndexToRectCoords(value.t0);
             let y = coordConverter.vertValueToRectCoords(value.pitch);
@@ -40,6 +44,7 @@ class UserPitchView extends React.Component<Props> {
                         radius={circleRadius}
                         x={x}
                         y={y}
+                        opacity={opacity}
                         fill={lineColor}
                 />
             );

@@ -14,6 +14,11 @@
     position: relative;
 }
 
+.pitch-art-controls-container {
+    display: flex;
+    justify-content: space-between;
+}
+
 .pitch-art-btn-container {
     display: flex;
     justify-content: flex-end;
@@ -22,6 +27,10 @@
 .metilda-btn {
     margin-top: 16px;
     margin-left: 16px;
+}
+
+.align-left {
+    margin-left: 0;
 }
 
 #metilda-word-list {

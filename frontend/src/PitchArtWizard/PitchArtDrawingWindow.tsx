@@ -6,7 +6,7 @@ import {Letter} from "../types/types";
 import * as Tone from 'tone';
 import {Encoding} from 'tone';
 import UserPitchView from "./PitchArtViewer/UserPitchView";
-import {RawPitchValue} from "./PitchArtViewer/types";
+import {PitchArtWindowConfig, RawPitchValue} from "./PitchArtViewer/types";
 import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
 
 interface Props {
@@ -25,7 +25,8 @@ interface Props {
     showVerticallyCentered: boolean,
     showAccentPitch: boolean,
     showSyllableText: boolean,
-    rawPitchValues?: Array<RawPitchValue>
+    showPrevPitchValueLists: boolean,
+    rawPitchValueLists?: Array<Array<RawPitchValue>>
 }
 
 interface State {
@@ -116,14 +117,21 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
         let tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
         let tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
+
         interface PitchArtNote {
             time: number,
             index: number,
             duration: number,
             pitch: number
         }
+
         let notes = this.props.letters.map(function (item, index) {
-                return {time: item.t0 - tStart, duration: item.t1 - item.t0, pitch: item.pitch, index: index} as PitchArtNote;
+                return {
+                    time: item.t0 - tStart,
+                    duration: item.t1 - item.t0,
+                    pitch: item.pitch,
+                    index: index
+                } as PitchArtNote;
             }
         );
         notes.push({time: tEnd, duration: 1, pitch: 1, index: -1});
@@ -261,10 +269,44 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 praatDotFillColor = "black";
         }
 
-        return {lineStrokeColor: lineStrokeColor,
-                praatDotFillColor: praatDotFillColor,
-                activePlayColor: "#e8e82e",
-                manualDotFillColor: "#af0008"};
+        return {
+            lineStrokeColor: lineStrokeColor,
+            praatDotFillColor: praatDotFillColor,
+            activePlayColor: "#e8e82e",
+            manualDotFillColor: "#af0008"
+        };
+    }
+
+    maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
+        if (!this.props.rawPitchValueLists || this.props.rawPitchValueLists.length === 0) {
+            return;
+        }
+
+        if (!this.props.showPrevPitchValueLists) {
+            return (
+                <UserPitchView pitchValues={this.props.rawPitchValueLists[0]}
+                               windowConfig={windowConfig}
+                               showVerticallyCentered={this.props.showVerticallyCentered}/>);
+        }
+
+        const colors: {[key:number]: string} = {
+            0: "#003489",
+            1: "#008489",
+            2: "#0d0d7c"
+        };
+
+
+        let lastIndex = this.props.rawPitchValueLists.length - 1;
+        return (
+            this.props.rawPitchValueLists.map((item: Array<RawPitchValue>, index) =>
+                <UserPitchView pitchValues={item}
+                               key={"user-pitch-view-" + index}
+                               windowConfig={windowConfig}
+                               showVerticallyCentered={this.props.showVerticallyCentered}
+                               fillColor={index < lastIndex ? colors[index % Object.keys(colors).length]: undefined}
+                               opacity={index < lastIndex ? 0.2 : undefined}/>
+            )
+        );
     }
 
     render() {
@@ -276,13 +318,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         let pitchValues: Array<RawPitchValue> = this.props.letters.filter(data => !data.isWordSep);
 
         let windowConfig = {
-                innerHeight: this.innerHeight,
-                innerWidth: this.innerWidth,
-                y0: this.pointDy0,
-                x0: this.pointDx0,
-                dMin: this.props.minPitch,
-                dMax: this.props.maxPitch
-            };
+            innerHeight: this.innerHeight,
+            innerWidth: this.innerWidth,
+            y0: this.pointDy0,
+            x0: this.pointDx0,
+            dMin: this.props.minPitch,
+            dMax: this.props.maxPitch
+        };
         let coordConverter = new PitchArtCoordConverter(
             windowConfig,
             pitchValues,
@@ -303,7 +345,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                         <Line key={i + "_pa_line"}
                               points={currLinePoints}
                               strokeWidth={this.graphWidth}
-                              // @ts-ignore
+                            // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}/>
                     );
                     currLinePoints = [];
@@ -336,7 +378,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 if (this.state.activePlayIndex === i) {
                     circleFill = colorScheme.activePlayColor;
                     circleStroke = colorScheme.activePlayColor;
-                } else if (this.props.letters[i].isManualPitch)  {
+                } else if (this.props.letters[i].isManualPitch) {
                     circleFill = colorScheme.manualDotFillColor;
                     circleStroke = colorScheme.manualDotFillColor;
                 } else {
@@ -355,9 +397,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 <Circle key={i + circleFill + circleStroke}
                         x={x}
                         y={y}
-                        // @ts-ignore
+                    // @ts-ignore
                         fill={circleFill}
-                        // @ts-ignore
+                    // @ts-ignore
                         stroke={circleStroke}
                         strokeWidth={this.circleStrokeWidth}
                         radius={circleRadius}
@@ -393,7 +435,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 <Line key={"last_pa_line"}
                       points={currLinePoints}
                       strokeWidth={this.graphWidth}
-                      // @ts-ignore
+                    // @ts-ignore
                       stroke={colorScheme.lineStrokeColor}/>
             );
         }
@@ -421,7 +463,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                              // @ts-ignore
+                            // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}
                               onClick={this.imageBoundaryClicked}
                               onMouseEnter={() => this.setPointerEnabled(true)}
@@ -437,12 +479,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     <Layer>
                         {this.props.showSyllableText ? letterSyllables : []}
                     </Layer>
-                    {
-                        this.props.rawPitchValues &&
-                            <UserPitchView pitchValues={this.props.rawPitchValues}
-                                           windowConfig={windowConfig}
-                                           showVerticallyCentered={this.props.showVerticallyCentered}/>
-                    }
+                    {this.maybeUserPitchView(windowConfig)}
                 </Stage>
                 <a className="hide" ref={this.downloadRef}>
                     Hidden Download Link

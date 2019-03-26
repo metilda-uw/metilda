@@ -59,6 +59,7 @@ class PitchArt extends React.Component<Props> {
                         showVerticallyCentered={this.props.showVerticallyCentered}
                         showPitchArtLines={this.props.showPitchArtLines}
                         showLargeCircles={this.props.showLargeCircles}
+                        showPrevPitchValueLists={false}
                         letters={this.props.letters}/>);
     }
 

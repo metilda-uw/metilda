@@ -22,7 +22,7 @@ interface Props extends RouteComponentProps<MatchParams> {
 
 interface State {
     activeWordIndex: number,
-    userPitchValues: Array<RawPitchValue>,
+    userPitchValueLists: Array<Array<RawPitchValue>>,
     words: Array<MetildaWord>,
     isLoadingPitchResults: boolean
 }
@@ -77,7 +77,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
         this.state = {
             activeWordIndex: 0,
-            userPitchValues: [],
+            userPitchValueLists: [],
             words: new StaticWordSyallableData().getData(
                 parseFloat(this.props.match.params.numSyllables),
                 parseFloat(accentIndex as string)
@@ -99,7 +99,6 @@ class WordSyllableReview extends React.Component<Props, State> {
             navigator.mediaDevices.getUserMedia({audio: true})
                 .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
                 .catch(err => console.log('Unable to initiate recording', err));
-            this.setState({userPitchValues: []});
         } else {
             let controller = this;
             this.recorder.stop().then((result: any) => {
@@ -115,12 +114,15 @@ class WordSyllableReview extends React.Component<Props, State> {
                 })
                     .then(response => response.json())
                     .then(function (data) {
-                        let pitchValues = (data as Array<Array<number>>).map(
+                        let pitchValues: Array<RawPitchValue> = (data as Array<Array<number>>).map(
                             item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                         );
                         controller.recorder = null;
-                        controller.setState({userPitchValues: pitchValues,
-                                                   isLoadingPitchResults: false});
+                        controller.setState(
+                            {
+                                userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
+                                isLoadingPitchResults: false
+                            });
                     });
             });
         }
@@ -173,6 +175,10 @@ class WordSyllableReview extends React.Component<Props, State> {
 
         let accentStr = "Accent " + (accentIndex + 1) + accentSuffix + " syllable";
         return syllableStr + ", " + accentStr;
+    };
+
+    clearPrevious = () => {
+        this.setState({userPitchValueLists: []});
     };
 
     render() {
@@ -230,8 +236,9 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showVerticallyCentered={true}
                                         showPitchArtLines={true}
                                         showLargeCircles={true}
+                                        showPrevPitchValueLists={true}
                                         letters={this.state.words[this.state.activeWordIndex].letters}
-                                        rawPitchValues={this.state.userPitchValues}
+                                        rawPitchValueLists={this.state.userPitchValueLists}
                                     />
 
                                 }
@@ -241,22 +248,29 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     this.minPitchArtTime(),
                                     this.maxPitchArtTime()
                                 )}/>
-                                <div className="pitch-art-btn-container">
-                                    <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.toggleRecord}
-                                            disabled={this.state.isLoadingPitchResults}>
-                                        {this.recorder == null ? 'Start Record' : 'Stop Record'}
+                                <div className="pitch-art-controls-container">
+                                    <button className="waves-effect waves-light btn metilda-btn align-left"
+                                            onClick={this.clearPrevious}
+                                            disabled={this.state.userPitchValueLists.length === 0}>
+                                        Clear
                                     </button>
-                                    <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.playPitchArt}
-                                            disabled={this.recorder != null}>
-                                        Play Tones
-                                    </button>
-                                    <button className="waves-effect waves-light btn metilda-btn"
-                                            onClick={this.saveImage}
-                                            disabled={this.recorder != null}>
-                                        Save Image
-                                    </button>
+                                    <div className="pitch-art-btn-container">
+                                        <button className="waves-effect waves-light btn metilda-btn"
+                                                onClick={this.toggleRecord}
+                                                disabled={this.state.isLoadingPitchResults}>
+                                            {this.recorder == null ? 'Start Record' : 'Stop Record'}
+                                        </button>
+                                        <button className="waves-effect waves-light btn metilda-btn"
+                                                onClick={this.playPitchArt}
+                                                disabled={this.recorder != null}>
+                                            Play Tones
+                                        </button>
+                                        <button className="waves-effect waves-light btn metilda-btn"
+                                                onClick={this.saveImage}
+                                                disabled={this.recorder != null}>
+                                            Save Image
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
