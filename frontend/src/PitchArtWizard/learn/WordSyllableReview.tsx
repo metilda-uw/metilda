@@ -24,6 +24,7 @@ interface State {
     activeWordIndex: number,
     userPitchValueLists: Array<Array<RawPitchValue>>,
     words: Array<MetildaWord>,
+    isRecording: boolean,
     isLoadingPitchResults: boolean
 }
 
@@ -82,6 +83,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 parseFloat(this.props.match.params.numSyllables),
                 parseFloat(accentIndex as string)
             ),
+            isRecording: false,
             isLoadingPitchResults: false
         };
     }
@@ -99,6 +101,7 @@ class WordSyllableReview extends React.Component<Props, State> {
             navigator.mediaDevices.getUserMedia({audio: true})
                 .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
                 .catch(err => console.log('Unable to initiate recording', err));
+            this.setState({isRecording: true});
         } else {
             let controller = this;
             this.recorder.stop().then((result: any) => {
@@ -121,6 +124,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                         controller.setState(
                             {
                                 userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
+                                isRecording: false,
                                 isLoadingPitchResults: false
                             });
                     });
@@ -258,16 +262,16 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
-                                            {this.recorder == null ? 'Start Record' : 'Stop Record'}
+                                            {!this.state.isRecording ? 'Start Record' : 'Stop Record'}
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.playPitchArt}
-                                                disabled={this.recorder != null}>
+                                                disabled={this.state.isRecording}>
                                             Play Tones
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.saveImage}
-                                                disabled={this.recorder != null}>
+                                                disabled={this.state.isRecording}>
                                             Save Image
                                         </button>
                                     </div>
