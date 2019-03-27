@@ -7,11 +7,17 @@ import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
 import Recorder from 'recorder-js';
 import StaticWordSyallableData from './StaticWordSyallableData';
-import {createRef} from "react";
+import {ChangeEvent, createRef} from "react";
 import * as queryString from "query-string";
 import PlayerBar from "../AudioViewer/PlayerBar";
 import TranscribeAudio from "../TranscribeAudio";
 import AudioImgLoading from "../AudioImgLoading";
+import AccentPitchToggle from "../PitchArtViewer/AccentPitchToggle";
+import SyllableToggle from "../PitchArtViewer/SyllableToggle";
+import PitchArtCenterToggle from "../PitchArtViewer/PitchArtCenterToggle";
+import PitchArtLinesToggle from "../PitchArtViewer/PitchArtLinesToggle";
+import PitchArtCircleToggle from "../PitchArtViewer/PitchArtCircleToggle";
+import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 
 interface MatchParams {
     numSyllables: string
@@ -25,7 +31,8 @@ interface State {
     userPitchValueLists: Array<Array<RawPitchValue>>,
     words: Array<MetildaWord>,
     isRecording: boolean,
-    isLoadingPitchResults: boolean
+    isLoadingPitchResults: boolean,
+    showPrevPitchValueLists: boolean
 }
 
 
@@ -84,7 +91,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                 parseFloat(accentIndex as string)
             ),
             isRecording: false,
-            isLoadingPitchResults: false
+            isLoadingPitchResults: false,
+            showPrevPitchValueLists: false
         };
     }
 
@@ -185,6 +193,23 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.setState({userPitchValueLists: []});
     };
 
+    handleInputChange = (event: ChangeEvent) => {
+        const target = event.target as HTMLInputElement;
+
+        let value: boolean | File | string;
+        if (target.type === "checkbox") {
+            value = target.checked;
+        } else if (target.type === "file") {
+            value = target.files![0];
+        } else {
+            value = target.value;
+        }
+
+        const name = target.name;
+
+        this.setState({[name]: value} as any);
+    };
+
     render() {
         let maxPitchIndex = -1;
         if (this.state.words[this.state.activeWordIndex].letters.length > 1) {
@@ -206,7 +231,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                 <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
-                            <div id="metilda-word-list" className="col s12">
+                            <h6 className="metilda-control-header">Word List</h6>
+                            <div id="metilda-word-list">
                                 <ul className="collection">
                                     {
                                         this.state.words.map((word, index) =>
@@ -218,6 +244,12 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         )
                                     }
                                 </ul>
+                            </div>
+                            <h6 className="metilda-control-header">Pitch Art</h6>
+                            <div className="metilda-pitch-art-container-control-list col s12">
+                                <PitchArtPrevPitchValueToggle
+                                    handleInputChange={this.handleInputChange}
+                                    showPrevPitchValueLists={this.state.showPrevPitchValueLists}/>
                             </div>
                         </div>
                         <div className="col s8">
@@ -240,7 +272,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showVerticallyCentered={true}
                                         showPitchArtLines={true}
                                         showLargeCircles={true}
-                                        showPrevPitchValueLists={true}
+                                        showPrevPitchValueLists={this.state.showPrevPitchValueLists}
                                         letters={this.state.words[this.state.activeWordIndex].letters}
                                         rawPitchValueLists={this.state.userPitchValueLists}
                                     />

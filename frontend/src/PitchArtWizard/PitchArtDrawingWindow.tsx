@@ -283,8 +283,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         }
 
         if (!this.props.showPrevPitchValueLists) {
+            let lastIndex = this.props.rawPitchValueLists.length - 1;
             return (
-                <UserPitchView pitchValues={this.props.rawPitchValueLists[0]}
+                <UserPitchView pitchValues={this.props.rawPitchValueLists[lastIndex]}
                                windowConfig={windowConfig}
                                showVerticallyCentered={this.props.showVerticallyCentered}/>);
         }
