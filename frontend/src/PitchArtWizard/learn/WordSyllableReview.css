@@ -36,6 +36,8 @@
 #metilda-word-list {
     margin-left: 12px;
     margin-right: 12px;
+    margin-bottom: 32px;
+    padding-right: 16px;
     height: 300px;
     max-height: 300px;
     overflow: hidden;

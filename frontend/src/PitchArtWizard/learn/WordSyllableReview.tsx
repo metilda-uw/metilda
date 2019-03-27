@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {ChangeEvent, createRef} from 'react';
 import './WordSyllableReview.css';
 import '../GlobalStyling.css';
 import {MetildaWord} from "./types";
@@ -7,16 +8,9 @@ import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
 import Recorder from 'recorder-js';
 import StaticWordSyallableData from './StaticWordSyallableData';
-import {ChangeEvent, createRef} from "react";
 import * as queryString from "query-string";
 import PlayerBar from "../AudioViewer/PlayerBar";
 import TranscribeAudio from "../TranscribeAudio";
-import AudioImgLoading from "../AudioImgLoading";
-import AccentPitchToggle from "../PitchArtViewer/AccentPitchToggle";
-import SyllableToggle from "../PitchArtViewer/SyllableToggle";
-import PitchArtCenterToggle from "../PitchArtViewer/PitchArtCenterToggle";
-import PitchArtLinesToggle from "../PitchArtViewer/PitchArtLinesToggle";
-import PitchArtCircleToggle from "../PitchArtViewer/PitchArtCircleToggle";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 
 interface MatchParams {
