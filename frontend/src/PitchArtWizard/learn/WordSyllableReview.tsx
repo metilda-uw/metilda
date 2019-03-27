@@ -287,7 +287,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                 <div className="pitch-art-controls-container">
                                     <button className="waves-effect waves-light btn metilda-btn align-left"
                                             onClick={this.clearPrevious}
-                                            disabled={this.state.userPitchValueLists.length === 0}>
+                                            disabled={this.state.isRecording || this.state.userPitchValueLists.length === 0}>
                                         Clear
                                     </button>
                                     <div className="pitch-art-btn-container">
