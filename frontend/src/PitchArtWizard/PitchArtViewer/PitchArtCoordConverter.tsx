@@ -20,7 +20,7 @@ class PitchArtCoordConverter {
         }
     }
 
-    centerOffset(pitches: Array<number>) {
+    private centerOffset(pitches: Array<number>) {
         if (pitches.length < 1) {
             return 0.0;
         }
