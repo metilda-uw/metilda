@@ -33,8 +33,9 @@ npm install
 npm start
 ```
 
-## IDE Configuration
-### TypeScript Lint
+## IntelliJ IDE Configuration
+### TSLint
+This feature enables tslint highlighting, it is only available in the Ultimate edition of IntelliJ.
 1) Open `Settings -> Language & Frameworks -> TypeScript -> TSLint`
 1) Select `Enable`
 1) Set `TSLint Package` to `<REPO_DIR>\frontend\node_modules\tslint`
