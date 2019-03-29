@@ -1,50 +1,50 @@
-import * as React from 'react';
-import './UploadAudio.css';
-import AudioImg from "./AudioImg";
-import AudioImgLoading from "./AudioImgLoading";
+import * as React from "react";
 import {connect} from "react-redux";
-import PlayerBar from "./AudioViewer/PlayerBar";
-import PitchRange from "./AudioViewer/PitchRange";
-import TargetPitchBar from "./TargetPitchBar";
-import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
-import UploadAudio from "./UploadAudio";
-import AudioImgDefault from "./AudioImgDefault";
-import {addLetter, setLetterPitch} from "../store/audio/actions";
 import {RouteComponentProps} from "react-router";
-import {Letter} from "../types/types";
-import {AppState} from "../store";
-import {AudioAction} from "../store/audio/types";
 import {ThunkDispatch} from "redux-thunk";
-import "./GlobalStyling.css";
+import {AppState} from "../store";
+import {addLetter, setLetterPitch} from "../store/audio/actions";
+import {AudioAction} from "../store/audio/types";
+import {Letter} from "../types/types";
 import ExportMetildaTranscribe from "./AudioAnalysis/ExportMetildaTranscribe";
+import AudioImg from "./AudioImg";
+import AudioImgDefault from "./AudioImgDefault";
+import AudioImgLoading from "./AudioImgLoading";
+import PitchRange from "./AudioViewer/PitchRange";
+import PlayerBar from "./AudioViewer/PlayerBar";
+import "./GlobalStyling.css";
+import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
+import TargetPitchBar from "./TargetPitchBar";
+import UploadAudio from "./UploadAudio";
+import "./UploadAudio.css";
 
 interface MatchParams  {
-    uploadId: string
+    uploadId: string;
 }
 export interface Props extends RouteComponentProps<MatchParams> {
-    letters: Array<Letter>,
-    addLetter: (letter: Letter) => void,
-    setLetterPitch: (index: number, pitch: number) => void,
+    letters: Letter[];
+    addLetter: (letter: Letter) => void;
+    setLetterPitch: (index: number, pitch: number) => void;
 }
 interface State {
-    letters: Array<Letter>,
-    isAudioImageLoaded: boolean,
-    soundLength: number,
-    selectionInterval: string,
-    maxPitch: number,
-    minPitch: number,
-    imageUrl: string,
-    audioUrl: string,
-    audioEditVersion: number,
-    minSelectX: number,
-    maxSelectX: number,
-    minAudioX: number,
-    maxAudioX: number,
-    minAudioTime: number,
-    maxAudioTime: number,
-    audioImgWidth: number,
-    closeImgSelectionCallback: () => void,
-    selectionCallback: (t1: number, t2: number) => void
+    letters: Letter[];
+    isAudioImageLoaded: boolean;
+    soundLength: number;
+    selectionInterval: string;
+    maxPitch: number;
+    minPitch: number;
+    imageUrl: string;
+    audioUrl: string;
+    audioEditVersion: number;
+    minSelectX: number;
+    maxSelectX: number;
+    minAudioX: number;
+    maxAudioX: number;
+    minAudioTime: number;
+    maxAudioTime: number;
+    audioImgWidth: number;
+    closeImgSelectionCallback: () => void;
+    selectionCallback: (t1: number, t2: number) => void;
 }
 
 class TranscribeAudio extends React.Component<Props, State> {
@@ -87,56 +87,9 @@ class TranscribeAudio extends React.Component<Props, State> {
         return "";
     }
 
-    constructor(props: Props) {
-        super(props);
-
-        const {uploadId} = this.props.match.params;
-        this.state = {
-            letters: [],
-            isAudioImageLoaded: false,
-            soundLength: -1,
-            selectionInterval: "Letter",
-            maxPitch: TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
-            minPitch: TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
-            imageUrl: TranscribeAudio.formatImageUrl(
-                uploadId,
-                TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
-                TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH),
-            audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
-            audioEditVersion: 0,
-            minSelectX: -1,
-            maxSelectX: -1,
-            minAudioX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
-            maxAudioX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
-            minAudioTime: 0.0,
-            maxAudioTime: -1.0,
-            audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
-                * TranscribeAudio.AUDIO_IMG_WIDTH,
-            closeImgSelectionCallback: () => (null),
-            selectionCallback: (t1, t2) => (null)
-        };
-        this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
-        this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
-        this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
-        this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.applyPitchRange = this.applyPitchRange.bind(this);
-        this.showAllClicked = this.showAllClicked.bind(this);
-        this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
-        this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
-        this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
-        this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
-        this.wordSplitClicked = this.wordSplitClicked.bind(this);
-        this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
-        this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
-        this.manualPitchChange = this.manualPitchChange.bind(this);
-        this.addPitch = this.addPitch.bind(this);
-        this.targetPitchSelected = this.targetPitchSelected.bind(this);
-    }
-
     static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
         let url = `/api/audio-analysis-image/${uploadId}.png`;
-        let urlOptions = [];
+        const urlOptions = [];
 
         if (minPitch !== undefined) {
             urlOptions.push(`min-pitch=${minPitch}`);
@@ -169,24 +122,71 @@ class TranscribeAudio extends React.Component<Props, State> {
         }
     }
 
+    constructor(props: Props) {
+        super(props);
+
+        const {uploadId} = this.props.match.params;
+        this.state = {
+            letters: [],
+            isAudioImageLoaded: false,
+            soundLength: -1,
+            selectionInterval: "Letter",
+            maxPitch: TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
+            minPitch: TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+            imageUrl: TranscribeAudio.formatImageUrl(
+                uploadId,
+                TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
+                TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH),
+            audioUrl: TranscribeAudio.formatAudioUrl(uploadId),
+            audioEditVersion: 0,
+            minSelectX: -1,
+            maxSelectX: -1,
+            minAudioX: TranscribeAudio.MIN_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            maxAudioX: TranscribeAudio.MAX_IMAGE_XPERC * TranscribeAudio.AUDIO_IMG_WIDTH,
+            minAudioTime: 0.0,
+            maxAudioTime: -1.0,
+            audioImgWidth: (TranscribeAudio.MAX_IMAGE_XPERC - TranscribeAudio.MIN_IMAGE_XPERC)
+                * TranscribeAudio.AUDIO_IMG_WIDTH,
+            closeImgSelectionCallback: () => (null),
+            selectionCallback: (t1, t2) => (null),
+        };
+        this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+        this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
+        this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
+        this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.applyPitchRange = this.applyPitchRange.bind(this);
+        this.showAllClicked = this.showAllClicked.bind(this);
+        this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
+        this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
+        this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
+        this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
+        this.wordSplitClicked = this.wordSplitClicked.bind(this);
+        this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
+        this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
+        this.manualPitchChange = this.manualPitchChange.bind(this);
+        this.addPitch = this.addPitch.bind(this);
+        this.targetPitchSelected = this.targetPitchSelected.bind(this);
+    }
+
     componentDidMount() {
         const {uploadId} = this.props.match.params;
         if (uploadId) {
-            var controller = this;
-            let request: RequestInit = {
+            const controller = this;
+            const request: RequestInit = {
                 method: "POST",
                 headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({uploadId: uploadId})
+                body: JSON.stringify({uploadId}),
             };
             fetch("/api/sound-length/" + uploadId, request)
-                .then(response => response.json())
-                .then(function (data: any) {
+                .then((response) => response.json())
+                .then(function(data: any) {
                     controller.setState({
-                        soundLength: data["sound_length"],
-                        maxAudioTime: data["sound_length"]
+                        soundLength: data.sound_length,
+                        maxAudioTime: data.sound_length,
                     });
                 });
         }
@@ -203,7 +203,7 @@ class TranscribeAudio extends React.Component<Props, State> {
 
         const {uploadId} = this.props.match.params;
 
-        let newAudioUrl = TranscribeAudio.formatAudioUrl(
+        const newAudioUrl = TranscribeAudio.formatAudioUrl(
             uploadId,
             ts[0],
             ts[1]);
@@ -211,50 +211,50 @@ class TranscribeAudio extends React.Component<Props, State> {
         return {
             audioUrl: newAudioUrl,
             minAudioTime: ts[0],
-            maxAudioTime: ts[1]
+            maxAudioTime: ts[1],
         };
     }
 
     targetPitchSelected(index: number) {
         if (index !== -1) {
-            let letter = this.props.letters[index];
+            const letter = this.props.letters[index];
             this.state.selectionCallback(letter.t0, letter.t1);
 
             const {uploadId} = this.props.match.params;
-            let newAudioUrl = TranscribeAudio.formatAudioUrl(
+            const newAudioUrl = TranscribeAudio.formatAudioUrl(
                 uploadId,
                 letter.t0,
                 letter.t1);
 
             this.setState({
-                audioUrl: newAudioUrl
+                audioUrl: newAudioUrl,
             });
         }
     }
 
     audioIntervalSelectionCanceled() {
-        let config = this.getAudioConfigForSelection();
+        const config = this.getAudioConfigForSelection();
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: -1,
-            maxSelectX: -1
+            maxSelectX: -1,
         });
     }
 
     audioIntervalSelected(leftX: number, rightX: number) {
-        let config = this.getAudioConfigForSelection(leftX, rightX);
+        const config = this.getAudioConfigForSelection(leftX, rightX);
         this.setState({
             audioUrl: config.audioUrl,
             minSelectX: leftX,
-            maxSelectX: rightX
+            maxSelectX: rightX,
         });
     }
 
-    addPitch(pitch: number, letter: string, ts: Array<number>, isManualPitch: boolean=false, isWordSep: boolean=false) {
+    addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean= false, isWordSep: boolean= false) {
         if (!isWordSep) {
             if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
                 // the pitch outside the bounds of the window, omit it
-                return
+                return;
             }
         }
 
@@ -264,21 +264,21 @@ class TranscribeAudio extends React.Component<Props, State> {
             ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
         }
 
-        let newLetter = {
+        const newLetter = {
             t0: ts[0],
             t1: ts[1],
-            pitch: pitch,
+            pitch,
             syllable: TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-            isManualPitch: isManualPitch,
-            isWordSep: isWordSep
+            isManualPitch,
+            isWordSep,
         };
 
         this.props.addLetter(newLetter);
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean=false) {
-        let ts = this.imageIntervalToTimeInterval(leftX, rightX);
+    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean= false) {
+        const ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
         const {uploadId} = this.props.match.params;
         if (manualPitch !== undefined) {
@@ -299,24 +299,24 @@ class TranscribeAudio extends React.Component<Props, State> {
             + "&min-pitch=" + this.state.minPitch, {
             method: "GET",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
         })
-            .then(response => response.json())
-            .then(data => this.addPitch(data["avg_pitch"], TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, false)
-            )
+            .then((response) => response.json())
+            .then((data) => this.addPitch(data.avg_pitch, TranscribeAudio.DEFAULT_SYLLABLE_TEXT, ts, false),
+            );
     }
 
     pitchArtRangeClicked() {
-        let ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+        const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
 
         const {uploadId} = this.props.match.params;
-        let json = {
-            "time_range": ts
+        const json = {
+            time_range: ts,
         };
 
-        type ApiResult = Array<Array<number>>;
+        type ApiResult = number[][];
 
         fetch("/api/all-pitches/"
             + uploadId + "?max-pitch="
@@ -324,16 +324,16 @@ class TranscribeAudio extends React.Component<Props, State> {
             + "&min-pitch=" + this.state.minPitch, {
             method: "POST",
             headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
+                "Accept": "application/json",
+                "Content-Type": "application/json",
             },
-            body: JSON.stringify(json)
+            body: JSON.stringify(json),
         })
-            .then(response => response.json())
-            .then(data => (data as ApiResult).map(item => this.addPitch(item[1],
+            .then((response) => response.json())
+            .then((data) => (data as ApiResult).map((item) => this.addPitch(item[1],
                 TranscribeAudio.DEFAULT_SYLLABLE_TEXT,
-                [item[0], item[0]]))
-            )
+                [item[0], item[0]])),
+            );
     }
 
     averagePitchArtClicked() {
@@ -359,7 +359,8 @@ class TranscribeAudio extends React.Component<Props, State> {
         let isValidNumber = false;
 
         while (!isValidNumber) {
-            let msg = `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz and ${this.state.maxPitch.toFixed(2)}Hz`;
+            const msg = `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz `
+                      + `and ${this.state.maxPitch.toFixed(2)}Hz`;
 
             manualPitch = prompt(msg);
 
@@ -380,7 +381,10 @@ class TranscribeAudio extends React.Component<Props, State> {
 
             isValidNumber = !(manualPitch < this.state.minPitch || manualPitch > this.state.maxPitch);
             if (!isValidNumber) {
-                alert(`${manualPitch}Hz is not between between ${this.state.minPitch.toFixed(2)}Hz and ${this.state.maxPitch.toFixed(2)}Hz`);
+                const errorMsg
+                    = `${manualPitch}Hz is not between between ${this.state.minPitch.toFixed(2)}Hz `
+                    + `and ${this.state.maxPitch.toFixed(2)}Hz`;
+                alert(errorMsg);
             }
         }
 
@@ -394,7 +398,7 @@ class TranscribeAudio extends React.Component<Props, State> {
         this.setState({
             isAudioImageLoaded: true,
             closeImgSelectionCallback: cancelCallback,
-            selectionCallback: selectionCallback
+            selectionCallback,
         });
     }
 
@@ -417,7 +421,7 @@ class TranscribeAudio extends React.Component<Props, State> {
 
     applyPitchRange(minPitch: number, maxPitch: number) {
         const {uploadId} = this.props.match.params;
-        let newUrl = TranscribeAudio.formatImageUrl(
+        const newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
             minPitch,
             maxPitch,
@@ -431,20 +435,20 @@ class TranscribeAudio extends React.Component<Props, State> {
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
             minPitch: minPitch || TranscribeAudio.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: maxPitch || TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH
+            maxPitch: maxPitch || TranscribeAudio.DEFAULT_MAX_ANALYSIS_PITCH,
         });
     }
 
     showAllClicked() {
         const {uploadId} = this.props.match.params;
-        let newUrl = TranscribeAudio.formatImageUrl(
+        const newUrl = TranscribeAudio.formatImageUrl(
             uploadId,
             this.state.minPitch,
             this.state.maxPitch,
             0,
             this.state.soundLength);
 
-        let newAudioUrl = TranscribeAudio.formatAudioUrl(
+        const newAudioUrl = TranscribeAudio.formatAudioUrl(
             uploadId,
             0,
             this.state.soundLength);
@@ -457,29 +461,29 @@ class TranscribeAudio extends React.Component<Props, State> {
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
             minAudioTime: 0,
-            maxAudioTime: this.state.soundLength
+            maxAudioTime: this.state.soundLength,
         });
     }
 
     imageIntervalToTimeInterval(x1: number, x2: number) {
-        let dt = this.state.maxAudioTime - this.state.minAudioTime;
-        let dx = this.state.maxAudioX - this.state.minAudioX;
-        let u0 = x1 / dx;
-        let u1 = x2 / dx;
+        const dt = this.state.maxAudioTime - this.state.minAudioTime;
+        const dx = this.state.maxAudioX - this.state.minAudioX;
+        const u0 = x1 / dx;
+        const u1 = x2 / dx;
 
-        let t0 = this.state.minAudioTime + (u0 * dt);
-        let t1 = this.state.minAudioTime + (u1 * dt);
+        const t0 = this.state.minAudioTime + (u0 * dt);
+        const t1 = this.state.minAudioTime + (u1 * dt);
         return [t0, t1];
     }
 
     selectionIntervalClicked() {
         // Compute the new time scale
-        let config = this.getAudioConfigForSelection(
+        const config = this.getAudioConfigForSelection(
             this.state.minSelectX,
             this.state.maxSelectX);
 
         const {uploadId} = this.props.match.params;
-        let newImageUrl = TranscribeAudio.formatImageUrl(
+        const newImageUrl = TranscribeAudio.formatImageUrl(
             uploadId,
             this.state.minPitch,
             this.state.maxPitch,
@@ -494,7 +498,7 @@ class TranscribeAudio extends React.Component<Props, State> {
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
             minAudioTime: config.minAudioTime,
-            maxAudioTime: config.maxAudioTime
+            maxAudioTime: config.maxAudioTime,
         });
     }
 
@@ -534,8 +538,8 @@ class TranscribeAudio extends React.Component<Props, State> {
                             <ExportMetildaTranscribe
                                 word={this.props.match.params.uploadId}
                                 disabled={this.props.letters.length === 0
-                                       || this.props.letters.filter(item => !item.isWordSep)
-                                                            .some(item => item.syllable === "X")}/>
+                                       || this.props.letters.filter((item) => !item.isWordSep)
+                                                            .some((item) => item.syllable === "X")}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
@@ -543,20 +547,21 @@ class TranscribeAudio extends React.Component<Props, State> {
                                     {nonAudioImg}
                                     {
                                         uploadId ?
-                                            <AudioImg key={this.state.audioEditVersion}
-                                                      uploadId={uploadId}
-                                                      src={this.state.imageUrl}
-                                                      ref="audioImage"
-                                                      imageWidth={TranscribeAudio.AUDIO_IMG_WIDTH}
-                                                      xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
-                                                      xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
-                                                      audioIntervalSelected={this.audioIntervalSelected}
-                                                      audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                                      onAudioImageLoaded={this.onAudioImageLoaded}
-                                                      minAudioX={this.state.minAudioX}
-                                                      maxAudioX={this.state.maxAudioX}
-                                                      minAudioTime={this.state.minAudioTime}
-                                                      maxAudioTime={this.state.maxAudioTime}/>
+                                            <AudioImg
+                                                key={this.state.audioEditVersion}
+                                                uploadId={uploadId}
+                                                src={this.state.imageUrl}
+                                                ref="audioImage"
+                                                imageWidth={TranscribeAudio.AUDIO_IMG_WIDTH}
+                                                xminPerc={TranscribeAudio.MIN_IMAGE_XPERC}
+                                                xmaxPerc={TranscribeAudio.MAX_IMAGE_XPERC}
+                                                audioIntervalSelected={this.audioIntervalSelected}
+                                                audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                                                onAudioImageLoaded={this.onAudioImageLoaded}
+                                                minAudioX={this.state.minAudioX}
+                                                maxAudioX={this.state.maxAudioX}
+                                                minAudioTime={this.state.minAudioTime}
+                                                maxAudioTime={this.state.maxAudioTime}/>
                                             : []
                                     }
                                 </div>
@@ -615,12 +620,12 @@ class TranscribeAudio extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: AppState) => ({
-    letters: state.audio.letters
+    letters: state.audio.letters,
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
     addLetter: (newLetter: Letter) => dispatch(addLetter(newLetter)),
-    setLetterPitch: (index: number, newPitch: number) => dispatch(setLetterPitch(index, newPitch))
+    setLetterPitch: (index: number, newPitch: number) => dispatch(setLetterPitch(index, newPitch)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TranscribeAudio);
