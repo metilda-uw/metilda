@@ -14,10 +14,31 @@ Audio analysis web app.
 ## Supported Platforms
 Tested on Windows, but should work on Linux as well (the test suite is run on a Linux VM).
 
-## Build Configuration
-1) Install a Python interpreter using the version specified in runtime.txt
+## Build and Run
+### Python
+1) Install a Python interpreter (the version is specified in runtime.txt)
 1) Create a virtualenv under the /venv folder
-1) Run `./venv/Scripts/python -r requirements.txt` 
+1) Run these commands:
+```
+./venv/Scripts/python -r requirements.txt
+./runLocalServer.sh
+```
+
+### React
+1) Install nodejs (the version is specified in `/frontend/package.json`)
+1) Run these commands:
+```
+cd frontend
+npm install 
+npm start
+```
+
+## IDE Configuration
+### TypeScript Lint
+1) Open `Settings -> Language & Frameworks -> TypeScript -> TSLint`
+1) Select `Enable`
+1) Set `TSLint Package` to `<REPO_DIR>\frontend\node_modules\tslint`
+1) Set `Configuration file` to `<REPO_DIR>\frontend\tslint.json`
 
 ## Tests
 After configuring your build environment, run tests locally using `./tesh.sh`. 
