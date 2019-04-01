@@ -33,9 +33,13 @@ npm install
 npm start
 ```
 
-## IntelliJ IDE Configuration
+## PyCharm IDE Configuration
 ### TSLint
-This feature enables tslint highlighting, it is only available in the Ultimate edition of IntelliJ.
+This feature enables tslint highlighting, it is only available in the Professional edition of PyCharm.
+##### Configure tsconfig.json
+1) Open `Settings -> Language & Frameworks -> TypeScript`
+1) Set `Options` to `--project ./frontend/tsconfig.json`
+##### Configure tslint.json
 1) Open `Settings -> Language & Frameworks -> TypeScript -> TSLint`
 1) Select `Enable`
 1) Set `TSLint Package` to `<REPO_DIR>\frontend\node_modules\tslint`
