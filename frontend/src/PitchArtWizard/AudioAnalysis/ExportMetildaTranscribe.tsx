@@ -1,29 +1,29 @@
-import * as React from 'react';
-import '../TranscribeAudio.css';
-import "../GlobalStyling.css";
-import "./ExportMetildaTranscribe.css";
-import {Redirect, RouteComponentProps} from "react-router-dom";
-import {AppState} from "../../store";
-import {connect} from "react-redux";
 import fileDownload from "js-file-download";
-import {MetildaWord} from "../learn/types";
+import moment from "moment";
+import * as React from "react";
+import {connect} from "react-redux";
+import {RouteComponentProps} from "react-router-dom";
+import {AppState} from "../../store";
 import {Letter} from "../../types/types";
-import moment from 'moment';
+import "../GlobalStyling.css";
+import {MetildaWord} from "../learn/types";
+import "../TranscribeAudio.css";
+import "./ExportMetildaTranscribe.css";
 
 interface Props extends RouteComponentProps {
-    letters: Array<Letter>,
-    word: string,
-    disabled: boolean
+    letters: Letter[];
+    word: string;
+    disabled: boolean;
 }
 
 class ExportMetildaTranscribe extends React.Component<Props> {
     state = {};
 
     exportToJson = () => {
-        let metildaWord = {uploadId : this.props.word, letters: this.props.letters} as MetildaWord;
-        let timeStamp = moment().format('MM-DD-YYYY_hh_mm_ss');
+        const metildaWord = {uploadId : this.props.word, letters: this.props.letters} as MetildaWord;
+        const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
-    };
+    }
 
     render() {
         return (

@@ -1,10 +1,10 @@
 import * as React from "react";
-import "../GlobalStyling.css";
 import {ChangeEvent} from "react";
+import "../GlobalStyling.css";
 
 interface Props {
-    showVerticallyCentered: boolean,
-    handleInputChange: (event: ChangeEvent) => void
+    showVerticallyCentered: boolean;
+    handleInputChange: (event: ChangeEvent) => void;
 }
 
 class PitchArtCenterToggle extends React.Component<Props> {

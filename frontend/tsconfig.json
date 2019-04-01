@@ -20,9 +20,10 @@
     "jsx": "preserve"
   },
   "include": [
-    "src"
-  ],
+      "src"
+    ],
   "exclude": [
-    "src/Lib/**/*"
+      "src/Lib/**/*",
+      "src/**/*.test.*"
   ]
 }

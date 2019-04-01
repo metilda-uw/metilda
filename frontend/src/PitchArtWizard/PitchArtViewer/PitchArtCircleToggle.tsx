@@ -1,10 +1,10 @@
 import * as React from "react";
-import "../GlobalStyling.css";
 import {ChangeEvent} from "react";
+import "../GlobalStyling.css";
 
 interface Props {
-    showLargeCircles: boolean,
-    handleInputChange: (event: ChangeEvent) => void
+    showLargeCircles: boolean;
+    handleInputChange: (event: ChangeEvent) => void;
 }
 
 class PitchArtCircleToggle extends React.Component<Props> {

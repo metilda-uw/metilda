@@ -1,10 +1,10 @@
 import * as React from "react";
-import "../GlobalStyling.css";
 import {ChangeEvent} from "react";
+import "../GlobalStyling.css";
 
 interface Props {
-    showSyllableText: boolean,
-    handleInputChange: (event: ChangeEvent) => void
+    showSyllableText: boolean;
+    handleInputChange: (event: ChangeEvent) => void;
 }
 
 class SyllableToggle extends React.Component<Props> {

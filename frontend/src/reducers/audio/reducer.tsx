@@ -6,8 +6,7 @@ const defaultState: AudioAnalysisState = {
     letters: []
 };
 
-
-const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaultState, action) =>{
+const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaultState, action) => {
     switch (action.type) {
         case constants.ADD_LETTER:
             return {...state, letters: action.letters};
@@ -22,6 +21,6 @@ const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaul
         default:
             return state;
     }
-}
+};
 
 export default reducer;

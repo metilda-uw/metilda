@@ -1,14 +1,14 @@
-import * as React from 'react';
-import {PitchArtWindowConfig, RawPitchValue} from "./types";
-import {Layer, Line, Circle} from "react-konva";
+import * as React from "react";
+import {Circle, Layer} from "react-konva";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 interface Props {
-    pitchValues: Array<RawPitchValue>,
-    windowConfig: PitchArtWindowConfig,
-    showVerticallyCentered: boolean,
-    fillColor?: string,
-    opacity?: number
+    pitchValues: RawPitchValue[];
+    windowConfig: PitchArtWindowConfig;
+    showVerticallyCentered: boolean;
+    fillColor?: string;
+    opacity?: number;
 }
 
 class UserPitchView extends React.Component<Props> {
@@ -24,21 +24,21 @@ class UserPitchView extends React.Component<Props> {
     }
 
     render() {
-        let coordConverter = new PitchArtCoordConverter(
+        const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
             this.props.pitchValues,
             this.props.showVerticallyCentered
         );
 
-        let points: Array<number> = [];
-        let circles: Array<any> = [];
-        let circleRadius = this.circleRadius;
-        let lineColor = this.props.fillColor || this.fillColor;
-        let opacity = this.props.opacity || 1.0;
+        const points: number[] = [];
+        const circles: any[] = [];
+        const circleRadius = this.circleRadius;
+        const lineColor = this.props.fillColor || this.fillColor;
+        const opacity = this.props.opacity || 1.0;
 
         this.props.pitchValues.forEach(function(value, index) {
-            let x = coordConverter.horzIndexToRectCoords(value.t0);
-            let y = coordConverter.vertValueToRectCoords(value.pitch);
+            const x = coordConverter.horzIndexToRectCoords(value.t0);
+            const y = coordConverter.vertValueToRectCoords(value.pitch);
             circles.push(
                 <Circle key={index}
                         radius={circleRadius}

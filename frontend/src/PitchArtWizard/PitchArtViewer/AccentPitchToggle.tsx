@@ -1,13 +1,12 @@
 import * as React from "react";
-import "../GlobalStyling.css";
 import {ChangeEvent} from "react";
 import {SyntheticEvent} from "react";
+import "../GlobalStyling.css";
 
 interface Props {
-    showAccentPitch: boolean,
-    handleInputChange: (event: SyntheticEvent) => void
+    showAccentPitch: boolean;
+    handleInputChange: (event: SyntheticEvent) => void;
 }
-
 
 class AccentPitchToggle extends React.Component<Props> {
     render() {

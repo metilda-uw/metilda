@@ -1,6 +1,6 @@
 import {Letter} from "../../types/types";
 
 export interface MetildaWord {
-    uploadId: string,
-    letters: Array<Letter>
+    uploadId: string;
+    letters: Letter[];
 }

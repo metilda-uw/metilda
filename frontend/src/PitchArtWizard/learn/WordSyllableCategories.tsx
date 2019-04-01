@@ -1,6 +1,7 @@
+import * as queryString from "query-string";
 import * as React from "react";
-import "./WordSyllableCategories.css";
-import {ChangeEvent, SyntheticEvent} from "react";
+import {ChangeEvent} from "react";
+import {Link, RouteComponentProps} from "react-router-dom";
 import pitchArt21 from "./images/Pitch Art - 21-01.jpg";
 import pitchArt22 from "./images/Pitch Art - 22-01.jpg";
 import pitchArt31 from "./images/Pitch Art - 31-01.jpg";
@@ -9,38 +10,26 @@ import pitchArt33 from "./images/Pitch Art - 33-01.jpg";
 import pitchArt41 from "./images/Pitch Art - 41-01.jpg";
 import pitchArt42 from "./images/Pitch Art - 42-01.jpg";
 import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
-import {Link, RouteComponentProps} from "react-router-dom";
-import * as queryString from "query-string";
+import "./WordSyllableCategories.css";
 
-
-interface Props extends RouteComponentProps {
-}
-
-interface State {
-
-}
-
-export default class WordSyllableCategories extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
+export default class WordSyllableCategories extends React.Component<RouteComponentProps> {
 
     handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-        let name = event.currentTarget.name;
-        let value = event.currentTarget.value;
+        const name = event.currentTarget.name;
+        const value = event.currentTarget.value;
         this.setState({[name]: parseFloat(value)} as any);
-    };
+    }
 
     getNumSyllables = (): number => {
         const values = queryString.parse(this.props.location.search);
-        let numSyllables = values['numSyllables'] as string;
+        const numSyllables = values.numSyllables as string;
 
         if (!numSyllables) {
             return 2;
         }
 
         return parseFloat(numSyllables);
-    };
+    }
 
     imageSrcList = () => {
         switch (this.getNumSyllables()) {
@@ -53,10 +42,10 @@ export default class WordSyllableCategories extends React.Component<Props, State
             default:
                 return [];
         }
-    };
+    }
 
     render() {
-        let numSyllables = this.getNumSyllables();
+        const numSyllables = this.getNumSyllables();
         return (
             <div>
                 <div className="metilda-page-header">

@@ -1,32 +1,30 @@
 import * as React from "react";
-import {ChangeEvent} from "react";
+import {SyntheticEvent} from "react";
+import {Letter} from "../../types/types";
 import PitchArt from "../PitchArt";
 import AccentPitchToggle from "./AccentPitchToggle";
-import "./PitchArtContainer.css";
-import SyllableToggle from "./SyllableToggle";
-import PitchArtLinesToggle from "./PitchArtLinesToggle";
-import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
-import {Letter} from "../../types/types";
-import {SyntheticEvent} from "react";
-
+import PitchArtCircleToggle from "./PitchArtCircleToggle";
+import "./PitchArtContainer.css";
+import PitchArtLinesToggle from "./PitchArtLinesToggle";
+import SyllableToggle from "./SyllableToggle";
 
 interface Props {
-    letters: Array<Letter>,
-    width: number,
-    height: number,
-    minPitch: number,
-    maxPitch: number,
-    uploadId: string,
-    manualPitchChange: (index: number, newPitch: number) => void
+    letters: Letter[];
+    width: number;
+    height: number;
+    minPitch: number;
+    maxPitch: number;
+    uploadId: string;
+    manualPitchChange: (index: number, newPitch: number) => void;
 }
 
 interface State {
-    showAccentPitch: boolean,
-    showSyllableText: boolean,
-    showVerticallyCentered: boolean,
-    showPitchArtLines: boolean,
-    showLargeCircles: boolean
+    showAccentPitch: boolean;
+    showSyllableText: boolean;
+    showVerticallyCentered: boolean;
+    showPitchArtLines: boolean;
+    showLargeCircles: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -60,8 +58,8 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     render() {
-        let sortedPitches = this.props.letters.map(item => item.pitch);
-        let maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
+        const sortedPitches = this.props.letters.map((item) => item.pitch);
+        const maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
         return (
             <div>
                 <div className="col s4">
@@ -100,7 +98,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               letters={this.props.letters}/>
                 </div>
             </div>
-        )
+        );
     }
 }
 

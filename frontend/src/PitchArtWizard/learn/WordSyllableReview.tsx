@@ -1,34 +1,33 @@
-import * as React from 'react';
-import {ChangeEvent, createRef} from 'react';
-import './WordSyllableReview.css';
-import '../GlobalStyling.css';
-import {MetildaWord} from "./types";
+import * as queryString from "query-string";
+import * as React from "react";
+import {ChangeEvent, createRef} from "react";
 import {RouteComponentProps} from "react-router";
+import Recorder from "recorder-js";
+import PlayerBar from "../AudioViewer/PlayerBar";
+import "../GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
-import Recorder from 'recorder-js';
-import StaticWordSyallableData from './StaticWordSyallableData';
-import * as queryString from "query-string";
-import PlayerBar from "../AudioViewer/PlayerBar";
 import TranscribeAudio from "../TranscribeAudio";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
+import StaticWordSyallableData from "./StaticWordSyallableData";
+import {MetildaWord} from "./types";
+import "./WordSyllableReview.css";
 
 interface MatchParams {
-    numSyllables: string
+    numSyllables: string;
 }
 
 interface Props extends RouteComponentProps<MatchParams> {
 }
 
 interface State {
-    activeWordIndex: number,
-    userPitchValueLists: Array<Array<RawPitchValue>>,
-    words: Array<MetildaWord>,
-    isRecording: boolean,
-    isLoadingPitchResults: boolean,
-    showPrevPitchValueLists: boolean
+    activeWordIndex: number;
+    userPitchValueLists: RawPitchValue[][];
+    words: MetildaWord[];
+    isRecording: boolean;
+    isLoadingPitchResults: boolean;
+    showPrevPitchValueLists: boolean;
 }
-
 
 function spinner() {
     return (
@@ -66,7 +65,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     // Amount of time to add at the start and end of a word
     // when playing its audio clip
     static get AUDIO_BUFFER_TIME(): number {
-        return 0.2
+        return 0.2;
     }
 
     private recorder: any;
@@ -75,7 +74,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
         const values = queryString.parse(this.props.location.search);
-        let accentIndex = values['accentIndex'];
+        const accentIndex = values.accentIndex;
 
         this.state = {
             activeWordIndex: 0,
@@ -92,7 +91,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
     wordClicked = (index: number) => {
         this.setState({activeWordIndex: index});
-    };
+    }
 
     toggleRecord = () => {
         const audioClass = (window as any).AudioContext || (window as any).webkitAudioContext;
@@ -101,26 +100,26 @@ class WordSyllableReview extends React.Component<Props, State> {
         if (this.recorder == null) {
             this.recorder = new Recorder(audioContext);
             navigator.mediaDevices.getUserMedia({audio: true})
-                .then(stream => this.recorder.init(stream).then(() => this.recorder.start()))
-                .catch(err => console.log('Unable to initiate recording', err));
+                .then((stream) => this.recorder.init(stream).then(() => this.recorder.start()))
+                .catch((err) => console.error("Unable to initiate recording", err));
             this.setState({isRecording: true});
         } else {
-            let controller = this;
+            const controller = this;
             this.recorder.stop().then((result: any) => {
                 controller.setState({isLoadingPitchResults: true});
                 const formData = new FormData();
-                formData.append('file', result.blob);
+                formData.append("file", result.blob);
                 fetch(`/api/all-pitches?min-pitch=30.0&max-pitch=300.0`, {
                     method: "POST",
                     headers: {
-                        'Accept': 'application/json'
+                        Accept: "application/json"
                     },
                     body: formData
                 })
-                    .then(response => response.json())
-                    .then(function (data) {
-                        let pitchValues: Array<RawPitchValue> = (data as Array<Array<number>>).map(
-                            item => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
+                    .then((response) => response.json())
+                    .then(function(data) {
+                        const pitchValues: RawPitchValue[] = (data as number[][]).map(
+                            (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                         );
                         controller.recorder = null;
                         controller.setState(
@@ -132,15 +131,15 @@ class WordSyllableReview extends React.Component<Props, State> {
                     });
             });
         }
-    };
+    }
 
     playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
-    };
+    }
 
     saveImage = () => {
         this.pitchArtRef.current!.saveImage();
-    };
+    }
 
     minPitchArtTime = () => {
         if (this.state.words.length === 0
@@ -151,7 +150,7 @@ class WordSyllableReview extends React.Component<Props, State> {
         return Math.max(
             this.state.words[this.state.activeWordIndex].letters[0].t0 - WordSyllableReview.AUDIO_BUFFER_TIME,
             0);
-    };
+    }
 
     maxPitchArtTime = () => {
         if (this.state.words.length === 0
@@ -159,33 +158,33 @@ class WordSyllableReview extends React.Component<Props, State> {
             return 0;
         }
 
-        let numLetters = this.state.words[this.state.activeWordIndex].letters.length;
+        const numLetters = this.state.words[this.state.activeWordIndex].letters.length;
         return (this.state.words[this.state.activeWordIndex].letters[numLetters - 1].t1
             + WordSyllableReview.AUDIO_BUFFER_TIME);
-    };
+    }
 
     pageTitle = () => {
-        let syllableStr = `${this.props.match.params.numSyllables} Syllables`;
+        const syllableStr = `${this.props.match.params.numSyllables} Syllables`;
 
         const values = queryString.parse(this.props.location.search);
-        let accentIndex = parseFloat(values['accentIndex'] as string);
+        const accentIndex = parseFloat(values.accentIndex as string);
         let accentSuffix: string = "";
 
-        if (accentIndex == 0) {
-            accentSuffix = "st"
-        } else if (accentIndex == 1) {
-            accentSuffix = "nd"
-        } else if (accentIndex == 2) {
-            accentSuffix = "rd"
+        if (accentIndex === 0) {
+            accentSuffix = "st";
+        } else if (accentIndex === 1) {
+            accentSuffix = "nd";
+        } else if (accentIndex === 2) {
+            accentSuffix = "rd";
         }
 
-        let accentStr = "Accent " + (accentIndex + 1) + accentSuffix + " syllable";
+        const accentStr = "Accent " + (accentIndex + 1) + accentSuffix + " syllable";
         return syllableStr + ", " + accentStr;
-    };
+    }
 
     clearPrevious = () => {
         this.setState({userPitchValueLists: []});
-    };
+    }
 
     handleInputChange = (event: ChangeEvent) => {
         const target = event.target as HTMLInputElement;
@@ -202,16 +201,16 @@ class WordSyllableReview extends React.Component<Props, State> {
         const name = target.name;
 
         this.setState({[name]: value} as any);
-    };
+    }
 
     render() {
         let maxPitchIndex = -1;
         if (this.state.words[this.state.activeWordIndex].letters.length > 1) {
-            let letters = this.state.words[this.state.activeWordIndex].letters;
+            const letters = this.state.words[this.state.activeWordIndex].letters;
 
-            if (!letters.some(item => item.isWordSep)) {
-                let maxValue = Math.max(...letters.map(item => item.pitch));
-                maxPitchIndex = letters.map(item => item.pitch).indexOf(maxValue);
+            if (!letters.some((item) => item.isWordSep)) {
+                const maxValue = Math.max(...letters.map((item) => item.pitch));
+                maxPitchIndex = letters.map((item) => item.pitch).indexOf(maxValue);
             }
         }
 
@@ -231,7 +230,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     {
                                         this.state.words.map((word, index) =>
                                             <li key={"metilda-word-" + index}
-                                                className={"collection-item " + (index == this.state.activeWordIndex ? "active" : "")}
+                                                className={"collection-item "
+                                                        + (index === this.state.activeWordIndex ? "active" : "")}
                                                 onClick={() => (this.wordClicked(index))}>
                                                 {word.uploadId}
                                             </li>
@@ -281,14 +281,15 @@ class WordSyllableReview extends React.Component<Props, State> {
                                 <div className="pitch-art-controls-container">
                                     <button className="waves-effect waves-light btn metilda-btn align-left"
                                             onClick={this.clearPrevious}
-                                            disabled={this.state.isRecording || this.state.userPitchValueLists.length === 0}>
+                                            disabled={this.state.isRecording
+                                                      || this.state.userPitchValueLists.length === 0}>
                                         Clear
                                     </button>
                                     <div className="pitch-art-btn-container">
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
-                                            {!this.state.isRecording ? 'Start Record' : 'Stop Record'}
+                                            {!this.state.isRecording ? "Start Record" : "Stop Record"}
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.playPitchArt}

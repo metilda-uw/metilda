@@ -1,12 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
 
-interface Props {}
-
-class AudioImgLoading extends React.Component<Props> {
-    constructor(props: Props) {
-        super(props);
-    }
-
+class AudioImgLoading extends React.Component {
     render() {
         return (
             <div className="metilda-audio-analysis-image-loading">
@@ -24,7 +18,7 @@ class AudioImgLoading extends React.Component<Props> {
                     </div>
                 </div>
             </div>
-        )
+        );
     }
 }
 

@@ -1,9 +1,10 @@
-import { expect } from 'chai';
-import {mount, shallow, ShallowWrapper} from 'enzyme';
-import sinon from 'sinon';
-import AccentPitchToggle from "./AccentPitchToggle";
+/* tslint:disable:no-unused-expression */
+import { expect } from "chai";
+import {mount, shallow, ShallowWrapper} from "enzyme";
 import {SyntheticEvent} from "react";
 import * as React from "react";
+import * as sinon from "sinon";
+import AccentPitchToggle from "./AccentPitchToggle";
 
 describe("AccentPitchToggle", () => {
     describe("checkbox", () => {
@@ -18,14 +19,14 @@ describe("AccentPitchToggle", () => {
         });
 
         it("GIVEN value false THEN checkbox is checked", () => {
-            let subject = makeShallow({showAccentPitch: false});
+            subject = makeShallow({showAccentPitch: false});
             expect(subject.find("input[type='checkbox']").prop("checked")).to.be.false;
         });
 
         it("GIVEN input is clicked THEN event handler is called", () => {
             const onButtonClick = sinon.spy();
             const wrapper = mount(<AccentPitchToggle {...makeProps({handleInputChange: onButtonClick})} />);
-            wrapper.find("input[type='checkbox']").simulate('change');
+            wrapper.find("input[type='checkbox']").simulate("change");
             expect(onButtonClick.calledOnce).to.be.true;
         });
     });
@@ -36,8 +37,8 @@ function makeShallow(props: Props = {}) {
 }
 
 interface Props {
-    showAccentPitch?: boolean,
-    handleInputChange?: (event: SyntheticEvent) => void
+    showAccentPitch?: boolean;
+    handleInputChange?: (event: SyntheticEvent) => void;
 }
 
 function makeProps(props: Props) {
@@ -47,4 +48,6 @@ function makeProps(props: Props) {
     };
 }
 
-function fakeEventHandler(event: SyntheticEvent) {}
+function fakeEventHandler(event: SyntheticEvent) {
+    return;
+}

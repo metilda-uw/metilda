@@ -1,10 +1,10 @@
 import * as React from "react";
-import "../GlobalStyling.css";
 import {ChangeEvent} from "react";
+import "../GlobalStyling.css";
 
 interface Props {
-    showPitchArtLines: boolean,
-    handleInputChange: (event: ChangeEvent) => void
+    showPitchArtLines: boolean;
+    handleInputChange: (event: ChangeEvent) => void;
 }
 
 class PitchArtLinesToggle extends React.Component<Props> {

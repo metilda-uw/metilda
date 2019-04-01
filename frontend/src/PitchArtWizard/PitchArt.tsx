@@ -1,26 +1,24 @@
 import * as React from "react";
-import './PitchArt.css';
-import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
-import {Letter} from "../types/types";
 import {createRef} from "react";
-
+import {Letter} from "../types/types";
+import "./PitchArt.css";
+import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 
 interface Props {
-    width: number,
-    height: number
-    minPitch: number
-    maxPitch: number
-    uploadId: string
-    manualPitchChange: (index: number, newPitch: number) => void,
-    maxPitchIndex: number
-    showAccentPitch: boolean
-    showSyllableText: boolean
-    showVerticallyCentered: boolean
-    showPitchArtLines: boolean
-    showLargeCircles: boolean
-    letters: Array<Letter>
+    width: number;
+    height: number;
+    minPitch: number;
+    maxPitch: number;
+    uploadId: string;
+    manualPitchChange: (index: number, newPitch: number) => void;
+    maxPitchIndex: number;
+    showAccentPitch: boolean;
+    showSyllableText: boolean;
+    showVerticallyCentered: boolean;
+    showPitchArtLines: boolean;
+    showLargeCircles: boolean;
+    letters: Letter[];
 }
-
 
 class PitchArt extends React.Component<Props> {
     private hiddenRef = createRef<PitchArtDrawingWindow>();
@@ -64,8 +62,8 @@ class PitchArt extends React.Component<Props> {
     }
 
     render() {
-        let visiblePitchArt = this.createPitchArt(true);
-        let hiddenPitchArt = this.createPitchArt(false);
+        const visiblePitchArt = this.createPitchArt(true);
+        const hiddenPitchArt = this.createPitchArt(false);
 
         return (
             <div>
@@ -88,7 +86,7 @@ class PitchArt extends React.Component<Props> {
                     </button>
                 </div>
             </div>
-        )
+        );
     }
 }
 

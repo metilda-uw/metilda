@@ -1,11 +1,11 @@
 import * as React from "react";
+import {ChangeEvent} from "react";
 import "../GlobalStyling.css";
 import "./PitchArtPrevPitchValueToggle.css";
-import {ChangeEvent} from "react";
 
 interface Props {
-    showPrevPitchValueLists: boolean,
-    handleInputChange: (event: ChangeEvent) => void
+    showPrevPitchValueLists: boolean;
+    handleInputChange: (event: ChangeEvent) => void;
 }
 
 class PitchArtPrevPitchValueToggle extends React.Component<Props> {

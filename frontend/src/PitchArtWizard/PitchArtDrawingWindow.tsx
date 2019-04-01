@@ -1,36 +1,36 @@
-import React, {createRef} from 'react';
-import './PitchArt.css';
-import {Circle, Group, Layer, Line, Rect, Stage, Text} from 'react-konva';
-import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale";
+import React, {createRef} from "react";
+import {Circle, Group, Layer, Line, Rect, Stage, Text} from "react-konva";
+import * as Tone from "tone";
+import {Encoding} from "tone";
 import {Letter} from "../types/types";
-import * as Tone from 'tone';
-import {Encoding} from 'tone';
-import UserPitchView from "./PitchArtViewer/UserPitchView";
-import {PitchArtWindowConfig, RawPitchValue} from "./PitchArtViewer/types";
+import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
+import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale";
+import {PitchArtWindowConfig, RawPitchValue} from "./PitchArtViewer/types";
+import UserPitchView from "./PitchArtViewer/UserPitchView";
 
 interface Props {
-    letters: Array<Letter>,
-    width: number,
-    height: number,
-    minPitch: number,
-    maxPitch: number,
-    maxPitchIndex: number,
-    fileName: string,
-    manualPitchChange: (index: number, newPitch: number) => void,
-    showDynamicContent: boolean,
-    showArtDesign: boolean,
-    showPitchArtLines: boolean,
-    showLargeCircles: boolean,
-    showVerticallyCentered: boolean,
-    showAccentPitch: boolean,
-    showSyllableText: boolean,
-    showPrevPitchValueLists: boolean,
-    rawPitchValueLists?: Array<Array<RawPitchValue>>
+    letters: Letter[];
+    width: number;
+    height: number;
+    minPitch: number;
+    maxPitch: number;
+    maxPitchIndex: number;
+    fileName: string;
+    manualPitchChange: (index: number, newPitch: number) => void;
+    showDynamicContent: boolean;
+    showArtDesign: boolean;
+    showPitchArtLines: boolean;
+    showLargeCircles: boolean;
+    showVerticallyCentered: boolean;
+    showAccentPitch: boolean;
+    showSyllableText: boolean;
+    showPrevPitchValueLists: boolean;
+    rawPitchValueLists?: RawPitchValue[][];
 }
 
 interface State {
-    activePlayIndex: number
+    activePlayIndex: number;
 }
 
 /**
@@ -91,54 +91,54 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
     saveImage() {
         // trip file extension from upload ID
-        let fileName = this.props.fileName.split(".")[0] + ".png";
+        const fileName = this.props.fileName.split(".")[0] + ".png";
 
         // follows example from:
         // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
         // @ts-ignore (TypeScript doesn't like the toDataURL call below, but it works fine)
-        let dataURL = this.stageRef.current!.getStage().toDataURL();
+        const dataURL = this.stageRef.current!.getStage().toDataURL();
         this.downloadRef.current!.href = dataURL;
         this.downloadRef.current!.download = fileName;
         this.downloadRef.current!.click();
     }
 
     playPitchArt() {
-        var env = new Tone.AmplitudeEnvelope({
-            "attack": 0.001,
-            "decay": 0.001,
-            "sustain": 0.001,
-            "release": 0.001
+        const env = new Tone.AmplitudeEnvelope({
+            attack: 0.001,
+            decay: 0.001,
+            sustain: 0.001,
+            release: 0.001
         }).toMaster();
 
-        var filter = new Tone.Filter({type: "highpass", frequency: 50, rolloff: -48}).toMaster();
+        const filter = new Tone.Filter({type: "highpass", frequency: 50, rolloff: -48}).toMaster();
 
-        //var synth = new window.Tone.Synth().toMaster().chain(filter, env);
-        var synth = new Tone.Synth().toMaster().chain(filter, env);
+        // var synth = new window.Tone.Synth().toMaster().chain(filter, env);
+        const synth = new Tone.Synth().toMaster().chain(filter, env);
 
-        let tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
-        let tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
+        const tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
+        const tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
 
         interface PitchArtNote {
-            time: number,
-            index: number,
-            duration: number,
-            pitch: number
+            time: number;
+            index: number;
+            duration: number;
+            pitch: number;
         }
 
-        let notes = this.props.letters.map(function (item, index) {
+        const notes = this.props.letters.map(function(item, index) {
                 return {
                     time: item.t0 - tStart,
                     duration: item.t1 - item.t0,
                     pitch: item.pitch,
-                    index: index
+                    index
                 } as PitchArtNote;
             }
         );
         notes.push({time: tEnd, duration: 1, pitch: 1, index: -1});
-        let controller = this;
+        const controller = this;
 
         // @ts-ignore
-        let midiPart = new Tone.Part(function (time: Encoding.Time, note: PitchArtNote) {
+        const midiPart = new Tone.Part(function(time: Encoding.Time, note: PitchArtNote) {
             controller.setState({activePlayIndex: note.index});
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
@@ -149,13 +149,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     playSound(pitch: number) {
-        let synth = new Tone.Synth().toMaster();
+        const synth = new Tone.Synth().toMaster();
         synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
     imageBoundaryClicked() {
-        let yPos = this.stageRef.current!.getStage().getPointerPosition().y;
-        let pitch = this.rectCoordsToVertValue(yPos);
+        const yPos = this.stageRef.current!.getStage().getPointerPosition().y;
+        const pitch = this.rectCoordsToVertValue(yPos);
         this.playSound(pitch);
     }
 
@@ -166,8 +166,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         rectCoordPerc = 1.0 - rectCoordPerc; // invert so 0.0 is lowest frequency and 1.0 is highest frequency
 
         // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
-        let pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
-        let rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
+        const pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
+        const rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
         let rectCoordPitch = exponentToNote(referenceExponent(this.props.minPitch) + rectCoordStepOffset);
 
         rectCoordPitch = Math.min(rectCoordPitch, this.props.maxPitch);
@@ -176,14 +176,14 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     accentedPoint(x: number, y: number) {
-        let accentedPoint =
+        const accentedPoint =
             <Circle x={x}
                     y={y}
                     fill={"#fcb040"}
                     radius={this.accentedCircleRadius}
             />;
 
-        let outlineCircles = [0, 1, 2].map(index =>
+        const outlineCircles = [0, 1, 2].map((index) =>
             <Circle key={index}
                     x={x}
                     y={y}
@@ -202,7 +202,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
 
     setPointerEnabled(isEnabled: boolean) {
         this.stageRef.current!.getStage().container().style.cursor
-            = isEnabled ? 'pointer' : 'default';
+            = isEnabled ? "pointer" : "default";
     }
 
     colorScheme(showArtDesign: boolean) {
@@ -270,8 +270,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         }
 
         return {
-            lineStrokeColor: lineStrokeColor,
-            praatDotFillColor: praatDotFillColor,
+            lineStrokeColor,
+            praatDotFillColor,
             activePlayColor: "#e8e82e",
             manualDotFillColor: "#af0008"
         };
@@ -282,43 +282,42 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             return;
         }
 
+        const lastIndex = this.props.rawPitchValueLists.length - 1;
+
         if (!this.props.showPrevPitchValueLists) {
-            let lastIndex = this.props.rawPitchValueLists.length - 1;
             return (
                 <UserPitchView pitchValues={this.props.rawPitchValueLists[lastIndex]}
                                windowConfig={windowConfig}
                                showVerticallyCentered={this.props.showVerticallyCentered}/>);
         }
 
-        const colors: {[key:number]: string} = {
+        const colors: {[key: number]: string} = {
             0: "#003489",
             1: "#008489",
             2: "#0d0d7c"
         };
 
-
-        let lastIndex = this.props.rawPitchValueLists.length - 1;
         return (
-            this.props.rawPitchValueLists.map((item: Array<RawPitchValue>, index) =>
+            this.props.rawPitchValueLists.map((item: RawPitchValue[], index) =>
                 <UserPitchView pitchValues={item}
                                key={"user-pitch-view-" + index}
                                windowConfig={windowConfig}
                                showVerticallyCentered={this.props.showVerticallyCentered}
-                               fillColor={index < lastIndex ? colors[index % Object.keys(colors).length]: undefined}
+                               fillColor={index < lastIndex ? colors[index % Object.keys(colors).length] : undefined}
                                opacity={index < lastIndex ? 0.2 : undefined}/>
             )
         );
     }
 
     render() {
-        let colorScheme = this.colorScheme(this.props.showArtDesign);
+        const colorScheme = this.colorScheme(this.props.showArtDesign);
 
-        let circleRadius = this.props.showLargeCircles ?
+        const circleRadius = this.props.showLargeCircles ?
             this.largeCircleRadius : this.smallCircleRadius;
 
-        let pitchValues: Array<RawPitchValue> = this.props.letters.filter(data => !data.isWordSep);
+        const pitchValues: RawPitchValue[] = this.props.letters.filter((data) => !data.isWordSep);
 
-        let windowConfig = {
+        const windowConfig = {
             innerHeight: this.innerHeight,
             innerWidth: this.innerWidth,
             y0: this.pointDy0,
@@ -326,18 +325,18 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             dMin: this.props.minPitch,
             dMax: this.props.maxPitch
         };
-        let coordConverter = new PitchArtCoordConverter(
+        const coordConverter = new PitchArtCoordConverter(
             windowConfig,
             pitchValues,
             this.props.showVerticallyCentered
         );
 
-        let points = [];
-        let pointPairs = [];
-        let lineCircles = [];
-        let controller = this;
-        let letterSyllables = [];
-        let lines = [];
+        const points = [];
+        const pointPairs = [];
+        const lineCircles = [];
+        const controller = this;
+        const letterSyllables = [];
+        const lines = [];
         let currLinePoints = [];
         for (let i = 0; i < this.props.letters.length; i++) {
             if (this.props.letters[i].isWordSep) {
@@ -354,15 +353,15 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 continue;
             }
 
-            let currPitch = this.props.letters[i].pitch;
-            let x = coordConverter.horzIndexToRectCoords(this.props.letters[i].t0);
-            let y = coordConverter.vertValueToRectCoords(this.props.letters[i].pitch);
+            const currPitch = this.props.letters[i].pitch;
+            const x = coordConverter.horzIndexToRectCoords(this.props.letters[i].t0);
+            const y = coordConverter.vertValueToRectCoords(this.props.letters[i].pitch);
 
             // The 'align' property is not working with the current version of
             // react-konva that's used. As a result, we're manually shifting
             // the text to be centered.
-            let konvaFontSizeAsPixels = this.fontSize * 0.65;
-            let text = this.props.letters[i].syllable;
+            const konvaFontSizeAsPixels = this.fontSize * 0.65;
+            const text = this.props.letters[i].syllable;
 
             letterSyllables.push(
                 <Text key={i}
@@ -409,13 +408,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                         onMouseLeave={() => this.setPointerEnabled(false)}
                         draggable={this.props.letters[i].isManualPitch}
                         dragDistance={5}
-                        dragBoundFunc={function (pos) {
+                        dragBoundFunc={function(pos) {
                             // @ts-ignore
                             if (!this.isDragging()) {
                                 return pos;
                             }
 
-                            let newPitch = controller.rectCoordsToVertValue(pos.y);
+                            const newPitch = controller.rectCoordsToVertValue(pos.y);
                             return {
                                 // @ts-ignore
                                 x: this.getAbsolutePosition().x,
@@ -423,9 +422,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             };
                         }
                         }
-                        onDragEnd={function () {
+                        onDragEnd={function() {
                             // @ts-ignore
-                            let newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
+                            const newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
                             controller.props.manualPitchChange(i, newPitch);
                         }
                         }/>);
@@ -441,7 +440,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             );
         }
 
-        var accentedPoint;
+        let accentedPoint;
 
         if (this.props.showAccentPitch
             && this.props.maxPitchIndex !== null
@@ -486,7 +485,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     Hidden Download Link
                 </a>
             </div>
-        )
+        );
     }
 }
 
