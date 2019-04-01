@@ -43,7 +43,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "prebuild": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
+    "pretest": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
