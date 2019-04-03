@@ -45,9 +45,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "pretest": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
+    "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "npm run tslint && react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

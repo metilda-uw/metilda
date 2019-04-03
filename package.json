@@ -1,5 +1,5 @@
 {
   "scripts": {
-    "heroku-prebuild": "cd frontend && npm ci && npm run build"
+    "heroku-prebuild": "cd frontend && npm ci && npm run build --verbose"
   }
 }
