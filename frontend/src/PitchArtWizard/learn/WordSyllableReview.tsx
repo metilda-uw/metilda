@@ -1,13 +1,13 @@
 import * as queryString from "query-string";
-import * as React from "react";
 import {ChangeEvent, createRef} from "react";
+import * as React from "react";
 import {RouteComponentProps} from "react-router";
 import Recorder from "recorder-js";
 import PlayerBar from "../AudioViewer/PlayerBar";
+import CreatePitchArt from "../CreatePitchArt";
 import "../GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
-import CreatePitchArt from "../CreatePitchArt";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
@@ -204,16 +204,6 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 
     render() {
-        let maxPitchIndex = -1;
-        if (this.state.words[this.state.activeWordIndex].letters.length > 1) {
-            const letters = this.state.words[this.state.activeWordIndex].letters;
-
-            if (!letters.some((item) => item.isWordSep)) {
-                const maxValue = Math.max(...letters.map((item) => item.pitch));
-                maxPitchIndex = letters.map((item) => item.pitch).indexOf(maxValue);
-            }
-        }
-
         return (
             <div>
                 <div className="metilda-page-header">
@@ -260,7 +250,6 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
                                         fileName={this.state.words[this.state.activeWordIndex].uploadId}
                                         manualPitchChange={(x, y) => (null)}
-                                        maxPitchIndex={maxPitchIndex}
                                         showAccentPitch={true}
                                         showSyllableText={true}
                                         showVerticallyCentered={true}

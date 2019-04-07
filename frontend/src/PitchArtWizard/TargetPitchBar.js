@@ -20,7 +20,7 @@ class TargetPitchBar extends Component {
     }
 
     resetAllLettersEvent() {
-        this.props.resetLetters();
+        this.props.resetLetters(this.props.speakerIndex);
     }
 
     timeCoordToImageCoord(t) {
@@ -45,7 +45,7 @@ class TargetPitchBar extends Component {
         // 0 is the left side of the selection interval and 1 is the right
         // side of the selection interval.
         let controller = this;
-        let intervalsInSelection = this.props.letters.map(function (item) {
+        let intervalsInSelection = this.props.speakers[this.props.speakerIndex].map(function (item) {
             item = Object.assign({}, item);
             let tooFarLeft = item.t1 < controller.props.minAudioTime;
             let tooFarRight = item.t0 > controller.props.maxAudioTime;
@@ -79,7 +79,7 @@ class TargetPitchBar extends Component {
     }
 
     removeLetterEvent() {
-        this.props.removeLetter(this.state.selectedIndex);
+        this.props.removeLetter(this.props.speakerIndex, this.state.selectedIndex);
         this.setState({selectedIndex: -1});
         this.props.targetPitchSelected(-1);
     }
@@ -104,7 +104,7 @@ class TargetPitchBar extends Component {
             }
         }
 
-        this.props.setLetterSyllable(this.state.selectedIndex, syllable);
+        this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
         this.setState({selectedIndex: -1});
         this.props.targetPitchSelected(-1);
     }
@@ -156,7 +156,7 @@ class TargetPitchBar extends Component {
                     <button className="btn waves-effect waves-light"
                             type="submit"
                             name="action"
-                            disabled={this.props.letters.length === 0}
+                            disabled={this.props.speakers[this.props.speakerIndex].length === 0}
                             onClick={this.resetAllLettersEvent}>
                         Reset
                     </button>
@@ -168,13 +168,13 @@ class TargetPitchBar extends Component {
 }
 
 const mapStateToProps = (state) => ({
-    letters: state.audio.letters
+    speakers: state.audio.speakers
 });
 
 const mapDispatchToProps = dispatch => ({
-    removeLetter: (index) => dispatch(removeLetter(index)),
-    resetLetters: () => dispatch(resetLetters()),
-    setLetterSyllable: (index, syllable) => dispatch(setLetterSyllable(index, syllable))
+    removeLetter: (speakerIndex, index) => dispatch(removeLetter(speakerIndex, index)),
+    resetLetters: (speakerIndex) => dispatch(resetLetters(speakerIndex)),
+    setLetterSyllable: (speakerIndex, index, syllable) => dispatch(setLetterSyllable(speakerIndex, index, syllable))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);

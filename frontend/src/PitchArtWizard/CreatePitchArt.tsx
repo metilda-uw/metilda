@@ -22,12 +22,11 @@ interface MatchParams  {
     uploadId: string;
 }
 export interface Props extends RouteComponentProps<MatchParams> {
-    letters: Letter[];
-    addLetter: (letter: Letter) => void;
-    setLetterPitch: (index: number, pitch: number) => void;
+    speakers: Letter[][];
+    addLetter: (speakerIndex: number, letter: Letter) => void;
+    setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
 interface State {
-    letters: Letter[];
     isAudioImageLoaded: boolean;
     soundLength: number;
     selectionInterval: string;
@@ -127,7 +126,6 @@ class CreatePitchArt extends React.Component<Props, State> {
 
         const {uploadId} = this.props.match.params;
         this.state = {
-            letters: [],
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
@@ -217,7 +215,8 @@ class CreatePitchArt extends React.Component<Props, State> {
 
     targetPitchSelected(index: number) {
         if (index !== -1) {
-            const letter = this.props.letters[index];
+            // TODO: Replace with appropriate speaker index
+            const letter = this.props.speakers[0][index];
             this.state.selectionCallback(letter.t0, letter.t1);
 
             const {uploadId} = this.props.match.params;
@@ -273,7 +272,8 @@ class CreatePitchArt extends React.Component<Props, State> {
             isWordSep,
         };
 
-        this.props.addLetter(newLetter);
+        // TODO: Replace with appropriate speaker index
+        this.props.addLetter(0, newLetter);
         this.state.closeImgSelectionCallback();
     }
 
@@ -351,7 +351,8 @@ class CreatePitchArt extends React.Component<Props, State> {
     }
 
     manualPitchChange(index: number, newPitch: number) {
-        this.props.setLetterPitch(index, newPitch);
+        // TODO: Replace with appropriate speaker index
+        this.props.setLetterPitch(0, index, newPitch);
     }
 
     manualPitchArtClicked() {
@@ -536,10 +537,7 @@ class CreatePitchArt extends React.Component<Props, State> {
                                         initMaxPitch={this.state.maxPitch}
                                         applyPitchRange={this.applyPitchRange}/>
                             <ExportMetildaTranscribe
-                                word={this.props.match.params.uploadId}
-                                disabled={this.props.letters.length === 0
-                                       || this.props.letters.filter((item) => !item.isWordSep)
-                                                            .some((item) => item.syllable === "X")}/>
+                                word={this.props.match.params.uploadId}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
@@ -594,18 +592,19 @@ class CreatePitchArt extends React.Component<Props, State> {
                                 <PlayerBar key={this.state.audioUrl}
                                            audioUrl={this.state.audioUrl}/>
 
-                                <TargetPitchBar letters={this.props.letters}
+                                <TargetPitchBar letters={this.props.speakers}
                                                 minAudioX={this.state.minAudioX}
                                                 maxAudioX={this.state.maxAudioX}
                                                 minAudioTime={this.state.minAudioTime}
                                                 maxAudioTime={this.state.maxAudioTime}
-                                                targetPitchSelected={this.targetPitchSelected}/>
+                                                targetPitchSelected={this.targetPitchSelected}
+                                                speakerIndex={0}/>
                             </div>
                         </div>
                     </div>
                     <div className="row">
                         <PitchArtContainer
-                            letters={this.props.letters}
+                            letters={this.props.speakers}
                             width={CreatePitchArt.AUDIO_IMG_WIDTH}
                             height={600}
                             minPitch={this.state.minPitch}
@@ -620,12 +619,13 @@ class CreatePitchArt extends React.Component<Props, State> {
 }
 
 const mapStateToProps = (state: AppState) => ({
-    letters: state.audio.letters,
+    speakers: state.audio.speakers,
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
-    addLetter: (newLetter: Letter) => dispatch(addLetter(newLetter)),
-    setLetterPitch: (index: number, newPitch: number) => dispatch(setLetterPitch(index, newPitch)),
+    addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
+        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CreatePitchArt);

@@ -3,21 +3,21 @@ import * as constants from "../../constants";
 import {AudioAnalysisState} from "../../store/audio/types";
 
 const defaultState: AudioAnalysisState = {
-    letters: []
+    speakers: [[]]
 };
 
 const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaultState, action) => {
     switch (action.type) {
         case constants.ADD_LETTER:
-            return {...state, letters: action.letters};
+            return {...state, speakers: action.speakers};
         case constants.REMOVE_LETTER:
-            return {...state, letters: action.letters};
+            return {...state, speakers: action.speakers};
         case constants.RESET_LETTERS:
-            return {...state, letters: action.letters};
+            return {...state, speakers: action.speakers};
         case constants.SET_LETTER_SYLLABLE:
-            return {...state, letters: action.letters};
+            return {...state, speakers: action.speakers};
         case constants.MANUAL_PITCH_ADJUST:
-            return {...state, letters: action.letters};
+            return {...state, speakers: action.speakers};
         default:
             return state;
     }

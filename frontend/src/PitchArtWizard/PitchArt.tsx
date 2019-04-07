@@ -11,7 +11,6 @@ interface Props {
     maxPitch: number;
     uploadId: string;
     manualPitchChange: (index: number, newPitch: number) => void;
-    maxPitchIndex: number;
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showVerticallyCentered: boolean;
@@ -51,7 +50,6 @@ class PitchArt extends React.Component<Props> {
                         maxPitch={this.props.maxPitch}
                         fileName={this.props.uploadId}
                         manualPitchChange={this.props.manualPitchChange}
-                        maxPitchIndex={this.props.maxPitchIndex}
                         showAccentPitch={this.props.showAccentPitch}
                         showSyllableText={this.props.showSyllableText}
                         showVerticallyCentered={this.props.showVerticallyCentered}

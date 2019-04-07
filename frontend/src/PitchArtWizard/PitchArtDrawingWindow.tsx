@@ -15,7 +15,6 @@ interface Props {
     height: number;
     minPitch: number;
     maxPitch: number;
-    maxPitchIndex: number;
     fileName: string;
     manualPitchChange: (index: number, newPitch: number) => void;
     showDynamicContent: boolean;

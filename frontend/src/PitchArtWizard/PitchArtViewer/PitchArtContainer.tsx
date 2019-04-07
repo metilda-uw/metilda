@@ -10,7 +10,7 @@ import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import SyllableToggle from "./SyllableToggle";
 
 interface Props {
-    letters: Letter[];
+    letters: Letter[][];
     width: number;
     height: number;
     minPitch: number;
@@ -58,8 +58,6 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     render() {
-        const sortedPitches = this.props.letters.map((item) => item.pitch);
-        const maxPitchIndex = sortedPitches.indexOf(Math.max(...sortedPitches));
         return (
             <div>
                 <div className="col s4">
@@ -89,13 +87,12 @@ class PitchArtContainer extends React.Component<Props, State> {
                               maxPitch={this.props.maxPitch}
                               uploadId={this.props.uploadId}
                               manualPitchChange={this.props.manualPitchChange}
-                              maxPitchIndex={maxPitchIndex}
                               showAccentPitch={this.state.showAccentPitch}
                               showSyllableText={this.state.showSyllableText}
                               showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
-                              letters={[this.props.letters]}/>
+                              letters={this.props.letters}/>
                 </div>
             </div>
         );
