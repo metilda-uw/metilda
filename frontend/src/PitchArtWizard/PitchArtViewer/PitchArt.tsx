@@ -1,6 +1,6 @@
 import * as React from "react";
 import {createRef} from "react";
-import {Letter} from "../types/types";
+import {Letter} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 

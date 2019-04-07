@@ -1,13 +1,13 @@
 import * as queryString from "query-string";
-import {ChangeEvent, createRef} from "react";
 import * as React from "react";
+import {ChangeEvent, createRef} from "react";
 import {RouteComponentProps} from "react-router";
 import Recorder from "recorder-js";
-import PlayerBar from "../AudioViewer/PlayerBar";
-import CreatePitchArt from "../CreatePitchArt";
-import "../GlobalStyling.css";
-import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
-import {RawPitchValue} from "../PitchArtViewer/types";
+import AudioAnalysis from "../Create/AudioAnalysis";
+import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
+import "../PitchArtWizard/GlobalStyling.css";
+import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
+import {RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
@@ -262,7 +262,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
                                 }
                                 {this.state.isLoadingPitchResults && spinner()}
-                                <PlayerBar audioUrl={CreatePitchArt.formatAudioUrl(
+                                <PlayerBar audioUrl={AudioAnalysis.formatAudioUrl(
                                     this.state.words[this.state.activeWordIndex].uploadId,
                                     this.minPitchArtTime(),
                                     this.maxPitchArtTime()

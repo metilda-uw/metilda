@@ -3,7 +3,7 @@ import React, {Component} from 'react';
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
 import * as ImgAreaSelect from '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
-import "./GlobalStyling.css";
+import "../PitchArtWizard/GlobalStyling.css";
 
 class AudioImg extends Component {
     state = {};

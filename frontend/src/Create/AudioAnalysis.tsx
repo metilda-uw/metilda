@@ -2,36 +2,36 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router";
 import {ThunkDispatch} from "redux-thunk";
+import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
+import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
+import "../PitchArtWizard/GlobalStyling.css";
+import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
 import {addLetter, setLetterPitch} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter} from "../types/types";
-import ExportMetildaTranscribe from "./AudioAnalysis/ExportMetildaTranscribe";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
-import PitchRange from "./AudioViewer/PitchRange";
-import PlayerBar from "./AudioViewer/PlayerBar";
-import "./GlobalStyling.css";
-import PitchArtContainer from "./PitchArtViewer/PitchArtContainer";
+import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
 
-interface MatchParams  {
-    uploadId: string;
-}
-export interface Props extends RouteComponentProps<MatchParams> {
+export interface Props extends RouteComponentProps {
+    speakerIndex: number;
     speakers: Letter[][];
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
+
 interface State {
     isAudioImageLoaded: boolean;
     soundLength: number;
     selectionInterval: string;
     maxPitch: number;
     minPitch: number;
+    uploadId: string;
     imageUrl: string;
     audioUrl: string;
     audioEditVersion: number;
@@ -46,7 +46,7 @@ interface State {
     selectionCallback: (t1: number, t2: number) => void;
 }
 
-class CreatePitchArt extends React.Component<Props, State> {
+class AudioAnalysis extends React.Component<Props, State> {
     /**
      * WARNING:
      * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
@@ -124,27 +124,27 @@ class CreatePitchArt extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        const {uploadId} = this.props.match.params;
         this.state = {
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
-            maxPitch: CreatePitchArt.DEFAULT_MAX_ANALYSIS_PITCH,
-            minPitch: CreatePitchArt.DEFAULT_MIN_ANALYSIS_PITCH,
-            imageUrl: CreatePitchArt.formatImageUrl(
-                uploadId,
-                CreatePitchArt.DEFAULT_MIN_ANALYSIS_PITCH,
-                CreatePitchArt.DEFAULT_MAX_ANALYSIS_PITCH),
-            audioUrl: CreatePitchArt.formatAudioUrl(uploadId),
+            maxPitch: AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
+            minPitch: AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
+            uploadId: "",
+            imageUrl: AudioAnalysis.formatImageUrl(
+                "",
+                AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
+                AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH),
+            audioUrl: AudioAnalysis.formatAudioUrl(""),
             audioEditVersion: 0,
             minSelectX: -1,
             maxSelectX: -1,
-            minAudioX: CreatePitchArt.MIN_IMAGE_XPERC * CreatePitchArt.AUDIO_IMG_WIDTH,
-            maxAudioX: CreatePitchArt.MAX_IMAGE_XPERC * CreatePitchArt.AUDIO_IMG_WIDTH,
+            minAudioX: AudioAnalysis.MIN_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
+            maxAudioX: AudioAnalysis.MAX_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
             minAudioTime: 0.0,
             maxAudioTime: -1.0,
-            audioImgWidth: (CreatePitchArt.MAX_IMAGE_XPERC - CreatePitchArt.MIN_IMAGE_XPERC)
-                * CreatePitchArt.AUDIO_IMG_WIDTH,
+            audioImgWidth: (AudioAnalysis.MAX_IMAGE_XPERC - AudioAnalysis.MIN_IMAGE_XPERC)
+                * AudioAnalysis.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null),
             selectionCallback: (t1, t2) => (null),
         };
@@ -167,27 +167,35 @@ class CreatePitchArt extends React.Component<Props, State> {
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
     }
 
-    componentDidMount() {
-        const {uploadId} = this.props.match.params;
-        if (uploadId) {
-            const controller = this;
-            const request: RequestInit = {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({uploadId}),
-            };
-            fetch("/api/sound-length/" + uploadId, request)
-                .then((response) => response.json())
-                .then(function(data: any) {
-                    controller.setState({
-                        soundLength: data.sound_length,
-                        maxAudioTime: data.sound_length,
-                    });
+    setUploadId = (uploadId: string) => {
+        const controller = this;
+        const request: RequestInit = {
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({uploadId}),
+        };
+
+        const imageUrl = AudioAnalysis.formatImageUrl(
+            uploadId,
+            this.state.minPitch,
+            this.state.maxPitch);
+
+        const audioUrl = AudioAnalysis.formatAudioUrl(uploadId);
+
+        fetch("/api/sound-length/" + uploadId, request)
+            .then((response) => response.json())
+            .then(function(data: any) {
+                controller.setState({
+                    uploadId,
+                    imageUrl,
+                    audioUrl,
+                    soundLength: data.sound_length,
+                    maxAudioTime: data.sound_length,
                 });
-        }
+            });
     }
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {
@@ -199,10 +207,8 @@ class CreatePitchArt extends React.Component<Props, State> {
             ts = [this.state.minAudioTime, this.state.maxAudioTime];
         }
 
-        const {uploadId} = this.props.match.params;
-
-        const newAudioUrl = CreatePitchArt.formatAudioUrl(
-            uploadId,
+        const newAudioUrl = AudioAnalysis.formatAudioUrl(
+            this.state.uploadId,
             ts[0],
             ts[1]);
 
@@ -215,13 +221,11 @@ class CreatePitchArt extends React.Component<Props, State> {
 
     targetPitchSelected(index: number) {
         if (index !== -1) {
-            // TODO: Replace with appropriate speaker index
-            const letter = this.props.speakers[0][index];
+            const letter = this.props.speakers[this.props.speakerIndex][index];
             this.state.selectionCallback(letter.t0, letter.t1);
 
-            const {uploadId} = this.props.match.params;
-            const newAudioUrl = CreatePitchArt.formatAudioUrl(
-                uploadId,
+            const newAudioUrl = AudioAnalysis.formatAudioUrl(
+                this.state.uploadId,
                 letter.t0,
                 letter.t1);
 
@@ -249,7 +253,7 @@ class CreatePitchArt extends React.Component<Props, State> {
         });
     }
 
-    addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean= false, isWordSep: boolean= false) {
+    addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false) {
         if (!isWordSep) {
             if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
                 // the pitch outside the bounds of the window, omit it
@@ -267,32 +271,30 @@ class CreatePitchArt extends React.Component<Props, State> {
             t0: ts[0],
             t1: ts[1],
             pitch,
-            syllable: CreatePitchArt.DEFAULT_SYLLABLE_TEXT,
+            syllable: AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
             isManualPitch,
             isWordSep,
         };
 
-        // TODO: Replace with appropriate speaker index
-        this.props.addLetter(0, newLetter);
+        this.props.addLetter(this.props.speakerIndex, newLetter);
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean= false) {
+    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean = false) {
         const ts = this.imageIntervalToTimeInterval(leftX, rightX);
 
-        const {uploadId} = this.props.match.params;
         if (manualPitch !== undefined) {
-            this.addPitch(manualPitch, CreatePitchArt.DEFAULT_SYLLABLE_TEXT, ts, true);
+            this.addPitch(manualPitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, true);
             return;
         }
 
         if (isWordSep) {
-            this.addPitch(-1, CreatePitchArt.DEFAULT_SEPARATOR_TEXT, ts, false, true);
+            this.addPitch(-1, AudioAnalysis.DEFAULT_SEPARATOR_TEXT, ts, false, true);
             return;
         }
 
         fetch("/api/avg-pitch/"
-            + uploadId
+            + this.state.uploadId
             + "?t0=" + ts[0]
             + "&t1=" + ts[1]
             + "&max-pitch=" + this.state.maxPitch
@@ -304,14 +306,13 @@ class CreatePitchArt extends React.Component<Props, State> {
             },
         })
             .then((response) => response.json())
-            .then((data) => this.addPitch(data.avg_pitch, CreatePitchArt.DEFAULT_SYLLABLE_TEXT, ts, false),
+            .then((data) => this.addPitch(data.avg_pitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, false),
             );
     }
 
     pitchArtRangeClicked() {
         const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
 
-        const {uploadId} = this.props.match.params;
         const json = {
             time_range: ts,
         };
@@ -319,7 +320,7 @@ class CreatePitchArt extends React.Component<Props, State> {
         type ApiResult = number[][];
 
         fetch("/api/all-pitches/"
-            + uploadId + "?max-pitch="
+            + this.state.uploadId + "?max-pitch="
             + this.state.maxPitch
             + "&min-pitch=" + this.state.minPitch, {
             method: "POST",
@@ -331,7 +332,7 @@ class CreatePitchArt extends React.Component<Props, State> {
         })
             .then((response) => response.json())
             .then((data) => (data as ApiResult).map((item) => this.addPitch(item[1],
-                CreatePitchArt.DEFAULT_SYLLABLE_TEXT,
+                AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
                 [item[0], item[0]])),
             );
     }
@@ -351,8 +352,7 @@ class CreatePitchArt extends React.Component<Props, State> {
     }
 
     manualPitchChange(index: number, newPitch: number) {
-        // TODO: Replace with appropriate speaker index
-        this.props.setLetterPitch(0, index, newPitch);
+        this.props.setLetterPitch(this.props.speakerIndex, index, newPitch);
     }
 
     manualPitchArtClicked() {
@@ -361,7 +361,7 @@ class CreatePitchArt extends React.Component<Props, State> {
 
         while (!isValidNumber) {
             const msg = `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz `
-                      + `and ${this.state.maxPitch.toFixed(2)}Hz`;
+                + `and ${this.state.maxPitch.toFixed(2)}Hz`;
 
             manualPitch = prompt(msg);
 
@@ -421,9 +421,8 @@ class CreatePitchArt extends React.Component<Props, State> {
     }
 
     applyPitchRange(minPitch: number, maxPitch: number) {
-        const {uploadId} = this.props.match.params;
-        const newUrl = CreatePitchArt.formatImageUrl(
-            uploadId,
+        const newUrl = AudioAnalysis.formatImageUrl(
+            this.state.uploadId,
             minPitch,
             maxPitch,
             this.state.minAudioTime,
@@ -435,22 +434,21 @@ class CreatePitchArt extends React.Component<Props, State> {
             imageUrl: newUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minPitch: minPitch || CreatePitchArt.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: maxPitch || CreatePitchArt.DEFAULT_MAX_ANALYSIS_PITCH,
+            minPitch: minPitch || AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: maxPitch || AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
         });
     }
 
     showAllClicked() {
-        const {uploadId} = this.props.match.params;
-        const newUrl = CreatePitchArt.formatImageUrl(
-            uploadId,
+        const newUrl = AudioAnalysis.formatImageUrl(
+            this.state.uploadId,
             this.state.minPitch,
             this.state.maxPitch,
             0,
             this.state.soundLength);
 
-        const newAudioUrl = CreatePitchArt.formatAudioUrl(
-            uploadId,
+        const newAudioUrl = AudioAnalysis.formatAudioUrl(
+            this.state.uploadId,
             0,
             this.state.soundLength);
 
@@ -483,9 +481,8 @@ class CreatePitchArt extends React.Component<Props, State> {
             this.state.minSelectX,
             this.state.maxSelectX);
 
-        const {uploadId} = this.props.match.params;
-        const newImageUrl = CreatePitchArt.formatImageUrl(
-            uploadId,
+        const newImageUrl = AudioAnalysis.formatImageUrl(
+            this.state.uploadId,
             this.state.minPitch,
             this.state.maxPitch,
             config.minAudioTime,
@@ -504,7 +501,7 @@ class CreatePitchArt extends React.Component<Props, State> {
     }
 
     render() {
-        const {uploadId} = this.props.match.params;
+        const uploadId = this.state.uploadId;
 
         let nonAudioImg;
         if (!uploadId) {
@@ -518,100 +515,78 @@ class CreatePitchArt extends React.Component<Props, State> {
         const isAllShown = this.state.minAudioTime === 0
             && this.state.maxAudioTime === this.state.soundLength;
 
-        let title = "";
-        if (this.props.match.params.uploadId) {
-            title = "- " + this.props.match.params.uploadId;
-        }
-
         return (
             <div>
-                <div className="metilda-page-header">
-                    <h5>Transcribe Audio {title}</h5>
-                </div>
-                <div className="metilda-page-content">
-                    <div className="row">
-                        <div className="metilda-audio-analysis-controls-list col s4">
-                            <h6 className="metilda-control-header">Audio Analysis</h6>
-                            <UploadAudio initFileName={uploadId}/>
-                            <PitchRange initMinPitch={this.state.minPitch}
-                                        initMaxPitch={this.state.maxPitch}
-                                        applyPitchRange={this.applyPitchRange}/>
-                            <ExportMetildaTranscribe
-                                word={this.props.match.params.uploadId}
-                                speakerIndex={0}/>
-                        </div>
-                        <div className="metilda-audio-analysis col s8">
-                            <div>
-                                <div className="metilda-audio-analysis-image-container">
-                                    {nonAudioImg}
-                                    {
-                                        uploadId ?
-                                            <AudioImg
-                                                key={this.state.audioEditVersion}
-                                                uploadId={uploadId}
-                                                src={this.state.imageUrl}
-                                                ref="audioImage"
-                                                imageWidth={CreatePitchArt.AUDIO_IMG_WIDTH}
-                                                xminPerc={CreatePitchArt.MIN_IMAGE_XPERC}
-                                                xmaxPerc={CreatePitchArt.MAX_IMAGE_XPERC}
-                                                audioIntervalSelected={this.audioIntervalSelected}
-                                                audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                                onAudioImageLoaded={this.onAudioImageLoaded}
-                                                minAudioX={this.state.minAudioX}
-                                                maxAudioX={this.state.maxAudioX}
-                                                minAudioTime={this.state.minAudioTime}
-                                                maxAudioTime={this.state.maxAudioTime}/>
-                                            : []
-                                    }
-                                </div>
-                                <div id="metilda-audio-function-btns">
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.showAllClicked}
-                                            disabled={isAllShown}>All
-                                    </button>
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.selectionIntervalClicked}
-                                            disabled={!isSelectionActive}>Sel
-                                    </button>
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.pitchArtRangeClicked}
-                                            disabled={!isSelectionActive}>Range Pitch
-                                    </button>
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.averagePitchArtClicked}
-                                            disabled={!isSelectionActive}>Average Pitch
-                                    </button>
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.manualPitchArtClicked}
-                                            disabled={!isSelectionActive}>Manual Pitch
-                                    </button>
-                                    <button className="waves-effect waves-light btn"
-                                            onClick={this.wordSplitClicked}
-                                            disabled={!isSelectionActive}>Split
-                                    </button>
-                                </div>
-                                <PlayerBar key={this.state.audioUrl}
-                                           audioUrl={this.state.audioUrl}/>
-
-                                <TargetPitchBar letters={this.props.speakers}
-                                                minAudioX={this.state.minAudioX}
-                                                maxAudioX={this.state.maxAudioX}
-                                                minAudioTime={this.state.minAudioTime}
-                                                maxAudioTime={this.state.maxAudioTime}
-                                                targetPitchSelected={this.targetPitchSelected}
-                                                speakerIndex={0}/>
-                            </div>
-                        </div>
+                <div className="row">
+                    <div className="metilda-audio-analysis-controls-list col s4">
+                        <h6 className="metilda-control-header">Audio Analysis</h6>
+                        <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}/>
+                        <PitchRange initMinPitch={this.state.minPitch}
+                                    initMaxPitch={this.state.maxPitch}
+                                    applyPitchRange={this.applyPitchRange}/>
+                        <ExportMetildaTranscribe
+                            word={uploadId}
+                            speakerIndex={this.props.speakerIndex}/>
                     </div>
-                    <div className="row">
-                        <PitchArtContainer
-                            letters={this.props.speakers}
-                            width={CreatePitchArt.AUDIO_IMG_WIDTH}
-                            height={600}
-                            minPitch={this.state.minPitch}
-                            maxPitch={this.state.maxPitch}
-                            manualPitchChange={this.manualPitchChange}
-                            uploadId={uploadId}/>
+                    <div className="metilda-audio-analysis col s8">
+                        <div>
+                            <div className="metilda-audio-analysis-image-container">
+                                {nonAudioImg}
+                                {
+                                    uploadId ?
+                                        <AudioImg
+                                            key={this.state.audioEditVersion}
+                                            uploadId={uploadId}
+                                            src={this.state.imageUrl}
+                                            ref="audioImage"
+                                            imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
+                                            xminPerc={AudioAnalysis.MIN_IMAGE_XPERC}
+                                            xmaxPerc={AudioAnalysis.MAX_IMAGE_XPERC}
+                                            audioIntervalSelected={this.audioIntervalSelected}
+                                            audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                                            onAudioImageLoaded={this.onAudioImageLoaded}
+                                            minAudioX={this.state.minAudioX}
+                                            maxAudioX={this.state.maxAudioX}
+                                            minAudioTime={this.state.minAudioTime}
+                                            maxAudioTime={this.state.maxAudioTime}/>
+                                        : []
+                                }
+                            </div>
+                            <div id="metilda-audio-function-btns">
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.showAllClicked}
+                                        disabled={isAllShown}>All
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.selectionIntervalClicked}
+                                        disabled={!isSelectionActive}>Sel
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.pitchArtRangeClicked}
+                                        disabled={!isSelectionActive}>Range Pitch
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.averagePitchArtClicked}
+                                        disabled={!isSelectionActive}>Average Pitch
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.manualPitchArtClicked}
+                                        disabled={!isSelectionActive}>Manual Pitch
+                                </button>
+                                <button className="waves-effect waves-light btn"
+                                        onClick={this.wordSplitClicked}
+                                        disabled={!isSelectionActive}>Split
+                                </button>
+                            </div>
+                            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
+                            <TargetPitchBar letters={this.props.speakers}
+                                            minAudioX={this.state.minAudioX}
+                                            maxAudioX={this.state.maxAudioX}
+                                            minAudioTime={this.state.minAudioTime}
+                                            maxAudioTime={this.state.maxAudioTime}
+                                            targetPitchSelected={this.targetPitchSelected}
+                                            speakerIndex={this.props.speakerIndex}/>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -629,4 +604,4 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreatePitchArt);
+export default connect(mapStateToProps, mapDispatchToProps)(AudioAnalysis);

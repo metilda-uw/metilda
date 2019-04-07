@@ -3,11 +3,11 @@ import moment from "moment";
 import * as React from "react";
 import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router-dom";
-import {AppState} from "../../store";
-import {Letter} from "../../types/types";
-import "../CreatePitchArt.css";
-import "../GlobalStyling.css";
-import {MetildaWord} from "../learn/types";
+import "../PitchArtWizard/GlobalStyling.css";
+import {MetildaWord} from "../Learn/types";
+import {AppState} from "../store/index";
+import {Letter} from "../types/types";
+import "./CreatePitchArt.css";
 import "./ExportMetildaTranscribe.css";
 
 interface Props extends RouteComponentProps {

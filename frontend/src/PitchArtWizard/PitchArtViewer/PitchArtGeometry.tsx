@@ -1,8 +1,8 @@
 import React from "react";
 import {Circle, Group, Layer, Line, Text} from "react-konva";
 import {Letter} from "../../types/types";
-import {ColorScheme} from "../PitchArtDrawingWindow";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import {ColorScheme} from "./PitchArtDrawingWindow";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 interface Props {
@@ -35,7 +35,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         super(props);
     }
 
-    renderLayer = (letters: Letter[]) => {
+    renderLayer = (letters: Letter[], layerIndex: number) => {
         const pitches = letters.map((item) => item.pitch);
         const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
 
@@ -169,7 +169,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         }
 
         return (
-            <Layer>
+            <Layer key={layerIndex}>
                 {accentedPoint}
                 {
                     this.props.showPitchArtLines ? lines : []
@@ -209,7 +209,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         return (
             <React.Fragment>
                 {
-                    this.props.letters.map((item) => this.renderLayer(item))
+                    this.props.letters.map((item, index) => this.renderLayer(item, index))
                 }
             </React.Fragment>
         );

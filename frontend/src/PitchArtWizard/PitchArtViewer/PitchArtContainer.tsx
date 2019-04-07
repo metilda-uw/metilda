@@ -1,8 +1,8 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Letter} from "../../types/types";
-import PitchArt from "../PitchArt";
 import AccentPitchToggle from "./AccentPitchToggle";
+import PitchArt from "./PitchArt";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import "./PitchArtContainer.css";

@@ -2,12 +2,12 @@ import React, {createRef} from "react";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
-import {Letter} from "../types/types";
+import {Letter} from "../../types/types";
 import "./PitchArt.css";
-import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
-import PitchArtGeometry from "./PitchArtViewer/PitchArtGeometry";
-import {PitchArtWindowConfig, RawPitchValue} from "./PitchArtViewer/types";
-import UserPitchView from "./PitchArtViewer/UserPitchView";
+import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import PitchArtGeometry from "./PitchArtGeometry";
+import {PitchArtWindowConfig, RawPitchValue} from "./types";
+import UserPitchView from "./UserPitchView";
 
 interface Props {
     letters: Letter[][];

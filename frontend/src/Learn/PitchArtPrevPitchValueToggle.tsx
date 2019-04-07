@@ -1,6 +1,6 @@
 import * as React from "react";
 import {ChangeEvent} from "react";
-import "../GlobalStyling.css";
+import "../PitchArtWizard/GlobalStyling.css";
 import "./PitchArtPrevPitchValueToggle.css";
 
 interface Props {
