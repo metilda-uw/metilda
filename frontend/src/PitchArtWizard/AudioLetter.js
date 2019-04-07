@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import styles from "./TranscribeAudio.css";
+import styles from "./CreatePitchArt.css";
 
 class AudioLetter extends Component {
   state = {};

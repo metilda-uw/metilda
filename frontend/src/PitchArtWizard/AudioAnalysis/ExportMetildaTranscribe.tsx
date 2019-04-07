@@ -7,7 +7,7 @@ import {AppState} from "../../store";
 import {Letter} from "../../types/types";
 import "../GlobalStyling.css";
 import {MetildaWord} from "../learn/types";
-import "../TranscribeAudio.css";
+import "../CreatePitchArt.css";
 import "./ExportMetildaTranscribe.css";
 
 interface Props extends RouteComponentProps {

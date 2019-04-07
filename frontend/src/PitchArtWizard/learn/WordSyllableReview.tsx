@@ -7,7 +7,7 @@ import PlayerBar from "../AudioViewer/PlayerBar";
 import "../GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtViewer/types";
-import TranscribeAudio from "../TranscribeAudio";
+import CreatePitchArt from "../CreatePitchArt";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
@@ -273,7 +273,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
                                 }
                                 {this.state.isLoadingPitchResults && spinner()}
-                                <PlayerBar audioUrl={TranscribeAudio.formatAudioUrl(
+                                <PlayerBar audioUrl={CreatePitchArt.formatAudioUrl(
                                     this.state.words[this.state.activeWordIndex].uploadId,
                                     this.minPitchArtTime(),
                                     this.maxPitchArtTime()
