@@ -15,6 +15,7 @@ class AudioImg extends Component {
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
+        this.metildaAudioAnalysisImageRef = React.createRef();
     }
 
     timeCoordToImageCoord(t) {
@@ -43,7 +44,7 @@ class AudioImg extends Component {
         let audioImage = this;
         let cropAreaLeftX;
         let cropAreaRightX;
-        let $el = $("#metilda-audio-analysis-image");
+        let $el = $(this.metildaAudioAnalysisImageRef.current);
         let imgBox = {xminPerc, xmaxPerc};
         let prevMaxWidth;
         let isProgrammaticSelection = false;
@@ -138,6 +139,7 @@ class AudioImg extends Component {
         const {src} = this.props;
         return (
             <img id="metilda-audio-analysis-image"
+                 ref={this.metildaAudioAnalysisImageRef}
                  className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
                  src={src}/>
         );
