@@ -267,7 +267,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showPitchArtLines={true}
                                         showLargeCircles={true}
                                         showPrevPitchValueLists={this.state.showPrevPitchValueLists}
-                                        letters={this.state.words[this.state.activeWordIndex].letters}
+                                        letters={[this.state.words[this.state.activeWordIndex].letters]}
                                         rawPitchValueLists={this.state.userPitchValueLists}
                                     />
 

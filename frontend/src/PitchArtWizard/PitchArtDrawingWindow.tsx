@@ -1,16 +1,16 @@
 import React, {createRef} from "react";
-import {Circle, Group, Layer, Line, Rect, Stage, Text} from "react-konva";
+import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
 import {Letter} from "../types/types";
 import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtViewer/PitchArtCoordConverter";
-import {exponentToNote, referenceExponent} from "./PitchArtViewer/PitchArtScale";
+import PitchArtGeometry from "./PitchArtViewer/PitchArtGeometry";
 import {PitchArtWindowConfig, RawPitchValue} from "./PitchArtViewer/types";
 import UserPitchView from "./PitchArtViewer/UserPitchView";
 
 interface Props {
-    letters: Letter[];
+    letters: Letter[][];
     width: number;
     height: number;
     minPitch: number;
@@ -31,6 +31,13 @@ interface Props {
 
 interface State {
     activePlayIndex: number;
+}
+
+export interface ColorScheme {
+    lineStrokeColor: string;
+    praatDotFillColor: string;
+    activePlayColor: string;
+    manualDotFillColor: string;
 }
 
 /**
@@ -62,14 +69,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         this.state = {
             activePlayIndex: -1
         };
-        this.accentedPoint = this.accentedPoint.bind(this);
         this.saveImage = this.saveImage.bind(this);
         this.playPitchArt = this.playPitchArt.bind(this);
         this.playSound = this.playSound.bind(this);
         this.imageBoundaryClicked = this.imageBoundaryClicked.bind(this);
-        this.rectCoordsToVertValue = this.rectCoordsToVertValue.bind(this);
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
-        this.colorScheme = this.colorScheme.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
         this.innerHeight = this.props.height * 0.90;
@@ -103,6 +107,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     playPitchArt() {
+        if (this.props.letters.length !== 1) {
+            return;
+        }
+
+        const letters = this.props.letters[0];
         const env = new Tone.AmplitudeEnvelope({
             attack: 0.001,
             decay: 0.001,
@@ -115,8 +124,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         // var synth = new window.Tone.Synth().toMaster().chain(filter, env);
         const synth = new Tone.Synth().toMaster().chain(filter, env);
 
-        const tStart = this.props.letters.length > 0 ? this.props.letters[0].t0 : 0;
-        const tEnd = this.props.letters.length > 0 ? this.props.letters[this.props.letters.length - 1].t1 : 0;
+        const tStart = letters.length > 0 ? letters[0].t0 : 0;
+        const tEnd = letters.length > 0 ? letters[letters.length - 1].t1 : 0;
 
         interface PitchArtNote {
             time: number;
@@ -125,7 +134,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             pitch: number;
         }
 
-        const notes = this.props.letters.map(function(item, index) {
+        const notes = letters.map(function(item, index) {
                 return {
                     time: item.t0 - tStart,
                     duration: item.t1 - item.t0,
@@ -153,128 +162,15 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
-    imageBoundaryClicked() {
+    imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {
         const yPos = this.stageRef.current!.getStage().getPointerPosition().y;
-        const pitch = this.rectCoordsToVertValue(yPos);
+        const pitch = coordConverter.rectCoordsToVertValue(yPos);
         this.playSound(pitch);
-    }
-
-    rectCoordsToVertValue(rectCoord: number) {
-        let rectCoordPerc = (rectCoord - this.pointDy0) / (this.innerHeight - this.pointDy0);
-        rectCoordPerc = Math.min(rectCoordPerc, 1.0);
-        rectCoordPerc = Math.max(rectCoordPerc, 0.0);
-        rectCoordPerc = 1.0 - rectCoordPerc; // invert so 0.0 is lowest frequency and 1.0 is highest frequency
-
-        // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
-        const pitchIntervalSteps = referenceExponent(this.props.maxPitch) - referenceExponent(this.props.minPitch);
-        const rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
-        let rectCoordPitch = exponentToNote(referenceExponent(this.props.minPitch) + rectCoordStepOffset);
-
-        rectCoordPitch = Math.min(rectCoordPitch, this.props.maxPitch);
-        rectCoordPitch = Math.max(rectCoordPitch, this.props.minPitch);
-        return rectCoordPitch;
-    }
-
-    accentedPoint(x: number, y: number) {
-        const accentedPoint =
-            <Circle x={x}
-                    y={y}
-                    fill={"#fcb040"}
-                    radius={this.accentedCircleRadius}
-            />;
-
-        const outlineCircles = [0, 1, 2].map((index) =>
-            <Circle key={index}
-                    x={x}
-                    y={y}
-                    stroke={"#e38748"}
-                    radius={this.accentedCircleRadius + index * 8}
-            />
-        );
-
-        return (
-            <Group>
-                {accentedPoint}
-                {outlineCircles}
-            </Group>
-        );
     }
 
     setPointerEnabled(isEnabled: boolean) {
         this.stageRef.current!.getStage().container().style.cursor
             = isEnabled ? "pointer" : "default";
-    }
-
-    colorScheme(showArtDesign: boolean) {
-        if (!showArtDesign) {
-            return {
-                lineStrokeColor: "#497dba",
-                praatDotFillColor: "#497dba",
-                activePlayColor: "#e8e82e",
-                manualDotFillColor: "#af0008"
-            };
-        }
-
-        let lineStrokeColor = null;
-        let praatDotFillColor = null;
-
-        // determine color scheme
-        switch (this.props.letters.length) {
-            case 2:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        lineStrokeColor = "#272264";
-                        praatDotFillColor = "#0ba14a";
-                        break;
-                    case 1:
-                        lineStrokeColor = "#71002b";
-                        praatDotFillColor = "#2e3192";
-                        break;
-                }
-                break;
-            case 3:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        lineStrokeColor = "#92278f";
-                        praatDotFillColor = "#000000";
-                        break;
-                    case 1:
-                        lineStrokeColor = "#056839";
-                        praatDotFillColor = "#be72b0";
-                        break;
-                    case 2:
-                    default:
-                        lineStrokeColor = "#5b4a42";
-                        praatDotFillColor = "#166e92";
-                }
-                break;
-            case 4:
-                switch (this.props.maxPitchIndex) {
-                    case 0:
-                        lineStrokeColor = "#f1592a";
-                        praatDotFillColor = "#12a89d";
-                        break;
-                    case 1:
-                        lineStrokeColor = "#283890";
-                        praatDotFillColor = "#8cc63e";
-                        break;
-                    case 2:
-                    default:
-                        lineStrokeColor = "#9e1f62";
-                        praatDotFillColor = "#f7941d";
-                }
-                break;
-            default:
-                lineStrokeColor = "black";
-                praatDotFillColor = "black";
-        }
-
-        return {
-            lineStrokeColor,
-            praatDotFillColor,
-            activePlayColor: "#e8e82e",
-            manualDotFillColor: "#af0008"
-        };
     }
 
     maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
@@ -291,7 +187,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                                showVerticallyCentered={this.props.showVerticallyCentered}/>);
         }
 
-        const colors: {[key: number]: string} = {
+        const colors: { [key: number]: string } = {
             0: "#003489",
             1: "#008489",
             2: "#0d0d7c"
@@ -309,14 +205,80 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         );
     }
 
+    colorScheme = (showArtDesign: boolean, letters: Letter[][]): ColorScheme => {
+        if (!showArtDesign || letters.length !== 1) {
+            return {
+                lineStrokeColor: "#497dba",
+                praatDotFillColor: "#497dba",
+                activePlayColor: "#e8e82e",
+                manualDotFillColor: "#af0008"
+            };
+        }
+
+        let lineStrokeColor = "black";
+        let praatDotFillColor = "black";
+
+        const numLetters = letters[0].length;
+        const pitches = letters[0].map((item) => item.pitch);
+        const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
+
+        // determine color scheme
+        switch (numLetters) {
+            case 2:
+                switch (maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#272264";
+                        praatDotFillColor = "#0ba14a";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#71002b";
+                        praatDotFillColor = "#2e3192";
+                        break;
+                }
+                break;
+            case 3:
+                switch (maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#92278f";
+                        praatDotFillColor = "#000000";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#056839";
+                        praatDotFillColor = "#be72b0";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#5b4a42";
+                        praatDotFillColor = "#166e92";
+                }
+                break;
+            case 4:
+                switch (maxPitchIndex) {
+                    case 0:
+                        lineStrokeColor = "#f1592a";
+                        praatDotFillColor = "#12a89d";
+                        break;
+                    case 1:
+                        lineStrokeColor = "#283890";
+                        praatDotFillColor = "#8cc63e";
+                        break;
+                    case 2:
+                    default:
+                        lineStrokeColor = "#9e1f62";
+                        praatDotFillColor = "#f7941d";
+                }
+                break;
+        }
+
+        return {
+            lineStrokeColor,
+            praatDotFillColor,
+            activePlayColor: "#e8e82e",
+            manualDotFillColor: "#af0008"
+        };
+    }
+
     render() {
-        const colorScheme = this.colorScheme(this.props.showArtDesign);
-
-        const circleRadius = this.props.showLargeCircles ?
-            this.largeCircleRadius : this.smallCircleRadius;
-
-        const pitchValues: RawPitchValue[] = this.props.letters.filter((data) => !data.isWordSep);
-
         const windowConfig = {
             innerHeight: this.innerHeight,
             innerWidth: this.innerWidth,
@@ -325,130 +287,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             dMin: this.props.minPitch,
             dMax: this.props.maxPitch
         };
-        const coordConverter = new PitchArtCoordConverter(
-            windowConfig,
-            pitchValues,
-            this.props.showVerticallyCentered
-        );
 
-        const points = [];
-        const pointPairs = [];
-        const lineCircles = [];
-        const controller = this;
-        const letterSyllables = [];
-        const lines = [];
-        let currLinePoints = [];
-        for (let i = 0; i < this.props.letters.length; i++) {
-            if (this.props.letters[i].isWordSep) {
-                if (currLinePoints.length > 0) {
-                    lines.push(
-                        <Line key={i + "_pa_line"}
-                              points={currLinePoints}
-                              strokeWidth={this.graphWidth}
-                            // @ts-ignore
-                              stroke={colorScheme.lineStrokeColor}/>
-                    );
-                    currLinePoints = [];
-                }
-                continue;
-            }
-
-            const currPitch = this.props.letters[i].pitch;
-            const x = coordConverter.horzIndexToRectCoords(this.props.letters[i].t0);
-            const y = coordConverter.vertValueToRectCoords(this.props.letters[i].pitch);
-
-            // The 'align' property is not working with the current version of
-            // react-konva that's used. As a result, we're manually shifting
-            // the text to be centered.
-            const konvaFontSizeAsPixels = this.fontSize * 0.65;
-            const text = this.props.letters[i].syllable;
-
-            letterSyllables.push(
-                <Text key={i}
-                      x={x - (konvaFontSizeAsPixels * text.length / 2.0)}
-                      y={y + circleRadius * 1.9}  // position text below the pitch circle
-                      fontSize={this.fontSize}
-                      text={text}/>
-            );
-
-            let circleFill = colorScheme.praatDotFillColor;
-            let circleStroke = colorScheme.lineStrokeColor;
-
-            if (this.props.showDynamicContent) {
-                if (this.state.activePlayIndex === i) {
-                    circleFill = colorScheme.activePlayColor;
-                    circleStroke = colorScheme.activePlayColor;
-                } else if (this.props.letters[i].isManualPitch) {
-                    circleFill = colorScheme.manualDotFillColor;
-                    circleStroke = colorScheme.manualDotFillColor;
-                } else {
-                    circleFill = colorScheme.praatDotFillColor;
-                    circleStroke = colorScheme.lineStrokeColor;
-                }
-            }
-
-            points.push(x);
-            points.push(y);
-            currLinePoints.push(x);
-            currLinePoints.push(y);
-            pointPairs.push([x, y]);
-            lineCircles.push(
-                // @ts-ignore
-                <Circle key={i + circleFill + circleStroke}
-                        x={x}
-                        y={y}
-                    // @ts-ignore
-                        fill={circleFill}
-                    // @ts-ignore
-                        stroke={circleStroke}
-                        strokeWidth={this.circleStrokeWidth}
-                        radius={circleRadius}
-                        onClick={() => this.playSound(currPitch)}
-                        onMouseEnter={() => this.setPointerEnabled(true)}
-                        onMouseLeave={() => this.setPointerEnabled(false)}
-                        draggable={this.props.letters[i].isManualPitch}
-                        dragDistance={5}
-                        dragBoundFunc={function(pos) {
-                            // @ts-ignore
-                            if (!this.isDragging()) {
-                                return pos;
-                            }
-
-                            const newPitch = controller.rectCoordsToVertValue(pos.y);
-                            return {
-                                // @ts-ignore
-                                x: this.getAbsolutePosition().x,
-                                y: coordConverter.vertValueToRectCoords(newPitch)
-                            };
-                        }
-                        }
-                        onDragEnd={function() {
-                            // @ts-ignore
-                            const newPitch = controller.rectCoordsToVertValue(this.getPosition().y);
-                            controller.props.manualPitchChange(i, newPitch);
-                        }
-                        }/>);
-        }
-
-        if (currLinePoints.length > 0) {
-            lines.push(
-                <Line key={"last_pa_line"}
-                      points={currLinePoints}
-                      strokeWidth={this.graphWidth}
-                    // @ts-ignore
-                      stroke={colorScheme.lineStrokeColor}/>
-            );
-        }
-
-        let accentedPoint;
-
-        if (this.props.showAccentPitch
-            && this.props.maxPitchIndex !== null
-            && pointPairs.length >= 1) {
-            accentedPoint = this.accentedPoint(
-                pointPairs[this.props.maxPitchIndex][0],
-                pointPairs[this.props.maxPitchIndex][1]);
-        }
+        const colorScheme = this.colorScheme(this.props.showArtDesign, this.props.letters);
+        const coordConverter = new PitchArtCoordConverter(windowConfig);
 
         return (
             <div>
@@ -463,22 +304,34 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                            // @ts-ignore
                               stroke={colorScheme.lineStrokeColor}
-                              onClick={this.imageBoundaryClicked}
+                              onClick={() => this.imageBoundaryClicked(coordConverter)}
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
-                        {accentedPoint}
                     </Layer>
-                    <Layer>
-                        {
-                            this.props.showPitchArtLines ? lines : []
-                        }
-                        {lineCircles}
-                    </Layer>
-                    <Layer>
-                        {this.props.showSyllableText ? letterSyllables : []}
-                    </Layer>
+                    <PitchArtGeometry letters={this.props.letters}
+                                      windowConfig={windowConfig}
+                                      manualPitchChange={this.props.manualPitchChange}
+                                      colorScheme={colorScheme}
+                                      playSound={this.playSound}
+                                      activePlayIndex={
+                                          this.props.letters.length === 1 ? this.state.activePlayIndex : -1}
+                                      showDynamicContent={this.props.showDynamicContent}
+                                      showArtDesign={this.props.showArtDesign}
+                                      showPitchArtLines={this.props.showPitchArtLines}
+                                      showLargeCircles={this.props.showLargeCircles}
+                                      showVerticallyCentered={this.props.showVerticallyCentered}
+                                      showAccentPitch={this.props.showAccentPitch}
+                                      showSyllableText={this.props.showSyllableText}
+                                      showPrevPitchValueLists={this.props.showPrevPitchValueLists}
+                                      largeCircleRadius={this.largeCircleRadius}
+                                      smallCircleRadius={this.smallCircleRadius}
+                                      graphWidth={this.graphWidth}
+                                      fontSize={this.fontSize}
+                                      circleStrokeWidth={this.circleStrokeWidth}
+                                      pitchArtSoundLengthSeconds={this.pitchArtSoundLengthSeconds}
+                                      accentedCircleRadius={this.accentedCircleRadius}
+                                      setPointerEnabled={this.setPointerEnabled} />
                     {this.maybeUserPitchView(windowConfig)}
                 </Stage>
                 <a className="hide" ref={this.downloadRef}>

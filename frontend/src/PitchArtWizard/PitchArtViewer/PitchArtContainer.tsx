@@ -95,7 +95,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
-                              letters={this.props.letters}/>
+                              letters={[this.props.letters]}/>
                 </div>
             </div>
         );

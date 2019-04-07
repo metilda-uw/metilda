@@ -17,7 +17,7 @@ interface Props {
     showVerticallyCentered: boolean;
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
-    letters: Letter[];
+    letters: Letter[][];
 }
 
 class PitchArt extends React.Component<Props> {
@@ -75,7 +75,7 @@ class PitchArt extends React.Component<Props> {
                 </div>
                 <div id="metilda-pitch-art-btn-container">
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                            disabled={this.props.letters.length === 0}
+                            disabled={this.props.letters.length !== 1 || this.props.letters[0].length === 0}
                             onClick={this.playPitchArt}>
                         Play Tones
                     </button>
