@@ -1,6 +1,6 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 import AccentPitchToggle from "./AccentPitchToggle";
 import PitchArt from "./PitchArt";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
@@ -10,7 +10,7 @@ import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import SyllableToggle from "./SyllableToggle";
 
 interface Props {
-    letters: Letter[][];
+    speakers: Speaker[];
     width: number;
     height: number;
     minPitch: number;
@@ -92,7 +92,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
-                              letters={this.props.letters}/>
+                              speakers={this.props.speakers}/>
                 </div>
             </div>
         );

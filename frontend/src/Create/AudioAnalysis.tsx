@@ -6,9 +6,9 @@ import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store";
-import {addLetter, addSpeaker, removeSpeaker, setLetterPitch} from "../store/audio/actions";
+import {addLetter, addSpeaker, removeSpeaker, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
-import {Letter} from "../types/types";
+import {Letter, Speaker} from "../types/types";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
@@ -20,9 +20,10 @@ import "./UploadAudio.css";
 
 export interface Props extends RouteComponentProps {
     speakerIndex: number;
-    speakers: Letter[][];
+    speakers: Speaker[];
     addSpeaker: () => void;
     removeSpeaker: (speakerIndex: number) => void;
+    setUploadId: (speakerIndex: number, uploadId: string) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
@@ -33,7 +34,6 @@ interface State {
     selectionInterval: string;
     maxPitch: number;
     minPitch: number;
-    uploadId: string;
     imageUrl: string;
     audioUrl: string;
     audioEditVersion: number;
@@ -132,7 +132,6 @@ class AudioAnalysis extends React.Component<Props, State> {
             selectionInterval: "Letter",
             maxPitch: AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
             minPitch: AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
-            uploadId: "",
             imageUrl: AudioAnalysis.formatImageUrl(
                 "",
                 AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
@@ -169,7 +168,16 @@ class AudioAnalysis extends React.Component<Props, State> {
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
     }
 
-    setUploadId = (uploadId: string) => {
+    getSpeaker = (): Speaker => {
+        return this.props.speakers[this.props.speakerIndex];
+    }
+
+    componentDidMount() {
+        const uploadId = this.getSpeaker().uploadId;
+        if (!uploadId) {
+            return;
+        }
+
         const controller = this;
         const request: RequestInit = {
             method: "POST",
@@ -191,13 +199,16 @@ class AudioAnalysis extends React.Component<Props, State> {
             .then((response) => response.json())
             .then(function(data: any) {
                 controller.setState({
-                    uploadId,
                     imageUrl,
                     audioUrl,
                     soundLength: data.sound_length,
                     maxAudioTime: data.sound_length,
                 });
             });
+    }
+
+    setUploadId = (uploadId: string) => {
+        this.props.setUploadId(this.props.speakerIndex, uploadId);
     }
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {
@@ -210,7 +221,7 @@ class AudioAnalysis extends React.Component<Props, State> {
         }
 
         const newAudioUrl = AudioAnalysis.formatAudioUrl(
-            this.state.uploadId,
+            this.getSpeaker().uploadId,
             ts[0],
             ts[1]);
 
@@ -223,11 +234,11 @@ class AudioAnalysis extends React.Component<Props, State> {
 
     targetPitchSelected(index: number) {
         if (index !== -1) {
-            const letter = this.props.speakers[this.props.speakerIndex][index];
+            const letter = this.props.speakers[this.props.speakerIndex].letters[index];
             this.state.selectionCallback(letter.t0, letter.t1);
 
             const newAudioUrl = AudioAnalysis.formatAudioUrl(
-                this.state.uploadId,
+                this.getSpeaker().uploadId,
                 letter.t0,
                 letter.t1);
 
@@ -296,7 +307,7 @@ class AudioAnalysis extends React.Component<Props, State> {
         }
 
         fetch("/api/avg-pitch/"
-            + this.state.uploadId
+            + this.getSpeaker().uploadId
             + "?t0=" + ts[0]
             + "&t1=" + ts[1]
             + "&max-pitch=" + this.state.maxPitch
@@ -322,7 +333,7 @@ class AudioAnalysis extends React.Component<Props, State> {
         type ApiResult = number[][];
 
         fetch("/api/all-pitches/"
-            + this.state.uploadId + "?max-pitch="
+            + this.getSpeaker().uploadId + "?max-pitch="
             + this.state.maxPitch
             + "&min-pitch=" + this.state.minPitch, {
             method: "POST",
@@ -424,7 +435,7 @@ class AudioAnalysis extends React.Component<Props, State> {
 
     applyPitchRange(minPitch: number, maxPitch: number) {
         const newUrl = AudioAnalysis.formatImageUrl(
-            this.state.uploadId,
+            this.getSpeaker().uploadId,
             minPitch,
             maxPitch,
             this.state.minAudioTime,
@@ -443,14 +454,14 @@ class AudioAnalysis extends React.Component<Props, State> {
 
     showAllClicked() {
         const newUrl = AudioAnalysis.formatImageUrl(
-            this.state.uploadId,
+            this.getSpeaker().uploadId,
             this.state.minPitch,
             this.state.maxPitch,
             0,
             this.state.soundLength);
 
         const newAudioUrl = AudioAnalysis.formatAudioUrl(
-            this.state.uploadId,
+            this.getSpeaker().uploadId,
             0,
             this.state.soundLength);
 
@@ -484,7 +495,7 @@ class AudioAnalysis extends React.Component<Props, State> {
             this.state.maxSelectX);
 
         const newImageUrl = AudioAnalysis.formatImageUrl(
-            this.state.uploadId,
+            this.getSpeaker().uploadId,
             this.state.minPitch,
             this.state.maxPitch,
             config.minAudioTime,
@@ -503,7 +514,7 @@ class AudioAnalysis extends React.Component<Props, State> {
     }
 
     render() {
-        const uploadId = this.state.uploadId;
+        const uploadId = this.getSpeaker().uploadId;
 
         let nonAudioImg;
         if (!uploadId) {
@@ -607,6 +618,7 @@ const mapStateToProps = (state: AppState) => ({
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
     addSpeaker: () => dispatch(addSpeaker()),
     removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
+    setUploadId: (speakerIndex: number, uploadId: string) => dispatch(setUploadId(speakerIndex, uploadId)),
     addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),

@@ -6,3 +6,8 @@ export interface Letter {
     isManualPitch: boolean;
     isWordSep: boolean;
 }
+
+export interface Speaker {
+    uploadId: string;
+    letters: Letter[];
+}

@@ -12,6 +12,7 @@ import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
+import {Speaker} from "../types/types";
 
 interface MatchParams {
     numSyllables: string;
@@ -204,6 +205,10 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 
     render() {
+        const speakers: Speaker[] = [
+            {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
+        ];
+
         return (
             <div>
                 <div className="metilda-page-header">
@@ -256,7 +261,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showPitchArtLines={true}
                                         showLargeCircles={true}
                                         showPrevPitchValueLists={this.state.showPrevPitchValueLists}
-                                        letters={[this.state.words[this.state.activeWordIndex].letters]}
+                                        speakers={speakers}
                                         rawPitchValueLists={this.state.userPitchValueLists}
                                     />
 

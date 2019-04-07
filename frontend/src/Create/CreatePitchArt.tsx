@@ -2,18 +2,18 @@ import * as React from "react";
 import {connect} from "react-redux";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
-import {Letter} from "../types/types";
+import {Letter, Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 
 interface Props {
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 class CreatePitchArt extends React.Component<Props> {
     renderSpeakers = () => {
         return (
-            this.props.speakers.map((_, index) =>
-               <AudioAnalysis speakerIndex={index} key={index} />
+            this.props.speakers.map((item, index) =>
+               <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`} />
             )
         );
     }
@@ -34,7 +34,7 @@ class CreatePitchArt extends React.Component<Props> {
                     {this.renderSpeakers()}
                     <div className="row">
                         <PitchArtContainer
-                            letters={this.props.speakers}
+                            speakers={this.props.speakers}
                             width={AudioAnalysis.AUDIO_IMG_WIDTH}
                             height={600}
                             minPitch={minPitch}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import {createRef} from "react";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 
@@ -16,7 +16,7 @@ interface Props {
     showVerticallyCentered: boolean;
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
-    letters: Letter[][];
+    speakers: Speaker[];
 }
 
 class PitchArt extends React.Component<Props> {
@@ -56,7 +56,7 @@ class PitchArt extends React.Component<Props> {
                         showPitchArtLines={this.props.showPitchArtLines}
                         showLargeCircles={this.props.showLargeCircles}
                         showPrevPitchValueLists={false}
-                        letters={this.props.letters}/>);
+                        speakers={this.props.speakers}/>);
     }
 
     render() {
@@ -73,12 +73,12 @@ class PitchArt extends React.Component<Props> {
                 </div>
                 <div id="metilda-pitch-art-btn-container">
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                            disabled={this.props.letters.length !== 1 || this.props.letters[0].length === 0}
+                            disabled={this.props.speakers.length !== 1 || this.props.speakers[0].letters.length === 0}
                             onClick={this.playPitchArt}>
                         Play Tones
                     </button>
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
-                            disabled={this.props.letters.length === 0}
+                            disabled={this.props.speakers.length === 0}
                             onClick={this.saveImage}>
                         Save Image
                     </button>

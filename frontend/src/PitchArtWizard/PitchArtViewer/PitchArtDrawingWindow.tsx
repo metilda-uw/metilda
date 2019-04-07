@@ -2,7 +2,7 @@ import React, {createRef} from "react";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import PitchArtGeometry from "./PitchArtGeometry";
@@ -10,7 +10,7 @@ import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
 
 interface Props {
-    letters: Letter[][];
+    speakers: Speaker[];
     width: number;
     height: number;
     minPitch: number;
@@ -106,11 +106,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     playPitchArt() {
-        if (this.props.letters.length !== 1) {
+        if (this.props.speakers.length !== 1) {
             return;
         }
 
-        const letters = this.props.letters[0];
+        const letters: Letter[] = this.props.speakers[0].letters;
         const env = new Tone.AmplitudeEnvelope({
             attack: 0.001,
             decay: 0.001,
@@ -204,8 +204,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         );
     }
 
-    colorScheme = (showArtDesign: boolean, letters: Letter[][]): ColorScheme => {
-        if (!showArtDesign || letters.length !== 1) {
+    colorScheme = (showArtDesign: boolean, speakers: Speaker[]): ColorScheme => {
+        if (!showArtDesign || speakers.length !== 1) {
             return {
                 lineStrokeColor: "#497dba",
                 praatDotFillColor: "#497dba",
@@ -217,8 +217,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         let lineStrokeColor = "black";
         let praatDotFillColor = "black";
 
-        const numLetters = letters[0].length;
-        const pitches = letters[0].map((item) => item.pitch);
+        const numLetters = speakers[0].letters.length;
+        const pitches = speakers[0].letters.map((item) => item.pitch);
         const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
 
         // determine color scheme
@@ -287,7 +287,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             dMax: this.props.maxPitch
         };
 
-        const colorScheme = this.colorScheme(this.props.showArtDesign, this.props.letters);
+        const colorScheme = this.colorScheme(this.props.showArtDesign, this.props.speakers);
         const coordConverter = new PitchArtCoordConverter(windowConfig);
 
         return (
@@ -308,13 +308,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
                     </Layer>
-                    <PitchArtGeometry letters={this.props.letters}
+                    <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
                                       manualPitchChange={this.props.manualPitchChange}
                                       colorScheme={colorScheme}
                                       playSound={this.playSound}
                                       activePlayIndex={
-                                          this.props.letters.length === 1 ? this.state.activePlayIndex : -1}
+                                          this.props.speakers.length === 1 ? this.state.activePlayIndex : -1}
                                       showDynamicContent={this.props.showDynamicContent}
                                       showArtDesign={this.props.showArtDesign}
                                       showPitchArtLines={this.props.showPitchArtLines}

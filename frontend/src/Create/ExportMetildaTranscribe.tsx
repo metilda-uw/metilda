@@ -6,12 +6,12 @@ import {RouteComponentProps} from "react-router-dom";
 import {MetildaWord} from "../Learn/types";
 import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store/index";
-import {Letter} from "../types/types";
+import {Letter, Speaker} from "../types/types";
 import "./CreatePitchArt.css";
 import "./ExportMetildaTranscribe.css";
 
 interface Props extends RouteComponentProps {
-    speakers: Letter[][];
+    speakers: Speaker[];
     speakerIndex: number;
     word: string;
 }
@@ -22,23 +22,24 @@ class ExportMetildaTranscribe extends React.Component<Props> {
     exportToJson = () => {
         const metildaWord = {
             uploadId: this.props.word,
-            letters: this.props.speakers[this.props.speakerIndex]
+            letters: this.props.speakers[this.props.speakerIndex].letters
         } as MetildaWord;
         const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
     };
 
     isDisabled = () => {
-        if (this.props.speakers[this.props.speakerIndex].length === 0) {
+        if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
             return true;
         }
 
-        const nonWordSep = this.props.speakers[this.props.speakerIndex].filter((item) => !item.isWordSep);
+        const nonWordSep = this.props.speakers[this.props.speakerIndex].letters.filter(
+            (item) => !item.isWordSep);
 
         if (nonWordSep.some((item) => item.syllable === "X")) {
             return true;
         }
-    };
+    }
 
     render() {
         return (

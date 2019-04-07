@@ -1,12 +1,12 @@
 import React from "react";
 import {Circle, Group, Layer, Line, Text} from "react-konva";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import {ColorScheme} from "./PitchArtDrawingWindow";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 interface Props {
-    letters: Letter[][];
+    speakers: Speaker[];
     windowConfig: PitchArtWindowConfig;
     manualPitchChange: (index: number, newPitch: number) => void;
     playSound: (pitch: number) => void;
@@ -35,14 +35,14 @@ export default class PitchArtGeometry extends React.Component<Props> {
         super(props);
     }
 
-    renderLayer = (letters: Letter[], layerIndex: number) => {
-        const pitches = letters.map((item) => item.pitch);
+    renderLayer = (speaker: Speaker, layerIndex: number) => {
+        const pitches = speaker.letters.map((item) => item.pitch);
         const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
 
         const circleRadius = this.props.showLargeCircles ?
             this.props.largeCircleRadius : this.props.smallCircleRadius;
 
-        const pitchValues: RawPitchValue[] = letters.filter((data) => !data.isWordSep);
+        const pitchValues: RawPitchValue[] = speaker.letters.filter((data) => !data.isWordSep);
 
         const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
@@ -57,8 +57,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
         const letterSyllables = [];
         const lines = [];
         let currLinePoints = [];
-        for (let i = 0; i < letters.length; i++) {
-            if (letters[i].isWordSep) {
+        for (let i = 0; i < speaker.letters.length; i++) {
+            if (speaker.letters[i].isWordSep) {
                 if (currLinePoints.length > 0) {
                     lines.push(
                         <Line key={i + "_pa_line"}
@@ -71,15 +71,15 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 continue;
             }
 
-            const currPitch = letters[i].pitch;
-            const x = coordConverter.horzIndexToRectCoords(letters[i].t0);
-            const y = coordConverter.vertValueToRectCoords(letters[i].pitch);
+            const currPitch = speaker.letters[i].pitch;
+            const x = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
+            const y = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);
 
             // The 'align' property is not working with the current version of
             // react-konva that's used. As a result, we're manually shifting
             // the text to be centered.
             const konvaFontSizeAsPixels = this.props.fontSize * 0.65;
-            const text = letters[i].syllable;
+            const text = speaker.letters[i].syllable;
 
             letterSyllables.push(
                 <Text key={i}
@@ -96,7 +96,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 if (this.props.activePlayIndex === i) {
                     circleFill = this.props.colorScheme.activePlayColor;
                     circleStroke = this.props.colorScheme.activePlayColor;
-                } else if (letters[i].isManualPitch) {
+                } else if (speaker.letters[i].isManualPitch) {
                     circleFill = this.props.colorScheme.manualDotFillColor;
                     circleStroke = this.props.colorScheme.manualDotFillColor;
                 } else {
@@ -121,7 +121,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                         onClick={() => this.props.playSound(currPitch)}
                         onMouseEnter={() => this.props.setPointerEnabled(true)}
                         onMouseLeave={() => this.props.setPointerEnabled(false)}
-                        draggable={letters[i].isManualPitch}
+                        draggable={speaker.letters[i].isManualPitch}
                         dragDistance={5}
                         dragBoundFunc={
                             function(pos) {
@@ -209,7 +209,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         return (
             <React.Fragment>
                 {
-                    this.props.letters.map((item, index) => this.renderLayer(item, index))
+                    this.props.speakers.map((item, index) => this.renderLayer(item, index))
                 }
             </React.Fragment>
         );

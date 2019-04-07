@@ -1,49 +1,49 @@
 import {Action} from "redux";
 import * as constants from "../../constants";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 
 export interface AudioAnalysisState {
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface AddSpeaker extends Action {
     type: constants.ADD_SPEAKER;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface RemoveSpeaker extends Action {
     type: constants.REMOVE_SPEAKER;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface AddLetter extends Action {
     type: constants.ADD_LETTER;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface RemoveLetter extends Action {
     type: constants.REMOVE_LETTER;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface ResetLetters extends Action {
     type: constants.RESET_LETTERS;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface SetLetterSyllable extends Action {
     type: constants.SET_LETTER_SYLLABLE;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface SetActiveLetter extends Action {
     type: constants.SET_ACTIVE_LETTER;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export interface ManualPitchAdjust extends Action {
     type: constants.MANUAL_PITCH_ADJUST;
-    speakers: Letter[][];
+    speakers: Speaker[];
 }
 
 export type AudioAction = (

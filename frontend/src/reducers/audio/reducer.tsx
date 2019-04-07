@@ -3,7 +3,7 @@ import * as constants from "../../constants";
 import {AudioAnalysisState} from "../../store/audio/types";
 
 const defaultState: AudioAnalysisState = {
-    speakers: [[]]
+    speakers: [{uploadId: "", letters: []}]
 };
 
 const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaultState, action) => {
@@ -11,6 +11,8 @@ const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaul
         case constants.ADD_SPEAKER:
             return {...state, speakers: action.speakers};
         case constants.REMOVE_SPEAKER:
+            return {...state, speakers: action.speakers};
+        case constants.SET_UPLOAD_ID:
             return {...state, speakers: action.speakers};
         case constants.ADD_LETTER:
             return {...state, speakers: action.speakers};
