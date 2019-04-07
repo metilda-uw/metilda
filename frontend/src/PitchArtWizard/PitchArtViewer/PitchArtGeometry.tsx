@@ -154,7 +154,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 <Line key={"last_pa_line"}
                       points={currLinePoints}
                       strokeWidth={this.props.graphWidth}
-                    // @ts-ignore
                       stroke={this.props.colorScheme.lineStrokeColor}/>
             );
         }
