@@ -1,3 +1,7 @@
+export const ADD_SPEAKER = "ADD_SPEAKER";
+export type ADD_SPEAKER = typeof ADD_SPEAKER;
+export const REMOVE_SPEAKER = "REMOVE_SPEAKER";
+export type REMOVE_SPEAKER = typeof REMOVE_SPEAKER;
 export const ADD_LETTER = "ADD_LETTER";
 export type ADD_LETTER = typeof ADD_LETTER;
 export const REMOVE_LETTER = "REMOVE_LETTER";

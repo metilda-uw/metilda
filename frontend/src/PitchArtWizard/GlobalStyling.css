@@ -1,7 +1,6 @@
 .group-label {
     display: flex;
     justify-content: flex-start;
-    margin-bottom: -16px;
 }
 
 .top-label {
@@ -42,4 +41,18 @@
 .metilda-pitch-art-container-control-list-item {
     margin-bottom: 24px;
     text-align: left;
+}
+
+.metilda-audio-analysis-controls-list-item-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.metilda-audio-analysis-controls-list-item-row-left-align {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 8px;
 }

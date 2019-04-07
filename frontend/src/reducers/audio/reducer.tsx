@@ -8,6 +8,10 @@ const defaultState: AudioAnalysisState = {
 
 const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaultState, action) => {
     switch (action.type) {
+        case constants.ADD_SPEAKER:
+            return {...state, speakers: action.speakers};
+        case constants.REMOVE_SPEAKER:
+            return {...state, speakers: action.speakers};
         case constants.ADD_LETTER:
             return {...state, speakers: action.speakers};
         case constants.REMOVE_LETTER:

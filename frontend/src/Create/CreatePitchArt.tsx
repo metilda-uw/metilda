@@ -10,6 +10,14 @@ interface Props {
 }
 
 class CreatePitchArt extends React.Component<Props> {
+    renderSpeakers = () => {
+        return (
+            this.props.speakers.map((_, index) =>
+               <AudioAnalysis speakerIndex={index} key={index} />
+            )
+        );
+    }
+
     render() {
         // TODO: determine these new values
         const uploadId = "";
@@ -23,8 +31,7 @@ class CreatePitchArt extends React.Component<Props> {
                     <h5>Transcribe Audio</h5>
                 </div>
                 <div className="metilda-page-content">
-                    <AudioAnalysis speakerIndex={0} />
-                    <AudioAnalysis speakerIndex={0} />
+                    {this.renderSpeakers()}
                     <div className="row">
                         <PitchArtContainer
                             letters={this.props.speakers}

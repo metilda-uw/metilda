@@ -6,6 +6,16 @@ export interface AudioAnalysisState {
     speakers: Letter[][];
 }
 
+export interface AddSpeaker extends Action {
+    type: constants.ADD_SPEAKER;
+    speakers: Letter[][];
+}
+
+export interface RemoveSpeaker extends Action {
+    type: constants.REMOVE_SPEAKER;
+    speakers: Letter[][];
+}
+
 export interface AddLetter extends Action {
     type: constants.ADD_LETTER;
     speakers: Letter[][];
@@ -37,5 +47,5 @@ export interface ManualPitchAdjust extends Action {
 }
 
 export type AudioAction = (
-    AddLetter | RemoveLetter | ResetLetters | SetLetterSyllable |
-    SetActiveLetter | ManualPitchAdjust);
+    AddSpeaker | RemoveSpeaker | AddLetter | RemoveLetter |
+    ResetLetters | SetLetterSyllable | SetActiveLetter | ManualPitchAdjust);

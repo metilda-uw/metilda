@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {controls, Media, Player} from 'react-media-player';
 import "../GlobalStyling.css";
+import "./PitchRange.css";
 
 const {PlayPause, MuteUnmute, SeekBar} = controls;
 
@@ -20,7 +21,7 @@ class PitchRange extends Component {
     submitMaxPitch(event) {
         event.preventDefault();
         this.props.applyPitchRange(this.state.minPitch || this.props.initMinPitch,
-                                   this.state.maxPitch || this.props.initMaxPitch);
+            this.state.maxPitch || this.props.initMaxPitch);
     }
 
     handleInputChange(event) {
@@ -31,6 +32,12 @@ class PitchRange extends Component {
             this.setState({isMinDirty: true});
         } else if (name === 'maxPitch') {
             this.setState({isMaxDirty: true});
+        }
+    }
+
+    enterPressed = (event) => {
+        if (event.key === 'Enter') {
+            this.submitMaxPitch(event);
         }
     }
 
@@ -48,39 +55,35 @@ class PitchRange extends Component {
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Pitch Range</label>
-                <div className="row">
-                    <form onSubmit={this.submitMaxPitch}>
-                        <div className="input-field inline col s4">
-                            <input name="minPitch"
-                                   id="minPitch"
-                                   value={minValue}
-                                   onChange={this.handleInputChange}
-                                   placeholder="min Hz"
-                                   className="validate"
-                                   pattern="(\d+)(\.\d+)?"
-                                   required={true}
-                                   type="text"/>
-                        </div>
-                        <div className="input-field inline col s1">
-                            <p>to</p>
-                        </div>
-                        <div className="input-field inline col s4">
-                            <input name="maxPitch"
-                                   id="maxPitch"
-                                   value={maxValue}
-                                   onChange={this.handleInputChange}
-                                   placeholder="max Hz"
-                                   className="validate"
-                                   pattern="(\d+)(\.\d+)?"
-                                   required={true}
-                                   type="text"/>
-                        </div>
-                        <div className="input-field col s2">
-                            <button className="waves-effect waves-light btn"
-                                    type="submit">Apply
-                            </button>
-                        </div>
-                    </form>
+                <div className="metilda-audio-analysis-controls-list-item-row">
+                    <input name="minPitch"
+                           id="minPitch"
+                           value={minValue}
+                           onChange={this.handleInputChange}
+                           onKeyPress={this.enterPressed}
+                           placeholder="min Hz"
+                           className="validate pitch-range-input"
+                           pattern="(\d+)(\.\d+)?"
+                           required={true}
+                           type="text"/>
+                    <div>
+                        <p>to</p>
+                    </div>
+                    <input name="maxPitch"
+                           id="maxPitch"
+                           value={maxValue}
+                           onChange={this.handleInputChange}
+                           onKeyPress={this.enterPressed}
+                           placeholder="max Hz"
+                           className="validate pitch-range-input"
+                           pattern="(\d+)(\.\d+)?"
+                           required={true}
+                           type="text"/>
+                    <button className="waves-effect waves-light btn"
+                            type="submit"
+                            onClick={this.submitMaxPitch}>
+                        Apply
+                    </button>
                 </div>
 
 

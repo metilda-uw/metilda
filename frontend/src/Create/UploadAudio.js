@@ -36,7 +36,7 @@ class UploadAudio extends Component {
     initInputField() {
         // initialize dropdowns
         var elems = document.querySelectorAll('#audioFileInput');
-        M.FormSelect.init(elems);
+        M.FormSelect.init(elems, {classes: 'metilda-select-dropdown'});
     }
 
     sendFormSubmit(event) {
@@ -67,16 +67,14 @@ class UploadAudio extends Component {
             <div className="metilda-audio-analysis-controls-list-item col s12"
                  key={this.state.updateCounter}>
                 <label className="group-label">Audio File</label>
-                <div className="row">
-                    <div className="input-field inline col s12">
-                        <select id="audioFileInput"
-                                value={this.props.initFileName || ""}
-                                name="audioFileName"
-                                onChange={this.sendFormSubmit}>
-                            <option value="" disabled="disabled">Choose audio file</option>
-                            {availableFilesList}
-                        </select>
-                    </div>
+                <div className="metilda-audio-analysis-controls-list-item-row">
+                    <select id="audioFileInput"
+                            value={this.props.initFileName || ""}
+                            name="audioFileName"
+                            onChange={this.sendFormSubmit}>
+                        <option value="" disabled="disabled">Choose audio file</option>
+                        {availableFilesList}
+                    </select>
                 </div>
             </div>
         );

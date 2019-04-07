@@ -8,6 +8,26 @@ import {AudioAction} from "./types";
 
 type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
 
+export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const newSpeakers = update(speakers, {$push: [[]]});
+    dispatch({
+        type: constants.ADD_SPEAKER,
+        speakers: newSpeakers,
+    });
+}
+
+export const removeSpeaker = (speakerIndex: number):
+    ActionReturn => (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const newSpeakers = speakers.filter((_: any, i: number) => i !== speakerIndex);
+
+    dispatch({
+        type: constants.REMOVE_SPEAKER,
+        speakers: newSpeakers,
+    });
+};
+
 export const addLetter = (speakerIndex: number, letter: Letter): ActionReturn => (dispatch: Dispatch, getState) => {
     let speakers = getState().audio.speakers;
 

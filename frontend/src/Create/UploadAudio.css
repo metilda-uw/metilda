@@ -12,3 +12,7 @@
 .dropdown-content {
     max-height: 500px;
 }
+
+.metilda-select-dropdown {
+    width: 100%;
+}

@@ -5,15 +5,15 @@ import {ThunkDispatch} from "redux-thunk";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
-import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
-import {addLetter, setLetterPitch} from "../store/audio/actions";
+import {addLetter, addSpeaker, removeSpeaker, setLetterPitch} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter} from "../types/types";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
 import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
+import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
@@ -21,6 +21,8 @@ import "./UploadAudio.css";
 export interface Props extends RouteComponentProps {
     speakerIndex: number;
     speakers: Letter[][];
+    addSpeaker: () => void;
+    removeSpeaker: (speakerIndex: number) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
@@ -527,6 +529,10 @@ class AudioAnalysis extends React.Component<Props, State> {
                         <ExportMetildaTranscribe
                             word={uploadId}
                             speakerIndex={this.props.speakerIndex}/>
+                        <SpeakerControl
+                            addSpeaker={this.props.addSpeaker}
+                            removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
+                            canRemoveSpeaker={this.props.speakerIndex > 0}/>
                     </div>
                     <div className="metilda-audio-analysis col s8">
                         <div>
@@ -599,6 +605,8 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    addSpeaker: () => dispatch(addSpeaker()),
+    removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
     addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
