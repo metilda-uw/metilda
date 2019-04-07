@@ -8,7 +8,7 @@ import {PitchArtWindowConfig, RawPitchValue} from "./types";
 interface Props {
     speakers: Speaker[];
     windowConfig: PitchArtWindowConfig;
-    manualPitchChange: (index: number, newPitch: number) => void;
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     playSound: (pitch: number) => void;
     activePlayIndex: number;
     colorScheme: ColorScheme;
@@ -35,7 +35,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         super(props);
     }
 
-    renderLayer = (speaker: Speaker, layerIndex: number) => {
+    renderLayer = (speaker: Speaker, speakerIndex: number) => {
         const pitches = speaker.letters.map((item) => item.pitch);
         const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
 
@@ -143,7 +143,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                                 // @ts-ignore
                                 const yPos: number = this.getPosition().y;
                                 const newPitch = coordConverter.rectCoordsToVertValue(yPos);
-                                controller.props.manualPitchChange(i, newPitch);
+                                controller.props.setLetterPitch(speakerIndex, i, newPitch);
                             }
                         }
                 />);
@@ -169,7 +169,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
         }
 
         return (
-            <Layer key={layerIndex}>
+            <Layer key={speakerIndex}>
                 {accentedPoint}
                 {
                     this.props.showPitchArtLines ? lines : []

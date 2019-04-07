@@ -16,7 +16,7 @@ interface Props {
     minPitch: number;
     maxPitch: number;
     uploadId: string;
-    manualPitchChange: (index: number, newPitch: number) => void;
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
 
 interface State {
@@ -86,7 +86,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               minPitch={this.props.minPitch}
                               maxPitch={this.props.maxPitch}
                               uploadId={this.props.uploadId}
-                              manualPitchChange={this.props.manualPitchChange}
+                              setLetterPitch={this.props.setLetterPitch}
                               showAccentPitch={this.state.showAccentPitch}
                               showSyllableText={this.state.showSyllableText}
                               showVerticallyCentered={this.state.showVerticallyCentered}

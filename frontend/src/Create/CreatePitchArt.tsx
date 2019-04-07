@@ -1,12 +1,16 @@
 import * as React from "react";
 import {connect} from "react-redux";
+import {ThunkDispatch} from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
-import {Letter, Speaker} from "../types/types";
+import {setLetterPitch} from "../store/audio/actions";
+import {AudioAction} from "../store/audio/types";
+import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 
 interface Props {
     speakers: Speaker[];
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
 
 class CreatePitchArt extends React.Component<Props> {
@@ -23,7 +27,6 @@ class CreatePitchArt extends React.Component<Props> {
         const uploadId = "";
         const minPitch = 30;
         const maxPitch = 300;
-        const manualPitchChange = (x: number, y: number) => 2;
 
         return (
             <div>
@@ -39,7 +42,7 @@ class CreatePitchArt extends React.Component<Props> {
                             height={600}
                             minPitch={minPitch}
                             maxPitch={maxPitch}
-                            manualPitchChange={manualPitchChange}
+                            setLetterPitch={this.props.setLetterPitch}
                             uploadId={uploadId}/>
                     </div>
                 </div>
@@ -52,4 +55,9 @@ const mapStateToProps = (state: AppState) => ({
     speakers: state.audio.speakers,
 });
 
-export default connect(mapStateToProps)(CreatePitchArt);
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
+        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(CreatePitchArt);

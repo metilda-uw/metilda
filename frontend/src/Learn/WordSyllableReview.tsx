@@ -254,7 +254,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
                                         maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
                                         fileName={this.state.words[this.state.activeWordIndex].uploadId}
-                                        manualPitchChange={(x, y) => (null)}
+                                        setLetterPitch={(x, y, z) => (null)}
                                         showAccentPitch={true}
                                         showSyllableText={true}
                                         showVerticallyCentered={true}

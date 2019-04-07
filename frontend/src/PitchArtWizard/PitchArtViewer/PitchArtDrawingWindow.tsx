@@ -16,7 +16,7 @@ interface Props {
     minPitch: number;
     maxPitch: number;
     fileName: string;
-    manualPitchChange: (index: number, newPitch: number) => void;
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showDynamicContent: boolean;
     showArtDesign: boolean;
     showPitchArtLines: boolean;
@@ -310,7 +310,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     </Layer>
                     <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
-                                      manualPitchChange={this.props.manualPitchChange}
+                                      setLetterPitch={this.props.setLetterPitch}
                                       colorScheme={colorScheme}
                                       playSound={this.playSound}
                                       activePlayIndex={
