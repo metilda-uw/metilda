@@ -537,7 +537,8 @@ class CreatePitchArt extends React.Component<Props, State> {
                                         initMaxPitch={this.state.maxPitch}
                                         applyPitchRange={this.applyPitchRange}/>
                             <ExportMetildaTranscribe
-                                word={this.props.match.params.uploadId}/>
+                                word={this.props.match.params.uploadId}
+                                speakerIndex={0}/>
                         </div>
                         <div className="metilda-audio-analysis col s8">
                             <div>
