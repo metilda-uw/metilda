@@ -6,6 +6,7 @@ import "./SpeakerControl.css";
 interface Props {
     addSpeaker: () => void;
     removeSpeaker: () => void;
+    canAddSpeaker: boolean;
     canRemoveSpeaker: boolean;
 }
 
@@ -23,15 +24,25 @@ export default class SpeakerControl extends React.Component<Props> {
         );
     }
 
+    maybeRenderAddSpeaker = () => {
+        if (!this.props.canAddSpeaker) {
+            return;
+        }
+
+        return (
+            <button className="waves-effect waves-light btn"
+                    onClick={this.props.addSpeaker}>
+                Add New
+            </button>
+        );
+    }
+
     render() {
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Speaker</label>
                 <div className="metilda-audio-analysis-controls-list-item-row-left-align">
-                    <button className="waves-effect waves-light btn"
-                            onClick={this.props.addSpeaker}>
-                        Add New
-                    </button>
+                    {this.maybeRenderAddSpeaker()}
                     {this.maybeRenderRemoveSpeaker()}
                 </div>
             </div>

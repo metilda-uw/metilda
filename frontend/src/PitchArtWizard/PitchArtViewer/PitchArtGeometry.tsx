@@ -11,7 +11,7 @@ interface Props {
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     playSound: (pitch: number) => void;
     activePlayIndex: number;
-    colorScheme: ColorScheme;
+    colorSchemes: ColorScheme[];
     showDynamicContent: boolean;
     showArtDesign: boolean;
     showPitchArtLines: boolean;
@@ -64,7 +64,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                         <Line key={i + "_pa_line"}
                               points={currLinePoints}
                               strokeWidth={this.props.graphWidth}
-                              stroke={this.props.colorScheme.lineStrokeColor}/>
+                              stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}/>
                     );
                     currLinePoints = [];
                 }
@@ -89,19 +89,19 @@ export default class PitchArtGeometry extends React.Component<Props> {
                       text={text}/>
             );
 
-            let circleFill = this.props.colorScheme.praatDotFillColor;
-            let circleStroke = this.props.colorScheme.lineStrokeColor;
+            let circleFill = this.props.colorSchemes[speakerIndex].praatDotFillColor;
+            let circleStroke = this.props.colorSchemes[speakerIndex].lineStrokeColor;
 
             if (this.props.showDynamicContent) {
                 if (this.props.activePlayIndex === i) {
-                    circleFill = this.props.colorScheme.activePlayColor;
-                    circleStroke = this.props.colorScheme.activePlayColor;
+                    circleFill = this.props.colorSchemes[speakerIndex].activePlayColor;
+                    circleStroke = this.props.colorSchemes[speakerIndex].activePlayColor;
                 } else if (speaker.letters[i].isManualPitch) {
-                    circleFill = this.props.colorScheme.manualDotFillColor;
-                    circleStroke = this.props.colorScheme.manualDotFillColor;
+                    circleFill = this.props.colorSchemes[speakerIndex].manualDotFillColor;
+                    circleStroke = this.props.colorSchemes[speakerIndex].manualDotFillColor;
                 } else {
-                    circleFill = this.props.colorScheme.praatDotFillColor;
-                    circleStroke = this.props.colorScheme.lineStrokeColor;
+                    circleFill = this.props.colorSchemes[speakerIndex].praatDotFillColor;
+                    circleStroke = this.props.colorSchemes[speakerIndex].lineStrokeColor;
                 }
             }
 
@@ -154,7 +154,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 <Line key={"last_pa_line"}
                       points={currLinePoints}
                       strokeWidth={this.props.graphWidth}
-                      stroke={this.props.colorScheme.lineStrokeColor}/>
+                      stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}/>
             );
         }
 

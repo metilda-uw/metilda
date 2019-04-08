@@ -6,6 +6,7 @@ import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import PitchArtGeometry from "./PitchArtGeometry";
+import PitchArtLegend from "./PitchArtLegend";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
 
@@ -33,6 +34,7 @@ interface State {
 }
 
 export interface ColorScheme {
+    windowLineStrokeColor: string;
     lineStrokeColor: string;
     praatDotFillColor: string;
     activePlayColor: string;
@@ -201,11 +203,13 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         );
     }
 
-    colorScheme = (showArtDesign: boolean, speakers: Speaker[]): ColorScheme => {
-        if (!showArtDesign || speakers.length !== 1) {
+    colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): ColorScheme => {
+        if (!showArtDesign) {
+            const color = PitchArtLegend.SPEAKER_COLOR(speakerIndex);
             return {
-                lineStrokeColor: "#497dba",
-                praatDotFillColor: "#497dba",
+                windowLineStrokeColor: "#497dba",
+                lineStrokeColor: color,
+                praatDotFillColor: color,
                 activePlayColor: "#e8e82e",
                 manualDotFillColor: "#af0008"
             };
@@ -214,8 +218,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         let lineStrokeColor = "black";
         let praatDotFillColor = "black";
 
-        const numLetters = speakers[0].letters.length;
-        const pitches = speakers[0].letters.map((item) => item.pitch);
+        const numLetters = speaker.letters.length;
+        const pitches = speaker.letters.map((item) => item.pitch);
         const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
 
         // determine color scheme
@@ -267,6 +271,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         }
 
         return {
+            windowLineStrokeColor: lineStrokeColor,
             lineStrokeColor,
             praatDotFillColor,
             activePlayColor: "#e8e82e",
@@ -284,7 +289,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             dMax: this.props.maxPitch
         };
 
-        const colorScheme = this.colorScheme(this.props.showArtDesign, this.props.speakers);
+        const colorSchemes = this.props.speakers.map((item, index) =>
+            this.colorScheme(this.props.showArtDesign, item, index)
+        );
         const coordConverter = new PitchArtCoordConverter(windowConfig);
 
         return (
@@ -300,7 +307,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
-                              stroke={colorScheme.lineStrokeColor}
+                              stroke={this.props.showArtDesign && colorSchemes.length === 1
+                                    ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
                               onClick={() => this.imageBoundaryClicked(coordConverter)}
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
@@ -308,7 +316,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                     <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
                                       setLetterPitch={this.props.setLetterPitch}
-                                      colorScheme={colorScheme}
+                                      colorSchemes={colorSchemes}
                                       playSound={this.playSound}
                                       activePlayIndex={
                                           this.props.speakers.length === 1 ? this.state.activePlayIndex : -1}

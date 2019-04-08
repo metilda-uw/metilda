@@ -9,6 +9,7 @@ import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import "./PitchArtContainer.css";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import SyllableToggle from "./SyllableToggle";
+import PitchArtLegend from "./PitchArtLegend";
 
 interface Props {
     speakers: Speaker[];
@@ -98,6 +99,10 @@ class PitchArtContainer extends React.Component<Props, State> {
                         <PitchArtCircleToggle
                             handleInputChange={this.handleInputChange}
                             showLargeCircles={this.state.showLargeCircles}/>
+                        {
+                            this.props.speakers.length > 1
+                                && <PitchArtLegend speakers={this.props.speakers}/>
+                        }
                     </div>
                 </div>
                 <div className="col s8">

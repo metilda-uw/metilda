@@ -513,6 +513,22 @@ class AudioAnalysis extends React.Component<Props, State> {
         });
     }
 
+    maybeRenderSpeakerControl = () => {
+        const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
+        const isFirstSpeaker = this.props.speakerIndex === 0;
+        if (!(isLastSpeaker || !isFirstSpeaker)) {
+            return;
+        }
+
+        return (
+            <SpeakerControl
+                addSpeaker={this.props.addSpeaker}
+                removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
+                canAddSpeaker={isLastSpeaker}
+                canRemoveSpeaker={!isFirstSpeaker}/>
+        );
+    }
+
     render() {
         const uploadId = this.getSpeaker().uploadId;
 
@@ -540,10 +556,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                         <ExportMetildaTranscribe
                             word={uploadId}
                             speakerIndex={this.props.speakerIndex}/>
-                        <SpeakerControl
-                            addSpeaker={this.props.addSpeaker}
-                            removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-                            canRemoveSpeaker={this.props.speakerIndex > 0}/>
+                        {this.maybeRenderSpeakerControl()}
                     </div>
                     <div className="metilda-audio-analysis col s8">
                         <div>
