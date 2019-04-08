@@ -52,7 +52,7 @@ def audio_analysis_image(upload_path,
         snd = snd.extract_part(from_time=tmin, to_time=tmax)
         snd.scale_times_to(tmin, tmax)
 
-    fig, (ax1, ax2) = plt.subplots(ncols=1, nrows=2, figsize=(7, 4.75), dpi=400)
+    fig, (ax1, ax2) = plt.subplots(ncols=1, nrows=2, figsize=(7, 3.25), gridspec_kw = {'height_ratios':[1, 2]}, dpi=400)
 
     # Draw waveform
     plt.sca(ax1)
@@ -70,7 +70,7 @@ def audio_analysis_image(upload_path,
     draw_pitch(snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch), min_pitch, max_pitch)
     plt.xlim([snd.xmin, snd.xmax])
 
-    plt.subplots_adjust(hspace=0.1, top=0.95, bottom=0.1)
+    plt.subplots_adjust(hspace=0.1, top=0.98, bottom=0.14)
 
     image = io.BytesIO()
     plt.savefig(image, format="png")
