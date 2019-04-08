@@ -562,16 +562,13 @@ class AudioAnalysis extends React.Component<Props, State> {
                             centerX={`${this.state.imgMenuX}px`}
                             centerY={`${this.state.imgMenuY}px`}
                         >
-                            <Slice onSelect={this.showAllClicked} backgroundColor="lightgrey">
-                                <span>Show<br/>All</span>
+                            <Slice onSelect={this.averagePitchArtClicked}
+                                   backgroundColor="darkgrey">
+                                <span>Average<br/>Pitch</span>
                             </Slice>
                             <Slice onSelect={this.selectionIntervalClicked}
-                                   backgroundColor="darkgrey">
-                                <span>Select</span>
-                            </Slice>
-                            <Slice onSelect={this.averagePitchArtClicked}
                                    backgroundColor="lightgrey">
-                                <span>Average<br/>Pitch</span>
+                                <span>Select</span>
                             </Slice>
                             <Slice onSelect={this.manualPitchArtClicked}
                                    backgroundColor="darkgrey">
@@ -584,6 +581,10 @@ class AudioAnalysis extends React.Component<Props, State> {
                             <Slice onSelect={this.wordSplitClicked}
                                    backgroundColor="darkgrey">
                                 <span>Split<br/>Word</span>
+                            </Slice>
+                            <Slice onSelect={this.showAllClicked}
+                                   backgroundColor="lightgrey">
+                                <span>Show<br/>All</span>
                             </Slice>
                         </PieMenu>
                     </ThemeProvider>
