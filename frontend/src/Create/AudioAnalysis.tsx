@@ -552,37 +552,56 @@ class AudioAnalysis extends React.Component<Props, State> {
                     container: audioImgMenuStyles.container,
                 }
             };
+
+            const isSelectionActive = this.state.minSelectX !== -1
+                && this.state.maxSelectX !== -1;
+
+            const isAllShown = this.state.minAudioTime === 0
+                && this.state.maxAudioTime === this.state.soundLength;
+
+            const maybeDo = (disabled: boolean, action: () => void) => {
+                if (!disabled) {
+                    action();
+                }
+            }
+
             return (
                 <div onContextMenu={(e) => e.preventDefault()}
                      onClick={() => this.showImgMenu(-1, -1)}>
                     <ThemeProvider theme={theme}>
                         <PieMenu
-                            radius="100px"
+                            radius="95px"
                             centerRadius="25px"
                             centerX={`${this.state.imgMenuX}px`}
                             centerY={`${this.state.imgMenuY}px`}
                         >
-                            <Slice onSelect={this.averagePitchArtClicked}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.averagePitchArtClicked)}
+                                   disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
                                 <span>Average<br/>Pitch</span>
                             </Slice>
-                            <Slice onSelect={this.selectionIntervalClicked}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.selectionIntervalClicked)}
+                                   disabled={!isSelectionActive}
                                    backgroundColor="lightgrey">
                                 <span>Select</span>
                             </Slice>
-                            <Slice onSelect={this.manualPitchArtClicked}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.manualPitchArtClicked)}
+                                   disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
                                 <span>Manual<br/>Pitch</span>
                             </Slice>
-                            <Slice onSelect={this.pitchArtRangeClicked}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.pitchArtRangeClicked)}
+                                   disabled={!isSelectionActive}
                                    backgroundColor="lightgrey">
                                 <span>Range<br/>Pitch</span>
                             </Slice>
-                            <Slice onSelect={this.wordSplitClicked}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.wordSplitClicked)}
+                                   disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
                                 <span>Split<br/>Word</span>
                             </Slice>
-                            <Slice onSelect={this.showAllClicked}
+                            <Slice onSelect={() => maybeDo(isAllShown, this.showAllClicked)}
+                                   disabled={isAllShown}
                                    backgroundColor="lightgrey">
                                 <span>Show<br/>All</span>
                             </Slice>
@@ -647,32 +666,6 @@ class AudioAnalysis extends React.Component<Props, State> {
                                             maxAudioTime={this.state.maxAudioTime}/>
                                         : []
                                 }
-                            </div>
-                            <div id="metilda-audio-function-btns">
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.showAllClicked}
-                                        disabled={isAllShown}>All
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.selectionIntervalClicked}
-                                        disabled={!isSelectionActive}>Sel
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.pitchArtRangeClicked}
-                                        disabled={!isSelectionActive}>Range Pitch
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.averagePitchArtClicked}
-                                        disabled={!isSelectionActive}>Average Pitch
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.manualPitchArtClicked}
-                                        disabled={!isSelectionActive}>Manual Pitch
-                                </button>
-                                <button className="waves-effect waves-light btn"
-                                        onClick={this.wordSplitClicked}
-                                        disabled={!isSelectionActive}>Split
-                                </button>
                             </div>
                             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
                             <TargetPitchBar letters={this.props.speakers}

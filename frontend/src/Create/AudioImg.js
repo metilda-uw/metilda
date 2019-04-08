@@ -45,6 +45,8 @@ class AudioImg extends Component {
         let cropAreaLeftX;
         let cropAreaRightX;
         let $el = $(this.metildaAudioAnalysisImageRef.current);
+        $el.mousedown(this.onMouseDown);
+
         let imgBox = {xminPerc, xmaxPerc};
         let prevMaxWidth;
         let isProgrammaticSelection = false;
@@ -57,15 +59,15 @@ class AudioImg extends Component {
             instance: true,
             handles: true,
             onInit: function () {
-                 $(".imgareaselect-selection, " +
-                   ".imgareaselect-border1, " +
-                   ".imgareaselect-border2, " +
-                   ".imgareaselect-border3, " +
-                   ".imgareaselect-border4, " +
-                   ".imgareaselect-outer").mousedown((e) => {
-                     e.preventDefault();
-                     audioImage.onMouseDown(e)
-                 }).contextmenu((e) => e.preventDefault());
+                $(".imgareaselect-selection, " +
+                    ".imgareaselect-border1, " +
+                    ".imgareaselect-border2, " +
+                    ".imgareaselect-border3, " +
+                    ".imgareaselect-border4, " +
+                    ".imgareaselect-outer").mousedown((e) => {
+                    e.preventDefault();
+                    audioImage.onMouseDown(e)
+                }).contextmenu((e) => e.preventDefault());
 
                 audioImage.setState({isLoaded: true}, function () {
                     imgObj.setOptions({minHeight: $el.height()});
@@ -147,6 +149,7 @@ class AudioImg extends Component {
     }
 
     onMouseDown = (event) => {
+        console.log("foobar")
         if (event.which === 1) {
             this.props.showImgMenu(-1, -1);
         } else if (event.which === 3) {
@@ -157,11 +160,12 @@ class AudioImg extends Component {
     render() {
         const {src} = this.props;
         return (
-            <img id="metilda-audio-analysis-image"
-                 ref={this.metildaAudioAnalysisImageRef}
-                 className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
-                 onMouseDown={this.onMouseDown}
-                 src={src}/>
+            <div onContextMenu={(e) => e.preventDefault()}>
+                <img id="metilda-audio-analysis-image"
+                     ref={this.metildaAudioAnalysisImageRef}
+                     className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
+                     src={src}/>
+            </div>
         );
     }
 }
