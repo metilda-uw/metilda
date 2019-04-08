@@ -133,10 +133,10 @@ class AudioAnalysis extends React.Component<Props, State> {
             maxPitch: AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
             minPitch: AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
             imageUrl: AudioAnalysis.formatImageUrl(
-                "",
+                this.getSpeaker().uploadId,
                 AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
                 AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH),
-            audioUrl: AudioAnalysis.formatAudioUrl(""),
+            audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
             maxSelectX: -1,
