@@ -93,15 +93,12 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     }
 
     saveImage() {
-        // trip file extension from upload ID
-        const fileName = this.props.fileName.split(".")[0] + ".png";
-
         // follows example from:
         // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
         // @ts-ignore (TypeScript doesn't like the toDataURL call below, but it works fine)
         const dataURL = this.stageRef.current!.getStage().toDataURL();
         this.downloadRef.current!.href = dataURL;
-        this.downloadRef.current!.download = fileName;
+        this.downloadRef.current!.download = this.props.fileName;
         this.downloadRef.current!.click();
     }
 

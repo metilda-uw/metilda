@@ -17,16 +17,23 @@ class CreatePitchArt extends React.Component<Props> {
     renderSpeakers = () => {
         return (
             this.props.speakers.map((item, index) =>
-               <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`} />
+                <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`}/>
             )
         );
     }
 
+    formatFileName = (uploadId: string): string => {
+        const splitIndex = uploadId.lastIndexOf(".");
+
+        if (splitIndex !== -1) {
+            return uploadId.slice(0, splitIndex);
+        }
+
+        return uploadId;
+    }
+
     render() {
-        // TODO: determine these new values
-        const uploadId = "";
-        const minPitch = 30;
-        const maxPitch = 300;
+        const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
 
         return (
             <div>
@@ -40,8 +47,6 @@ class CreatePitchArt extends React.Component<Props> {
                             speakers={this.props.speakers}
                             width={AudioAnalysis.AUDIO_IMG_WIDTH}
                             height={600}
-                            minPitch={minPitch}
-                            maxPitch={maxPitch}
                             setLetterPitch={this.props.setLetterPitch}
                             uploadId={uploadId}/>
                     </div>

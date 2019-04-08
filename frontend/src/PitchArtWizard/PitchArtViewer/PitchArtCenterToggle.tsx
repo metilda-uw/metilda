@@ -10,7 +10,7 @@ interface Props {
 class PitchArtCenterToggle extends React.Component<Props> {
     render() {
         return (
-            <div className="metilda-pitch-art-container-control-list-item">
+            <div className="metilda-pitch-art-container-control-list-item col s12">
                 <div className="top-label">
                     <label>Vertically Center</label>
                 </div>

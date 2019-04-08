@@ -1,6 +1,7 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Letter, Speaker} from "../../types/types";
+import PitchRange from "../AudioViewer/PitchRange";
 import AccentPitchToggle from "./AccentPitchToggle";
 import PitchArt from "./PitchArt";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
@@ -13,13 +14,15 @@ interface Props {
     speakers: Speaker[];
     width: number;
     height: number;
-    minPitch: number;
-    maxPitch: number;
+    minPitch?: number;
+    maxPitch?: number;
     uploadId: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
 
 interface State {
+    minPitch: number;
+    maxPitch: number;
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showVerticallyCentered: boolean;
@@ -28,9 +31,19 @@ interface State {
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
+    static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
+        return 75.0;
+    }
+
+    static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
+        return 500.0;
+    }
+
     constructor(props: Props) {
         super(props);
         this.state = {
+            minPitch: this.props.minPitch || PitchArtContainer.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: this.props.maxPitch || PitchArtContainer.DEFAULT_MAX_ANALYSIS_PITCH,
             showAccentPitch: false,
             showSyllableText: false,
             showVerticallyCentered: false,
@@ -57,12 +70,19 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.setState({[name]: value} as any);
     }
 
+    applyPitchRange = (minPitch: number, maxPitch: number) => {
+        this.setState({minPitch, maxPitch});
+    }
+
     render() {
         return (
             <div>
                 <div className="col s4">
                     <h6 className="metilda-control-header">Pitch Art</h6>
-                    <div className="metilda-pitch-art-container-control-list col s12">
+                    <div className="metilda-pitch-art-container-control-list">
+                        <PitchRange initMinPitch={this.state.minPitch}
+                                    initMaxPitch={this.state.maxPitch}
+                                    applyPitchRange={this.applyPitchRange}/>
                         <AccentPitchToggle
                             handleInputChange={this.handleInputChange}
                             showAccentPitch={this.state.showAccentPitch}/>
@@ -83,8 +103,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                 <div className="col s8">
                     <PitchArt width={this.props.width}
                               height={this.props.height}
-                              minPitch={this.props.minPitch}
-                              maxPitch={this.props.maxPitch}
+                              minPitch={this.state.minPitch}
+                              maxPitch={this.state.maxPitch}
                               uploadId={this.props.uploadId}
                               setLetterPitch={this.props.setLetterPitch}
                               showAccentPitch={this.state.showAccentPitch}
