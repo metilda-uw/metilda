@@ -11,22 +11,51 @@ class PitchRange extends Component {
         this.state = {
             minPitch: null,
             maxPitch: null,
+            errors: [],
             isMinDirty: false,
             isMaxDirty: false
         };
+        this.minPitchRef = React.createRef();
+        this.maxPitchRef = React.createRef();
         this.submitMaxPitch = this.submitMaxPitch.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     submitMaxPitch(event) {
-        event.preventDefault();
-        this.props.applyPitchRange(this.state.minPitch || this.props.initMinPitch,
-            this.state.maxPitch || this.props.initMaxPitch);
+        if (this.state.errors.length > 0) {
+            return;
+        }
+
+        this.props.applyPitchRange(this.minPitchRef.current.value, this.maxPitchRef.current.value);
+    }
+
+    validateInput = () => {
+        const minPitch = this.minPitchRef.current.value;
+        const maxPitch = this.maxPitchRef.current.value;
+
+        const errors = [];
+        const invalidValues = [minPitch, maxPitch].filter((value) => isNaN(value) || value <= 0.0);
+        if (invalidValues.length > 0) {
+            errors.push("Pitch must be a positive number");
+        }
+
+        this.setState({errors: errors});
+
+        return errors.length === 0;
     }
 
     handleInputChange(event) {
+        this.validateInput();
+
         const name = event.target.name;
-        this.setState({[name]: parseFloat(event.target.value)});
+        let num = parseFloat(event.target.value);
+
+        if (isNaN(num) || num <= 0) {
+            this.setState({[name]: ''});
+            return;
+        }
+
+        this.setState({[name]: num});
 
         if (name === 'minPitch') {
             this.setState({isMinDirty: true});
@@ -55,12 +84,16 @@ class PitchRange extends Component {
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12">
                 <label className="group-label">Pitch Range</label>
+                <span className="pitch-range-err-list">
+                    {this.state.errors.map((item, index) => <p key={index} className="pitch-range-err-list-item">{item}</p>)}
+                </span>
                 <div className="metilda-audio-analysis-controls-list-item-row">
                     <input name="minPitch"
                            id="minPitch"
+                           ref={this.minPitchRef}
                            value={minValue}
-                           onChange={this.handleInputChange}
-                           onKeyPress={this.enterPressed}
+                           onChange={(event) => this.handleInputChange(event)}
+                           onKeyPress={(event) => this.enterPressed(event)}
                            placeholder="min Hz"
                            className="validate pitch-range-input"
                            pattern="(\d+)(\.\d+)?"
@@ -71,9 +104,10 @@ class PitchRange extends Component {
                     </div>
                     <input name="maxPitch"
                            id="maxPitch"
+                           ref={this.maxPitchRef}
                            value={maxValue}
-                           onChange={this.handleInputChange}
-                           onKeyPress={this.enterPressed}
+                           onChange={(event) => this.handleInputChange(event)}
+                           onKeyPress={(event) => this.enterPressed(event)}
                            placeholder="max Hz"
                            className="validate pitch-range-input"
                            pattern="(\d+)(\.\d+)?"
@@ -81,7 +115,7 @@ class PitchRange extends Component {
                            type="text"/>
                     <button className="waves-effect waves-light btn"
                             type="submit"
-                            onClick={this.submitMaxPitch}>
+                            onClick={(event) => this.submitMaxPitch(event)}>
                         Apply
                     </button>
                 </div>

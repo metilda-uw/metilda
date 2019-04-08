@@ -1,3 +1,14 @@
 .pitch-range-input {
     width: 80px !important;
 }
+
+.pitch-range-err-list {
+    display: flex;
+}
+
+.pitch-range-err-list-item {
+    color: red;
+    margin-top: 8px;
+    margin-bottom: -8px;
+    font-size: 14px;
+}
