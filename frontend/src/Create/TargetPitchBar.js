@@ -114,7 +114,7 @@ class TargetPitchBar extends Component {
         let letters = this.scaleIntervals();
         return (
             <div>
-                <div className="metilda-control-container">
+                <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
                         <span>Target Pitch</span>
                     </div>

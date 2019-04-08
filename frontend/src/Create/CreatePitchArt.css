@@ -19,7 +19,7 @@
 }
 
 .metilda-audio-analysis-image-container {
-    margin-bottom: 8px;
+    margin-bottom: 0px;
 }
 
 .metilda-audio-analysis-image {
@@ -40,8 +40,6 @@
 .metilda-audio-analysis-image-col-3 {
     border: 1px solid black;
     height: 32px;
-    margin-top: 8px;
-    margin-bottom: 8px;
 }
 
 .metilda-audio-analysis-image-col-1 {
@@ -64,6 +62,10 @@
 .metilda-control-container {
     display: flex;
     align-items: center;
+}
+
+.metilda-target-pitch-bar {
+    margin-bottom: 4px;
 }
 
 .metilda-audio-analysis-image-col-2.metilda-audio-analysis-letter-container {
@@ -129,7 +131,7 @@
 #metilda-audio-function-btns {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
 }
 
 #metilda-audio-function-btns button {

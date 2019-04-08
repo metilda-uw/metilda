@@ -532,7 +532,7 @@ class AudioAnalysis extends React.Component<Props, State> {
             <div>
                 <div className="row">
                     <div className="metilda-audio-analysis-controls-list col s4">
-                        <h6 className="metilda-control-header">Audio Analysis</h6>
+                        <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
                         <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}/>
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
