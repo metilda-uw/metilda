@@ -1,7 +1,9 @@
 import * as React from "react";
+import PieMenu, { Slice } from "react-pie-menu";
 import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router";
 import {ThunkDispatch} from "redux-thunk";
+import {css, ThemeProvider} from "styled-components";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
@@ -12,6 +14,7 @@ import {Letter, Speaker} from "../types/types";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
+import * as audioImgMenuStyles from "./AudioImgMenu.styles";
 import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
 import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
@@ -29,6 +32,9 @@ export interface Props extends RouteComponentProps {
 }
 
 interface State {
+    showImgMenu: boolean;
+    imgMenuX: number;
+    imgMenuY: number;
     isAudioImageLoaded: boolean;
     soundLength: number;
     selectionInterval: string;
@@ -127,6 +133,9 @@ class AudioAnalysis extends React.Component<Props, State> {
         super(props);
 
         this.state = {
+            showImgMenu: false,
+            imgMenuX: -1,
+            imgMenuY: -1,
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
@@ -529,6 +538,60 @@ class AudioAnalysis extends React.Component<Props, State> {
         );
     }
 
+    showImgMenu = (imgMenuX: number, imgMenuY: number) => {
+        this.setState({imgMenuX, imgMenuY});
+    }
+
+    maybeRenderImgMenu = () => {
+        if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
+            const theme = {
+                pieMenu:  {
+                    container: css`z-index: 10;`,
+                },
+                slice: {
+                    container: audioImgMenuStyles.container,
+                }
+            };
+            return (
+                <div onContextMenu={(e) => e.preventDefault()}
+                     onClick={() => this.showImgMenu(-1, -1)}>
+                    <ThemeProvider theme={theme}>
+                        <PieMenu
+                            radius="100px"
+                            centerRadius="25px"
+                            centerX={`${this.state.imgMenuX}px`}
+                            centerY={`${this.state.imgMenuY}px`}
+                        >
+                            <Slice onSelect={this.showAllClicked} backgroundColor="lightgrey">
+                                <span>Show<br/>All</span>
+                            </Slice>
+                            <Slice onSelect={this.selectionIntervalClicked}
+                                   backgroundColor="darkgrey">
+                                <span>Select</span>
+                            </Slice>
+                            <Slice onSelect={this.averagePitchArtClicked}
+                                   backgroundColor="lightgrey">
+                                <span>Average<br/>Pitch</span>
+                            </Slice>
+                            <Slice onSelect={this.manualPitchArtClicked}
+                                   backgroundColor="darkgrey">
+                                <span>Manual<br/>Pitch</span>
+                            </Slice>
+                            <Slice onSelect={this.pitchArtRangeClicked}
+                                   backgroundColor="lightgrey">
+                                <span>Range<br/>Pitch</span>
+                            </Slice>
+                            <Slice onSelect={this.wordSplitClicked}
+                                   backgroundColor="darkgrey">
+                                <span>Split<br/>Word</span>
+                            </Slice>
+                        </PieMenu>
+                    </ThemeProvider>
+                </div>
+            );
+        }
+    }
+
     render() {
         const uploadId = this.getSpeaker().uploadId;
 
@@ -562,6 +625,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                         <div>
                             <div className="metilda-audio-analysis-image-container">
                                 {nonAudioImg}
+                                {this.maybeRenderImgMenu()}
                                 {
                                     uploadId ?
                                         <AudioImg
@@ -575,6 +639,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                                             audioIntervalSelected={this.audioIntervalSelected}
                                             audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
                                             onAudioImageLoaded={this.onAudioImageLoaded}
+                                            showImgMenu={this.showImgMenu}
                                             minAudioX={this.state.minAudioX}
                                             maxAudioX={this.state.maxAudioX}
                                             minAudioTime={this.state.minAudioTime}

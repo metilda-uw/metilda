@@ -57,9 +57,20 @@ class AudioImg extends Component {
             instance: true,
             handles: true,
             onInit: function () {
+                 $(".imgareaselect-selection, " +
+                   ".imgareaselect-border1, " +
+                   ".imgareaselect-border2, " +
+                   ".imgareaselect-border3, " +
+                   ".imgareaselect-border4, " +
+                   ".imgareaselect-outer").mousedown((e) => {
+                     e.preventDefault();
+                     audioImage.onMouseDown(e)
+                 }).contextmenu((e) => e.preventDefault());
+
                 audioImage.setState({isLoaded: true}, function () {
                     imgObj.setOptions({minHeight: $el.height()});
                 });
+
                 audioImage.props.onAudioImageLoaded(imgObj.cancelSelection, function (t1, t2) {
                     isProgrammaticSelection = true;
                     // clear existing selections
@@ -135,12 +146,21 @@ class AudioImg extends Component {
         });
     }
 
+    onMouseDown = (event) => {
+        if (event.which === 1) {
+            this.props.showImgMenu(-1, -1);
+        } else if (event.which === 3) {
+            this.props.showImgMenu(event.pageX, event.pageY);
+        }
+    }
+
     render() {
         const {src} = this.props;
         return (
             <img id="metilda-audio-analysis-image"
                  ref={this.metildaAudioAnalysisImageRef}
                  className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
+                 onMouseDown={this.onMouseDown}
                  src={src}/>
         );
     }
