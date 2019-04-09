@@ -1,3 +1,12 @@
+.pitch-art-legend-col-container {
+    display: flex;
+    flex-direction: row;
+}
+
+.pitch-art-legend-col {
+    margin-right: 16px;
+}
+
 .pitch-art-legend-list-item {
     display: flex;
     align-items: center;

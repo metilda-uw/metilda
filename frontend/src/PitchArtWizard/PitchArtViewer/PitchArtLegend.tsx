@@ -16,12 +16,12 @@ export default class PitchArtLegend extends React.Component<Props> {
     renderSpeaker = (speaker: Speaker, speakerIndex: number) => {
         const color = PitchArtLegend.SPEAKER_COLOR(speakerIndex);
         return (
-          <div className="pitch-art-legend-list-item" key={speakerIndex}>
-              <span style={{backgroundColor: color}} className="pitch-art-legend-icon"></span>
-              <p className="pitch-art-legend-list-item-text">Speaker {speakerIndex + 1}</p>
-          </div>
+            <div className="pitch-art-legend-list-item" key={speakerIndex}>
+                <span style={{backgroundColor: color}} className="pitch-art-legend-icon"></span>
+                <p className="pitch-art-legend-list-item-text">Speaker {speakerIndex + 1}</p>
+            </div>
         );
-    }
+    };
 
     render() {
         return (
@@ -29,11 +29,22 @@ export default class PitchArtLegend extends React.Component<Props> {
                 <div className="top-label">
                     <label>Legend</label>
                 </div>
-                {
-                    this.props.speakers.map(
-                    (item, speakerIndex) => this.renderSpeaker(item, speakerIndex)
-                    )
-                }
+                <div className="pitch-art-legend-col-container">
+                    <div className="pitch-art-legend-col">
+                        {
+                            this.props.speakers.slice(0, 2).map(
+                                (item, speakerIndex) => this.renderSpeaker(item, speakerIndex)
+                            )
+                        }
+                    </div>
+                    <div className="pitch-art-legend-col">
+                        {
+                            this.props.speakers.slice(2).map(
+                                (item, speakerIndex) => this.renderSpeaker(item, speakerIndex + 2)
+                            )
+                        }
+                    </div>
+                </div>
             </div>
         );
     }
