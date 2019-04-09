@@ -15,7 +15,7 @@ export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => 
         type: constants.ADD_SPEAKER,
         speakers: newSpeakers,
     });
-}
+};
 
 export const removeSpeaker = (speakerIndex: number):
     ActionReturn => (dispatch: Dispatch, getState) => {

@@ -1,6 +1,6 @@
 import * as queryString from "query-string";
-import * as React from "react";
 import {ChangeEvent, createRef} from "react";
+import * as React from "react";
 import {RouteComponentProps} from "react-router";
 import Recorder from "recorder-js";
 import AudioAnalysis from "../Create/AudioAnalysis";
@@ -8,11 +8,11 @@ import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
 import {RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
+import {Speaker} from "../types/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
-import {Speaker} from "../types/types";
 
 interface MatchParams {
     numSyllables: string;

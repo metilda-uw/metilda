@@ -21,7 +21,7 @@ export default class PitchArtLegend extends React.Component<Props> {
                 <p className="pitch-art-legend-list-item-text">Speaker {speakerIndex + 1}</p>
             </div>
         );
-    };
+    }
 
     render() {
         return (

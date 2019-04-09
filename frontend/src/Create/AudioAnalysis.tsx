@@ -560,7 +560,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                 if (!disabled) {
                     action();
                 }
-            }
+            };
 
             return (
                 <div onContextMenu={(e) => e.preventDefault()}

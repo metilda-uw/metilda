@@ -7,9 +7,9 @@ import PitchArt from "./PitchArt";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import "./PitchArtContainer.css";
+import PitchArtLegend from "./PitchArtLegend";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import SyllableToggle from "./SyllableToggle";
-import PitchArtLegend from "./PitchArtLegend";
 
 interface Props {
     speakers: Speaker[];
