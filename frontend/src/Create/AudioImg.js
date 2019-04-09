@@ -55,19 +55,31 @@ class AudioImg extends Component {
             prevMaxWidth = undefined;
         };
 
+        const classPrefix = `imgareaselect-speaker-${this.props.speakerIndex}`;
+
         let imgObj = $el.imgAreaSelect({
             instance: true,
             handles: true,
+            classPrefix: classPrefix,
+            resizable: false,
+            movable: false,
             onInit: function () {
-                $(".imgareaselect-selection, " +
-                    ".imgareaselect-border1, " +
-                    ".imgareaselect-border2, " +
-                    ".imgareaselect-border3, " +
-                    ".imgareaselect-border4, " +
-                    ".imgareaselect-outer").mousedown((e) => {
+                $(`.${classPrefix}-selection, ` +
+                    `.${classPrefix}-border1, ` +
+                    `.${classPrefix}-border2, ` +
+                    `.${classPrefix}-border3, ` +
+                    `.${classPrefix}-border4, ` +
+                    `.${classPrefix}-outer`).mousedown((e) => {
                     e.preventDefault();
                     audioImage.onMouseDown(e)
                 }).contextmenu((e) => e.preventDefault());
+
+                // apply styling to custom imgareaselect divs
+                $(`.${classPrefix}-border1`).addClass("imgareaselect-border1");
+                $(`.${classPrefix}-border2`).addClass("imgareaselect-border2");
+                $(`.${classPrefix}-border3`).addClass("imgareaselect-border3");
+                $(`.${classPrefix}-border4`).addClass("imgareaselect-border4");
+                $(`.${classPrefix}-outer`).addClass("imgareaselect-outer");
 
                 audioImage.setState({isLoaded: true}, function () {
                     imgObj.setOptions({minHeight: $el.height()});
@@ -149,7 +161,6 @@ class AudioImg extends Component {
     }
 
     onMouseDown = (event) => {
-        console.log("foobar")
         if (event.which === 1) {
             this.props.showImgMenu(-1, -1);
         } else if (event.which === 3) {

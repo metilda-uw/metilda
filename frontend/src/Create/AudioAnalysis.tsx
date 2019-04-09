@@ -651,6 +651,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                                         <AudioImg
                                             key={this.state.audioEditVersion}
                                             uploadId={uploadId}
+                                            speakerIndex={this.props.speakerIndex}
                                             src={this.state.imageUrl}
                                             ref="audioImage"
                                             imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
