@@ -23,13 +23,14 @@
 }
 
 .metilda-page-header {
-    margin-bottom: 30px;
+    margin-bottom: 0px;
 }
 
 .metilda-page-header h5 {
     position: relative;
     margin-left: 24px;
     text-align: left;
+    font-size: 22px !important;
 }
 
 .metilda-pitch-art-container-control-list {

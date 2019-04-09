@@ -7,6 +7,7 @@ import {setLetterPitch} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
+import "./CreatePitchArt.css";
 
 interface Props {
     speakers: Speaker[];
@@ -36,17 +37,14 @@ class CreatePitchArt extends React.Component<Props> {
         const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
 
         return (
-            <div>
-                <div className="metilda-page-header">
-                    <h5>Transcribe Audio</h5>
-                </div>
+            <div className="CreatePitchArt">
                 <div className="metilda-page-content">
                     {this.renderSpeakers()}
                     <div className="row">
                         <PitchArtContainer
                             speakers={this.props.speakers}
                             width={AudioAnalysis.AUDIO_IMG_WIDTH}
-                            height={600}
+                            height={500}
                             setLetterPitch={this.props.setLetterPitch}
                             uploadId={uploadId}/>
                     </div>
