@@ -98,6 +98,7 @@
     justify-content: center;
     align-items: center;
     border: 1px solid black;
+    margin-bottom: 6px;
 }
 
 .metilda-audio-analysis-image-loading .preloader-wrapper.big {
