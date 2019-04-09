@@ -26,7 +26,8 @@ class PitchRange extends Component {
             return;
         }
 
-        this.props.applyPitchRange(this.minPitchRef.current.value, this.maxPitchRef.current.value);
+        this.props.applyPitchRange(parseFloat(this.minPitchRef.current.value),
+                                   parseFloat(this.maxPitchRef.current.value));
     }
 
     validateInput = () => {
