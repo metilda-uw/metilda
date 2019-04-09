@@ -11,7 +11,8 @@ class AudioImg extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoaded: false
+            isLoaded: false,
+            imgObj: null
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
@@ -38,6 +39,14 @@ class AudioImg extends Component {
         return x0
     }
 
+    componentWillUnmount() {
+        this.state.imgObj.remove();
+    }
+
+    audioImgId = () => {
+        return `imgareaselect-speaker-${this.props.speakerIndex}`;
+    }
+
     componentDidMount() {
         const {xminPerc, xmaxPerc} = this.props;
 
@@ -55,33 +64,34 @@ class AudioImg extends Component {
             prevMaxWidth = undefined;
         };
 
-        const classPrefix = `imgareaselect-speaker-${this.props.speakerIndex}`;
+        const audioImgId = this.audioImgId();
 
         let imgObj = $el.imgAreaSelect({
             instance: true,
             handles: true,
-            classPrefix: classPrefix,
+            classPrefix: audioImgId,
             resizable: false,
             movable: false,
+            parent: `#${audioImgId}`,
             onInit: function () {
-                $(`.${classPrefix}-selection, ` +
-                    `.${classPrefix}-border1, ` +
-                    `.${classPrefix}-border2, ` +
-                    `.${classPrefix}-border3, ` +
-                    `.${classPrefix}-border4, ` +
-                    `.${classPrefix}-outer`).mousedown((e) => {
+                $(`.${audioImgId}-selection, ` +
+                    `.${audioImgId}-border1, ` +
+                    `.${audioImgId}-border2, ` +
+                    `.${audioImgId}-border3, ` +
+                    `.${audioImgId}-border4, ` +
+                    `.${audioImgId}-outer`).mousedown((e) => {
                     e.preventDefault();
                     audioImage.onMouseDown(e)
                 }).contextmenu((e) => e.preventDefault());
 
                 // apply styling to custom imgareaselect divs
-                $(`.${classPrefix}-border1`).addClass("imgareaselect-border1");
-                $(`.${classPrefix}-border2`).addClass("imgareaselect-border2");
-                $(`.${classPrefix}-border3`).addClass("imgareaselect-border3");
-                $(`.${classPrefix}-border4`).addClass("imgareaselect-border4");
-                $(`.${classPrefix}-outer`).addClass("imgareaselect-outer");
+                $(`.${audioImgId}-border1`).addClass("imgareaselect-border1");
+                $(`.${audioImgId}-border2`).addClass("imgareaselect-border2");
+                $(`.${audioImgId}-border3`).addClass("imgareaselect-border3");
+                $(`.${audioImgId}-border4`).addClass("imgareaselect-border4");
+                $(`.${audioImgId}-outer`).addClass("imgareaselect-outer");
 
-                audioImage.setState({isLoaded: true}, function () {
+                audioImage.setState({isLoaded: true, imgObj: imgObj}, function () {
                     imgObj.setOptions({minHeight: $el.height()});
                 });
 
@@ -172,6 +182,7 @@ class AudioImg extends Component {
         const {src} = this.props;
         return (
             <div onContextMenu={(e) => e.preventDefault()}>
+                <div id={this.audioImgId()} />
                 <img id="metilda-audio-analysis-image"
                      ref={this.metildaAudioAnalysisImageRef}
                      className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
