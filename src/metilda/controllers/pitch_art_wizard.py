@@ -72,7 +72,8 @@ def avg_pitch(upload_id):
 def all_pitches(upload_id):
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
-    time_range = [float(x) for x in request.args.get('time_range', "0, inf").split(",")]
+    t0 = request.args.get('t0', 0, type=float)
+    t1 = request.args.get('t1', float('inf'), type=float)
     temp_dir = None
 
     if 'file' in request.files:
@@ -83,7 +84,7 @@ def all_pitches(upload_id):
     else:
         sound_path = os.path.join(app.config["SOUNDS"], upload_id)
 
-    pitches = audio_analysis.get_all_pitches(time_range, sound_path, min_pitch, max_pitch)
+    pitches = audio_analysis.get_all_pitches([t0, t1], sound_path, min_pitch, max_pitch)
 
     if temp_dir is not None:
         shutil.rmtree(temp_dir)

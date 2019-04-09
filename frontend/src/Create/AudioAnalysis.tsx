@@ -335,22 +335,19 @@ class AudioAnalysis extends React.Component<Props, State> {
     pitchArtRangeClicked() {
         const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
 
-        const json = {
-            time_range: ts,
-        };
-
         type ApiResult = number[][];
 
         fetch("/api/all-pitches/"
             + this.getSpeaker().uploadId + "?max-pitch="
             + this.state.maxPitch
-            + "&min-pitch=" + this.state.minPitch, {
+            + "&min-pitch=" + this.state.minPitch
+            + "&t0=" + ts[0]
+            + "&t1=" + ts[1], {
             method: "POST",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify(json),
+            }
         })
             .then((response) => response.json())
             .then((data) => (data as ApiResult).map((item) => this.addPitch(item[1],
