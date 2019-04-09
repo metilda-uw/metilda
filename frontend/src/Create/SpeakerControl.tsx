@@ -32,7 +32,7 @@ export default class SpeakerControl extends React.Component<Props> {
         return (
             <button className="waves-effect waves-light btn"
                     onClick={this.props.addSpeaker}>
-                Add New
+                Add
             </button>
         );
     }

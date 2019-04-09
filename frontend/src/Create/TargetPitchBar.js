@@ -158,7 +158,7 @@ class TargetPitchBar extends Component {
                             name="action"
                             disabled={this.props.speakers[this.props.speakerIndex].length === 0}
                             onClick={this.resetAllLettersEvent}>
-                        Reset
+                        Clear
                     </button>
                 </div>
             </div>
