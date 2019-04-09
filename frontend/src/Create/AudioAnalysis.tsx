@@ -66,6 +66,10 @@ class AudioAnalysis extends React.Component<Props, State> {
      * below were altered slightly, the bug went away. Likely it
      * was a result of a weird, undocumented edge case in that library.
      */
+    static SPEAKER_LIMIT(): number {
+        return 4;
+    }
+
     static get MIN_IMAGE_XPERC(): number {
         return 351.0 / 2800.0;
     }
@@ -530,7 +534,7 @@ class AudioAnalysis extends React.Component<Props, State> {
             <SpeakerControl
                 addSpeaker={this.props.addSpeaker}
                 removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-                canAddSpeaker={isLastSpeaker}
+                canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
                 canRemoveSpeaker={!isFirstSpeaker}/>
         );
     }
