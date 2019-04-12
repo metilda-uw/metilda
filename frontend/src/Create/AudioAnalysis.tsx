@@ -1,5 +1,8 @@
+import {faCircle, faCut, faEllipsisH, faRulerHorizontal,
+        faSearchMinus, faSearchPlus} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
-import PieMenu, { Slice } from "react-pie-menu";
+import PieMenu, {Slice} from "react-pie-menu";
 import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router";
 import {ThunkDispatch} from "redux-thunk";
@@ -11,6 +14,7 @@ import {AppState} from "../store";
 import {addLetter, addSpeaker, removeSpeaker, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
+import "./AudioAnalysis.css";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
@@ -546,7 +550,7 @@ class AudioAnalysis extends React.Component<Props, State> {
     maybeRenderImgMenu = () => {
         if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
             const theme = {
-                pieMenu:  {
+                pieMenu: {
                     container: css`z-index: 10;`,
                 },
                 slice: {
@@ -571,40 +575,76 @@ class AudioAnalysis extends React.Component<Props, State> {
                      onClick={() => this.showImgMenu(-1, -1)}>
                     <ThemeProvider theme={theme}>
                         <PieMenu
-                            radius="95px"
-                            centerRadius="25px"
+                            radius="110px"
+                            centerRadius="20px"
                             centerX={`${this.state.imgMenuX}px`}
                             centerY={`${this.state.imgMenuY}px`}
                         >
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.averagePitchArtClicked)}
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.wordSplitClicked)}
                                    disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
-                                <span>Average<br/>Pitch</span>
+                                <div className="menu-icon-top">
+                                    <FontAwesomeIcon icon={faCut} size="2x"/>
+                                    <br/>
+                                    <span>Split</span>
+                                </div>
                             </Slice>
                             <Slice onSelect={() => maybeDo(!isSelectionActive, this.selectionIntervalClicked)}
                                    disabled={!isSelectionActive}
                                    backgroundColor="lightgrey">
-                                <span>Select</span>
+                                <div className="menu-icon-top-right">
+                                    <FontAwesomeIcon icon={faSearchPlus}
+                                                     size="2x"/>
+                                    <br/>
+                                    <span>Zoom</span>
+                                </div>
                             </Slice>
                             <Slice onSelect={() => maybeDo(!isSelectionActive, this.manualPitchArtClicked)}
                                    disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
-                                <span>Manual<br/>Pitch</span>
+                                <div className="menu-icon-bottom-right">
+                                    <FontAwesomeIcon icon={faCircle}
+                                                     size="xs"
+                                    />
+                                    <br/>
+                                    <span>Manual</span>
+                                </div>
+                            </Slice>
+                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.averagePitchArtClicked)}
+                                   disabled={!isSelectionActive}
+                                   backgroundColor="lightgrey">
+                                <div className="menu-icon-bottom">
+                                    <FontAwesomeIcon icon={faEllipsisH}
+                                                     size="2x"
+                                                     className="avg-ellipsis"
+                                    />
+                                    <br />
+                                    <FontAwesomeIcon icon={faRulerHorizontal}
+                                                     size="2x"
+                                    />
+                                    <br />
+                                    <span>Average</span>
+                                </div>
                             </Slice>
                             <Slice onSelect={() => maybeDo(!isSelectionActive, this.pitchArtRangeClicked)}
                                    disabled={!isSelectionActive}
-                                   backgroundColor="lightgrey">
-                                <span>Range<br/>Pitch</span>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.wordSplitClicked)}
-                                   disabled={!isSelectionActive}
                                    backgroundColor="darkgrey">
-                                <span>Split<br/>Word</span>
+                                <div className="menu-icon-bottom-left">
+                                    <FontAwesomeIcon icon={faEllipsisH}
+                                                     size="2x"/>
+                                    <br/>
+                                    <span>Range</span>
+                                </div>
                             </Slice>
                             <Slice onSelect={() => maybeDo(isAllShown, this.showAllClicked)}
                                    disabled={isAllShown}
                                    backgroundColor="lightgrey">
-                                <span>Show<br/>All</span>
+                                <div className="menu-icon-top-left">
+                                    <FontAwesomeIcon icon={faSearchMinus}
+                                                     size="2x"/>
+                                    <br/>
+                                    <span>All</span>
+                                </div>
                             </Slice>
                         </PieMenu>
                     </ThemeProvider>
