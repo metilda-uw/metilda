@@ -186,9 +186,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         }
 
         const colors: { [key: number]: string } = {
-            0: "#003489",
-            1: "#008489",
-            2: "#0d0d7c"
+            0: "green",
+            1: "orange",
+            2: "blue",
+            3: "brown",
+            4: "red"
         };
 
         return (
@@ -198,7 +200,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                                windowConfig={windowConfig}
                                showVerticallyCentered={this.props.showVerticallyCentered}
                                fillColor={index < lastIndex ? colors[index % Object.keys(colors).length] : undefined}
-                               opacity={index < lastIndex ? 0.2 : undefined}/>
+                               opacity={index < lastIndex ? 0.35 : undefined}/>
             )
         );
     }
