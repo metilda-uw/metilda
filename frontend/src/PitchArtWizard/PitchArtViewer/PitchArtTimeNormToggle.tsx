@@ -10,7 +10,7 @@ interface Props {
 class PitchArtTimeNormToggle extends React.Component<Props> {
     render() {
         return (
-            <div className="metilda-pitch-art-container-control-list-item col s12">
+            <div className="metilda-pitch-art-container-control-list-item col s6">
                 <div className="top-label">
                     <label>Time Normalization</label>
                 </div>

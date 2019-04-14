@@ -39,6 +39,10 @@
     align-items: flex-start;
 }
 
+.metilda-pitch-art-container-control-toggle-list {
+    margin-left: 0 !important;
+}
+
 .metilda-pitch-art-container-control-list-item {
     margin-bottom: 24px;
     text-align: left;

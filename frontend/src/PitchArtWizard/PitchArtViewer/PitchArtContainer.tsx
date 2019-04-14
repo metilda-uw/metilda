@@ -76,7 +76,7 @@ class PitchArtContainer extends React.Component<Props, State> {
 
     applyPitchRange = (minPitch: number, maxPitch: number) => {
         this.setState({minPitch, maxPitch});
-    }
+    };
 
     render() {
         return (
@@ -87,27 +87,29 @@ class PitchArtContainer extends React.Component<Props, State> {
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
-                        <AccentPitchToggle
-                            handleInputChange={this.handleInputChange}
-                            showAccentPitch={this.state.showAccentPitch}/>
-                        <SyllableToggle
-                            handleInputChange={this.handleInputChange}
-                            showSyllableText={this.state.showSyllableText}/>
-                        <PitchArtCenterToggle
-                            handleInputChange={this.handleInputChange}
-                            showVerticallyCentered={this.state.showVerticallyCentered}/>
-                        <PitchArtLinesToggle
-                            handleInputChange={this.handleInputChange}
-                            showPitchArtLines={this.state.showPitchArtLines}/>
-                        <PitchArtCircleToggle
-                            handleInputChange={this.handleInputChange}
-                            showLargeCircles={this.state.showLargeCircles}/>
-                        <PitchArtTimeNormToggle
-                            handleInputChange={this.handleInputChange}
-                            showTimeNormalization={this.state.showTimeNormalization}/>
+                        <div className="row metilda-pitch-art-container-control-toggle-list">
+                            <AccentPitchToggle
+                                handleInputChange={this.handleInputChange}
+                                showAccentPitch={this.state.showAccentPitch}/>
+                            <SyllableToggle
+                                handleInputChange={this.handleInputChange}
+                                showSyllableText={this.state.showSyllableText}/>
+                            <PitchArtCenterToggle
+                                handleInputChange={this.handleInputChange}
+                                showVerticallyCentered={this.state.showVerticallyCentered}/>
+                            <PitchArtLinesToggle
+                                handleInputChange={this.handleInputChange}
+                                showPitchArtLines={this.state.showPitchArtLines}/>
+                            <PitchArtCircleToggle
+                                handleInputChange={this.handleInputChange}
+                                showLargeCircles={this.state.showLargeCircles}/>
+                            <PitchArtTimeNormToggle
+                                handleInputChange={this.handleInputChange}
+                                showTimeNormalization={this.state.showTimeNormalization}/>
+                        </div>
                         {
                             this.props.speakers.length > 1
-                                && <PitchArtLegend speakers={this.props.speakers}/>
+                            && <PitchArtLegend speakers={this.props.speakers}/>
                         }
                     </div>
                 </div>
