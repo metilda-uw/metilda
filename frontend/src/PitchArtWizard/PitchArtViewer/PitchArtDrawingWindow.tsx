@@ -25,6 +25,7 @@ interface Props {
     showVerticallyCentered: boolean;
     showAccentPitch: boolean;
     showSyllableText: boolean;
+    showTimeNormalization: boolean;
     showPrevPitchValueLists: boolean;
     rawPitchValueLists?: RawPitchValue[][];
 }
@@ -329,6 +330,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                                       showVerticallyCentered={this.props.showVerticallyCentered}
                                       showAccentPitch={this.props.showAccentPitch}
                                       showSyllableText={this.props.showSyllableText}
+                                      showTimeNormalization={this.props.showTimeNormalization}
                                       showPrevPitchValueLists={this.props.showPrevPitchValueLists}
                                       largeCircleRadius={this.largeCircleRadius}
                                       smallCircleRadius={this.smallCircleRadius}

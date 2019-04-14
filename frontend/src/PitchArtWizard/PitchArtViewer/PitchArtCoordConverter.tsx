@@ -5,13 +5,16 @@ class PitchArtCoordConverter {
     private config: PitchArtWindowConfig;
     private pitchValues?: RawPitchValue[];
     private readonly vertOffset: number;
+    private isTimeNormalized: boolean;
 
     constructor(config: PitchArtWindowConfig,
                 pitchValues?: RawPitchValue[],
-                isVerticallyCentered?: boolean) {
+                isVerticallyCentered?: boolean,
+                isTimeNormalized?: boolean) {
         this.config = config;
         this.pitchValues = pitchValues;
         this.vertOffset = 0.0;
+        this.isTimeNormalized = isTimeNormalized || false;
 
         if (isVerticallyCentered && pitchValues) {
             this.vertOffset = this.centerOffset(
@@ -28,7 +31,10 @@ class PitchArtCoordConverter {
         let timePerc;
 
         if (this.pitchValues.length === 1) {
-            timePerc = 0.1;
+            timePerc = 0.0;
+        } else if (this.isTimeNormalized) {
+            const timeIndex = this.pitchValues.map((item) => item.t0).indexOf(time);
+            timePerc = timeIndex / (this.pitchValues.length - 1);
         } else {
             const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
             timePerc = (time - this.pitchValues[0].t0) / totalDuration;

@@ -10,6 +10,7 @@ import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
 import SyllableToggle from "./SyllableToggle";
+import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
 
 interface Props {
     speakers: Speaker[];
@@ -29,6 +30,7 @@ interface State {
     showVerticallyCentered: boolean;
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
+    showTimeNormalization: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -49,7 +51,8 @@ class PitchArtContainer extends React.Component<Props, State> {
             showSyllableText: false,
             showVerticallyCentered: false,
             showPitchArtLines: true,
-            showLargeCircles: true
+            showLargeCircles: true,
+            showTimeNormalization: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -99,6 +102,9 @@ class PitchArtContainer extends React.Component<Props, State> {
                         <PitchArtCircleToggle
                             handleInputChange={this.handleInputChange}
                             showLargeCircles={this.state.showLargeCircles}/>
+                        <PitchArtTimeNormToggle
+                            handleInputChange={this.handleInputChange}
+                            showTimeNormalization={this.state.showTimeNormalization}/>
                         {
                             this.props.speakers.length > 1
                                 && <PitchArtLegend speakers={this.props.speakers}/>
@@ -117,6 +123,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showVerticallyCentered={this.state.showVerticallyCentered}
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
+                              showTimeNormalization={this.state.showTimeNormalization}
                               speakers={this.props.speakers}/>
                 </div>
             </div>

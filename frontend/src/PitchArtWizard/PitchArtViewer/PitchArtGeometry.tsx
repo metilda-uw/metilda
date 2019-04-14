@@ -19,6 +19,7 @@ interface Props {
     showVerticallyCentered: boolean;
     showAccentPitch: boolean;
     showSyllableText: boolean;
+    showTimeNormalization: boolean;
     showPrevPitchValueLists: boolean;
     largeCircleRadius: number;
     smallCircleRadius: number;
@@ -47,7 +48,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
         const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
             pitchValues,
-            this.props.showVerticallyCentered
+            this.props.showVerticallyCentered,
+            this.props.showTimeNormalization
         );
 
         const points = [];

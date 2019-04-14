@@ -16,6 +16,7 @@ interface Props {
     showVerticallyCentered: boolean;
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
+    showTimeNormalization: boolean;
     speakers: Speaker[];
 }
 
@@ -55,6 +56,7 @@ class PitchArt extends React.Component<Props> {
                         showVerticallyCentered={this.props.showVerticallyCentered}
                         showPitchArtLines={this.props.showPitchArtLines}
                         showLargeCircles={this.props.showLargeCircles}
+                        showTimeNormalization={this.props.showTimeNormalization}
                         showPrevPitchValueLists={false}
                         speakers={this.props.speakers}/>);
     }
