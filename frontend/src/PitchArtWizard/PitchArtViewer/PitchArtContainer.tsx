@@ -9,8 +9,8 @@ import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
-import SyllableToggle from "./SyllableToggle";
 import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
+import SyllableToggle from "./SyllableToggle";
 
 interface Props {
     speakers: Speaker[];
@@ -76,7 +76,7 @@ class PitchArtContainer extends React.Component<Props, State> {
 
     applyPitchRange = (minPitch: number, maxPitch: number) => {
         this.setState({minPitch, maxPitch});
-    };
+    }
 
     render() {
         return (
