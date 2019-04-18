@@ -1,4 +1,4 @@
-import {exponentToNote, referenceExponent} from "./PitchArtScale";
+import {exponentToNote, referenceExponent, roundToNearestNote} from "./PitchArtScale";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 class PitchArtCoordConverter {
@@ -30,7 +30,7 @@ class PitchArtCoordConverter {
 
         let timePerc;
 
-        if (this.pitchValues.length === 1) {
+        if (this.pitchValues.length <= 1) {
             timePerc = 0.0;
         } else if (this.isTimeNormalized) {
             const timeIndex = this.pitchValues.map((item) => item.t0).indexOf(time);
@@ -61,11 +61,42 @@ class PitchArtCoordConverter {
         // Convert the rectangular coordinate to the appropriate "step" along the perceptual scale
         const pitchIntervalSteps = referenceExponent(this.config.dMax) - referenceExponent(this.config.dMin);
         const rectCoordStepOffset = Math.round(pitchIntervalSteps * rectCoordPerc);
-        let rectCoordPitch = exponentToNote(referenceExponent(this.config.dMin) + rectCoordStepOffset);
-
-        rectCoordPitch = Math.min(rectCoordPitch, this.config.dMax);
-        rectCoordPitch = Math.max(rectCoordPitch, this.config.dMin);
+        const rectCoordPitch = exponentToNote(referenceExponent(this.config.dMin) + rectCoordStepOffset);
         return rectCoordPitch;
+    }
+
+    vertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
+        const minExponent = referenceExponent(minValue);
+        const maxExponent = referenceExponent(maxValue);
+
+        let exponentStep: number;
+
+        if (!numSteps) {
+            const dStep = maxExponent - minExponent;
+
+            if (dStep / 10.0 > 2.0) {
+                numSteps = 10;
+                exponentStep = (maxExponent - minExponent) / numSteps;
+            } else if (dStep > 10) {
+                exponentStep = 4;
+            } else {
+                exponentStep = 1;
+            }
+        } else {
+            exponentStep  = (maxExponent - minExponent) / numSteps;
+        }
+
+        const exponents = [];
+
+        let currExponent: number = minExponent;
+        while (currExponent < maxExponent) {
+            exponents.push(currExponent);
+            currExponent += exponentStep;
+        }
+
+        exponents.push(maxExponent);
+
+        return exponents.map((value) => exponentToNote(value));
     }
 
     private centerOffset(pitches: number[]) {

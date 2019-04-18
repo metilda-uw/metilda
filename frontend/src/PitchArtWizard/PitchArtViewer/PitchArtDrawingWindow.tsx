@@ -9,6 +9,7 @@ import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
+import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 
 interface Props {
     speakers: Speaker[];
@@ -316,6 +317,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
                     </Layer>
+                    <PitchArtCoordinateSystem
+                        fontSize={this.fontSize * 0.75}
+                        windowConfig={windowConfig}
+                        xOrigin={windowConfig.x0 * 0.5}
+                    />
                     <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
                                       setLetterPitch={this.props.setLetterPitch}
