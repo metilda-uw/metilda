@@ -1,7 +1,7 @@
 import {exponentToNote, referenceExponent, roundToNearestNote} from "./PitchArtScale";
-import {PitchArtWindowConfig, RawPitchValue} from "./types";
+import {PitchArtCoordConverter, PitchArtWindowConfig, RawPitchValue} from "./types";
 
-class PitchArtCoordConverter {
+class PitchArtPerceptualScale implements PitchArtCoordConverter {
     private config: PitchArtWindowConfig;
     private pitchValues?: RawPitchValue[];
     private readonly vertOffset: number;
@@ -23,7 +23,7 @@ class PitchArtCoordConverter {
         }
     }
 
-    horzIndexToRectCoords(time: number) {
+    horzIndexToRectCoords(time: number): number {
         if (!this.pitchValues) {
             throw new Error("Unsupported operation, pitchValues is not provided");
         }
@@ -44,7 +44,7 @@ class PitchArtCoordConverter {
         return this.config.x0 + pointDx;
     }
 
-    vertValueToRectCoords(pitch: number) {
+    vertValueToRectCoords(pitch: number): number {
         const refExp = referenceExponent(pitch);
         const pitchIntervalSteps = referenceExponent(this.config.dMax) - referenceExponent(this.config.dMin);
         const valuePerc = (refExp - referenceExponent(this.config.dMin)) / pitchIntervalSteps;
@@ -52,7 +52,7 @@ class PitchArtCoordConverter {
         return this.config.innerHeight - rectHeight + this.config.y0 - this.vertOffset;
     }
 
-    rectCoordsToVertValue(rectCoord: number) {
+    rectCoordsToVertValue(rectCoord: number): number {
         let rectCoordPerc = (rectCoord - this.config.y0) / (this.config.innerHeight - this.config.y0);
         rectCoordPerc = Math.min(rectCoordPerc, 1.0);
         rectCoordPerc = Math.max(rectCoordPerc, 0.0);
@@ -113,4 +113,4 @@ class PitchArtCoordConverter {
 
 }
 
-export default PitchArtCoordConverter;
+export default PitchArtPerceptualScale;

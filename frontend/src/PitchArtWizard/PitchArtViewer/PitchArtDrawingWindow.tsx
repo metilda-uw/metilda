@@ -4,12 +4,12 @@ import * as Tone from "tone";
 import {Encoding} from "tone";
 import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
-import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
-import {PitchArtWindowConfig, RawPitchValue} from "./types";
+import PitchArtPerceptualScale from "./PitchArtPerceptualScale";
+import {PitchArtCoordConverter, PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
-import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 
 interface Props {
     speakers: Speaker[];
@@ -296,7 +296,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         const colorSchemes = this.props.speakers.map((item, index) =>
             this.colorScheme(this.props.showArtDesign, item, index)
         );
-        const coordConverter = new PitchArtCoordConverter(windowConfig);
+        const coordConverter = new PitchArtPerceptualScale(windowConfig);
 
         return (
             <div>

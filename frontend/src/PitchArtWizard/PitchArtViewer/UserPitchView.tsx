@@ -1,6 +1,6 @@
 import * as React from "react";
 import {Circle, Layer} from "react-konva";
-import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import PitchArtPerceptualScale from "./PitchArtPerceptualScale";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 interface Props {
@@ -24,7 +24,7 @@ class UserPitchView extends React.Component<Props> {
     }
 
     render() {
-        const coordConverter = new PitchArtCoordConverter(
+        const coordConverter = new PitchArtPerceptualScale(
             this.props.windowConfig,
             this.props.pitchValues,
             this.props.showVerticallyCentered
