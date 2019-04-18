@@ -12,10 +12,3 @@ export interface PitchArtWindowConfig {
     dMin: number;  // the initial value of the domain data
     dMax: number;    // the final value of the domain data
 }
-
-export interface PitchArtCoordConverter {
-    horzIndexToRectCoords(time: number): number;
-    vertValueToRectCoords(pitch: number): number;
-    rectCoordsToVertValue(rectCoord: number): number;
-    vertValueRange(minValue: number, maxValue: number, numSteps?: number): number[];
-}

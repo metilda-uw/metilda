@@ -1,8 +1,8 @@
 import {expect} from "chai";
 import * as React from "react";
-import PitchArtPerceptualScale from "./PitchArtPerceptualScale";
+import PitchArtCoordConverter from "./PitchArtCoordConverter";
 
-describe("PitchArtPerceptualScale", () => {
+describe("PitchArtCoordConverter", () => {
     describe("horzIndexToRectCoords", () => {
         it("GIVEN a time scale EXPECT coordinates are evenly distributed", () => {
             const config = {
@@ -13,7 +13,7 @@ describe("PitchArtPerceptualScale", () => {
                 dMin: 1,
                 dMax: 10
             };
-            const subject = new PitchArtPerceptualScale(
+            const subject = new PitchArtCoordConverter(
                 config,
                 [{t0: 1, t1: 2, pitch: 42}, {t0: 3, t1: 4, pitch: 42}],
                 true);
@@ -31,7 +31,7 @@ describe("PitchArtPerceptualScale", () => {
             dMax: 10
         };
 
-        const subject = new PitchArtPerceptualScale(
+        const subject = new PitchArtCoordConverter(
             config,
             [{t0: 1, t1: 2, pitch: 42}, {t0: 3, t1: 4, pitch: 42}],
             true);

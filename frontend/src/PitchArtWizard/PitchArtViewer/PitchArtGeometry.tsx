@@ -1,9 +1,9 @@
 import React from "react";
 import {Circle, Group, Layer, Line, Text} from "react-konva";
 import {Letter, Speaker} from "../../types/types";
+import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import {ColorScheme} from "./PitchArtDrawingWindow";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
-import PitchArtPerceptualScale from "./PitchArtPerceptualScale";
 
 interface Props {
     speakers: Speaker[];
@@ -45,7 +45,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
 
         const pitchValues: RawPitchValue[] = speaker.letters.filter((data) => !data.isWordSep);
 
-        const coordConverter = new PitchArtPerceptualScale(
+        const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
             pitchValues,
             this.props.showVerticallyCentered,

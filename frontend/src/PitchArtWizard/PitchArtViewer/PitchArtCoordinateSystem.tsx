@@ -1,7 +1,7 @@
 import * as React from "react";
 import {Group, Layer, Line, Text} from "react-konva";
-import PitchArtPerceptualScale from "./PitchArtPerceptualScale";
-import {PitchArtCoordConverter, PitchArtWindowConfig, RawPitchValue} from "./types";
+import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 interface Props {
     fontSize: number;
@@ -19,21 +19,11 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
     }
 
     render() {
-        let coordConverter: PitchArtCoordConverter;
-
-        if (true) {
-            coordConverter = new PitchArtPerceptualScale(
-                this.props.windowConfig,
-                [{pitch: this.props.windowConfig.dMin, t0: 0, t1: 0},
-                    {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}]
-            );
-        } else {
-            coordConverter = new PitchArtPerceptualScale(
-                this.props.windowConfig,
-                [{pitch: this.props.windowConfig.dMin, t0: 0, t1: 0},
-                    {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}]
-            );
-        }
+        const coordConverter = new PitchArtCoordConverter(
+            this.props.windowConfig,
+            [{pitch: this.props.windowConfig.dMin, t0: 0, t1: 0},
+                {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}]
+        );
 
         const yMin = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMin);
         const yMax = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMax);
@@ -50,7 +40,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
         return (
             <Layer>
                 {
-                    axisTickMarks.map((value: number, index: number) => {
+                    axisTickMarks.map((value, index) => {
                         const currVertValue = coordConverter.vertValueToRectCoords(value);
                         return (
                             <Group key={index}>
