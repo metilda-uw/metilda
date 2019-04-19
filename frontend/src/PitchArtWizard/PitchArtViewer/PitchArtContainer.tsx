@@ -84,6 +84,12 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.setState({minPitch, maxPitch});
     }
 
+    onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
+        if (isVerticallyCentered) {
+            this.setState({showPitchScale: false});
+        }
+    }
+
     render() {
         return (
             <div>
@@ -102,7 +108,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 showSyllableText={this.state.showSyllableText}/>
                             <PitchArtCenterToggle
                                 handleInputChange={this.handleInputChange}
-                                showVerticallyCentered={this.state.showVerticallyCentered}/>
+                                showVerticallyCentered={this.state.showVerticallyCentered}
+                                onVerticallyCenterClick={this.onVerticallyCenterClick}/>
                             <PitchArtLinesToggle
                                 handleInputChange={this.handleInputChange}
                                 showPitchArtLines={this.state.showPitchArtLines}/>
@@ -114,7 +121,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 showTimeNormalization={this.state.showTimeNormalization}/>
                             <PitchArtShowScaleToggle
                                 handleInputChange={this.handleInputChange}
-                                showPitchScale={this.state.showPitchScale}/>
+                                showPitchScale={this.state.showPitchScale}
+                                disabled={this.state.showVerticallyCentered}/>
                             <PitchArtScaleToggle
                                 handleInputChange={this.handleInputChange}
                                 showPerceptualScale={this.state.showPerceptualScale}/>

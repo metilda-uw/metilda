@@ -5,6 +5,7 @@ import "../GlobalStyling.css";
 interface Props {
     showPitchScale: boolean;
     handleInputChange: (event: ChangeEvent) => void;
+    disabled: boolean;
 }
 
 class PitchArtShowScaleToggle extends React.Component<Props> {
@@ -20,6 +21,7 @@ class PitchArtShowScaleToggle extends React.Component<Props> {
                         <input type="checkbox"
                                checked={this.props.showPitchScale}
                                onChange={this.props.handleInputChange}
+                               disabled={this.props.disabled}
                                name="showPitchScale"/>
                         <span className="lever"></span>
                         Show

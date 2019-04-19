@@ -1,13 +1,19 @@
 import * as React from "react";
-import {ChangeEvent} from "react";
+import {ChangeEvent, SyntheticEvent} from "react";
 import "../GlobalStyling.css";
 
 interface Props {
     showVerticallyCentered: boolean;
     handleInputChange: (event: ChangeEvent) => void;
+    onVerticallyCenterClick: (isVerticallyCentered: boolean) => void;
 }
 
 class PitchArtCenterToggle extends React.Component<Props> {
+    onChangeEvent = (event: ChangeEvent) => {
+        this.props.handleInputChange(event);
+        this.props.onVerticallyCenterClick(!this.props.showVerticallyCentered);
+    }
+
     render() {
         return (
             <div className="metilda-pitch-art-container-control-list-item col s6">
@@ -19,7 +25,7 @@ class PitchArtCenterToggle extends React.Component<Props> {
                         No
                         <input type="checkbox"
                                checked={this.props.showVerticallyCentered}
-                               onChange={this.props.handleInputChange}
+                               onChange={this.onChangeEvent}
                                name="showVerticallyCentered"/>
                         <span className="lever"></span>
                         Yes
