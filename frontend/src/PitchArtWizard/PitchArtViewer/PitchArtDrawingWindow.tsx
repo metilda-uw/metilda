@@ -136,7 +136,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             pitch: number;
         }
 
-        const notes = letters.map(function (item, index) {
+        const notes = letters.map(function(item, index) {
                 return {
                     time: item.t0 - tStart,
                     duration: item.t1 - item.t0,
@@ -149,7 +149,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         const controller = this;
 
         // @ts-ignore
-        const midiPart = new Tone.Part(function (time: Encoding.Time, note: PitchArtNote) {
+        const midiPart = new Tone.Part(function(time: Encoding.Time, note: PitchArtNote) {
             controller.setState({activePlayIndex: note.index});
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
