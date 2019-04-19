@@ -13,7 +13,7 @@ class PitchArtShowScaleToggle extends React.Component<Props> {
         return (
             <div className="metilda-pitch-art-container-control-list-item col s6">
                 <div className="top-label">
-                    <label>Show Scale</label>
+                    <label>Pitch Scale</label>
                 </div>
                 <div className="switch">
                     <label>
