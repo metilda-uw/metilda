@@ -260,6 +260,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showVerticallyCentered={true}
                                         showPitchArtLines={true}
                                         showTimeNormalization={false}
+                                        showPitchScale={false}
+                                        showPerceptualScale={true}
                                         showLargeCircles={true}
                                         showPrevPitchValueLists={this.state.showPrevPitchValueLists}
                                         speakers={speakers}

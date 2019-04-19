@@ -7,6 +7,8 @@ interface Props {
     fontSize: number;
     windowConfig: PitchArtWindowConfig;
     xOrigin: number;
+    xMax: number;
+    showPerceptualScale: boolean;
 }
 
 export default class PitchArtCoordinateSystem extends React.Component<Props> {
@@ -22,7 +24,10 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
         const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
             [{pitch: this.props.windowConfig.dMin, t0: 0, t1: 0},
-                {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}]
+                        {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}],
+            false,
+            false,
+            this.props.showPerceptualScale
         );
 
         const yMin = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMin);
@@ -45,7 +50,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         return (
                             <Group key={index}>
                                 <Line points={[this.props.xOrigin - tickWidth, currVertValue,
-                                               this.props.xOrigin + tickWidth, currVertValue]}
+                                    this.props.xOrigin + tickWidth, currVertValue]}
                                       strokeWidth={1}
                                       stroke="black"
                                 />
@@ -60,6 +65,10 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         );
                     })
                 }
+                <Line points={[this.props.xOrigin, yMin, this.props.xMax, yMin]}
+                      strokeWidth={1}
+                      stroke="black"
+                />
                 <Line points={[this.props.xOrigin, yMin, this.props.xOrigin, yMax]}
                       strokeWidth={1}
                       stroke="black"/>

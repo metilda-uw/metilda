@@ -17,6 +17,8 @@ interface Props {
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
     showTimeNormalization: boolean;
+    showPitchScale: boolean;
+    showPerceptualScale: boolean;
     speakers: Speaker[];
 }
 
@@ -57,6 +59,8 @@ class PitchArt extends React.Component<Props> {
                         showPitchArtLines={this.props.showPitchArtLines}
                         showLargeCircles={this.props.showLargeCircles}
                         showTimeNormalization={this.props.showTimeNormalization}
+                        showPitchScale={this.props.showPitchScale}
+                        showPerceptualScale={this.props.showPerceptualScale}
                         showPrevPitchValueLists={false}
                         speakers={this.props.speakers}/>);
     }

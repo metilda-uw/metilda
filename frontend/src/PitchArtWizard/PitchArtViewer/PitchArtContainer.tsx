@@ -9,6 +9,8 @@ import PitchArtCircleToggle from "./PitchArtCircleToggle";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
+import PitchArtScaleToggle from "./PitchArtScaleToggle";
+import PitchArtShowScaleToggle from "./PitchArtShowScaleToggle";
 import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
 import SyllableToggle from "./SyllableToggle";
 
@@ -31,6 +33,8 @@ interface State {
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
     showTimeNormalization: boolean;
+    showPitchScale: boolean;
+    showPerceptualScale: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -52,7 +56,9 @@ class PitchArtContainer extends React.Component<Props, State> {
             showVerticallyCentered: false,
             showPitchArtLines: true,
             showLargeCircles: true,
-            showTimeNormalization: false
+            showTimeNormalization: false,
+            showPitchScale: false,
+            showPerceptualScale: true
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -106,6 +112,12 @@ class PitchArtContainer extends React.Component<Props, State> {
                             <PitchArtTimeNormToggle
                                 handleInputChange={this.handleInputChange}
                                 showTimeNormalization={this.state.showTimeNormalization}/>
+                            <PitchArtShowScaleToggle
+                                handleInputChange={this.handleInputChange}
+                                showPitchScale={this.state.showPitchScale}/>
+                            <PitchArtScaleToggle
+                                handleInputChange={this.handleInputChange}
+                                showPerceptualScale={this.state.showPerceptualScale}/>
                         </div>
                         {
                             this.props.speakers.length > 1
@@ -126,6 +138,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showPitchArtLines={this.state.showPitchArtLines}
                               showLargeCircles={this.state.showLargeCircles}
                               showTimeNormalization={this.state.showTimeNormalization}
+                              showPitchScale={this.state.showPitchScale}
+                              showPerceptualScale={this.state.showPerceptualScale}
                               speakers={this.props.speakers}/>
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import {scaleLinear} from "d3-scale";
 import {exponentToNote, referenceExponent, roundToNearestNote} from "./PitchArtScale";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
@@ -6,15 +7,18 @@ class PitchArtCoordConverter {
     private pitchValues?: RawPitchValue[];
     private readonly vertOffset: number;
     private isTimeNormalized: boolean;
+    private isPerceptualScale: boolean;
 
     constructor(config: PitchArtWindowConfig,
                 pitchValues?: RawPitchValue[],
                 isVerticallyCentered?: boolean,
-                isTimeNormalized?: boolean) {
+                isTimeNormalized?: boolean,
+                isPerceptualScale?: boolean) {
         this.config = config;
         this.pitchValues = pitchValues;
         this.vertOffset = 0.0;
         this.isTimeNormalized = isTimeNormalized || false;
+        this.isPerceptualScale = isPerceptualScale || false;
 
         if (isVerticallyCentered && pitchValues) {
             this.vertOffset = this.centerOffset(
@@ -44,7 +48,37 @@ class PitchArtCoordConverter {
         return this.config.x0 + pointDx;
     }
 
-    vertValueToRectCoords(pitch: number) {
+    vertValueToRectCoords(pitch: number): number {
+        if (this.isPerceptualScale) {
+            return this.perceptualVertValueToRectCoords(pitch);
+        } else {
+           return this.linearVertValueToRectCoords(pitch);
+        }
+    }
+
+    rectCoordsToVertValue(rectCoord: number): number {
+        if (this.isPerceptualScale) {
+            return this.perceptualRectCoordsToVertValue(rectCoord);
+        } else {
+            return this.linearRectCoordsToVertValue(rectCoord);
+        }
+    }
+
+    vertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
+        if (this.isPerceptualScale) {
+            return this.perceptualVertValueRange(minValue, maxValue, numSteps);
+        } else {
+            return this.linearVertValueRange(minValue, maxValue, numSteps);
+        }
+    }
+
+    private linearVertValueToRectCoords(pitch: number): number {
+        const scale = scaleLinear().domain([this.config.dMin, this.config.dMax])
+                                   .range([this.config.innerHeight + this.config.y0, this.config.y0]);
+        return scale(pitch) - this.vertOffset;
+    }
+
+    private perceptualVertValueToRectCoords(pitch: number) {
         const refExp = referenceExponent(pitch);
         const pitchIntervalSteps = referenceExponent(this.config.dMax) - referenceExponent(this.config.dMin);
         const valuePerc = (refExp - referenceExponent(this.config.dMin)) / pitchIntervalSteps;
@@ -52,7 +86,13 @@ class PitchArtCoordConverter {
         return this.config.innerHeight - rectHeight + this.config.y0 - this.vertOffset;
     }
 
-    rectCoordsToVertValue(rectCoord: number) {
+    private linearRectCoordsToVertValue(rectCoord: number): number {
+        const scale = scaleLinear().domain([this.config.dMin, this.config.dMax])
+                                   .range([this.config.innerHeight, this.config.y0]);
+        return scale.invert(rectCoord);
+    }
+
+    private perceptualRectCoordsToVertValue(rectCoord: number) {
         let rectCoordPerc = (rectCoord - this.config.y0) / (this.config.innerHeight - this.config.y0);
         rectCoordPerc = Math.min(rectCoordPerc, 1.0);
         rectCoordPerc = Math.max(rectCoordPerc, 0.0);
@@ -65,7 +105,29 @@ class PitchArtCoordConverter {
         return rectCoordPitch;
     }
 
-    vertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
+    private linearVertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
+        let numTickMarks: number;
+        const dStep = maxValue - minValue;
+
+        if (!numSteps) {
+            if (dStep / 10.0 > 2.0) {
+                numTickMarks = 10;
+            } else if (dStep > 10) {
+                numTickMarks = 4;
+            } else {
+                numTickMarks = 1;
+            }
+        } else {
+            numTickMarks  = dStep / numSteps;
+        }
+
+        const scale = scaleLinear().domain([this.config.dMin, this.config.dMax])
+                                   .range([this.config.innerHeight + this.config.y0, this.config.y0]);
+
+        return scale.ticks(numTickMarks);
+    }
+
+    private perceptualVertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
         const minExponent = referenceExponent(minValue);
         const maxExponent = referenceExponent(maxValue);
 

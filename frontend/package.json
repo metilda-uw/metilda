@@ -22,6 +22,7 @@
     "@types/styled-components": "^4.1.13",
     "@types/tone": "git://github.com/Tonejs/TypeScript.git",
     "chai": "^4.2.0",
+    "d3-scale": "^3.0.0",
     "enzyme": "^3.9.0",
     "enzyme-adapter-react-16": "^1.11.2",
     "font-awesome": "^4.7.0",
@@ -68,6 +69,7 @@
   ],
   "proxy": "http://localhost:5000",
   "devDependencies": {
+    "@types/d3-scale": "^2.1.1",
     "chai-enzyme": "^1.0.0-beta.1"
   }
 }

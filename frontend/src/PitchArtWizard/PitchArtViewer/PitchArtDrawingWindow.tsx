@@ -5,11 +5,11 @@ import {Encoding} from "tone";
 import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
-import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 
 interface Props {
     speakers: Speaker[];
@@ -27,6 +27,8 @@ interface Props {
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showTimeNormalization: boolean;
+    showPitchScale: boolean;
+    showPerceptualScale: boolean;
     showPrevPitchValueLists: boolean;
     rawPitchValueLists?: RawPitchValue[][];
 }
@@ -134,7 +136,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             pitch: number;
         }
 
-        const notes = letters.map(function(item, index) {
+        const notes = letters.map(function (item, index) {
                 return {
                     time: item.t0 - tStart,
                     duration: item.t1 - item.t0,
@@ -147,7 +149,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         const controller = this;
 
         // @ts-ignore
-        const midiPart = new Tone.Part(function(time: Encoding.Time, note: PitchArtNote) {
+        const midiPart = new Tone.Part(function (time: Encoding.Time, note: PitchArtNote) {
             controller.setState({activePlayIndex: note.index});
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
@@ -283,6 +285,22 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         };
     }
 
+    maybeShowPitchScale = (windowConfig: PitchArtWindowConfig) => {
+        if (!this.props.showPitchScale) {
+            return;
+        }
+
+        return (
+            <PitchArtCoordinateSystem
+                fontSize={this.fontSize * 0.75}
+                windowConfig={windowConfig}
+                xOrigin={windowConfig.x0 * 0.5}
+                xMax={windowConfig.x0 + windowConfig.innerWidth + (windowConfig.x0 / 2)}
+                showPerceptualScale={this.props.showPerceptualScale}
+            />
+        );
+    }
+
     render() {
         const windowConfig = {
             innerHeight: this.innerHeight,
@@ -312,16 +330,12 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.innerBorderX0, this.innerBorderY0]}
                               strokeWidth={this.borderWidth}
                               stroke={this.props.showArtDesign && colorSchemes.length === 1
-                                    ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
+                                  ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
                               onClick={() => this.imageBoundaryClicked(coordConverter)}
                               onMouseEnter={() => this.setPointerEnabled(true)}
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
                     </Layer>
-                    <PitchArtCoordinateSystem
-                        fontSize={this.fontSize * 0.75}
-                        windowConfig={windowConfig}
-                        xOrigin={windowConfig.x0 * 0.5}
-                    />
+                    {this.maybeShowPitchScale(windowConfig)}
                     <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
                                       setLetterPitch={this.props.setLetterPitch}
@@ -337,6 +351,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                                       showAccentPitch={this.props.showAccentPitch}
                                       showSyllableText={this.props.showSyllableText}
                                       showTimeNormalization={this.props.showTimeNormalization}
+                                      showPerceptualScale={this.props.showPerceptualScale}
                                       showPrevPitchValueLists={this.props.showPrevPitchValueLists}
                                       largeCircleRadius={this.largeCircleRadius}
                                       smallCircleRadius={this.smallCircleRadius}
@@ -345,7 +360,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                                       circleStrokeWidth={this.circleStrokeWidth}
                                       pitchArtSoundLengthSeconds={this.pitchArtSoundLengthSeconds}
                                       accentedCircleRadius={this.accentedCircleRadius}
-                                      setPointerEnabled={this.setPointerEnabled} />
+                                      setPointerEnabled={this.setPointerEnabled}/>
                     {this.maybeUserPitchView(windowConfig)}
                 </Stage>
                 <a className="hide" ref={this.downloadRef}>
