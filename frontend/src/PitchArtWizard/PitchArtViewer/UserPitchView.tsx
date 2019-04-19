@@ -7,6 +7,8 @@ interface Props {
     pitchValues: RawPitchValue[];
     windowConfig: PitchArtWindowConfig;
     showVerticallyCentered: boolean;
+    showTimeNormalized: boolean;
+    showPerceptualScale: boolean;
     fillColor?: string;
     opacity?: number;
 }
@@ -27,7 +29,9 @@ class UserPitchView extends React.Component<Props> {
         const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
             this.props.pitchValues,
-            this.props.showVerticallyCentered
+            this.props.showVerticallyCentered,
+            this.props.showTimeNormalized,
+            this.props.showPerceptualScale
         );
 
         const points: number[] = [];

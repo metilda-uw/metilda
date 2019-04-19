@@ -186,7 +186,10 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             return (
                 <UserPitchView pitchValues={this.props.rawPitchValueLists[lastIndex]}
                                windowConfig={windowConfig}
-                               showVerticallyCentered={this.props.showVerticallyCentered}/>);
+                               showTimeNormalized={this.props.showTimeNormalization}
+                               showVerticallyCentered={this.props.showVerticallyCentered}
+                               showPerceptualScale={this.props.showPerceptualScale}
+                />);
         }
 
         const colors: { [key: number]: string } = {
@@ -202,7 +205,9 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 <UserPitchView pitchValues={item}
                                key={"user-pitch-view-" + index}
                                windowConfig={windowConfig}
+                               showTimeNormalized={this.props.showTimeNormalization}
                                showVerticallyCentered={this.props.showVerticallyCentered}
+                               showPerceptualScale={this.props.showPerceptualScale}
                                fillColor={index < lastIndex ? colors[index % Object.keys(colors).length] : undefined}
                                opacity={index < lastIndex ? 0.35 : undefined}/>
             )
@@ -314,7 +319,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
         const colorSchemes = this.props.speakers.map((item, index) =>
             this.colorScheme(this.props.showArtDesign, item, index)
         );
-        const coordConverter = new PitchArtCoordConverter(windowConfig);
+        const coordConverter = new PitchArtCoordConverter(windowConfig,
+            [],
+            false,
+            false,
+            this.props.showPerceptualScale);
 
         return (
             <div>

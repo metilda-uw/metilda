@@ -4,16 +4,16 @@ import {PitchArtWindowConfig, RawPitchValue} from "./types";
 
 class PitchArtCoordConverter {
     private config: PitchArtWindowConfig;
-    private pitchValues?: RawPitchValue[];
+    private readonly pitchValues: RawPitchValue[];
     private readonly vertOffset: number;
-    private isTimeNormalized: boolean;
-    private isPerceptualScale: boolean;
+    private readonly isTimeNormalized: boolean;
+    private readonly isPerceptualScale: boolean;
 
     constructor(config: PitchArtWindowConfig,
-                pitchValues?: RawPitchValue[],
-                isVerticallyCentered?: boolean,
-                isTimeNormalized?: boolean,
-                isPerceptualScale?: boolean) {
+                pitchValues: RawPitchValue[],
+                isVerticallyCentered: boolean,
+                isTimeNormalized: boolean,
+                isPerceptualScale: boolean) {
         this.config = config;
         this.pitchValues = pitchValues;
         this.vertOffset = 0.0;
