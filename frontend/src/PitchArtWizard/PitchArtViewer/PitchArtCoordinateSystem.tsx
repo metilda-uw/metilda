@@ -67,7 +67,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         );
                     })
                 }
-                <Text x={this.props.xOrigin * 0.20}
+                <Text x={this.props.xOrigin * 0.17}
                       y={yMin}
                       width={Math.abs(yMax - yMin)}
                       align={"center"}
