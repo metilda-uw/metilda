@@ -42,6 +42,8 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
 
         const tickWidth = 5;
 
+        const yAxisTitle = this.props.showPerceptualScale ? "MeTILDA Perceptual Scale (Hz)" : "Linear Scale (Hz)";
+
         return (
             <Layer>
                 {
@@ -65,6 +67,13 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         );
                     })
                 }
+                <Text x={this.props.xOrigin * 0.20}
+                      y={yMin}
+                      width={Math.abs(yMax - yMin)}
+                      align={"center"}
+                      fontSize={this.props.fontSize * 1.4}
+                      text={yAxisTitle}
+                      rotation={-90}/>
                 <Line points={[this.props.xOrigin, yMin, this.props.xMax, yMin]}
                       strokeWidth={1}
                       stroke="black"

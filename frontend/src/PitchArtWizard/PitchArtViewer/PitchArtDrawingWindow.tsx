@@ -299,7 +299,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             <PitchArtCoordinateSystem
                 fontSize={this.fontSize * 0.75}
                 windowConfig={windowConfig}
-                xOrigin={windowConfig.x0 * 0.5}
+                xOrigin={windowConfig.x0 * 0.75}
                 xMax={windowConfig.x0 + windowConfig.innerWidth + (windowConfig.x0 / 2)}
                 showPerceptualScale={this.props.showPerceptualScale}
             />
