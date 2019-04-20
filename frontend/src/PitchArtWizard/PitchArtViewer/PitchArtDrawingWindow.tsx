@@ -29,6 +29,7 @@ interface Props {
     showTimeNormalization: boolean;
     showPitchScale: boolean;
     showPerceptualScale: boolean;
+    showPitchArtImageColor: boolean;
     showPrevPitchValueLists: boolean;
     rawPitchValueLists?: RawPitchValue[][];
 }
@@ -337,7 +338,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                             this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.props.height - this.innerBorderY0,
                             this.innerBorderX0, this.innerBorderY0]}
-                              strokeWidth={this.borderWidth}
+                              strokeWidth={this.props.showPitchArtImageColor ? this.borderWidth : 0}
                               stroke={this.props.showArtDesign && colorSchemes.length === 1
                                   ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
                               onClick={() => this.imageBoundaryClicked(coordConverter)}

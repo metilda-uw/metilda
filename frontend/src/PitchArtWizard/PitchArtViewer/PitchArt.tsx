@@ -66,6 +66,7 @@ class PitchArt extends React.Component<Props> {
                         showTimeNormalization={this.props.showTimeNormalization}
                         showPitchScale={this.props.showPitchScale}
                         showPerceptualScale={this.props.showPerceptualScale}
+                        showPitchArtImageColor={this.props.showPitchArtImageColor}
                         showPrevPitchValueLists={false}
                         speakers={this.props.speakers}/>);
     }
