@@ -23,7 +23,8 @@ class ExportMetildaTranscribe extends React.Component<Props> {
             letters: speaker.letters
         } as Speaker;
         const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
-        fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
+        const fileName = `Speaker${this.props.speakerIndex + 1}_${timeStamp}.json`;
+        fileDownload(JSON.stringify(metildaWord, null, 2), fileName);
     }
 
     isDisabled = () => {
