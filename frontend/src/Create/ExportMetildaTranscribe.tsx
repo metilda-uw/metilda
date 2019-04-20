@@ -21,7 +21,7 @@ class ExportMetildaTranscribe extends React.Component<Props> {
         const metildaWord = {
             uploadId: speaker.uploadId,
             letters: speaker.letters
-        } as MetildaWord;
+        } as Speaker;
         const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
     }
