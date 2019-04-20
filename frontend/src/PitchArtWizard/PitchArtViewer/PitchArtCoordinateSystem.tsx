@@ -52,7 +52,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         return (
                             <Group key={index}>
                                 <Line points={[this.props.xOrigin - tickWidth, currVertValue,
-                                    this.props.xOrigin + tickWidth, currVertValue]}
+                                               this.props.xOrigin, currVertValue]}
                                       strokeWidth={1}
                                       stroke="black"
                                 />
