@@ -13,16 +13,14 @@ import "./ExportMetildaTranscribe.css";
 interface Props extends RouteComponentProps {
     speakers: Speaker[];
     speakerIndex: number;
-    word: string;
 }
 
 class ExportMetildaTranscribe extends React.Component<Props> {
-    state = {};
-
     exportToJson = () => {
+        const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
-            uploadId: this.props.word,
-            letters: this.props.speakers[this.props.speakerIndex].letters
+            uploadId: speaker.uploadId,
+            letters: speaker.letters
         } as MetildaWord;
         const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
         fileDownload(JSON.stringify(metildaWord, null, 2), `Metilda_Transcribe_${timeStamp}.json`);
@@ -43,15 +41,11 @@ class ExportMetildaTranscribe extends React.Component<Props> {
 
     render() {
         return (
-            <div className="metilda-audio-analysis-controls-list-item col s12">
-                <label className="group-label">Export</label>
-                <div className="metilda-audio-analysis-controls-list-item-row">
-                    <button className="waves-effect waves-light btn"
-                            disabled={this.isDisabled()}
-                            onClick={this.exportToJson}>To JSON
-                    </button>
-                </div>
-            </div>
+            <button className="waves-effect waves-light btn"
+                    disabled={this.isDisabled()}
+                    onClick={this.exportToJson}>
+                Save
+            </button>
         );
     }
 }

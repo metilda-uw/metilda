@@ -528,15 +528,13 @@ class AudioAnalysis extends React.Component<Props, State> {
         });
     }
 
-    maybeRenderSpeakerControl = () => {
+    renderSpeakerControl = () => {
         const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
         const isFirstSpeaker = this.props.speakerIndex === 0;
-        if (!(isLastSpeaker || !isFirstSpeaker)) {
-            return;
-        }
 
         return (
             <SpeakerControl
+                speakerIndex={this.props.speakerIndex}
                 addSpeaker={this.props.addSpeaker}
                 removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
                 canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
@@ -678,11 +676,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
-                        <ExportMetildaTranscribe
-                            word={uploadId}
-                            speakerIndex={this.props.speakerIndex}/>
-                        <ImportMetildaTranscribe speakerIndex={this.props.speakerIndex}/>
-                        {this.maybeRenderSpeakerControl()}
+                        {this.renderSpeakerControl()}
                     </div>
                     <div className="metilda-audio-analysis col s8">
                         <div>

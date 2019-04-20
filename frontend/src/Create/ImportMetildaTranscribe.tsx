@@ -28,20 +28,15 @@ class ImportMetildaTranscribe extends React.Component<Props> {
             });
             reader.readAsText(file);
         }
-    }
+    };
 
     render() {
         return (
-            <div className="metilda-audio-analysis-controls-list-item col s12">
-                <label className="group-label">Import</label>
-                <div className="metilda-audio-analysis-controls-list-item-row">
-                    <FileReaderInput as="binary" onChange={this.fileSelected}>
-                        <button className="waves-effect waves-light btn">
-                            From JSON
-                        </button>
-                    </FileReaderInput>
-                </div>
-            </div>
+            <FileReaderInput as="binary" onChange={this.fileSelected}>
+                <button className="waves-effect waves-light btn">
+                    Load
+                </button>
+            </FileReaderInput>
         );
     }
 }

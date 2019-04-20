@@ -1,9 +1,12 @@
 import * as React from "react";
 import "../PitchArtWizard/GlobalStyling.css";
 import "./CreatePitchArt.css";
+import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
+import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 import "./SpeakerControl.css";
 
 interface Props {
+    speakerIndex: number;
     addSpeaker: () => void;
     removeSpeaker: () => void;
     canAddSpeaker: boolean;
@@ -44,6 +47,8 @@ export default class SpeakerControl extends React.Component<Props> {
                 <div className="metilda-audio-analysis-controls-list-item-row-left-align">
                     {this.maybeRenderAddSpeaker()}
                     {this.maybeRenderRemoveSpeaker()}
+                    <ExportMetildaTranscribe speakerIndex={this.props.speakerIndex} />
+                    <ImportMetildaTranscribe speakerIndex={this.props.speakerIndex} />
                 </div>
             </div>
         );
