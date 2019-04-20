@@ -2,7 +2,7 @@ import update from "immutability-helper";
 import {Dispatch} from "redux";
 import {ThunkAction} from "redux-thunk";
 import * as constants from "../../constants";
-import {Letter} from "../../types/types";
+import {Letter, Speaker} from "../../types/types";
 import {AppState} from "../index";
 import {AudioAction} from "./types";
 
@@ -73,6 +73,18 @@ export const resetLetters = (speakerIndex: number): ActionReturn => (dispatch: D
     const newSpeakers = update(speakers, {[speakerIndex]: {letters: {$set: []}}});
     dispatch({
         type: constants.RESET_LETTERS,
+        speakers: newSpeakers,
+    });
+};
+
+export const setSpeaker = (speakerIndex: number, speaker: Speaker):
+    ActionReturn => (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+
+    const newSpeakers = update(speakers, {[speakerIndex]: {$set: speaker}});
+
+    dispatch({
+        type: constants.SET_SPEAKER,
         speakers: newSpeakers,
     });
 };

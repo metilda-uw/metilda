@@ -24,6 +24,7 @@ import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
+import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 
 export interface Props extends RouteComponentProps {
     speakerIndex: number;
@@ -680,6 +681,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                         <ExportMetildaTranscribe
                             word={uploadId}
                             speakerIndex={this.props.speakerIndex}/>
+                        <ImportMetildaTranscribe speakerIndex={this.props.speakerIndex}/>
                         {this.maybeRenderSpeakerControl()}
                     </div>
                     <div className="metilda-audio-analysis col s8">

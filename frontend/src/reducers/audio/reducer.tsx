@@ -20,6 +20,8 @@ const reducer: Reducer<AudioAnalysisState> = (state: AudioAnalysisState = defaul
             return {...state, speakers: action.speakers};
         case constants.RESET_LETTERS:
             return {...state, speakers: action.speakers};
+        case constants.SET_SPEAKER:
+            return {...state, speakers: action.speakers};
         case constants.SET_LETTER_SYLLABLE:
             return {...state, speakers: action.speakers};
         case constants.MANUAL_PITCH_ADJUST:
