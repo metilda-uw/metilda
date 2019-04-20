@@ -19,6 +19,7 @@ interface Props {
     showTimeNormalization: boolean;
     showPitchScale: boolean;
     showPerceptualScale: boolean;
+    showPitchArtImageColor: boolean;
     speakers: Speaker[];
 }
 
@@ -35,7 +36,11 @@ class PitchArt extends React.Component<Props> {
     }
 
     saveImage() {
-        this.hiddenRef.current!.saveImage();
+        if (this.props.showPitchArtImageColor) {
+            this.hiddenRef.current!.saveImage();
+        } else {
+            this.visibleRef.current!.saveImage();
+        }
     }
 
     playPitchArt() {

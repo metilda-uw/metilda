@@ -13,6 +13,7 @@ import PitchArtScaleToggle from "./PitchArtScaleToggle";
 import PitchArtShowScaleToggle from "./PitchArtShowScaleToggle";
 import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
 import SyllableToggle from "./SyllableToggle";
+import PitchArtColorToggle from "./PitchArtColorToggle";
 
 interface Props {
     speakers: Speaker[];
@@ -35,6 +36,7 @@ interface State {
     showTimeNormalization: boolean;
     showPitchScale: boolean;
     showPerceptualScale: boolean;
+    showPitchArtImageColor: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -58,7 +60,8 @@ class PitchArtContainer extends React.Component<Props, State> {
             showLargeCircles: true,
             showTimeNormalization: false,
             showPitchScale: false,
-            showPerceptualScale: true
+            showPerceptualScale: true,
+            showPitchArtImageColor: true
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -126,6 +129,9 @@ class PitchArtContainer extends React.Component<Props, State> {
                             <PitchArtScaleToggle
                                 handleInputChange={this.handleInputChange}
                                 showPerceptualScale={this.state.showPerceptualScale}/>
+                            <PitchArtColorToggle
+                                handleInputChange={this.handleInputChange}
+                                showPitchArtImageColor={this.state.showPitchArtImageColor} />
                         </div>
                         {
                             this.props.speakers.length > 1
@@ -148,6 +154,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showTimeNormalization={this.state.showTimeNormalization}
                               showPitchScale={this.state.showPitchScale}
                               showPerceptualScale={this.state.showPerceptualScale}
+                              showPitchArtImageColor={this.state.showPitchArtImageColor}
                               speakers={this.props.speakers}/>
                 </div>
             </div>
