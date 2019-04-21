@@ -138,7 +138,7 @@ class PitchArtCoordConverter {
 
             if (dStep / 10.0 > 2.0) {
                 numSteps = 10;
-                exponentStep = (maxExponent - minExponent) / numSteps;
+                exponentStep = Math.round((maxExponent - minExponent) / numSteps);
             } else if (dStep > 10) {
                 exponentStep = 4;
             } else {
@@ -151,12 +151,10 @@ class PitchArtCoordConverter {
         const exponents = [];
 
         let currExponent: number = minExponent;
-        while (currExponent < maxExponent) {
+        while (currExponent <= maxExponent) {
             exponents.push(currExponent);
             currExponent += exponentStep;
         }
-
-        exponents.push(maxExponent);
 
         return exponents.map((value) => exponentToNote(value));
     }

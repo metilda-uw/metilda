@@ -61,7 +61,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                                       fontSize={this.props.fontSize}
                                       height={PitchArtCoordinateSystem.TEXT_BOX_HEIGHT()}
                                       verticalAlign="middle"
-                                      text={`${value.toFixed(0)}`}
+                                      text={`${Math.round(value).toFixed(0)}`}
                                 />
                             </Group>
                         );
