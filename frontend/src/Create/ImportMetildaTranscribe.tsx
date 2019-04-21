@@ -28,7 +28,7 @@ class ImportMetildaTranscribe extends React.Component<Props> {
             });
             reader.readAsText(file);
         }
-    };
+    }
 
     render() {
         return (

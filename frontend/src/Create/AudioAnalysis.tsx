@@ -1,5 +1,11 @@
-import {faCircle, faCut, faEllipsisH, faRulerHorizontal,
-        faSearchMinus, faSearchPlus} from "@fortawesome/free-solid-svg-icons";
+import {
+    faCircle,
+    faCut,
+    faEllipsisH,
+    faRulerHorizontal,
+    faSearchMinus,
+    faSearchPlus
+} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
 import PieMenu, {Slice} from "react-pie-menu";
@@ -19,12 +25,10 @@ import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
 import * as audioImgMenuStyles from "./AudioImgMenu.styles";
-import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
 import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
-import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 
 export interface Props extends RouteComponentProps {
     speakerIndex: number;

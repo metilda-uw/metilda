@@ -1,11 +1,12 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
-import {Letter, Speaker} from "../../types/types";
+import {Speaker} from "../../types/types";
 import PitchRange from "../AudioViewer/PitchRange";
 import AccentPitchToggle from "./AccentPitchToggle";
 import PitchArt from "./PitchArt";
 import PitchArtCenterToggle from "./PitchArtCenterToggle";
 import PitchArtCircleToggle from "./PitchArtCircleToggle";
+import PitchArtColorToggle from "./PitchArtColorToggle";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtLinesToggle from "./PitchArtLinesToggle";
@@ -13,7 +14,6 @@ import PitchArtScaleToggle from "./PitchArtScaleToggle";
 import PitchArtShowScaleToggle from "./PitchArtShowScaleToggle";
 import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
 import SyllableToggle from "./SyllableToggle";
-import PitchArtColorToggle from "./PitchArtColorToggle";
 
 interface Props {
     speakers: Speaker[];
