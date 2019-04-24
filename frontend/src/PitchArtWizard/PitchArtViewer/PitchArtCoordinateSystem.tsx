@@ -9,6 +9,8 @@ interface Props {
     xOrigin: number;
     xMax: number;
     showPerceptualScale: boolean;
+    axisTickMarkClicked: (coordConverter: PitchArtCoordConverter) => void;
+    setPointerEnabled: (isEnabled: boolean) => void;
 }
 
 export default class PitchArtCoordinateSystem extends React.Component<Props> {
@@ -61,6 +63,9 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                                       fontSize={this.props.fontSize}
                                       height={PitchArtCoordinateSystem.TEXT_BOX_HEIGHT()}
                                       verticalAlign="middle"
+                                      onClick={() => this.props.axisTickMarkClicked(coordConverter)}
+                                      onMouseEnter={() => this.props.setPointerEnabled(true)}
+                                      onMouseLeave={() => this.props.setPointerEnabled(false)}
                                       text={`${Math.round(value).toFixed(0)}`}
                                 />
                             </Group>

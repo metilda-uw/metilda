@@ -303,6 +303,8 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
                 xOrigin={windowConfig.x0 * 0.77}
                 xMax={windowConfig.x0 + windowConfig.innerWidth + (windowConfig.x0 / 2)}
                 showPerceptualScale={this.props.showPerceptualScale}
+                axisTickMarkClicked={this.imageBoundaryClicked}
+                setPointerEnabled={this.setPointerEnabled}
             />
         );
     }
