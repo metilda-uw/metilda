@@ -1,4 +1,5 @@
 import * as React from "react";
+import {SyntheticEvent} from "react";
 import FileReaderInput, {Result} from "react-file-reader-input";
 import {connect} from "react-redux";
 import {RouteComponentProps} from "react-router-dom";
@@ -14,6 +15,7 @@ import "./ImportMetildaTranscribe.css";
 interface Props extends RouteComponentProps {
     speakerIndex: number;
     setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
+    onImport: (event: SyntheticEvent) => boolean;
 }
 
 class ImportMetildaTranscribe extends React.Component<Props> {
@@ -33,8 +35,8 @@ class ImportMetildaTranscribe extends React.Component<Props> {
     render() {
         return (
             <FileReaderInput as="binary" onChange={this.fileSelected}>
-                <button className="waves-effect waves-light btn">
-                    Load
+                <button onClick={this.props.onImport} className="waves-effect waves-light btn">
+                    Open
                 </button>
             </FileReaderInput>
         );
