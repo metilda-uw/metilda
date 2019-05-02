@@ -108,7 +108,7 @@ class AudioAnalysis extends React.Component<Props, State> {
     }
 
     static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
-        let url = `/api/audio-analysis-image/${uploadId}.png`;
+        let url = `/api/audio/${uploadId}.png/image`;
         const urlOptions = [];
 
         if (minPitch !== undefined) {
@@ -136,9 +136,9 @@ class AudioAnalysis extends React.Component<Props, State> {
 
     static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
         if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
-            return `/api/audio/${uploadId}?tmin=${tmin}&tmax=${tmax}`;
+            return `/api/audio/${uploadId}/file?tmin=${tmin}&tmax=${tmax}`;
         } else {
-            return `/api/audio/${uploadId}`;
+            return `/api/audio/${uploadId}/file`;
         }
     }
 
@@ -202,12 +202,11 @@ class AudioAnalysis extends React.Component<Props, State> {
 
         const controller = this;
         const request: RequestInit = {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",
-            },
-            body: JSON.stringify({uploadId}),
+            }
         };
 
         const imageUrl = AudioAnalysis.formatImageUrl(
@@ -217,7 +216,7 @@ class AudioAnalysis extends React.Component<Props, State> {
 
         const audioUrl = AudioAnalysis.formatAudioUrl(uploadId);
 
-        fetch("/api/sound-length/" + uploadId, request)
+        fetch(`/api/audio/${uploadId}/duration`, request)
             .then((response) => response.json())
             .then(function(data: any) {
                 controller.setState({
@@ -328,8 +327,7 @@ class AudioAnalysis extends React.Component<Props, State> {
             return;
         }
 
-        fetch("/api/avg-pitch/"
-            + this.getSpeaker().uploadId
+        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
             + "?t0=" + ts[0]
             + "&t1=" + ts[1]
             + "&max-pitch=" + this.state.maxPitch
@@ -350,13 +348,13 @@ class AudioAnalysis extends React.Component<Props, State> {
 
         type ApiResult = number[][];
 
-        fetch("/api/all-pitches/"
-            + this.getSpeaker().uploadId + "?max-pitch="
+        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/all`
+            + "?max-pitch="
             + this.state.maxPitch
             + "&min-pitch=" + this.state.minPitch
             + "&t0=" + ts[0]
             + "&t1=" + ts[1], {
-            method: "POST",
+            method: "GET",
             headers: {
                 "Accept": "application/json",
                 "Content-Type": "application/json",

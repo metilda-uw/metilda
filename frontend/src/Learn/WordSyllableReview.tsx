@@ -110,7 +110,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 controller.setState({isLoadingPitchResults: true});
                 const formData = new FormData();
                 formData.append("file", result.blob);
-                fetch(`/api/all-pitches?min-pitch=30.0&max-pitch=300.0`, {
+                fetch(`/api/upload/pitch/all?min-pitch=30.0&max-pitch=300.0`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json"

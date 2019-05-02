@@ -19,7 +19,7 @@ def upload_audio_metadata():
     pass
 
 
-@app.route('/api/audio-analysis-image/<string:upload_id>.png', methods=["GET"])
+@app.route('/api/audio/<string:upload_id>.png/image', methods=["GET"])
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
 
@@ -42,7 +42,7 @@ def audio_analysis_image(upload_id):
     # return send_file(image_path)
 
 
-@app.route('/api/audio/<string:upload_id>', methods=["GET"])
+@app.route('/api/audio/<string:upload_id>/file', methods=["GET"])
 def audio(upload_id):
     if upload_id == "undefined":
         # This is the case when the page load and a file has
@@ -56,7 +56,7 @@ def audio(upload_id):
     return send_file(file_bytes, mimetype="audio/wav")
 
 
-@app.route('/api/avg-pitch/<string:upload_id>', methods=["GET"])
+@app.route('/api/audio/<string:upload_id>/pitch/avg', methods=["GET"])
 def avg_pitch(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     t0 = request.args.get('t0', type=float)
@@ -67,38 +67,44 @@ def avg_pitch(upload_id):
     return jsonify({"avg_pitch": result})
 
 
-@app.route('/api/all-pitches', defaults={'upload_id': None}, methods=["POST"])
-@app.route('/api/all-pitches/<string:upload_id>', methods=["POST"])
-def all_pitches(upload_id):
+@app.route('/api/audio/<string:upload_id>/pitch/all', methods=["GET"])
+def all_audio_pitches(upload_id):
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
     t0 = request.args.get('t0', 0, type=float)
     t1 = request.args.get('t1', float('inf'), type=float)
-    temp_dir = None
 
-    if 'file' in request.files:
-        temp_dir = tempfile.mkdtemp()
-        audio_file = request.files['file']
-        sound_path = os.path.join(temp_dir, "audio.wav")
-        audio_file.save(sound_path)
-    else:
-        sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     pitches = audio_analysis.get_all_pitches([t0, t1], sound_path, min_pitch, max_pitch)
-
-    if temp_dir is not None:
-        shutil.rmtree(temp_dir)
 
     return jsonify(pitches)
 
 
-@app.route('/api/sound-length/<string:upload_id>', methods=["POST"])
+@app.route('/api/upload/pitch/all', methods=["POST"])
+def all_upload_pitches():
+    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
+    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
+    t0 = request.args.get('t0', 0, type=float)
+    t1 = request.args.get('t1', float('inf'), type=float)
+
+    temp_dir = tempfile.mkdtemp()
+    audio_file = request.files['file']
+    sound_path = os.path.join(temp_dir, "audio.wav")
+    audio_file.save(sound_path)
+
+    pitches = audio_analysis.get_all_pitches([t0, t1], sound_path, min_pitch, max_pitch)
+    shutil.rmtree(temp_dir)
+
+    return jsonify(pitches)
+
+
+@app.route('/api/audio/<string:upload_id>/duration', methods=["GET"])
 def sound_length(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     sound_length = audio_analysis.get_sound_length(sound_path)
     return jsonify({'sound_length': sound_length})
 
 
-@app.route('/api/available-files', methods=["GET"])
+@app.route('/api/audio', methods=["GET"])
 def available_files():
-    return jsonify({'available_files': file_io.available_files(app.config["SOUNDS"])})
+    return jsonify({'ids': file_io.available_files(app.config["SOUNDS"])})

@@ -19,9 +19,9 @@ class UploadAudio extends Component {
 
     componentDidMount() {
         let controller = this;
-        fetch("/api/available-files")
+        fetch("/api/audio")
             .then(data => data.json())
-            .then(data => this.setState({availableFiles: data["available_files"]}))
+            .then(data => this.setState({availableFiles: data["ids"]}))
             .then(function () {
                 controller.initInputField();
             })
