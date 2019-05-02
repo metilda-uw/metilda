@@ -12,3 +12,7 @@ export interface PitchArtWindowConfig {
     dMin: number;  // the initial value of the domain data
     dMax: number;    // the final value of the domain data
 }
+
+export interface PitchRangeDTO {
+    pitches: number[][];
+}

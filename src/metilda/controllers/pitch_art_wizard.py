@@ -67,7 +67,7 @@ def avg_pitch(upload_id):
     return jsonify({"avg_pitch": result})
 
 
-@app.route('/api/audio/<string:upload_id>/pitch/all', methods=["GET"])
+@app.route('/api/audio/<string:upload_id>/pitch/range', methods=["GET"])
 def all_audio_pitches(upload_id):
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
@@ -77,10 +77,10 @@ def all_audio_pitches(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     pitches = audio_analysis.get_all_pitches([t0, t1], sound_path, min_pitch, max_pitch)
 
-    return jsonify(pitches)
+    return jsonify({'pitches': pitches})
 
 
-@app.route('/api/upload/pitch/all', methods=["POST"])
+@app.route('/api/upload/pitch/range', methods=["POST"])
 def all_upload_pitches():
     max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
@@ -95,7 +95,7 @@ def all_upload_pitches():
     pitches = audio_analysis.get_all_pitches([t0, t1], sound_path, min_pitch, max_pitch)
     shutil.rmtree(temp_dir)
 
-    return jsonify(pitches)
+    return jsonify({'pitches': pitches})
 
 
 @app.route('/api/audio/<string:upload_id>/duration', methods=["GET"])

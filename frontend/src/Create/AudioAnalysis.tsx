@@ -29,6 +29,7 @@ import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
+import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 
 export interface Props extends RouteComponentProps {
     speakerIndex: number;
@@ -346,9 +347,7 @@ class AudioAnalysis extends React.Component<Props, State> {
     pitchArtRangeClicked() {
         const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
 
-        type ApiResult = number[][];
-
-        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/all`
+        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
             + "?max-pitch="
             + this.state.maxPitch
             + "&min-pitch=" + this.state.minPitch
@@ -361,7 +360,7 @@ class AudioAnalysis extends React.Component<Props, State> {
             }
         })
             .then((response) => response.json())
-            .then((data) => (data as ApiResult).map((item) => this.addPitch(item[1],
+            .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
                 AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
                 [item[0], item[0]])),
             );

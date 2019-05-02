@@ -7,7 +7,7 @@ import AudioAnalysis from "../Create/AudioAnalysis";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
-import {RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
+import {PitchRangeDTO, RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Speaker} from "../types/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
@@ -110,7 +110,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 controller.setState({isLoadingPitchResults: true});
                 const formData = new FormData();
                 formData.append("file", result.blob);
-                fetch(`/api/upload/pitch/all?min-pitch=30.0&max-pitch=300.0`, {
+                fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
@@ -119,7 +119,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 })
                     .then((response) => response.json())
                     .then(function(data) {
-                        const pitchValues: RawPitchValue[] = (data as number[][]).map(
+                        const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
                             (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
                         );
                         controller.recorder = null;
