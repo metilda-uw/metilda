@@ -102,7 +102,7 @@ def all_upload_pitches():
 def sound_length(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     sound_length = audio_analysis.get_sound_length(sound_path)
-    return jsonify({'sound_length': sound_length})
+    return jsonify({'duration': sound_length})
 
 
 @app.route('/api/audio', methods=["GET"])

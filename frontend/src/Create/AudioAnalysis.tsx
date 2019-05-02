@@ -223,8 +223,8 @@ class AudioAnalysis extends React.Component<Props, State> {
                 controller.setState({
                     imageUrl,
                     audioUrl,
-                    soundLength: data.sound_length,
-                    maxAudioTime: data.sound_length,
+                    soundLength: data.duration,
+                    maxAudioTime: data.duration,
                 });
             });
     }
