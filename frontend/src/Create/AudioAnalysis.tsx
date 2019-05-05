@@ -16,6 +16,7 @@ import {css, ThemeProvider} from "styled-components";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
+import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 import {AppState} from "../store";
 import {addLetter, addSpeaker, removeSpeaker, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
@@ -29,7 +30,6 @@ import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
-import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 
 export interface Props extends RouteComponentProps {
     speakerIndex: number;
