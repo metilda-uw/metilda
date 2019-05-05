@@ -9,12 +9,12 @@ import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 import "./CreatePitchArt.css";
 
-interface Props {
+export interface CreatePitchArtProps {
     speakers: Speaker[];
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
 
-class CreatePitchArt extends React.Component<Props> {
+export class CreatePitchArt extends React.Component<CreatePitchArtProps> {
     renderSpeakers = () => {
         return (
             this.props.speakers.map((item, index) =>
