@@ -16,6 +16,7 @@ jobs:
     - "(cd frontend && npm ci)"
     script:
     - bash runTests.sh --nodejs
+    - npm run coveralls
   - stage: deploy
     script: skip
     deploy: &heroku

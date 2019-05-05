@@ -58,8 +58,15 @@
     "start": "react-scripts start",
     "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
     "build": "react-scripts build",
-    "test": "npm run tslint && react-scripts test",
+    "test": "npm run tslint && react-scripts test --coverage --coverageDirectory=/coverage/jest --runInBand",
+    "coveralls": "react-scripts test --coverage --coverageReporters=text-lcov | coveralls",
     "eject": "react-scripts eject"
+  },
+  "jest": {
+    "coverageReporters": [
+      "text",
+      "html"
+    ]
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -72,6 +79,7 @@
   ],
   "proxy": "http://localhost:5000",
   "devDependencies": {
-    "chai-enzyme": "^1.0.0-beta.1"
+    "chai-enzyme": "^1.0.0-beta.1",
+    "coveralls": "^3.0.3"
   }
 }
