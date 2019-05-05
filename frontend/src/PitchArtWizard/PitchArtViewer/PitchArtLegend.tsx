@@ -3,11 +3,11 @@ import {Speaker} from "../../types/types";
 import "../GlobalStyling.css";
 import "./PitchArtLegend.css";
 
-interface Props {
+export interface PitchArtLegendProps {
     speakers: Speaker[];
 }
 
-export default class PitchArtLegend extends React.Component<Props> {
+export default class PitchArtLegend extends React.Component<PitchArtLegendProps> {
     static SPEAKER_COLOR(speakerIndex: number): string {
         const colors = ["green", "blue", "purple", "red", "orange"];
         return colors[speakerIndex % colors.length];
@@ -25,9 +25,9 @@ export default class PitchArtLegend extends React.Component<Props> {
 
     render() {
         return (
-            <div className="metilda-pitch-art-container-control-list-item col s12">
+            <div className="PitchArtLegend metilda-pitch-art-container-control-list-item col s12">
                 <div className="top-label">
-                    <label>Legend</label>
+                    <label className="PitchArtLegend-title">Legend</label>
                 </div>
                 <div className="pitch-art-legend-col-container">
                     <div className="pitch-art-legend-col">
