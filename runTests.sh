@@ -7,3 +7,7 @@ fi
 if [ "$1" == "--nodejs" ] || [ "$1" == "--all" ]; then
     (cd frontend && CI=true npm test)
 fi
+
+if [ "$1" == "--nodejs-coverage" ]; then
+    (cd frontend && CI=true npm coveralls)
+fi
