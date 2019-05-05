@@ -9,5 +9,5 @@ if [ "$1" == "--nodejs" ] || [ "$1" == "--all" ]; then
 fi
 
 if [ "$1" == "--nodejs-coverage" ]; then
-    (cd frontend && CI=true npm coveralls)
+    (cd frontend && CI=true npm run coveralls)
 fi
