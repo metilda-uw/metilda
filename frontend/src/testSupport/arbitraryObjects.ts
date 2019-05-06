@@ -1,19 +1,32 @@
 import {Letter, Speaker} from "../types/types";
 
-export const arbitraryLetter = (): Letter => {
+export interface ArbitraryLetterProps {
+    t0?: number;
+    t1?: number;
+    pitch?: number;
+    syllable?: string;
+    isManualPitch?: boolean;
+    isWordSep?: boolean;
+}
+
+export const arbitraryLetter = (props: ArbitraryLetterProps = {}): Letter => {
     return {
-        t0: 0,
-        t1: 0,
-        pitch: 0,
-        syllable: "",
-        isManualPitch: false,
-        isWordSep: false
+        t0: props.t0 || 0,
+        t1: props.t1 || 0,
+        pitch: props.pitch || 0,
+        syllable: props.syllable || "",
+        isManualPitch: props.isManualPitch || false,
+        isWordSep: props.isWordSep || false
     };
 };
 
-export const arbitrarySpeaker = (): Speaker => {
+export interface ArbitrarySpeakerProps {
+    letters?: Letter[];
+}
+
+export const arbitrarySpeaker = (props: ArbitrarySpeakerProps = {}): Speaker => {
     return {
         uploadId: "",
-        letters: []
+        letters: props.letters || []
     };
 };

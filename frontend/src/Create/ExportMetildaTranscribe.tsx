@@ -2,20 +2,18 @@ import fileDownload from "js-file-download";
 import moment from "moment";
 import * as React from "react";
 import {connect} from "react-redux";
-import {RouteComponentProps} from "react-router-dom";
-import {MetildaWord} from "../Learn/types";
 import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store/index";
-import {Letter, Speaker} from "../types/types";
+import {Speaker} from "../types/types";
 import "./CreatePitchArt.css";
 import "./ExportMetildaTranscribe.css";
 
-interface Props extends RouteComponentProps {
+export interface ExportMetildaTranscribeProps {
     speakers: Speaker[];
     speakerIndex: number;
 }
 
-class ExportMetildaTranscribe extends React.Component<Props> {
+export class ExportMetildaTranscribe extends React.Component<ExportMetildaTranscribeProps> {
     exportToJson = () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
@@ -42,11 +40,13 @@ class ExportMetildaTranscribe extends React.Component<Props> {
 
     render() {
         return (
-            <button className="waves-effect waves-light btn"
-                    disabled={this.isDisabled()}
-                    onClick={this.exportToJson}>
-                Save
-            </button>
+            <div className="ExportMetildaTranscribe">
+                <button className="ExportMetildaTranscribe-save waves-effect waves-light btn"
+                        disabled={this.isDisabled()}
+                        onClick={this.exportToJson}>
+                    Save
+                </button>
+            </div>
         );
     }
 }
