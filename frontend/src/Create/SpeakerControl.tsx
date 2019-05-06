@@ -9,7 +9,7 @@ import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
 import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 import "./SpeakerControl.css";
 
-interface Props {
+export interface SpeakerControlProps {
     speakerIndex: number;
     speakers: Speaker[];
     addSpeaker: () => void;
@@ -18,14 +18,14 @@ interface Props {
     canRemoveSpeaker: boolean;
 }
 
-class SpeakerControl extends React.Component<Props> {
+export class SpeakerControl extends React.Component<SpeakerControlProps> {
     maybeRenderRemoveSpeaker = () => {
         if (!this.props.canRemoveSpeaker) {
             return;
         }
 
         return (
-            <button className="waves-effect waves-light btn"
+            <button className="SpeakerControl-remove-speaker waves-effect waves-light btn"
                     onClick={this.checkIfSpeakerRemovalIsOk}>
                 Remove
             </button>
@@ -38,7 +38,7 @@ class SpeakerControl extends React.Component<Props> {
         }
 
         return (
-            <button className="waves-effect waves-light btn"
+            <button className="SpeakerControl-add-speaker waves-effect waves-light btn"
                     onClick={this.props.addSpeaker}>
                 Add
             </button>
@@ -81,8 +81,8 @@ class SpeakerControl extends React.Component<Props> {
 
     render() {
         return (
-            <div className="metilda-audio-analysis-controls-list-item col s12">
-                <label className="group-label">Speaker</label>
+            <div className="SpeakerControl metilda-audio-analysis-controls-list-item col s12">
+                <label className="SpeakerControl-title group-label">Speaker</label>
                 <div className="metilda-audio-analysis-controls-list-item-row-left-align">
                     <ImportMetildaTranscribe
                         onImport={this.checkIfSpeakerImportIsOk}
