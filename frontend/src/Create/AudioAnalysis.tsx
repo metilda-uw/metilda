@@ -30,6 +30,7 @@ import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
+import AudioAnalysisImageMenu from "./AudioAnalysisImageMenu";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;
@@ -193,7 +194,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     getSpeaker = (): Speaker => {
         return this.props.speakers[this.props.speakerIndex];
-    }
+    };
 
     componentDidMount() {
         const uploadId = this.getSpeaker().uploadId;
@@ -219,7 +220,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
         fetch(`/api/audio/${uploadId}/duration`, request)
             .then((response) => response.json())
-            .then(function(data: any) {
+            .then(function (data: any) {
                 controller.setState({
                     imageUrl,
                     audioUrl,
@@ -231,7 +232,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     setUploadId = (uploadId: string) => {
         this.props.setUploadId(this.props.speakerIndex, uploadId);
-    }
+    };
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {
         // Compute the new time scale
@@ -541,117 +542,37 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
                 canRemoveSpeaker={!isFirstSpeaker}/>
         );
-    }
+    };
 
     showImgMenu = (imgMenuX: number, imgMenuY: number) => {
         this.setState({imgMenuX, imgMenuY});
-    }
+    };
 
     maybeRenderImgMenu = () => {
         if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
-            const theme = {
-                pieMenu: {
-                    container: css`z-index: 10;`,
-                },
-                slice: {
-                    container: audioImgMenuStyles.container,
-                }
-            };
-
             const isSelectionActive = this.state.minSelectX !== -1
                 && this.state.maxSelectX !== -1;
 
             const isAllShown = this.state.minAudioTime === 0
                 && this.state.maxAudioTime === this.state.soundLength;
 
-            const maybeDo = (disabled: boolean, action: () => void) => {
-                if (!disabled) {
-                    action();
-                }
-            };
-
             return (
-                <div onContextMenu={(e) => e.preventDefault()}
-                     onClick={() => this.showImgMenu(-1, -1)}>
-                    <ThemeProvider theme={theme}>
-                        <PieMenu
-                            radius="110px"
-                            centerRadius="20px"
-                            centerX={`${this.state.imgMenuX}px`}
-                            centerY={`${this.state.imgMenuY}px`}
-                        >
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.wordSplitClicked)}
-                                   disabled={!isSelectionActive}
-                                   backgroundColor="darkgrey">
-                                <div className="menu-icon-top">
-                                    <FontAwesomeIcon icon={faCut} size="2x"/>
-                                    <br/>
-                                    <span>Split</span>
-                                </div>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.selectionIntervalClicked)}
-                                   disabled={!isSelectionActive}
-                                   backgroundColor="lightgrey">
-                                <div className="menu-icon-top-right">
-                                    <FontAwesomeIcon icon={faSearchPlus}
-                                                     size="2x"/>
-                                    <br/>
-                                    <span>Zoom</span>
-                                </div>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.manualPitchArtClicked)}
-                                   disabled={!isSelectionActive}
-                                   backgroundColor="darkgrey">
-                                <div className="menu-icon-bottom-right">
-                                    <FontAwesomeIcon icon={faCircle}
-                                                     size="xs"
-                                    />
-                                    <br/>
-                                    <span>Manual</span>
-                                </div>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.averagePitchArtClicked)}
-                                   disabled={!isSelectionActive}
-                                   backgroundColor="lightgrey">
-                                <div className="menu-icon-bottom">
-                                    <FontAwesomeIcon icon={faEllipsisH}
-                                                     size="2x"
-                                                     className="avg-ellipsis"
-                                    />
-                                    <br />
-                                    <FontAwesomeIcon icon={faRulerHorizontal}
-                                                     size="2x"
-                                    />
-                                    <br />
-                                    <span>Average</span>
-                                </div>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(!isSelectionActive, this.pitchArtRangeClicked)}
-                                   disabled={!isSelectionActive}
-                                   backgroundColor="darkgrey">
-                                <div className="menu-icon-bottom-left">
-                                    <FontAwesomeIcon icon={faEllipsisH}
-                                                     size="2x"/>
-                                    <br/>
-                                    <span>Range</span>
-                                </div>
-                            </Slice>
-                            <Slice onSelect={() => maybeDo(isAllShown, this.showAllClicked)}
-                                   disabled={isAllShown}
-                                   backgroundColor="lightgrey">
-                                <div className="menu-icon-top-left">
-                                    <FontAwesomeIcon icon={faSearchMinus}
-                                                     size="2x"/>
-                                    <br/>
-                                    <span>All</span>
-                                </div>
-                            </Slice>
-                        </PieMenu>
-                    </ThemeProvider>
-                </div>
+                <AudioAnalysisImageMenu
+                    imgMenuX={this.state.imgMenuX}
+                    imgMenuY={this.state.imgMenuY}
+                    isSelectionActive={isSelectionActive}
+                    isAllShown={isAllShown}
+                    splitWord={this.wordSplitClicked}
+                    intervalSelected={this.selectionIntervalClicked}
+                    newManualPitch={this.manualPitchArtClicked}
+                    newAvgPitch={this.averagePitchArtClicked}
+                    newRangePitch={this.pitchArtRangeClicked}
+                    showAllAudio={this.showAllClicked}
+                    onClick={() => this.showImgMenu(-1, -1)}
+                />
             );
         }
-    }
+    };
 
     render() {
         const uploadId = this.getSpeaker().uploadId;
