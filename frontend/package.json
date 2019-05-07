@@ -69,6 +69,10 @@
       "html"
     ],
     "collectCoverageFrom": [
+      "src/**/*.js",
+      "src/**/*.jsx",
+      "src/**/*.tsx",
+      "src/**/*.ts",
       "!src/Lib/**/*.js"
     ]
   },
