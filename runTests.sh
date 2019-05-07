@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 if [ "$1" == "--python" ] || [ "$1" == "--all" ]; then
     PATH=$PATH:../venv/Scripts
     (cd src && python -m unittest discover ../tests)
