@@ -1,18 +1,7 @@
-import {
-    faCircle,
-    faCut,
-    faEllipsisH,
-    faRulerHorizontal,
-    faSearchMinus,
-    faSearchPlus
-} from "@fortawesome/free-solid-svg-icons";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import * as React from "react";
-import PieMenu, {Slice} from "react-pie-menu";
+import {Slice} from "react-pie-menu";
 import {connect} from "react-redux";
-import {RouteComponentProps} from "react-router";
 import {ThunkDispatch} from "redux-thunk";
-import {css, ThemeProvider} from "styled-components";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
@@ -22,15 +11,14 @@ import {addLetter, addSpeaker, removeSpeaker, setLetterPitch, setUploadId} from 
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import "./AudioAnalysis.css";
+import AudioAnalysisImageMenu from "./AudioAnalysisImageMenu";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
-import * as audioImgMenuStyles from "./AudioImgMenu.styles";
 import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
-import AudioAnalysisImageMenu from "./AudioAnalysisImageMenu";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;
@@ -194,7 +182,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     getSpeaker = (): Speaker => {
         return this.props.speakers[this.props.speakerIndex];
-    };
+    }
 
     componentDidMount() {
         const uploadId = this.getSpeaker().uploadId;
@@ -220,7 +208,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
         fetch(`/api/audio/${uploadId}/duration`, request)
             .then((response) => response.json())
-            .then(function (data: any) {
+            .then(function(data: any) {
                 controller.setState({
                     imageUrl,
                     audioUrl,
@@ -232,7 +220,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     setUploadId = (uploadId: string) => {
         this.props.setUploadId(this.props.speakerIndex, uploadId);
-    };
+    }
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {
         // Compute the new time scale
@@ -542,11 +530,11 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
                 canRemoveSpeaker={!isFirstSpeaker}/>
         );
-    };
+    }
 
     showImgMenu = (imgMenuX: number, imgMenuY: number) => {
         this.setState({imgMenuX, imgMenuY});
-    };
+    }
 
     maybeRenderImgMenu = () => {
         if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
@@ -572,7 +560,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 />
             );
         }
-    };
+    }
 
     render() {
         const uploadId = this.getSpeaker().uploadId;
