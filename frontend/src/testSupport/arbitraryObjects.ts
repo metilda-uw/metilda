@@ -21,12 +21,13 @@ export const arbitraryLetter = (props: ArbitraryLetterProps = {}): Letter => {
 };
 
 export interface ArbitrarySpeakerProps {
+    uploadId?: string;
     letters?: Letter[];
 }
 
 export const arbitrarySpeaker = (props: ArbitrarySpeakerProps = {}): Speaker => {
     return {
-        uploadId: "",
+        uploadId: props.uploadId || "",
         letters: props.letters || []
     };
 };

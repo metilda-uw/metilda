@@ -31,7 +31,7 @@ import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
 
-export interface Props extends RouteComponentProps {
+export interface AudioAnalysisProps {
     speakerIndex: number;
     speakers: Speaker[];
     addSpeaker: () => void;
@@ -64,7 +64,7 @@ interface State {
     selectionCallback: (t1: number, t2: number) => void;
 }
 
-class AudioAnalysis extends React.Component<Props, State> {
+export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     /**
      * WARNING:
      * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
@@ -143,7 +143,7 @@ class AudioAnalysis extends React.Component<Props, State> {
         }
     }
 
-    constructor(props: Props) {
+    constructor(props: AudioAnalysisProps) {
         super(props);
 
         this.state = {
@@ -663,15 +663,10 @@ class AudioAnalysis extends React.Component<Props, State> {
             nonAudioImg = <AudioImgLoading/>;
         }
 
-        const isSelectionActive = this.state.minSelectX !== -1
-            && this.state.maxSelectX !== -1;
-        const isAllShown = this.state.minAudioTime === 0
-            && this.state.maxAudioTime === this.state.soundLength;
-
         return (
-            <div>
+            <div className="AudioAnalysis">
                 <div className="row">
-                    <div className="metilda-audio-analysis-controls-list col s4">
+                    <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s4">
                         <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
                         <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}/>
                         <PitchRange initMinPitch={this.state.minPitch}
@@ -679,7 +674,7 @@ class AudioAnalysis extends React.Component<Props, State> {
                                     applyPitchRange={this.applyPitchRange}/>
                         {this.renderSpeakerControl()}
                     </div>
-                    <div className="metilda-audio-analysis col s8">
+                    <div className="AudioAnalysis-analysis metilda-audio-analysis col s8">
                         <div>
                             <div className="metilda-audio-analysis-image-container">
                                 {nonAudioImg}
