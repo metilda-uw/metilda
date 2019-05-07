@@ -1,3 +1,7 @@
+"""
+Run with this command from the root-level folder:
+./venv/Scripts/locust.exe --host http://localhost:5000  -f load_tests/controllers_test/pitch_art_wizard_test.py
+"""
 import os
 
 from locust import HttpLocust, TaskSet, task
