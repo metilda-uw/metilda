@@ -67,6 +67,9 @@
     "coverageReporters": [
       "text",
       "html"
+    ],
+    "collectCoverageFrom": [
+      "!src/Lib/**/*.js"
     ]
   },
   "eslintConfig": {
