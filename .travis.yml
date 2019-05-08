@@ -7,7 +7,7 @@ jobs:
     install:
     - pip install -r requirements.txt
     script:
-    - bash runTests.sh --python
+    - bash ./bin/runTests.sh --python
   - stage: test frontend
     language: node_js
     node_js:
