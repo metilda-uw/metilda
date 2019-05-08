@@ -11,7 +11,7 @@ import PitchArtLegend from "./PitchArtLegend";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
 
-interface Props {
+export interface PitchArtDrawingWindowProps {
     speakers: Speaker[];
     width: number;
     height: number;
@@ -52,7 +52,7 @@ export interface ColorScheme {
  * are marked with "// @ts-ignore". These are functional parts of
  * the code, they just don't have explicit types yet.
  */
-class PitchArtDrawingWindow extends React.Component<Props, State> {
+class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, State> {
     private readonly innerWidth: number;
     private readonly innerHeight: number;
     private readonly pointDx0: number;
@@ -70,7 +70,7 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
     private downloadRef = createRef<HTMLAnchorElement>();
     private stageRef = createRef<Stage>();
 
-    constructor(props: Props) {
+    constructor(props: PitchArtDrawingWindowProps) {
         super(props);
         this.state = {
             activePlayIndex: -1
@@ -329,8 +329,11 @@ class PitchArtDrawingWindow extends React.Component<Props, State> {
             this.props.showPerceptualScale);
 
         return (
-            <div>
-                <Stage ref={this.stageRef} width={this.props.width} height={this.props.height}>
+            <div className="PitchArtDrawingWindow">
+                <Stage className="PitchArtDrawingWindow-pitchart"
+                       ref={this.stageRef}
+                       width={this.props.width}
+                       height={this.props.height}>
                     <Layer>
                         <Rect width={this.props.width}
                               height={this.props.height}

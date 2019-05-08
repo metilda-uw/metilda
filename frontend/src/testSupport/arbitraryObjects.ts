@@ -1,3 +1,4 @@
+import {RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Letter, Speaker} from "../types/types";
 
 export interface ArbitraryLetterProps {
@@ -30,4 +31,8 @@ export const arbitrarySpeaker = (props: ArbitrarySpeakerProps = {}): Speaker => 
         uploadId: props.uploadId || "",
         letters: props.letters || []
     };
+};
+
+export const arbitraryRawPitchValue = (): RawPitchValue => {
+    return {t0: 0, t1: 0, pitch: 0};
 };
