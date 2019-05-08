@@ -65,7 +65,7 @@
     "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
     "build": "npm run build-css && react-scripts build",
     "test": "npm run tslint && npm run build-css && react-scripts test",
-    "coveralls": "npm run test --coverage --coverageReporters=text-lcov | coveralls",
+    "coveralls": "npm run tslint && npm run build-css && react-scripts test --coverage --coverageReporters=text-lcov | coveralls",
     "eject": "react-scripts eject"
   },
   "jest": {
