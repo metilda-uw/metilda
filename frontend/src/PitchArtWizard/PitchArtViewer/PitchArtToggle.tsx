@@ -3,9 +3,12 @@ import "./PitchArtToggle.css";
 
 export interface PitchArtToggleProps {
     label: string;
+    offText: string;
+    onText: string;
     inputName: string;
     isSelected: boolean;
     onChange: (inputName: string, isSelected: boolean) => void;
+    disabled?: boolean;
 }
 
 class PitchArtToggle extends React.Component<PitchArtToggleProps> {
@@ -17,13 +20,14 @@ class PitchArtToggle extends React.Component<PitchArtToggleProps> {
                 </div>
                 <div className="switch PitchArtToggle-toggle">
                     <label>
-                        Hide
+                        <span className="PitchArtToggle-toggle-off-label">{this.props.offText}</span>
                         <input type="checkbox"
                                checked={this.props.isSelected}
+                               disabled={this.props.disabled}
                                onChange={() => this.props.onChange(this.props.inputName, !this.props.isSelected)}
                                className="PitchArtToggle-toggle-input"/>
                         <span className="lever"></span>
-                        Show
+                        <span className="PitchArtToggle-toggle-on-label">{this.props.onText}</span>
                     </label>
                 </div>
             </div>

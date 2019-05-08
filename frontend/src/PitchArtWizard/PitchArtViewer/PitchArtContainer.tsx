@@ -2,18 +2,10 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Speaker} from "../../types/types";
 import PitchRange from "../AudioViewer/PitchRange";
-import AccentPitchToggle from "./AccentPitchToggle";
 import PitchArt from "./PitchArt";
-import PitchArtCenterToggle from "./PitchArtCenterToggle";
-import PitchArtCircleToggle from "./PitchArtCircleToggle";
-import PitchArtColorToggle from "./PitchArtColorToggle";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
-import PitchArtLinesToggle from "./PitchArtLinesToggle";
-import PitchArtScaleToggle from "./PitchArtScaleToggle";
-import PitchArtShowScaleToggle from "./PitchArtShowScaleToggle";
-import PitchArtTimeNormToggle from "./PitchArtTimeNormToggle";
-import SyllableToggle from "./SyllableToggle";
+import PitchArtToggle from "./PitchArtToggle";
 
 interface Props {
     speakers: Speaker[];
@@ -83,6 +75,14 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.setState({[name]: value} as any);
     }
 
+    toggleChanged = (inputName: string, isSelected: boolean) => {
+        if (inputName === "showVerticallyCentered") {
+            this.onVerticallyCenterClick(isSelected);
+        }
+
+        this.setState({[inputName]: isSelected} as any);
+    }
+
     applyPitchRange = (minPitch: number, maxPitch: number) => {
         this.setState({minPitch, maxPitch});
     }
@@ -103,35 +103,79 @@ class PitchArtContainer extends React.Component<Props, State> {
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
                         <div className="row metilda-pitch-art-container-control-toggle-list">
-                            <AccentPitchToggle
-                                handleInputChange={this.handleInputChange}
-                                showAccentPitch={this.state.showAccentPitch}/>
-                            <SyllableToggle
-                                handleInputChange={this.handleInputChange}
-                                showSyllableText={this.state.showSyllableText}/>
-                            <PitchArtCenterToggle
-                                handleInputChange={this.handleInputChange}
-                                showVerticallyCentered={this.state.showVerticallyCentered}
-                                onVerticallyCenterClick={this.onVerticallyCenterClick}/>
-                            <PitchArtLinesToggle
-                                handleInputChange={this.handleInputChange}
-                                showPitchArtLines={this.state.showPitchArtLines}/>
-                            <PitchArtCircleToggle
-                                handleInputChange={this.handleInputChange}
-                                showLargeCircles={this.state.showLargeCircles}/>
-                            <PitchArtTimeNormToggle
-                                handleInputChange={this.handleInputChange}
-                                showTimeNormalization={this.state.showTimeNormalization}/>
-                            <PitchArtShowScaleToggle
-                                handleInputChange={this.handleInputChange}
-                                showPitchScale={this.state.showPitchScale}
-                                disabled={this.state.showVerticallyCentered}/>
-                            <PitchArtScaleToggle
-                                handleInputChange={this.handleInputChange}
-                                showPerceptualScale={this.state.showPerceptualScale}/>
-                            <PitchArtColorToggle
-                                handleInputChange={this.handleInputChange}
-                                showPitchArtImageColor={this.state.showPitchArtImageColor} />
+                            <PitchArtToggle
+                                label="Accent Symbol"
+                                inputName="showAccentPitch"
+                                isSelected={this.state.showAccentPitch}
+                                offText="Hide"
+                                onText="Show"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Syllable Text"}
+                                inputName={"showSyllableText"}
+                                isSelected={this.state.showSyllableText}
+                                offText="Hide"
+                                onText="Show"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Vertically Center"}
+                                inputName={"showVerticallyCentered"}
+                                isSelected={this.state.showVerticallyCentered}
+                                offText="No"
+                                onText="Yes"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Lines"}
+                                inputName={"showPitchArtLines"}
+                                isSelected={this.state.showPitchArtLines}
+                                offText="No"
+                                onText="Yes"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Circle Size"}
+                                inputName={"showLargeCircles"}
+                                isSelected={this.state.showLargeCircles}
+                                offText="Small"
+                                onText="Large"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Time Normalization"}
+                                inputName={"showTimeNormalization"}
+                                isSelected={this.state.showTimeNormalization}
+                                offText="No"
+                                onText="Yes"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Pitch Scale"}
+                                inputName={"showPitchScale"}
+                                isSelected={this.state.showPitchScale}
+                                offText="No"
+                                onText="Yes"
+                                onChange={this.toggleChanged}
+                                disabled={this.state.showVerticallyCentered}
+                            />
+                            <PitchArtToggle
+                                label={"Pitch Type"}
+                                inputName={"showPerceptualScale"}
+                                isSelected={this.state.showPerceptualScale}
+                                offText="Linear"
+                                onText="Metilda"
+                                onChange={this.toggleChanged}
+                            />
+                            <PitchArtToggle
+                                label={"Saved Image Colors"}
+                                inputName={"showPitchArtImageColor"}
+                                isSelected={this.state.showPitchArtImageColor}
+                                offText="Basic"
+                                onText="Pitch Art"
+                                onChange={this.toggleChanged}
+                            />
                         </div>
                         {
                             this.props.speakers.length > 1
