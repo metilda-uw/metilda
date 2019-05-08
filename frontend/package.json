@@ -35,6 +35,8 @@
     "konva": "^2.5.1",
     "materialize-css": "^1.0.0-rc.2",
     "moment": "^2.24.0",
+    "node-sass": "^4.12.0",
+    "npm-run-all": "^4.1.5",
     "query-string": "^6.4.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
@@ -56,9 +58,12 @@
     "typescript": "^3.3.4000"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "build-css": "node-sass --include-path ./src --include-path ./node_modules src/ -o src/",
+    "watch-css": "npm run build-css && node-sass --include-path ./src --include-path ./node_modules src/ -o src/ --watch --recursive",
+    "start": "npm-run-all -p watch-css start-js",
+    "start-js": "react-scripts start",
     "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
-    "build": "react-scripts build",
+    "build": "npm run build-css && react-scripts build",
     "test": "npm run tslint && react-scripts test",
     "coveralls": "react-scripts test --coverage --coverageReporters=text-lcov | coveralls",
     "eject": "react-scripts eject"
