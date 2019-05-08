@@ -15,7 +15,7 @@ jobs:
     install:
     - "(cd frontend && npm ci)"
     script:
-    - bash runTests.sh --nodejs-coverage
+    - bash ./bin/runTests.sh --nodejs-coverage
   - stage: deploy
     script: skip
     deploy: &heroku
