@@ -1,5 +1,8 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# css output (from SASS compilation)
+/src/**/*.css
+
 # dependencies
 /node_modules
 
