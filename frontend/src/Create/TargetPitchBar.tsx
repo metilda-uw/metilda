@@ -1,12 +1,37 @@
-import React, {Component} from 'react';
-import AudioLetter from "./AudioLetter";
-import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions";
+import React, {Component} from "react";
 import {connect} from "react-redux";
+import {ThunkDispatch} from "redux-thunk";
+import {AppState} from "../store";
+import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions";
+import {AudioAction} from "../store/audio/types";
+import {Letter, Speaker} from "../types/types";
+import AudioLetter from "./AudioLetter";
 
-class TargetPitchBar extends Component {
-    state = {};
+export interface TargetPitchBarProps {
+    speakers: Speaker[];
+    speakerIndex: number;
+    minAudioTime: number;
+    maxAudioTime: number;
+    minAudioX: number;
+    maxAudioX: number;
+    targetPitchSelected: (letterIndex: number) => void;
+    removeLetter: (speakerIndex: number, index: number) => void;
+    resetLetters: (speakerIndex: number) => void;
+    setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
+}
 
-    constructor(props) {
+interface State {
+    selectedIndex: number;
+}
+
+interface PitchBarLetter extends Letter {
+    isShown: boolean;
+    leftX: number;
+    rightX: number;
+}
+
+export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
+    constructor(props: TargetPitchBarProps) {
         super(props);
         this.state = {
             selectedIndex: -1
@@ -23,7 +48,7 @@ class TargetPitchBar extends Component {
         this.props.resetLetters(this.props.speakerIndex);
     }
 
-    timeCoordToImageCoord(t) {
+    timeCoordToImageCoord(t: number) {
         // clip times that lie beyond the image boundaries
         if (t < this.props.minAudioTime) {
             return 0;
@@ -31,37 +56,40 @@ class TargetPitchBar extends Component {
             return this.props.maxAudioX - this.props.minAudioX;
         }
 
-        let dt = this.props.maxAudioTime - this.props.minAudioTime;
-        let u0 = (t - this.props.minAudioTime) / dt;
+        const dt = this.props.maxAudioTime - this.props.minAudioTime;
+        const u0 = (t - this.props.minAudioTime) / dt;
 
-        let dx = this.props.maxAudioX - this.props.minAudioX;
-        let x0 = u0 * dx;
+        const dx = this.props.maxAudioX - this.props.minAudioX;
+        const x0 = u0 * dx;
 
-        return x0
+        return x0;
     }
 
-    scaleIntervals() {
+    scaleIntervals(): PitchBarLetter[] {
         // Scale letter intervals to be within the range [0, 1], where
         // 0 is the left side of the selection interval and 1 is the right
         // side of the selection interval.
-        let controller = this;
-        let intervalsInSelection = this.props.speakers[this.props.speakerIndex].letters.map(function (item) {
-            item = Object.assign({}, item);
-            let tooFarLeft = item.t1 < controller.props.minAudioTime;
-            let tooFarRight = item.t0 > controller.props.maxAudioTime;
-            item.isShown = !(tooFarLeft || tooFarRight)
-            return item;
-        });
+        const controller = this;
+        const intervalsInSelection: PitchBarLetter[] = this.props.speakers[this.props.speakerIndex].letters.map(
+            function(item: Letter) {
+                const pitchBarLetter: PitchBarLetter = Object.assign(
+                    {leftX: -1, rightX: -1, isShown: false}, item
+                );
+                const tooFarLeft = pitchBarLetter.t1 < controller.props.minAudioTime;
+                const tooFarRight = pitchBarLetter.t0 > controller.props.maxAudioTime;
+                pitchBarLetter.isShown = !(tooFarLeft || tooFarRight);
+                return pitchBarLetter;
+            });
 
         // Since the letters are relatively positioned, we need to decrement
         // their positions based on all previous letters' widths.
         let prevLetterWidths = 0.0;
-        return intervalsInSelection.map(function (item) {
+        return intervalsInSelection.map(function(item) {
             if (!item.isShown) {
                 return item;
             }
 
-            let itemCopy = Object.assign({}, item);
+            const itemCopy = Object.assign({}, item);
             itemCopy.leftX = controller.timeCoordToImageCoord(itemCopy.t0) - prevLetterWidths;
             itemCopy.rightX = controller.timeCoordToImageCoord(itemCopy.t1) - prevLetterWidths;
 
@@ -73,9 +101,9 @@ class TargetPitchBar extends Component {
         });
     }
 
-    targetPitchSelected(index) {
-        this.setState({selectedIndex: index});
-        this.props.targetPitchSelected(index);
+    targetPitchSelected(letterIndex: number) {
+        this.setState({selectedIndex: letterIndex});
+        this.props.targetPitchSelected(letterIndex);
     }
 
     removeLetterEvent() {
@@ -89,11 +117,11 @@ class TargetPitchBar extends Component {
         let syllable = "";
 
         while (!isValidInput) {
-            let response = prompt("Enter syllable text", "X");
+            const response = prompt("Enter syllable text", "X");
 
             if (response == null) {
                 // user canceled input
-                return
+                return;
             }
 
             syllable = response.trim();
@@ -110,17 +138,17 @@ class TargetPitchBar extends Component {
     }
 
     render() {
-        let controller = this;
-        let letters = this.scaleIntervals();
+        const controller = this;
+        const letters = this.scaleIntervals();
         return (
-            <div>
+            <div className="TargetPitchBar">
                 <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
                         <span>Target Pitch</span>
                     </div>
                     <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container">
                         {
-                            letters.map(function (item, index) {
+                            letters.map(function(item, index) {
                                 if (!item.isShown) {
                                     return;
                                 }
@@ -131,7 +159,7 @@ class TargetPitchBar extends Component {
                                                     rightX={item.rightX}
                                                     isSelected={index === controller.state.selectedIndex}
                                                     isWordSep={item.isWordSep}
-                                                    onClick={() => controller.targetPitchSelected(index)}/>
+                                                    onClick={() => controller.targetPitchSelected(index)}/>;
                             })
                         }
                     </div>
@@ -139,24 +167,24 @@ class TargetPitchBar extends Component {
                     </div>
                 </div>
                 <div className="right-align">
-                    <button className="btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-set-syllable btn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterSyllableEvent}>
                         Set Syllable
                     </button>
-                    <button className="btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-remove-letter btn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.removeLetterEvent}>
                         Remove
                     </button>
-                    <button className="btn waves-effect waves-light"
+                    <button className="TargetPitchBar-clear-letter btn waves-effect waves-light"
                             type="submit"
                             name="action"
-                            disabled={this.props.speakers[this.props.speakerIndex].length === 0}
+                            disabled={this.props.speakers[this.props.speakerIndex].letters.length === 0}
                             onClick={this.resetAllLettersEvent}>
                         Clear
                     </button>
@@ -167,14 +195,15 @@ class TargetPitchBar extends Component {
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: AppState) => ({
     speakers: state.audio.speakers
 });
 
-const mapDispatchToProps = dispatch => ({
-    removeLetter: (speakerIndex, index) => dispatch(removeLetter(speakerIndex, index)),
-    resetLetters: (speakerIndex) => dispatch(resetLetters(speakerIndex)),
-    setLetterSyllable: (speakerIndex, index, syllable) => dispatch(setLetterSyllable(speakerIndex, index, syllable))
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    removeLetter: (speakerIndex: number, index: number) => dispatch(removeLetter(speakerIndex, index)),
+    resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
+    setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
+        dispatch(setLetterSyllable(speakerIndex, index, syllable))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);
