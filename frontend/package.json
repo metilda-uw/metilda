@@ -78,7 +78,8 @@
       "src/**/*.jsx",
       "src/**/*.tsx",
       "src/**/*.ts",
-      "!src/Lib/**/*.js"
+      "!src/Lib/**/*.js",
+      "!src/serviceWorker.js"
     ]
   },
   "eslintConfig": {
