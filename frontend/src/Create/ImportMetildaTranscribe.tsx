@@ -11,6 +11,7 @@ import {AppState} from "../store/index";
 import {Speaker} from "../types/types";
 import "./CreatePitchArt.css";
 import "./ImportMetildaTranscribe.css";
+import {importSpeakerFile} from "./ImportUtils";
 
 export interface ImportMetildaTranscribeProps {
     speakerIndex: number;
@@ -20,16 +21,7 @@ export interface ImportMetildaTranscribeProps {
 
 export class ImportMetildaTranscribe extends React.Component<ImportMetildaTranscribeProps> {
     fileSelected = (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
-        if (event.target.files && event.target.files.length === 1) {
-            const file: File = event.target.files[0];
-            const reader = new FileReader();
-            reader.addEventListener("loadend", () => {
-                const speakerString = JSON.parse(reader.result as string);
-                const speaker: Speaker = speakerString as Speaker;
-                this.props.setSpeaker(this.props.speakerIndex, speaker);
-            });
-            reader.readAsText(file);
-        }
+        importSpeakerFile(results, this.props.speakerIndex, this.props.setSpeaker);
     }
 
     render() {

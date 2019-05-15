@@ -7,6 +7,7 @@ import {expect} from "../setupTests";
 import {arbitrarySpeaker} from "../testSupport/arbitraryObjects";
 import {Speaker} from "../types/types";
 import {ImportMetildaTranscribe, ImportMetildaTranscribeProps} from "./ImportMetildaTranscribe";
+import * as importUtils from "./ImportUtils";
 
 describe("ImportMetildaTranscribe", () => {
     it("renders import input", () => {
@@ -15,11 +16,11 @@ describe("ImportMetildaTranscribe", () => {
         expect(subject.find(".ImportMetildaTranscribe-open")).to.be.present();
     });
 
-    it("loads a file on click", () => {
+    it("importSpeakerFile imports the speaker correctly", () => {
         const mockSetSpeaker = sinon.stub();
-        const subject = shallowRender({setSpeaker: mockSetSpeaker});
         const fileString = JSON.stringify(arbitrarySpeaker());
-        const file = new Blob([fileString], {type: "text/plain"});
+        const fileBlob: Blob = new Blob([fileString], {type: "text/plain"});
+        const file: File = {lastModified: 0, name: "", ...fileBlob};
         const readAsText = sinon.stub();
         const addEventListener = sinon.stub().callsFake((_, evtHandler) => {
             evtHandler();
@@ -28,14 +29,20 @@ describe("ImportMetildaTranscribe", () => {
         // @ts-ignore
         window.FileReader = sinon.stub().returns(dummyFileReader);
 
-        subject.find(FileReaderInput).simulate("change", {
-            target: {
-                files: [
-                    file
-                ]
-            }
-        });
+        const fakeProgressEvent: any = {};
+        importUtils.importSpeakerFile([[fakeProgressEvent, file]], 0, mockSetSpeaker);
         sinon.assert.calledOnce(mockSetSpeaker);
+    });
+
+    it("loads a file on click", () => {
+        const sinonSandbox = sinon.createSandbox();
+        const mockImportSpeakerFile = sinonSandbox.stub(importUtils, "importSpeakerFile");
+        const subject = shallowRender({});
+
+        subject.find(FileReaderInput).simulate("change");
+        sinon.assert.calledOnce(mockImportSpeakerFile);
+
+        sinonSandbox.restore();
     });
 });
 
