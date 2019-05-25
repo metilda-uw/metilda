@@ -304,8 +304,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX: number, rightX: number, manualPitch?: number, isWordSep: boolean = false) {
-        const ts = this.imageIntervalToTimeInterval(leftX, rightX);
+    imageIntervalSelected(leftX: number,
+                          rightX: number,
+                          manualPitch?: number,
+                          isWordSep: boolean = false,
+                          tsOverride?: number[]) {
+        const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
 
         if (manualPitch !== undefined) {
             this.addPitch(manualPitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, true);
@@ -374,22 +378,39 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     }
 
     manualPitchArtClicked() {
-        let manualPitch;
+        let manualPitch: number | undefined;
         let isValidNumber = false;
 
         while (!isValidNumber) {
             const msg = `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz `
                 + `and ${this.state.maxPitch.toFixed(2)}Hz`;
 
-            manualPitch = prompt(msg);
+            const manualPitchStr: string | null = prompt(msg);
 
-            if (manualPitch === null) {
+            if (manualPitchStr === null) {
                 // user cancelled manual input
                 this.state.closeImgSelectionCallback();
                 return;
             }
 
-            manualPitch = parseFloat(manualPitch);
+            if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
+                try {
+                    const values = manualPitchStr.split(",");
+                    const t0: number = parseFloat(values[0]);
+                    const t1: number = parseFloat(values[1]);
+                    this.imageIntervalSelected(
+                        -1,
+                        -1,
+                        undefined,
+                        undefined,
+                        [t0, t1]);
+                    return;
+                } catch {
+                    // do nothing
+                }
+            }
+
+            manualPitch = parseFloat(manualPitchStr);
 
             isValidNumber = !isNaN(manualPitch);
 
