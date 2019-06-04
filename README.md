@@ -1,5 +1,6 @@
 # metilda
 [![Build Status](https://travis-ci.com/mitchl2/metilda.svg?branch=master)](https://travis-ci.com/mitchl2/metilda)
+[![Coverage Status](https://coveralls.io/repos/github/mitchl2/metilda/badge.svg?branch=master)](https://coveralls.io/github/mitchl2/metilda?branch=master)
 
 Audio analysis web app.
 
@@ -21,7 +22,7 @@ Tested on Windows, but should work on Linux as well (the test suite is run on a 
 1) Run these commands:
 ```
 ./venv/Scripts/python -r requirements.txt
-./runLocalServer.sh
+./bin/runLocalServer.sh
 ```
 
 ### React
@@ -46,9 +47,9 @@ This feature enables tslint highlighting, it is only available in the Profession
 1) Set `Configuration file` to `<REPO_DIR>\frontend\tslint.json`
 
 ## Tests
-After configuring your build environment, run tests locally using `./tesh.sh`. 
+After configuring your build environment, run tests locally using `./bin/runTests.sh`. 
 
-Note, tests are also run prior to a push in `./push.sh`. Upon being pushed, the test suite is also
+Note, tests are also run prior to a push in `./bin/push.sh`. Upon being pushed, the test suite is also
 run on travis ci.
 
 ### Travis CI Prequisites
@@ -77,5 +78,5 @@ deployment:
 - `Procfile` includes the command that is used to start the web server 
 
 To initiate deployment: 
-1) Run `./push.sh` to deploy to Heroku
+1) Run `./bin/push.sh` to deploy to Heroku
 1) Wait for tests to pass in travis ci and then check the appropriate web app environment in Heroku. 
