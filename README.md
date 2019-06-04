@@ -47,20 +47,25 @@ This feature enables tslint highlighting, it is only available in the Profession
 1) Set `Configuration file` to `<REPO_DIR>\frontend\tslint.json`
 
 ## Tests
+
+### Unit Tests
 After configuring your build environment, run tests locally using `./bin/runTests.sh`. 
 
 Note, tests are also run prior to a push in `./bin/push.sh`. Upon being pushed, the test suite is also
-run on travis ci.
+run on Travis CI.
 
-### Travis CI Prequisites
-Running tests in a travis ci pipeline requires that you have:
+### Load Tests
+To test web server behavior under load conditions use `./bin/loadTests.sh XXX` where XXX is 5, 50, or 500 (the
+number of simulated users).
+
+### Travis CI Configuration
+Changing the Travis CI pipeline configuration requires that you have:
 - Installed travis CLI
 - Installed heroku CLI
 - Repo hosted on GitHub
 - Personal access token from your GitHub account
 
-### Travis CI Configuration
-The `.travis.yml` file contains the configuration for running tests on travis ci. Note the
+The `.travis.yml` file contains the configuration for running tests on Travis CI. Note the
 `secure` field was made using these commands:
 1) `cmd> heroku login`
 1) `cmd> travis login --pro --github-token <YOUR_GIT_HUB_TOKEN>`
@@ -69,7 +74,7 @@ The `.travis.yml` file contains the configuration for running tests on travis ci
 1) Verify that the secure token has been set under `deploy > api_key`
   
 ## Deployment
-The application is deployed to Heroku after tests pass in travis ci.
+The application is deployed to Heroku after tests pass in Travis CI.
 
 ### Deploy Configuration
 The Python buildpack is configured for the application on Heroku. Additionally, several files are used by Heroku upon
@@ -79,4 +84,4 @@ deployment:
 
 To initiate deployment: 
 1) Run `./bin/push.sh` to deploy to Heroku
-1) Wait for tests to pass in travis ci and then check the appropriate web app environment in Heroku. 
+1) Wait for tests to pass in Travis CI and then check the appropriate web app environment in Heroku. 
