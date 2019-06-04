@@ -1,16 +1,18 @@
+"""
+Contains utilities for audio analysis. Some of the visualization functions are
+based on examples from the parselmouth-praat library:
+https://github.com/YannickJadoul/Parselmouth
+"""
+
+import io
+import os
 import shutil
 import tempfile
-
-import parselmouth
-
-import os
 from math import isnan
-import numpy as np
+
 import matplotlib.pyplot as plt
-from StringIO import StringIO
-import io
-import base64
-import seaborn as sns
+import numpy as np
+import parselmouth
 
 # sns.set()  # Use seaborn's default style to make attractive graph
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
@@ -137,19 +139,3 @@ def get_audio(upload_path, tmin=-1, tmax=-1):
 
     shutil.rmtree(temp_dir)
     return file_bytes
-
-
-if __name__ == "__main__":
-    p = get_avg_pitch(
-        (1.45,2.03),
-        r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds\EOP-AF-saahkomaapiwa_mono.wav",
-        50,
-        500)
-    print(p)
-    # import glob
-    # sdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\sounds"
-    # pdir = r"C:\Users\Mitchell\Documents\Masters\2018\Capstone\github\metilda\src\metilda\pictures"
-    # for path in glob.iglob(os.path.join(sdir, "*.wav")):
-    #     file_name = os.path.basename(os.path.splitext(path)[0])
-    #     print("Processing %s" % file_name)
-    #     audio_analysis_image(path, output_path=os.path.join(pdir, file_name + ".png"))

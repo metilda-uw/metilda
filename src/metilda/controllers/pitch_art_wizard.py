@@ -9,16 +9,6 @@ from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
 
 
-@app.route('/api/upload-audio-file', methods=["POST"])
-def upload_audio_file():
-    pass
-
-
-@app.route('/api/upload-audio-metadata', methods=["POST", "GET"])
-def upload_audio_metadata():
-    pass
-
-
 @app.route('/api/audio/<string:upload_id>.png/image', methods=["GET"])
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
@@ -36,10 +26,6 @@ def audio_analysis_image(upload_id):
         tmax=tmax)
 
     return send_file(image_binary, mimetype="image/png")
-    # # return send_file(r"C:\Users\Mitchell\Downloads\img3.png")
-    # file_name = os.path.splitext(upload_id)[0]
-    # image_path = os.path.join(app.config["PICTURES"], file_name + ".png")
-    # return send_file(image_path)
 
 
 @app.route('/api/audio/<string:upload_id>/file', methods=["GET"])
