@@ -1,6 +1,6 @@
 # metilda
-[![Build Status](https://travis-ci.com/mitchl2/metilda.svg?branch=master)](https://travis-ci.com/mitchl2/metilda)
-[![Coverage Status](https://coveralls.io/repos/github/mitchl2/metilda/badge.svg?branch=master)](https://coveralls.io/github/mitchl2/metilda?branch=master)
+[![Build Status](https://travis-ci.com/metilda-uw/metilda.svg?branch=master)](https://travis-ci.com/metilda-uw/metilda)
+[![Coverage Status](https://coveralls.io/repos/github/metilda-uw/metilda/badge.svg?branch=master)](https://coveralls.io/github/metilda-uw/metilda?branch=master)
 
 Audio analysis web app.
 
