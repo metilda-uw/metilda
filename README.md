@@ -70,7 +70,7 @@ The `.travis.yml` file contains the configuration for running tests on Travis CI
 1) `cmd> heroku login`
 1) `cmd> travis login --pro --github-token <YOUR_GIT_HUB_TOKEN>`
 1) `cmd> heroku authorizations:create`
-1) `cmd> travis encrypt <TOKEN_FROM_PREVIOUS_OUTPUT> --add`
+1) `cmd> travis encrypt <TOKEN_FROM_PREVIOUS_OUTPUT> --pro --add`
 1) Verify that the secure token has been set under `deploy > api_key`
   
 ## Deployment
