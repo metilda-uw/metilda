@@ -1,0 +1,49 @@
+.signin__Form,
+.signup__Form {
+  float: left;
+  width: 48%;
+  border: 2px solid maroon;
+  border-radius: 8px;
+  margin: 10px;
+  border-style: solid;
+  background-color: #f2f2f2;
+  padding: 15px;
+  .roles_Options {
+    width: 50%;
+  }
+}
+
+.signup_Submit,
+.signin_Submit {
+  width: 100%;
+  background-color: #ee6e73;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.signup_Submit:hover,
+.signin_Submit:hover {
+  background-color: #e0363c;
+}
+
+.login_Page {
+  padding: 10px;
+  margin: 5px;
+  h3 {
+    color: rgb(185, 54, 54);
+    font-size: 25pt;
+  }
+}
+
+.password_Forget_Link {
+  color: maroon;
+}
+
+.terms_of_use {
+  float: left;
+  padding: 10px;
+}

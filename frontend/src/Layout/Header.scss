@@ -11,3 +11,97 @@
 .metilda-navbar-item {
     margin-right: 16px;
 }
+
+#metilda-navbar {
+    text-align: left;
+    display: flex;
+    margin-left: 24px;
+  }
+  
+  #metilda-navbar .app-logo {
+    font-size: 32px;
+  }
+  
+  .metilda-navbar-item {
+    margin-right: 16px;
+  }
+  
+  .main_Navbar {
+    background-color: #ee6e73;
+  }
+  
+  .nav__submenu {
+    display: none;
+  }
+  
+  .nav__menu-item:hover {
+    .nav__submenu {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  
+  $color-blue: #00aeef;
+  $color-blue-dark: #0d2035;
+  $submenu-width: 180px;
+  
+  .menu-container {
+    text-align: center;
+  }
+  
+  nav {
+    ul {
+      list-style: none;
+      padding-left: 0;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  
+  .nav {
+    display: inline-block;
+    background: #ee6e73;
+    color: white;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  
+    a {
+      display: block;
+      padding: 8 8px;
+      line-height: inherit;
+      cursor: pointer;
+    }
+  }
+  
+  .nav__menu {
+    line-height: 30px 30px;
+    font-weight: 700;
+    text-transform: inherit;
+  }
+  
+  .nav__menu-item {
+    display: inline-block;
+    position: relative;
+  
+    &:hover {
+      background-color: rgb(216, 94, 94);
+    }
+  }
+  
+  .nav__submenu {
+    font-weight: 300;
+    text-transform: none;
+    position: absolute;
+    width: $submenu-width;
+    background-color: #e96d71;
+  }
+  
+  .nav__submenu-item {
+    &:hover {
+      background: rgba(#000, 0.1);
+      display: block;
+    }
+  }
+  

@@ -11,8 +11,10 @@ import pitchArt41 from "./images/Pitch Art - 41-01.jpg";
 import pitchArt42 from "./images/Pitch Art - 42-01.jpg";
 import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
 import "./WordSyllableCategories.css";
+import { withAuthorization } from '../Session';
+import Header from '../Layout/Header'
 
-export default class WordSyllableCategories extends React.Component<RouteComponentProps> {
+class WordSyllableCategories extends React.Component<RouteComponentProps> {
 
     handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         const name = event.currentTarget.name;
@@ -48,6 +50,7 @@ export default class WordSyllableCategories extends React.Component<RouteCompone
         const numSyllables = this.getNumSyllables();
         return (
             <div>
+                <Header/>
                 <div className="metilda-page-header">
                     <h5>
                         Blackfoot Words
@@ -117,3 +120,5 @@ export default class WordSyllableCategories extends React.Component<RouteCompone
         );
     }
 }
+const authCondition = (authUser: any) => !!authUser
+export default withAuthorization(authCondition)(WordSyllableCategories as any)

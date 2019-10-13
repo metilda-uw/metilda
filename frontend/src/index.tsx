@@ -6,11 +6,14 @@ import App from "./App";
 import configureStore from "./configureStore";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+import Firebase, { FirebaseContext } from './Firebase';
 
 ReactDOM.render(
     <Provider store={configureStore()}>
         <BrowserRouter>
+        <FirebaseContext.Provider value = {new Firebase()}>
             <App/>
+        </FirebaseContext.Provider>
         </BrowserRouter>
     </Provider>,
     document.getElementById("root"));

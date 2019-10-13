@@ -7,7 +7,9 @@ import {setLetterPitch} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
+import { withAuthorization } from '../Session'
 import "./CreatePitchArt.css";
+import Header from "../Layout/Header";
 
 export interface CreatePitchArtProps {
     speakers: Speaker[];
@@ -37,6 +39,8 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps> {
         const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
 
         return (
+            <div>
+            <Header/>
             <div className="CreatePitchArt">
                 <div className="metilda-page-content">
                     {this.renderSpeakers()}
@@ -49,6 +53,7 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps> {
                             uploadId={uploadId}/>
                     </div>
                 </div>
+            </div>
             </div>
         );
     }
@@ -63,4 +68,5 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreatePitchArt);
+const authCondition = (authUser: any) => !!authUser
+export default connect(mapStateToProps, mapDispatchToProps)(withAuthorization(authCondition)(CreatePitchArt as any));

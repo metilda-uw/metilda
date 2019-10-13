@@ -13,6 +13,8 @@ import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
+import { withAuthorization } from '../Session';
+import Header from "../Layout/Header";
 
 interface MatchParams {
     numSyllables: string;
@@ -211,6 +213,7 @@ class WordSyllableReview extends React.Component<Props, State> {
 
         return (
             <div>
+                <Header/>
                 <div className="metilda-page-header">
                     <h5>
                         Blackfoot Words > {this.pageTitle()}
@@ -310,4 +313,5 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 }
 
-export default WordSyllableReview;
+const authCondition = (authUser: any) => !!authUser
+export default withAuthorization(authCondition)(WordSyllableReview as any)
