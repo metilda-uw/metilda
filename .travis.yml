@@ -18,7 +18,7 @@ jobs:
     - bash ./bin/runTests.sh --nodejs-coverage
   - stage: deploy
     script: skip
-    deploy: &heroku
+    deploy:
       provider: heroku
       api_key:
         secure: cf9SmylEsetrzID1khWjy0v4euxKUspK+tfVWIoc43DEJkd9YGCDx7Qt/UkKJH9wWTe7YeC1FsasUrWsgqYsLYjOfYfoRgkpekQ7sr/V5ImaVmP4ItH7B5UTOAJLi1Eqr8W3f/IQ10zsX3afzIeEnoCo4PluG1OMvAo+9ZVeIH3X5xjPpPU7793/wr2ffFdcvUQ0C9T8REjyDFLSIRQDdMiyIuQUbPOE2RNNYs4Cq3rptyIreObOXViRWtnaondCg5an2Cwww4lY0aAwGUM6ACZOkOVufAJ+LtyPI1N8ZJPZVjo9xhWHWnJifDd0WQgfJ70xXBjcy5ky9O2ay0penTSSMPtJ40nqz8ZeObsvfS73Epj9Zu6j0IeAtRWlG6FRgXC/BgWADnb15TBDqiFjjwUEmy/DbSaiSKfUHGS7AZnunc/NTrEbclBud+yF1u9XmNQqyaokHqEzgQhOT4RPjjClqDul5TEOhcZ7vA4P5Dde7Ehzfp3GBNFs1nBaYnHh90A4u8viVQvpBEQqzoJOIBjrjHawO3MROsdSyK710vF+xASMbmjvb8MqCeA/dKIlCHc2aUJBWbO3CJieNiFnkCUFSq/Ki3payjvfJ6TzB/bY7L/tyH1Eftf43jO/iLJbF1KpXuc3CEsqfm4RGl+FDxsmhiz6s9kIMsnRMg0bnL0=
@@ -26,3 +26,6 @@ jobs:
         master: metilda
       on:
         repo: metilda-uw/metilda
+env:
+  global:
+    secure: yCE1LuOa7b8nGzcIhH251Mj12gnIQiTjjngv0wCWhMEwjyUfVLUV5Y/8f3wJp5LnKrahR/o2pVNwRMnq0h9p2Yt0T0CflYGm5Xtw72rRns+lpUynNxAu/EFlaUM3Hty59SbMlswpb62ubnems3oKEBhDZ57DA0C6TJ3DoHhjqE0uRSOYR/l6z8D8Ex7pe1JzJ3UVAwlimC9hbj8UxVZfNx/yUx2Y8Dg+j1akmrTOHxcYRNNPrnVZLsD2f7s2fkK0bCbpaEimTTHmb6EPJVKT7WjqJfZ/xhJ5iQLLnbemVGjwGwFjwSSef7pkBCJ+11EohmCrDi0HgM84cyr8in85WowHvRofV9Xk6Gb9c8avYDhW9IX9iFzZP9TBkEgvmNNoEcI9Lcuz3bRQhcny6oxDFMp9V8TPAM+5hNjhx6tA9ELzJnKbeptxlU53b+TdUSDRx8iVMW6onVyJoSUiIpaomHViBaqccEzUYIZHLl5Ql7b93r0wp9mDo6kX6jFp4vr1rUBDLhgT63mmKs+jhApS2aueHir9M3ccTnL42zGtHrI4vnhcgtnENFIUSAUHHZYzz9/CwSszW3Zu1MdSV8tcnUSwxr7R2vSPckZJ4B2O4GvEYoheGrJTqLIlKeSFteVJW9/l8HE+LOGYE6jiQJ7lGt3rK72Y3s1bQMDCTQG9oOw=
