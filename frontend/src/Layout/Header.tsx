@@ -1,33 +1,31 @@
-import React, { Component } from 'react'
-import '../App.scss'
-import './Header.scss'
-import { withAuthorization } from '../Session'
-import Submenu from './DropdownComponent'
-import { Link } from 'react-router-dom'
+import React, { Component } from "react";
+import "../App.scss";
+import "./Header.scss";
+import { withAuthorization } from "../Session";
+import Submenu from "./DropdownComponent";
+import { Link } from "react-router-dom";
 
 class Header extends Component {
   state = {
     anchorEl: null,
-  }
+  };
   handleClick = (event: any) => {
-    this.setState({ anchorEl: event.currentTarget })
+    this.setState({ anchorEl: event.currentTarget });
   }
 
   handleClose = () => {
-    this.setState({ anchorEl: null })
+    this.setState({ anchorEl: null });
   }
-
-  componentDidMount() {}
 
   renderNavBarItem = (title: string, link: string, index: number) => {
     return (
       <li
         key={index}
-        className={window.location.href.includes(link) ? 'active' : ''}
+        className={window.location.href.includes(link) ? "active" : ""}
       >
         <Link to={link}>{title}</Link>
       </li>
-    )
+    );
   }
 
   onChange = (event: any) => {
@@ -47,12 +45,12 @@ class Header extends Component {
               <Submenu
                 navLinks={[
                   {
-                    name: 'Create',
-                    link: '/pitchartwizard',
+                    name: "Create",
+                    link: "/pitchartwizard",
                   },
                   {
-                    name: 'Learn',
-                    link: '/learn/words/syllables',
+                    name: "Learn",
+                    link: "/learn/words/syllables",
                   },
                 ]}
               />
@@ -62,12 +60,12 @@ class Header extends Component {
               <Submenu
                 navLinks={[
                   {
-                    name: 'Settings',
-                    link: '/manage-account',
+                    name: "Settings",
+                    link: "/manage-account",
                   },
                   {
-                    name: 'Signout',
-                    link: '/signout',
+                    name: "Signout",
+                    link: "/signout",
                   },
                 ]}
               />
@@ -75,8 +73,8 @@ class Header extends Component {
           </ul>
         </nav>
       </div>
-    )
+    );
   }
 }
-const condition = (authUser: any) => !!authUser
-export default withAuthorization(condition)(Header as any)
+const condition = (authUser: any) => !!authUser;
+export default withAuthorization(condition)(Header as any);

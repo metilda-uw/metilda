@@ -1,7 +1,7 @@
-import * as React from 'react'
-import './home.scss'
-import { withAuthorization } from '../Session'
-import Header from '../Layout/Header'
+import * as React from "react";
+import "./home.scss";
+import { withAuthorization } from "../Session";
+import Header from "../Layout/Header";
 
 class Home extends React.Component {
   render() {
@@ -13,7 +13,7 @@ class Home extends React.Component {
           <b>
             Melodic Transcription in Language Documentation and Application
             (MeTILDA)
-          </b>{' '}
+          </b>{" "}
           is a Learning and Analysis Platform that helps people who are
           interested to learn the endangered language called
           <b>Blackfoot</b> and also the linguistic researchers who are working
@@ -31,9 +31,9 @@ class Home extends React.Component {
         </div>
         {/* TODO: Add citation for MeTILDA */}
       </div>
-    )
+    );
   }
 }
 
-const authCondition = (authUser: any) => !!authUser
-export default withAuthorization(authCondition)(Home as any)
+const authCondition = (authUser: any) => !!authUser;
+export default withAuthorization(authCondition)(Home as any);

@@ -6,7 +6,7 @@ import App from "./App";
 import configureStore from "./configureStore";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
-import Firebase, { FirebaseContext } from './Firebase';
+import Firebase, { FirebaseContext } from "./Firebase";
 
 ReactDOM.render(
     <Provider store={configureStore()}>

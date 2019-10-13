@@ -11,8 +11,8 @@ import pitchArt41 from "./images/Pitch Art - 41-01.jpg";
 import pitchArt42 from "./images/Pitch Art - 42-01.jpg";
 import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
 import "./WordSyllableCategories.css";
-import { withAuthorization } from '../Session';
-import Header from '../Layout/Header'
+import { withAuthorization } from "../Session";
+import Header from "../Layout/Header";
 
 class WordSyllableCategories extends React.Component<RouteComponentProps> {
 
@@ -120,5 +120,5 @@ class WordSyllableCategories extends React.Component<RouteComponentProps> {
         );
     }
 }
-const authCondition = (authUser: any) => !!authUser
-export default withAuthorization(authCondition)(WordSyllableCategories as any)
+const authCondition = (authUser: any) => !!authUser;
+export default withAuthorization(authCondition)(WordSyllableCategories as any);

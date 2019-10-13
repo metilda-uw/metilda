@@ -1,51 +1,51 @@
-import React from 'react'
-import { Link, withRouter } from 'react-router-dom'
-import { compose } from 'recompose'
-import { withFirebase } from '../Firebase'
-import * as ROUTES from '../constants/routes'
-import Select from 'react-select'
+import React from "react";
+import { Link, withRouter } from "react-router-dom";
+import { compose } from "recompose";
+import { withFirebase } from "../Firebase";
+import * as ROUTES from "../constants/routes";
+import Select from "react-select";
 
 interface Props {
-  firebase: any
-  history: any
+  firebase: any;
+  history: any;
 }
 interface State {
-  username: string
-  email: string
-  passwordOne: string
-  passwordTwo: string
-  error: any
-  [key: string]: any
+  username: string;
+  email: string;
+  passwordOne: string;
+  passwordTwo: string;
+  error: any;
+  [key: string]: any;
 }
 const SignUpPage = () => (
   <div>
     <h3>Create an Account</h3>
     <SignUpForm />
   </div>
-)
+);
 
 const INITIAL_STATE = {
-  username: '',
-  email: '',
-  passwordOne: '',
-  passwordTwo: '',
-  institution: '',
-  role: '',
+  username: "",
+  email: "",
+  passwordOne: "",
+  passwordTwo: "",
+  institution: "",
+  role: "",
   checked: false,
   error: null,
-}
+};
 
 class SignUpFormBase extends React.Component<Props, State> {
   constructor(props: any) {
-    super(props)
+    super(props);
 
-    this.state = { ...INITIAL_STATE }
+    this.state = { ...INITIAL_STATE };
   }
 
   onSubmit = (event: any) => {
-    event.preventDefault()
-    const { username, email, passwordOne } = this.state
-    console.log(this.props)
+    event.preventDefault();
+    const { username, email, passwordOne } = this.state;
+    console.log(this.props);
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser: any) => {
@@ -53,25 +53,25 @@ class SignUpFormBase extends React.Component<Props, State> {
         return this.props.firebase.user(authUser.user.uid).set({
           username,
           email,
-        })
+        });
       })
       .then((authUser: any) => {
-        this.setState({ ...INITIAL_STATE })
-        this.props.history.push(ROUTES.HOME)
+        this.setState({ ...INITIAL_STATE });
+        this.props.history.push(ROUTES.HOME);
       })
       .catch((error: any) => {
-        this.setState({ error })
-      })
+        this.setState({ error });
+      });
   }
 
   onChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   handleCheckboxChange = (event: any) =>
     this.setState({ checked: event.target.checked })
 
-  handleDropDownChange = (event: any) => this.setState({ role: event.value })
+  handleDropDownChange = (event: any) => this.setState({ role: event.value });
 
   render() {
     const {
@@ -84,59 +84,59 @@ class SignUpFormBase extends React.Component<Props, State> {
       checked,
       languageOfResearch,
       error,
-    } = this.state
+    } = this.state;
 
     const isInvalid =
       passwordOne !== passwordTwo ||
-      passwordOne === '' ||
-      role === '' ||
-      email === '' ||
-      username === '' ||
-      checked === false
+      passwordOne === "" ||
+      role === "" ||
+      email === "" ||
+      username === "" ||
+      checked === false;
 
     const options = [
-      { value: 'linguistic_researcher', label: 'Linguistic Researcher' },
-      { value: 'teacher', label: 'Teacher' },
-      { value: 'student', label: 'Student' },
-      { value: 'other', label: 'Other' },
-    ]
+      { value: "linguistic_researcher", label: "Linguistic Researcher" },
+      { value: "teacher", label: "Teacher" },
+      { value: "student", label: "Student" },
+      { value: "other", label: "Other" },
+    ];
 
     const colourStyles = {
-      control: (styles: any) => ({ ...styles, backgroundColor: 'white' }),
+      control: (styles: any) => ({ ...styles, backgroundColor: "white" }),
       option: (styles: any) => ({
         ...styles,
-        ':hover': {
-          ...styles[':hover'],
-          backgroundColor: 'red',
+        ":hover": {
+          ...styles[":hover"],
+          backgroundColor: "red",
         },
       }),
-      input: (styles: any) => ({ ...styles, padding: '0px', margin: '0px' }),
-    }
+      input: (styles: any) => ({ ...styles, padding: "0px", margin: "0px" }),
+    };
     const customStyles = {
       option: (provided: any, state: any) => ({
         ...provided,
-        borderBottom: '1px dotted pink',
-        color: state.isSelected ? 'red' : 'blue',
+        borderBottom: "1px dotted pink",
+        color: state.isSelected ? "red" : "blue",
         padding: 20,
       }),
       control: () => ({
         // none of react-select's styles are passed to <Control />
         width: 200,
-        height: '1em',
+        height: "1em",
       }),
       singleValue: (provided: any, state: any) => {
-        const opacity = state.isDisabled ? 0.5 : 1
-        const transition = 'opacity 300ms'
+        const opacity = state.isDisabled ? 0.5 : 1;
+        const transition = "opacity 300ms";
 
-        return { ...provided, opacity, transition }
+        return { ...provided, opacity, transition };
       },
-    }
-    const Checkbox = (props: any) => <input type="checkbox" {...props} />
+    };
+    const Checkbox = (props: any) => <input type="checkbox" {...props} />;
     const TermsOfUseLink = () => (
       <Link to={ROUTES.TERMS_OF_USE} className="terms_of_use_Link">
         terms of use
       </Link>
-    )
+    );
 
     return (
       <form onSubmit={this.onSubmit}>
@@ -205,7 +205,7 @@ class SignUpFormBase extends React.Component<Props, State> {
 
         {error && <p>{error.message}</p>}
       </form>
-    )
+    );
   }
 }
 
@@ -213,11 +213,11 @@ const SignUpLink = () => (
   <p>
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
   </p>
-)
+);
 // const SignUpForm = withRouter(withFirebase(SignUpFormBase as any));
 const SignUpForm = compose(
   withRouter,
   withFirebase
-)(SignUpFormBase)
-export default SignUpPage
-export { SignUpForm, SignUpLink, SignUpPage }
+)(SignUpFormBase);
+export default SignUpPage;
+export { SignUpForm, SignUpLink, SignUpPage };

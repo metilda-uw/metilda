@@ -1,53 +1,53 @@
-import React, { Component } from 'react'
-import { withFirebase } from '../Firebase'
+import React, { Component } from "react";
+import { withFirebase } from "../Firebase";
 
 interface Props {
-  firebase: any
+  firebase: any;
 }
 
 interface State {
-  passwordOne: string
-  passwordTwo: string
-  error: any
-  [key: string]: any
+  passwordOne: string;
+  passwordTwo: string;
+  error: any;
+  [key: string]: any;
 }
 
 const INITIAL_STATE = {
-  passwordOne: '',
-  passwordTwo: '',
+  passwordOne: "",
+  passwordTwo: "",
   error: null,
-}
+};
 
 class PasswordChangeForm extends Component<Props, State> {
   constructor(props: any) {
-    super(props)
+    super(props);
 
-    this.state = { ...INITIAL_STATE }
+    this.state = { ...INITIAL_STATE };
   }
 
   onSubmit = (event: any) => {
-    const { passwordOne } = this.state
+    const { passwordOne } = this.state;
 
     this.props.firebase
       .doPasswordUpdate(passwordOne)
       .then(() => {
-        this.setState({ ...INITIAL_STATE })
+        this.setState({ ...INITIAL_STATE });
       })
       .catch((error: any) => {
-        this.setState({ error })
-      })
+        this.setState({ error });
+      });
 
-    event.preventDefault()
+    event.preventDefault();
   }
 
   onChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   render() {
-    const { passwordOne, passwordTwo, error } = this.state
+    const { passwordOne, passwordTwo, error } = this.state;
 
-    const isInvalid = passwordOne !== passwordTwo || passwordOne === ''
+    const isInvalid = passwordOne !== passwordTwo || passwordOne === "";
 
     return (
       <form onSubmit={this.onSubmit}>
@@ -71,8 +71,8 @@ class PasswordChangeForm extends Component<Props, State> {
 
         {error && <p>{error.message}</p>}
       </form>
-    )
+    );
   }
 }
 
-export default withFirebase(PasswordChangeForm as any)
+export default withFirebase(PasswordChangeForm as any);

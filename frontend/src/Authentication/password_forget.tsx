@@ -1,17 +1,17 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { withFirebase } from '../Firebase'
-import * as ROUTES from '../constants/routes'
-import './password_forget.scss'
+import React from "react";
+import { Link } from "react-router-dom";
+import { withFirebase } from "../Firebase";
+import * as ROUTES from "../constants/routes";
+import "./password_forget.scss";
 
 interface Props {
-  firebase: any
+  firebase: any;
 }
 
 interface State {
-  email: string
-  error: any
-  [key: string]: any
+  email: string;
+  error: any;
+  [key: string]: any;
 }
 
 const PasswordForgetPage = () => (
@@ -19,43 +19,43 @@ const PasswordForgetPage = () => (
     <h3>Enter your Email Address</h3>
     <PasswordForgetForm />
   </div>
-)
+);
 
 const INITIAL_STATE = {
-  email: '',
+  email: "",
   error: null,
-}
+};
 
 class PasswordForgetFormBase extends React.Component<Props, State> {
   constructor(props: any) {
-    super(props)
+    super(props);
 
-    this.state = { ...INITIAL_STATE }
+    this.state = { ...INITIAL_STATE };
   }
 
   onSubmit = (event: any) => {
-    const { email } = this.state
+    const { email } = this.state;
 
     this.props.firebase
       .doPasswordReset(email)
       .then(() => {
-        this.setState({ ...INITIAL_STATE })
+        this.setState({ ...INITIAL_STATE });
       })
       .catch((error: any) => {
-        this.setState({ error })
-      })
+        this.setState({ error });
+      });
 
-    event.preventDefault()
+    event.preventDefault();
   }
 
   onChange = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value })
+    this.setState({ [event.target.name]: event.target.value });
   }
 
   render() {
-    const { email, error } = this.state
+    const { email, error } = this.state;
 
-    const isInvalid = email === ''
+    const isInvalid = email === "";
 
     return (
       <form onSubmit={this.onSubmit}>
@@ -76,7 +76,7 @@ class PasswordForgetFormBase extends React.Component<Props, State> {
 
         {error && <p>{error.message}</p>}
       </form>
-    )
+    );
   }
 }
 
@@ -86,10 +86,10 @@ const PasswordForgetLink = () => (
       Forgot Password?
     </Link>
   </p>
-)
+);
 
-export default PasswordForgetPage
+export default PasswordForgetPage;
 
-const PasswordForgetForm = withFirebase(PasswordForgetFormBase as any)
+const PasswordForgetForm = withFirebase(PasswordForgetFormBase as any);
 
-export { PasswordForgetForm, PasswordForgetLink }
+export { PasswordForgetForm, PasswordForgetLink };

@@ -13,7 +13,7 @@ import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
-import { withAuthorization } from '../Session';
+import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 
 interface MatchParams {
@@ -313,5 +313,5 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 }
 
-const authCondition = (authUser: any) => !!authUser
-export default withAuthorization(authCondition)(WordSyllableReview as any)
+const authCondition = (authUser: any) => !!authUser;
+export default withAuthorization(authCondition)(WordSyllableReview as any);

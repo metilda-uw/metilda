@@ -8,7 +8,7 @@ import Header from "../Layout/Header";
 
 const AccountPage = () => (<AuthUserContext.Consumer>
   {
-    authUser => (<div>
+    (authUser) => (<div>
       <Header />
       <div className="manageAccount">
         <h3>Account: {(authUser as any).email}</h3>

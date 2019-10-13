@@ -1,13 +1,13 @@
-import React, { Component } from 'react'
-import { withAuthorization } from '../Session'
-import { Link } from 'react-router-dom'
+import React, { Component } from "react";
+import { withAuthorization } from "../Session";
+import { Link } from "react-router-dom";
 
 interface Props {
-  navLinks: any
+  navLinks: any;
 }
 class Submenu extends React.Component<Props> {
   constructor(props: any) {
-    super(props)
+    super(props);
   }
   render() {
     return (
@@ -18,9 +18,9 @@ class Submenu extends React.Component<Props> {
           </li>
         ))}
       </ul>
-    )
+    );
   }
 }
 
-const condition = (authUser: any) => !!authUser
-export default withAuthorization(condition)(Submenu as any) as any
+const condition = (authUser: any) => !!authUser;
+export default withAuthorization(condition)(Submenu as any) as any;

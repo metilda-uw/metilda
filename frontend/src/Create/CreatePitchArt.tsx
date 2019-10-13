@@ -7,7 +7,7 @@ import {setLetterPitch} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
-import { withAuthorization } from '../Session'
+import { withAuthorization } from "../Session";
 import "./CreatePitchArt.css";
 import Header from "../Layout/Header";
 
@@ -68,5 +68,5 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
 });
 
-const authCondition = (authUser: any) => !!authUser
+const authCondition = (authUser: any) => !!authUser;
 export default connect(mapStateToProps, mapDispatchToProps)(withAuthorization(authCondition)(CreatePitchArt as any));
