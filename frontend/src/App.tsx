@@ -24,33 +24,20 @@ interface Props {
 interface State {
   authUser: any;
 }
-const App = () => (
-  <Router>
-    <div className="App">
-      <Route exact={true} path={ROUTES.LANDING} component={Landing} />
-      <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
-      <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
-      <Route
-        exact={true}
-        path={ROUTES.PASSWORD_FORGET}
-        component={passwordForget}
-      />
-      <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
-      <Route exact={true} path={ROUTES.ADMIN} component={adminPage} />
-      <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
-      <Route path="/home" component={Home} />
-      <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
-      <Route
-        exact={true}
-        path="/learn/words/syllables"
-        component={WordSyllableCategories}
-      />
-      <Route
-        path="/learn/words/syllables/:numSyllables"
-        component={WordSyllableReview}
-      />
-    </div>
-  </Router>
-);
+const App = () => (<Router>
+  <div className="App">
+    <Route exact={true} path={ROUTES.LANDING} component={Landing} />
+    <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
+    <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
+    <Route exact={true} path={ROUTES.PASSWORD_FORGET} component={passwordForget} />
+    <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
+    <Route exact={true} path={ROUTES.ADMIN} component={adminPage} />
+    <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
+    <Route path="/home" component={Home} />
+    <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
+    <Route exact={true} path="/learn/words/syllables" component={WordSyllableCategories} />
+    <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
+  </div>
+</Router>);
 
 export default withAuthentication(App as any);

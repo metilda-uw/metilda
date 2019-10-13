@@ -6,21 +6,19 @@ import PasswordChangeForm from "./password_change";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 
-const AccountPage = () => (
-  <AuthUserContext.Consumer>
-    {authUser => (
-      <div>
-        <Header />
-        <div className="manageAccount">
-          <h3>Account: {(authUser as any).email}</h3>
-          <PasswordForgetForm />
-          <PasswordChangeForm />
-        </div>
+const AccountPage = () => (<AuthUserContext.Consumer>
+  {
+    authUser => (<div>
+      <Header />
+      <div className="manageAccount">
+        <h3>Account: {(authUser as any).email}</h3>
+        <PasswordForgetForm />
+        <PasswordChangeForm />
       </div>
-    )}
-  </AuthUserContext.Consumer>
-)
+    </div>)
+  }
+</AuthUserContext.Consumer>);
 
-const authCondition = (authUser: any) => !!authUser
+const authCondition = (authUser: any) => !!authUser;
 
-export default withAuthorization(authCondition)(AccountPage as any)
+export default withAuthorization(authCondition)(AccountPage as any);
