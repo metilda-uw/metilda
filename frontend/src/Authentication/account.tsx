@@ -1,10 +1,10 @@
-import React from 'react'
-import './account.scss'
-import { AuthUserContext } from '../Session/'
-import { PasswordForgetForm } from './password_forget'
-import PasswordChangeForm from './password_change'
-import { withAuthorization } from '../Session'
-import Header from '../Layout/Header'
+import React from "react";
+import "./account.scss";
+import { AuthUserContext } from "../Session/";
+import { PasswordForgetForm } from "./password_forget";
+import PasswordChangeForm from "./password_change";
+import { withAuthorization } from "../Session";
+import Header from "../Layout/Header";
 
 const AccountPage = () => (
   <AuthUserContext.Consumer>

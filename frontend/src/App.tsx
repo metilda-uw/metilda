@@ -1,28 +1,28 @@
-import 'materialize-css/dist/css/materialize.min.css'
-import * as React from 'react'
-import { BrowserRouter as Router, Route } from 'react-router-dom'
-import CreatePitchArt from './Create/CreatePitchArt'
-import WordSyllableCategories from './Learn/WordSyllableCategories'
-import WordSyllableReview from './Learn/WordSyllableReview'
-import Home from './Authentication/home'
-import 'firebase/auth'
-import 'firebase/firestore'
-import * as ROUTES from './constants/routes'
-import Landing from './Authentication/landing'
-import signUp from './Authentication/signup'
-import signIn from './Authentication/login'
-import signOut from './Authentication/signout'
-import passwordForget from './Authentication/password_forget'
-import accountPage from './Authentication/account'
-import adminPage from './Authentication/admin'
-import { withAuthentication } from './Session'
+import "materialize-css/dist/css/materialize.min.css";
+import * as React from "react";
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import CreatePitchArt from "./Create/CreatePitchArt";
+import WordSyllableCategories from "./Learn/WordSyllableCategories";
+import WordSyllableReview from "./Learn/WordSyllableReview";
+import Home from "./Authentication/home";
+import "firebase/auth";
+import "firebase/firestore";
+import * as ROUTES from "./constants/routes";
+import Landing from "./Authentication/landing";
+import signUp from "./Authentication/signup";
+import signIn from "./Authentication/login";
+import signOut from "./Authentication/signout";
+import passwordForget from "./Authentication/password_forget";
+import accountPage from "./Authentication/account";
+import adminPage from "./Authentication/admin";
+import { withAuthentication } from "./Session";
 
 interface Props {
-  firebase: any
+  firebase: any;
 }
 
 interface State {
-  authUser: any
+  authUser: any;
 }
 const App = () => (
   <Router>
@@ -51,6 +51,6 @@ const App = () => (
       />
     </div>
   </Router>
-)
+);
 
-export default withAuthentication(App as any)
+export default withAuthentication(App as any);
