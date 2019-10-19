@@ -32,7 +32,6 @@ const withAuthorization = (condition: any) => (Component: React.FC) => {
       return (
         <AuthUserContext.Consumer>
           {(authUser) => {
-            console.log(authUser);
             return authUser ? <Component {...this.props} /> : null;
           }}
         </AuthUserContext.Consumer>

@@ -15,6 +15,8 @@ interface State {
   passwordOne: string;
   passwordTwo: string;
   error: any;
+  uid: string;
+  languageOfResearch: string;
   [key: string]: any;
 }
 const SignUpPage = () => (
@@ -31,6 +33,8 @@ const INITIAL_STATE = {
   passwordTwo: "",
   institution: "",
   role: "",
+  uid: "",
+  languageOfResearch: "",
   checked: false,
   error: null,
 };
@@ -45,17 +49,33 @@ class SignUpFormBase extends React.Component<Props, State> {
   onSubmit = (event: any) => {
     event.preventDefault();
     const { username, email, passwordOne } = this.state;
-    console.log(this.props);
     this.props.firebase
       .doCreateUserWithEmailAndPassword(email, passwordOne)
       .then((authUser: any) => {
         // Create a user in your Firebase realtime database
+        this.setState({
+          uid: authUser.user.uid
+          });
         return this.props.firebase.user(authUser.user.uid).set({
           username,
           email,
         });
       })
       .then((authUser: any) => {
+        const formData = new FormData();
+        formData.append("user_id", this.state.uid);
+        formData.append("email", this.state.email);
+        formData.append("university", this.state.institution);
+        formData.append("role", this.state.role);
+        formData.append("research_language", this.state.languageOfResearch);
+        fetch(`/api/create-user`, {
+          method: "POST",
+          headers: {
+              Accept: "application/json"
+          },
+          body: formData
+      })
+      .then((response) => response.json());
         this.setState({ ...INITIAL_STATE });
         this.props.history.push(ROUTES.HOME);
       })

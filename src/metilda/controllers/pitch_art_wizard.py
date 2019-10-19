@@ -1,9 +1,9 @@
+from __future__ import with_statement
 import os
 import shutil
 import tempfile
-
 from flask import request, jsonify, send_file
-
+from Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
@@ -94,3 +94,23 @@ def sound_length(upload_id):
 @app.route('/api/audio', methods=["GET"])
 def available_files():
     return jsonify({'ids': file_io.available_files(app.config["SOUNDS"])})
+
+
+@app.route('/api/create-user', methods=["POST"])
+def create_db_user():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO users (USER_ID, EMAIL, UNIVERSITY, ROLE, RESEARCH_LANGUAGE,
+        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)"""
+        record_to_insert = (request.form['user_id'], request.form['email'], request.form['university'],request.form['role'],
+        request.form['research_language'])
+        connection.query_with_record(postgres_insert_query, record_to_insert)
+    return jsonify({'result': 'success'})
+
+@app.route('/api/update-user', methods=["POST"])
+def update_db_user():
+    with Postgres() as connection:
+        postgres_insert_query = """ UPDATE users
+                SET last_login = CURRENT_TIMESTAMP
+                WHERE user_id = %s"""
+        connection.query_with_record(postgres_insert_query, (request.form['user_id'],))
+    return jsonify({'result': 'success'})

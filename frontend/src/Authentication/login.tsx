@@ -51,9 +51,18 @@ class SignInFormBase extends React.Component<Props, State> {
 
     this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
-      .then(() => {
+      .then((authUser: any) => {
         this.setState({ ...INITIAL_STATE });
-        console.log(this.props.history);
+        const formData = new FormData();
+        formData.append("user_id", authUser.user.uid);
+        fetch(`/api/update-user`, {
+          method: "POST",
+          headers: {
+              Accept: "application/json"
+          },
+          body: formData
+      })
+      .then((response) => response.json());
         this.props.history.push(ROUTES.HOME);
       })
       .catch((error: any) => {
