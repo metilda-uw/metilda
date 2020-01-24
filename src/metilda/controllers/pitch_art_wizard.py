@@ -2,17 +2,23 @@ from __future__ import with_statement
 import os
 import shutil
 import tempfile
-from flask import request, jsonify, send_file
+from flask import request, jsonify, send_file, flash
 from Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
+from flask_accept import accept
+from werkzeug.utils import secure_filename
+import wave
 
+ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 @app.route('/api/audio/<string:upload_id>.png/image', methods=["GET"])
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
-
     tmin = request.args.get('tmin', -1, type=float)
     tmax = request.args.get('tmax', -1, type=float)
     min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
@@ -90,6 +96,18 @@ def sound_length(upload_id):
     sound_length = audio_analysis.get_sound_length(sound_path)
     return jsonify({'duration': sound_length})
 
+@app.route('/api/audio/download-file', methods=["POST"])
+def download_file(): 
+    file=request.files['file']
+    if file.filename == '':
+            flash('No selected file')
+    if file and allowed_file(file.filename):
+            # filename = secure_filename(file.filename)
+            filename = file.filename
+            sound_path = os.path.join(app.config["SOUNDS"], filename)
+            file.save(sound_path)
+    return jsonify({'result': 'success'})
+
 
 @app.route('/api/audio', methods=["GET"])
 def available_files():
@@ -99,12 +117,27 @@ def available_files():
 @app.route('/api/create-user', methods=["POST"])
 def create_db_user():
     with Postgres() as connection:
-        postgres_insert_query = """ INSERT INTO users (USER_ID, EMAIL, UNIVERSITY, ROLE, RESEARCH_LANGUAGE,
-        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)"""
-        record_to_insert = (request.form['user_id'], request.form['email'], request.form['university'],request.form['role'],
-        request.form['research_language'])
-        connection.query_with_record(postgres_insert_query, record_to_insert)
-    return jsonify({'result': 'success'})
+        postgres_insert_query = """ INSERT INTO users (USER_ID, UNIVERSITY,
+        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
+        record_to_insert = (request.form['user_id'], request.form['university'])
+        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/create-user-research-language', methods=["POST"])
+def create_user_research_language():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO user_research_language (USER_ID, USER_LANGUAGE) VALUES (%s,%s) RETURNING USER_ID"""
+        record_to_insert = (request.form['user_id'], request.form['language'])
+        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/create-user-role', methods=["POST"])
+def create_user_research_role():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO user_role (USER_ID, USER_ROLE) VALUES (%s,%s) RETURNING USER_ID"""
+        record_to_insert = (request.form['user_id'], request.form['user_role'])
+        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
 
 @app.route('/api/update-user', methods=["POST"])
 def update_db_user():
@@ -112,5 +145,107 @@ def update_db_user():
         postgres_insert_query = """ UPDATE users
                 SET last_login = CURRENT_TIMESTAMP
                 WHERE user_id = %s"""
-        connection.query_with_record(postgres_insert_query, (request.form['user_id'],))
+        connection.execute_update_query(postgres_insert_query, (request.form['user_id'],))
     return jsonify({'result': 'success'})
+
+@app.route('/api/create-file', methods=["POST"])
+def create_file():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO audio (AUDIO_ID, USER_ID, FILE_NAME, FILE_PATH, FILE_TYPE, FILE_SIZE,
+         CREATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING AUDIO_ID"""
+        record_to_insert = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'],
+        request.form['file_size'])
+        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+        if request.form['file_type'] == 'Recording':
+            postgres_insert_query = """ INSERT INTO recording_info (AUDIO_ID, NUMBER_OF_SYLLABLES, RECORDING_NAME) VALUES (%s,%s,%s) RETURNING AUDIO_ID"""
+            record_to_insert = (last_row_id, request.form['number_of_syllables'], request.form['recording_word_name'])
+            connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/delete-file/', methods=["POST"])
+def delete_file():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM audio WHERE AUDIO_ID = %s"""
+        results = connection.execute_update_query(postgres_select_query, (request.form['file_id'],))
+    return jsonify({'result': results})
+
+@app.route('/api/get-files/<string:user_id>', methods=["GET"])
+def get_file(user_id):
+    file_type = request.args.get('file-type', type=None)
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM audio WHERE USER_ID = %s AND FILE_TYPE = %s"""
+        filter_values= (user_id, file_type)
+        results = connection.execute_select_query(postgres_select_query, filter_values)
+    return jsonify({'result': results})
+
+@app.route('/api/get-analysis-file-path/<string:analysis_id>', methods=["GET"])
+def get_analysis_file_path(analysis_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT ANALYSIS_FILE_PATH FROM analysis WHERE ANALYSIS_ID = %s"""
+        results = connection.execute_select_query(postgres_select_query, (analysis_id,))
+    return jsonify({'result': results[0]})
+
+@app.route('/api/create-analysis', methods=["POST"])
+def create_analysis():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO analysis (ANALYSIS_ID, AUDIO_ID, ANALYSIS_FILE_NAME, ANALYSIS_FILE_PATH, GENERATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING ANALYSIS_ID"""
+        record_to_insert = (request.form['file_id'], request.form['analysis_file_name'],request.form['analysis_file_path'])
+        last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/update-analysis', methods=["POST"])
+def update_analysis():
+    with Postgres() as connection:
+        postgres_insert_query = """ UPDATE analysis SET ANALYSIS_FILE_PATH=%s, UPDATED_AT=CURRENT_TIMESTAMP WHERE ANALYSIS_ID=%s"""
+        record_to_insert = (request.form['analysis_file_path'], request.form['analysis_id'])
+        last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/create-image', methods=["POST"])
+def create_image():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO image (IMAGE_ID, IMAGE_NAME, IMAGE_PATH, CREATED_AT) VALUES (DEFAULT,%s,%s,CURRENT_TIMESTAMP) RETURNING IMAGE_ID"""
+        record_to_insert = (request.form['image_name'], request.form['image_path'])
+        last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/insert-image-analysis-ids', methods=["POST"])
+def insert_image_analysis_ids():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO image_analysis (IMAGE_ID, ANALYSIS_ID) VALUES (%s,%s) RETURNING ANALYSIS_ID"""
+        record_to_insert = (request.form['image_id'], request.form['analysis_id'])
+        last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/get-analyses-for-file/<string:file_id>', methods=["GET"])
+def get_analyses_for_file(file_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM analysis WHERE AUDIO_ID = %s"""
+        filter_values= (file_id)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-image-for-analysis/<string:analysis_id>', methods=["GET"])
+def get_image_for_analysis(analysis_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT IMAGE.* FROM IMAGE, IMAGE_ANALYSIS WHERE IMAGE_ANALYSIS.ANALYSIS_ID = %s AND IMAGE.IMAGE_ID=IMAGE_ANALYSIS.IMAGE_ID"""
+        filter_values= (analysis_id)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-all-images/<string:user_id>', methods=["GET"])
+def get_all_images(user_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM IMAGE WHERE IMAGE_PATH LIKE %s"""
+        filter_values=("%"+user_id+"%")
+        print(filter_values)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-analyses-for-image/<string:image_id>', methods=["GET"])
+def get_analyses_for_image(image_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT ANALYSIS.* FROM ANALYSIS, IMAGE_ANALYSIS WHERE IMAGE_ANALYSIS.IMAGE_ID = %s AND ANALYSIS.ANALYSIS_ID=IMAGE_ANALYSIS.ANALYSIS_ID"""
+        filter_values= (image_id)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})

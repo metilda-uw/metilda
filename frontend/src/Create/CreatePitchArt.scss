@@ -28,7 +28,7 @@
 
 .metilda-audio-analysis-image {
     border: 1px solid black;
-    width: 100%;
+    width: 653px;
 }
 
 .metilda-audio-analysis-input {
@@ -40,8 +40,7 @@
 }
 
 .metilda-audio-analysis-image-col-1,
-.metilda-audio-analysis-image-col-2,
-.metilda-audio-analysis-image-col-3 {
+.metilda-audio-analysis-image-col-2 {
     border: 1px solid black;
     height: 32px;
 }
@@ -58,14 +57,10 @@
     width: 77.5%;
 }
 
-.metilda-audio-analysis-image-col-3 {
-    width: 10%;
-    background: lightgray;
-}
-
 .metilda-control-container {
     display: flex;
     align-items: center;
+    width: 725px;
 }
 
 .metilda-target-pitch-bar {
@@ -115,7 +110,7 @@
 }
 
 .m-r-16 {
-    margin-right: 16px;
+    margin-right: 8px;
 }
 
 .no-border {
@@ -146,4 +141,17 @@
 #metilda-pitch-art-btn-container {
     display: flex;
     justify-content: flex-end;
+}
+
+.UploadFile {
+    position: fixed;
+    top: 70px;
+    right:40px
+}
+
+.TargetPitchBarElements{
+    text-align: right;
+}
+.btn{
+    text-transform: none
 }

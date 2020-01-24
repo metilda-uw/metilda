@@ -8,6 +8,7 @@ import PitchArtLegend from "./PitchArtLegend";
 import PitchArtToggle from "./PitchArtToggle";
 
 interface Props {
+    firebase: any;
     speakers: Speaker[];
     width: number;
     height: number;
@@ -96,7 +97,7 @@ class PitchArtContainer extends React.Component<Props, State> {
     render() {
         return (
             <div>
-                <div className="col s4">
+                <div className="col s5">
                     <h6 className="metilda-control-header">Pitch Art</h6>
                     <div className="metilda-pitch-art-container-control-list">
                         <PitchRange initMinPitch={this.state.minPitch}
@@ -183,7 +184,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                         }
                     </div>
                 </div>
-                <div className="col s8">
+                <div className="col s7">
                     <PitchArt width={this.props.width}
                               height={this.props.height}
                               minPitch={this.state.minPitch}
@@ -199,7 +200,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showPitchScale={this.state.showPitchScale}
                               showPerceptualScale={this.state.showPerceptualScale}
                               showPitchArtImageColor={this.state.showPitchArtImageColor}
-                              speakers={this.props.speakers}/>
+                              speakers={this.props.speakers}
+                              firebase={this.props.firebase}/>
                 </div>
             </div>
         );

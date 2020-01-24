@@ -1,6 +1,7 @@
 import app from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
+import "firebase/storage";
 
 const config = {
   apiKey: "AIzaSyBO-NeTgR5i13a4fawJylwyoOfTXigvYmU",
@@ -20,7 +21,7 @@ class Firebase {
     app.initializeApp(config);
     this.auth = app.auth();
     this.db = app.database();
-    // this.storage = app.storage();
+    this.storage = app.storage();
   }
 
   // *** Auth API ***
@@ -45,6 +46,7 @@ class Firebase {
   users = () => this.db.ref("users");
 
   // *** Cloud Storage API ***/
+  uploadFile = () =>  this.storage.ref();
 }
 
 export default Firebase;

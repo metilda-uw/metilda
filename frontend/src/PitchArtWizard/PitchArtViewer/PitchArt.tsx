@@ -21,16 +21,18 @@ interface Props {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     speakers: Speaker[];
+    firebase: any;
 }
 
 class PitchArt extends React.Component<Props> {
-    private hiddenRef = createRef<PitchArtDrawingWindow>();
-    private visibleRef = createRef<PitchArtDrawingWindow>();
+    private hiddenRef = createRef<any>();
+    private visibleRef = createRef<any>();
 
     constructor(props: Props) {
         super(props);
 
         this.saveImage = this.saveImage.bind(this);
+        this.downloadImage = this.downloadImage.bind(this);
         this.playPitchArt = this.playPitchArt.bind(this);
         this.createPitchArt = this.createPitchArt.bind(this);
     }
@@ -40,6 +42,14 @@ class PitchArt extends React.Component<Props> {
             this.hiddenRef.current!.saveImage();
         } else {
             this.visibleRef.current!.saveImage();
+        }
+    }
+
+    downloadImage() {
+        if (this.props.showPitchArtImageColor) {
+            this.hiddenRef.current!.downloadImage();
+        } else {
+            this.visibleRef.current!.downloadImage();
         }
     }
 
@@ -68,7 +78,8 @@ class PitchArt extends React.Component<Props> {
                         showPerceptualScale={this.props.showPerceptualScale}
                         showPitchArtImageColor={this.props.showPitchArtImageColor}
                         showPrevPitchValueLists={false}
-                        speakers={this.props.speakers}/>);
+                        speakers={this.props.speakers}
+                        firebase={this.props.firebase}/>);
     }
 
     render() {
@@ -87,12 +98,26 @@ class PitchArt extends React.Component<Props> {
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
                             disabled={this.props.speakers.length !== 1 || this.props.speakers[0].letters.length === 0}
                             onClick={this.playPitchArt}>
+                        <i className="material-icons right">
+                            play_circle_filled
+                        </i>
                         Play Tones
                     </button>
                     <button className="waves-effect waves-light btn metilda-pitch-art-btn"
                             disabled={this.props.speakers.length === 0}
                             onClick={this.saveImage}>
+                        <i className="material-icons right">
+                            cloud_upload
+                        </i>
                         Save Image
+                    </button>
+                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                            disabled={this.props.speakers.length === 0}
+                            onClick={this.downloadImage}>
+                        Download Image
+                        <i className="material-icons right">
+                            file_download
+                        </i>
                     </button>
                 </div>
             </div>

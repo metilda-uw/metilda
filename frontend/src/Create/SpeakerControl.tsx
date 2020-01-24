@@ -16,6 +16,7 @@ export interface SpeakerControlProps {
     removeSpeaker: () => void;
     canAddSpeaker: boolean;
     canRemoveSpeaker: boolean;
+    firebase: any;
 }
 
 export class SpeakerControl extends React.Component<SpeakerControlProps> {
@@ -27,7 +28,10 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
         return (
             <button className="SpeakerControl-remove-speaker waves-effect waves-light btn"
                     onClick={this.checkIfSpeakerRemovalIsOk}>
-                Remove
+                 <i className="material-icons right">
+                    remove_circle
+                 </i>
+                Remove Speaker
             </button>
         );
     }
@@ -40,7 +44,10 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
         return (
             <button className="SpeakerControl-add-speaker waves-effect waves-light btn"
                     onClick={this.props.addSpeaker}>
-                Add
+                <i className="material-icons right">
+                    person_add
+                 </i>
+                Add Speaker
             </button>
         );
     }
@@ -82,13 +89,13 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
     render() {
         return (
             <div className="SpeakerControl metilda-audio-analysis-controls-list-item col s12">
-                <label className="SpeakerControl-title group-label">Speaker</label>
+                {/* <label className="SpeakerControl-title group-label">Speaker</label> */}
                 <div className="metilda-audio-analysis-controls-list-item-row-left-align">
-                    <ImportMetildaTranscribe
+                    {/* <ImportMetildaTranscribe
                         onImport={this.checkIfSpeakerImportIsOk}
                         speakerIndex={this.props.speakerIndex}
-                    />
-                    <ExportMetildaTranscribe speakerIndex={this.props.speakerIndex}/>
+                    /> */}
+                    <ExportMetildaTranscribe speakerIndex={this.props.speakerIndex} firebase={this.props.firebase}/>
                     {this.maybeRenderRemoveSpeaker()}
                     {this.maybeRenderAddSpeaker()}
                 </div>

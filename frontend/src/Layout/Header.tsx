@@ -60,6 +60,14 @@ class Header extends Component {
               <Submenu
                 navLinks={[
                   {
+                    name: "History",
+                    link: "/history",
+                  },
+                  {
+                    name: "My Files",
+                    link: "/my-files",
+                  },
+                  {
                     name: "Settings",
                     link: "/manage-account",
                   },

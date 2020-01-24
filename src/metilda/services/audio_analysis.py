@@ -44,7 +44,7 @@ def audio_analysis_image(upload_path,
                          tmax=-1,
                          min_pitch=MIN_PITCH_HZ,
                          max_pitch=MAX_PITCH_HZ,
-                         output_path=None):
+                         output_path=None):                     
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
 
@@ -118,6 +118,9 @@ def get_all_pitches(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=M
 
 def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
+
+def test(upload_path):
+    return parselmouth.Sound(upload_path)
 
 
 def get_audio(upload_path, tmin=-1, tmax=-1):

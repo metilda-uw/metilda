@@ -8,8 +8,9 @@
   border-style: solid;
   background-color: #f2f2f2;
   padding: 15px;
-  .roles_Options {
-    width: 50%;
+  .roles_Options,.language_Options {
+    width: 60%;
+    padding-bottom:3px;
   }
 }
 
@@ -31,7 +32,6 @@
 }
 
 .login_Page {
-  padding: 10px;
   margin: 5px;
   h3 {
     color: rgb(185, 54, 54);
@@ -39,11 +39,15 @@
   }
 }
 
-.password_Forget_Link {
+.password_Forget_Link,.mandatory_message {
   color: maroon;
 }
 
 .terms_of_use {
   float: left;
-  padding: 10px;
+  padding-top: 10px;
+  color:grey
+}
+ ::placeholder{
+  color:grey
 }

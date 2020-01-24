@@ -32,20 +32,32 @@ class Postgres(object):
         self.connection.close()
         print('connection closed')
 
-    def query(self, query):
+    def execute_update_query(self, query, record):
         try:
-            result = self.cursor.execute(query)
+            self.cursor.execute(query, record)
         except Exception as error:
             print('error execting query "{}", error: {}'.format(query, error))
             return None
         else:
-            return result
+            return self.cursor.rowcount
     
-    def query_with_record(self, query, record):
+    def execute_insert_query(self, query, record):
         try:
-            result = self.cursor.execute(query, record)
+            self.cursor.execute(query, record)
         except Exception as error:
             print('error execting query "{}", error: {}'.format(query, error))
             return None
         else:
-            return result
+            print('last row id is: ')
+            last_row_id=self.cursor.fetchone()[0]
+            print(last_row_id)
+            return last_row_id
+    
+    def execute_select_query(self, query, record):
+        try:
+            self.cursor.execute(query, record)
+        except Exception as error:
+            print('error execting query "{}", error: {}'.format(query, error))
+            return None
+        else:
+            return self.cursor.fetchall()

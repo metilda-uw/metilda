@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
-import {controls, Media, Player} from 'react-media-player';
 import "../GlobalStyling.css";
 import "./PitchRange.css";
-
-const {PlayPause, MuteUnmute, SeekBar} = controls;
 
 class PitchRange extends Component {
     constructor(props) {

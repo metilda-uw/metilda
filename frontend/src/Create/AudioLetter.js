@@ -1,12 +1,7 @@
 import React, {Component} from 'react';
-import styles from "./CreatePitchArt.css";
 
 class AudioLetter extends Component {
   state = {};
-
-  constructor(props) {
-      super(props);
-  }
 
   render() {
     const {letter, leftX, rightX} = this.props;

@@ -1,0 +1,16 @@
+.imageContainer {
+  display: flex;
+  padding-left: 40px;
+  flex-flow:row wrap;
+}
+.image{
+  flex:0 1 calc(25% - 8px);
+  flex-basis: 20%;
+  margin:20px;
+}
+.image input{
+  width:100%
+}
+.ExportToExcel{
+  margin:30px;
+}

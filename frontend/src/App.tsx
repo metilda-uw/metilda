@@ -14,6 +14,8 @@ import signIn from "./Authentication/login";
 import signOut from "./Authentication/signout";
 import passwordForget from "./Authentication/password_forget";
 import accountPage from "./Authentication/account";
+import MyFiles from "./MyFiles/MyFiles";
+import History from "./History/History";
 import adminPage from "./Authentication/admin";
 import { withAuthentication } from "./Session";
 
@@ -31,6 +33,8 @@ const App = () => (<Router>
     <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
     <Route exact={true} path={ROUTES.PASSWORD_FORGET} component={passwordForget} />
     <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
+    <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
+    <Route exact={true} path={ROUTES.HISTORY} component={History} />
     <Route exact={true} path={ROUTES.ADMIN} component={adminPage} />
     <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
     <Route path="/home" component={Home} />

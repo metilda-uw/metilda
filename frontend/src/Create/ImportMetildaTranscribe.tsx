@@ -16,7 +16,7 @@ import {importSpeakerFile} from "./ImportUtils";
 export interface ImportMetildaTranscribeProps {
     speakerIndex: number;
     setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
-    onImport: (event: SyntheticEvent) => boolean;
+    onImport: (event: SyntheticEvent) => any;
 }
 
 export class ImportMetildaTranscribe extends React.Component<ImportMetildaTranscribeProps> {

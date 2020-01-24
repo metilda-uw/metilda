@@ -23,8 +23,6 @@ class PlayerBar extends React.Component<Props> {
                             <div className="metilda-audio-analysis-image-col-2 vert-center">
                                 <SeekBar className="no-border"/>
                             </div>
-                            <div className="metilda-audio-analysis-image-col-3">
-                            </div>
                         </div>
                     </div>
                 </Media>
