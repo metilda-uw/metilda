@@ -1,5 +1,6 @@
 import * as React from "react";
 import {connect} from "react-redux";
+import {SyntheticEvent} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
@@ -10,17 +11,38 @@ import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
 import "./CreatePitchArt.css";
 import Header from "../Layout/Header";
+import FileReaderInput, {Result} from "react-file-reader-input";
+import {uploadAudio} from "./ImportUtils";
 
 export interface CreatePitchArtProps {
     speakers: Speaker[];
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
+    firebase: any;
 }
 
-export class CreatePitchArt extends React.Component<CreatePitchArtProps> {
+interface State {
+    files: any[];
+    isLoading: boolean;
+}
+
+export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> {
+    constructor(props: CreatePitchArtProps) {
+        super(props);
+
+        this.state = {
+            files: [],
+            isLoading: false,
+        };
+    }
+    componentDidMount() {
+        this.getUserFiles();
+    }
+
     renderSpeakers = () => {
         return (
             this.props.speakers.map((item, index) =>
-                <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`}/>
+                <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`}
+                firebase={this.props.firebase} files={this.state.files}/>
             )
         );
     }
@@ -35,17 +57,77 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps> {
         return uploadId;
     }
 
-    render() {
-        const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
+    getUserFiles = () => {
+        // Get files of a user
+        const currentUserId = this.props.firebase.auth.currentUser.email;
+        fetch(`api/get-files/${currentUserId}`
+        + "?file-type=Upload", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => this.setState({
+            files: data.result.map((item: any) =>
+            item)}));
+   }
 
+    fileSelected = async (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
+        this.setState({
+            isLoading: true,
+        });
+        try {
+            const response = await uploadAudio(results, this.props.firebase);
+            this.getUserFiles();
+        } catch (ex) {
+            console.log(ex);
+        }
+        this.setState({
+            isLoading: false,
+        });
+    }
+
+    checkIfSpeakerImportIsOk = (event: SyntheticEvent) => {
+        // TO DO:: CHECK IF FILE TRYING TO UPLOAD IS ALREADY PRESENT IN CLOUD OR NOT
+        // if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
+        //     return;
+        // }
+
+        // const isOk: boolean = confirm(
+        //     "The current speaker will be reset.\n\n" +
+        //     "Do you want to continue?"
+        // );
+
+        // if (!isOk) {
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        // }
+    }
+
+    render() {
+        const { isLoading } = this.state;
+        const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
+        const loadingComponent = isLoading ? <div className="loadingContainer">loading...</div> : <div />;
         return (
             <div>
             <Header/>
+            {/* {loadingComponent} */}
             <div className="CreatePitchArt">
+                <FileReaderInput as="binary" onChange={this.fileSelected}>
+                    <button onClick={this.checkIfSpeakerImportIsOk} className="UploadFile waves-effect waves-light btn">
+                        <i className="material-icons right">
+                            cloud_upload
+                        </i>
+                        Upload File to cloud
+                    </button>
+                </FileReaderInput>
                 <div className="metilda-page-content">
                     {this.renderSpeakers()}
                     <div className="row">
                         <PitchArtContainer
+                            firebase={this.props.firebase}
                             speakers={this.props.speakers}
                             width={AudioAnalysis.AUDIO_IMG_WIDTH}
                             height={500}

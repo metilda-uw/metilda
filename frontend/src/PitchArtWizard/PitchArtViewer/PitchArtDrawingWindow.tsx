@@ -2,6 +2,8 @@ import React, {createRef} from "react";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
+import moment from "moment";
+import {connect} from "react-redux";
 import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
@@ -10,6 +12,11 @@ import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
+import {uploadAnalysis, uploadImage, uploadImageAnalysisIds} from "../../Create/ImportUtils";
+import {ThunkDispatch} from "redux-thunk";
+import {AppState} from "../../store/index";
+import {AudioAction} from "../../store/audio/types";
+import {setLatestAnalysisId} from "../../store/audio/actions";
 
 export interface PitchArtDrawingWindowProps {
     speakers: Speaker[];
@@ -32,6 +39,10 @@ export interface PitchArtDrawingWindowProps {
     showPitchArtImageColor: boolean;
     showPrevPitchValueLists: boolean;
     rawPitchValueLists?: RawPitchValue[][];
+    firebase: any;
+    setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
+                          lastUploadedLetters: Letter[]) => void;
+    ref: any;
 }
 
 interface State {
@@ -99,17 +110,98 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         this.fontSize = 16;
     }
 
-    saveImage() {
-        // follows example from:
-        // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
-        // @ts-ignore (TypeScript doesn't like the toDataURL call below, but it works fine)
+    downloadImage = () => {
+        // @ts-ignore
         const dataURL = this.stageRef.current!.getStage().toDataURL();
         this.downloadRef.current!.href = dataURL;
         this.downloadRef.current!.download = this.props.fileName;
         this.downloadRef.current!.click();
     }
 
-    playPitchArt() {
+    saveImage = async () => {
+        // follows example from:
+        // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
+        // @ts-ignore (TypeScript doesn't like the toDataURL call below, but it works fine)
+        const dataURL = this.stageRef.current!.getStage().toDataURL();
+        // this.downloadRef.current!.href = dataURL;
+        // const imageTimeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+        // this.downloadRef.current!.download = `${this.props.fileName}_${imageTimeStamp}.png`;
+        const speakerIndicesForUnsavedAnalysis: number[] = [];
+        const allAnalysisIds: number[] = [];
+        this.props.speakers.forEach((item, index) => {
+            if (item.latestAnalysisId == null || JSON.stringify(item.letters) !==
+            JSON.stringify(item.lastUploadedLetters)) {
+                speakerIndicesForUnsavedAnalysis.push(index);
+            } else {
+                allAnalysisIds.push(item.latestAnalysisId);
+            }
+        });
+        if (speakerIndicesForUnsavedAnalysis.length !== 0) {
+                for (const index of speakerIndicesForUnsavedAnalysis) {
+                    const speaker = this.props.speakers[index];
+                    const metildaWord = {
+                    uploadId: speaker.uploadId,
+                    letters: speaker.letters
+                    } as Speaker;
+                    let isValidAnalysisInput = false;
+                    let updatedAnalysisName = "";
+                    let analysisName;
+                    while (!isValidAnalysisInput) {
+                        analysisName = prompt("Analysis should be saved before saving the image. Enter analysis name", "Ex: Analysis1.json");
+                        if (analysisName == null) {
+                            // user canceled input
+                             break;
+                        }
+                        updatedAnalysisName = analysisName.trim();
+                        if (updatedAnalysisName.length === 0) {
+                            alert("Analysis name should contain at least one character");
+                        } else {
+                            isValidAnalysisInput = true;
+                        }
+                    }
+                    if (isValidAnalysisInput && analysisName !== null && analysisName !== undefined) {
+                        const analysisId = await uploadAnalysis(metildaWord, speaker.fileIndex,
+                            analysisName, this.props.firebase);
+                        if (typeof(analysisId) === "number") {
+                           this.props.setLatestAnalysisId(index, analysisId, analysisName, speaker.letters);
+                           allAnalysisIds.push(analysisId);
+                       }
+                    } else {
+                        alert("Analysis not uploaded. Analysis name is missing");
+                        }
+
+            }
+        }
+        let isValidImageInput = false;
+        let updatedImageName = "";
+        let imageName;
+        while (!isValidImageInput) {
+            imageName = prompt(" Enter image name", "Ex: Image1.png");
+            if (imageName == null) {
+                // user canceled input
+                break;
+            }
+            updatedImageName = imageName.trim();
+            if (updatedImageName.length === 0) {
+                alert("Image name should contain at least one character");
+            } else {
+                isValidImageInput = true;
+            }
+        }
+        if (isValidImageInput && imageName !== null && imageName !== undefined) {
+        const imageId = await uploadImage(`${imageName}`, dataURL, this.props.firebase);
+        if (typeof(imageId) === "number") {
+        for (const id of allAnalysisIds) {
+                const imageAnalysisId = await uploadImageAnalysisIds(imageId, id);
+            }
+        }
+        // this.downloadRef.current!.click();
+        } else {
+            alert("Image not uploaded. Image name is missing");
+            }
+    }
+
+playPitchArt() {
         if (this.props.speakers.length !== 1) {
             return;
         }
@@ -160,23 +252,23 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         Tone.Transport.start();
     }
 
-    playSound(pitch: number) {
+playSound(pitch: number) {
         const synth = new Tone.Synth().toMaster();
         synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
-    imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {
+imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {
         const yPos = this.stageRef.current!.getStage().getPointerPosition().y;
         const pitch = coordConverter.rectCoordsToVertValue(yPos);
         this.playSound(pitch);
     }
 
-    setPointerEnabled(isEnabled: boolean) {
+setPointerEnabled(isEnabled: boolean) {
         this.stageRef.current!.getStage().container().style.cursor
             = isEnabled ? "pointer" : "default";
     }
 
-    maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
+maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
         if (!this.props.rawPitchValueLists || this.props.rawPitchValueLists.length === 0) {
             return;
         }
@@ -215,7 +307,7 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         );
     }
 
-    colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): ColorScheme => {
+colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): ColorScheme => {
         if (!showArtDesign) {
             const color = PitchArtLegend.SPEAKER_COLOR(speakerIndex);
             return {
@@ -291,7 +383,7 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         };
     }
 
-    maybeShowPitchScale = (windowConfig: PitchArtWindowConfig) => {
+maybeShowPitchScale = (windowConfig: PitchArtWindowConfig) => {
         if (!this.props.showPitchScale) {
             return;
         }
@@ -309,7 +401,7 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         );
     }
 
-    render() {
+render() {
         const windowConfig = {
             innerHeight: this.innerHeight,
             innerWidth: this.innerWidth,
@@ -386,4 +478,9 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
     }
 }
 
-export default PitchArtDrawingWindow;
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
+                          lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
+                            latestAnalysisName, lastUploadedLetters))
+});
+export default connect(null, mapDispatchToProps, null, {forwardRef: true})(PitchArtDrawingWindow);

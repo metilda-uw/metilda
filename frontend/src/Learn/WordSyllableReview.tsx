@@ -6,7 +6,7 @@ import Recorder from "recorder-js";
 import AudioAnalysis from "../Create/AudioAnalysis";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
-import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
+import PitchArtDrawingWindow, { PitchArtDrawingWindowProps } from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
 import {PitchRangeDTO, RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Speaker} from "../types/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
@@ -15,12 +15,14 @@ import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
+import {uploadRecording} from "../Create/ImportUtils";
 
 interface MatchParams {
     numSyllables: string;
 }
 
 interface Props extends RouteComponentProps<MatchParams> {
+    firebase: any;
 }
 
 interface State {
@@ -72,7 +74,7 @@ class WordSyllableReview extends React.Component<Props, State> {
     }
 
     private recorder: any;
-    private pitchArtRef = createRef<PitchArtDrawingWindow>();
+    private pitchArtRef = createRef <any> ();
 
     constructor(props: Props) {
         super(props);
@@ -109,6 +111,35 @@ class WordSyllableReview extends React.Component<Props, State> {
         } else {
             const controller = this;
             this.recorder.stop().then((result: any) => {
+                const isOk: boolean = confirm(
+                    "Do you want to save the recording to cloud?"
+                );
+                if (isOk) {
+                    let isValidInput = false;
+                    let updatedFileName = "";
+                    let fileName;
+                    while (!isValidInput) {
+                         fileName = prompt("Enter recording name", "Ex: Recording1.wav");
+                         if (fileName == null) {
+                            // user canceled input
+                             break;
+                        }
+
+                         updatedFileName = fileName.trim();
+                         if (updatedFileName.length === 0) {
+                            alert("Recording name should contain at least one character");
+                        } else {
+                            isValidInput = true;
+                        }
+                    }
+                    const numberOfSyllables = this.props.match.params.numSyllables;
+                    const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+                    if (isValidInput) {
+                    uploadRecording(result, fileName, numberOfSyllables, recordingWordName, this.props.firebase);
+                    } else {
+                    alert("Recording not uploaded. Recording name is missing");
+                    }
+                }
                 controller.setState({isLoadingPitchResults: true});
                 const formData = new FormData();
                 formData.append("file", result.blob);
@@ -270,6 +301,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         showPrevPitchValueLists={this.state.showPrevPitchValueLists}
                                         speakers={speakers}
                                         rawPitchValueLists={this.state.userPitchValueLists}
+                                        firebase={this.props.firebase}
                                     />
 
                                 }
@@ -295,11 +327,17 @@ class WordSyllableReview extends React.Component<Props, State> {
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.playPitchArt}
                                                 disabled={this.state.isRecording}>
+                                            <i className="material-icons right">
+                                                play_circle_filled
+                                            </i>
                                             Play Tones
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn"
                                                 onClick={this.saveImage}
                                                 disabled={this.state.isRecording}>
+                                            <i className="material-icons right">
+                                                cloud_upload
+                                            </i>
                                             Save Image
                                         </button>
                                     </div>

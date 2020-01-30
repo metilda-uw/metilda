@@ -9,7 +9,6 @@ class UploadAudio extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            availableFiles: [],
             updateCounter: 0
         };
 
@@ -21,11 +20,11 @@ class UploadAudio extends Component {
         let controller = this;
         fetch("/api/audio")
             .then(data => data.json())
-            .then(data => this.setState({availableFiles: data["ids"]}))
             .then(function () {
                 controller.initInputField();
             })
     }
+
 
     componentDidUpdate() {
         // We reset the select field to force the select input to re-render with the
@@ -54,25 +53,26 @@ class UploadAudio extends Component {
             }
         }
 
-        const fileName = event.target.value;
-        this.props.setUploadId(fileName);
+        const index = event.target.value;
+        this.props.setUploadId(this.props.userFiles[index][1], this.props.userFiles[index][2], this.props.userFiles[index][0]);
     }
 
     render() {
-        const availableFilesList = this.state.availableFiles.map(item =>
-            <option key={item}>{item}</option>
-        );
-
+        const availableFilesList = this.props.userFiles.map((item, index) => {
+            return (
+                <option key={index} value={index}>{item[1]}</option>
+            )
+        });
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12"
                  key={this.state.updateCounter}>
                 <label className="group-label">Audio File</label>
                 <div className="metilda-audio-analysis-controls-list-item-row">
                     <select id="audioFileInput"
-                            value={this.props.initFileName || ""}
+                            value={this.props.initFileName || ''}
                             name="audioFileName"
                             onChange={this.sendFormSubmit}>
-                        <option value="" disabled="disabled">Choose audio file</option>
+                        <option value={''} disabled="disabled">Choose audio file</option>
                         {availableFilesList}
                     </select>
                 </div>

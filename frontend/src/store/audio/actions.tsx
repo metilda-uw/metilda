@@ -28,13 +28,26 @@ export const removeSpeaker = (speakerIndex: number):
     });
 };
 
-export const setUploadId = (speakerIndex: number, uploadId: string):
+export const setUploadId = (speakerIndex: number, uploadId: string, fileIndex: number):
     ActionReturn => (dispatch: Dispatch, getState) => {
     const speakers = getState().audio.speakers;
-    const newSpeakers = update(speakers, {[speakerIndex]: {uploadId: {$set: uploadId}}});
+    const newSpeakers = update(speakers, {[speakerIndex]: {uploadId: {$set: uploadId},
+        fileIndex: {$set: fileIndex}}});
 
     dispatch({
         type: constants.SET_UPLOAD_ID,
+        speakers: newSpeakers,
+    });
+};
+
+export const setLatestAnalysisId = (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
+                                    lastUploadedLetters: Letter[]):
+    ActionReturn => (dispatch: Dispatch, getState) => {
+        const speakers = getState().audio.speakers;
+        const newSpeakers = update(speakers, {[speakerIndex]: {latestAnalysisId: {$set: latestAnalysisId},
+            latestAnalysisName: {$set: latestAnalysisName}, lastUploadedLetters: {$set: lastUploadedLetters}}});
+        dispatch({
+        type: constants.SET_LATEST_ANALYSIS_ID,
         speakers: newSpeakers,
     });
 };

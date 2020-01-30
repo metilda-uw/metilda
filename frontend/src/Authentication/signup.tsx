@@ -15,8 +15,9 @@ interface State {
   passwordOne: string;
   passwordTwo: string;
   error: any;
+  role: any[];
   uid: string;
-  languageOfResearch: string;
+  languageOfResearch: any[];
   [key: string]: any;
 }
 const SignUpPage = () => (
@@ -32,9 +33,9 @@ const INITIAL_STATE = {
   passwordOne: "",
   passwordTwo: "",
   institution: "",
-  role: "",
+  role: [],
   uid: "",
-  languageOfResearch: "",
+  languageOfResearch: [],
   checked: false,
   error: null,
 };
@@ -46,52 +47,92 @@ class SignUpFormBase extends React.Component<Props, State> {
     this.state = { ...INITIAL_STATE };
   }
 
-  onSubmit = (event: any) => {
-    event.preventDefault();
-    const { username, email, passwordOne } = this.state;
-    this.props.firebase
-      .doCreateUserWithEmailAndPassword(email, passwordOne)
-      .then((authUser: any) => {
-        // Create a user in your Firebase realtime database
+  onSubmit = async (event: any) => {
+      event.preventDefault();
+      const { username, email, passwordOne } = this.state;
+      try {
+        const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
         this.setState({
           uid: authUser.user.uid
-          });
-        return this.props.firebase.user(authUser.user.uid).set({
-          username,
-          email,
         });
-      })
-      .then((authUser: any) => {
+        this.props.firebase.user(authUser.user.uid).set({username, email});
         const formData = new FormData();
-        formData.append("user_id", this.state.uid);
-        formData.append("email", this.state.email);
+        formData.append("user_id", this.state.email);
         formData.append("university", this.state.institution);
-        formData.append("role", this.state.role);
-        formData.append("research_language", this.state.languageOfResearch);
-        fetch(`/api/create-user`, {
+        formData.append("role", this.state.role.toString());
+
+        const response = await fetch(`/api/create-user`, {
           method: "POST",
           headers: {
               Accept: "application/json"
           },
           body: formData
-      })
-      .then((response) => response.json());
+        });
+        const body = await response.json();
+        for (const researchLanguage of this.state.languageOfResearch) {
+          const recordingData = new FormData();
+          const userId = body.result;
+          recordingData.append("user_id", userId);
+          recordingData.append("language", researchLanguage);
+          const result =  await fetch(`/api/create-user-research-language`, {
+            method: "POST",
+            headers: {
+            Accept: "application/json"
+            },
+            body: recordingData
+            });
+        }
+        for (const role of this.state.role) {
+          const roleData = new FormData();
+          const userId = body.result;
+          roleData.append("user_id", userId);
+          roleData.append("user_role", role);
+          const result =  await fetch(`/api/create-user-role`, {
+            method: "POST",
+            headers: {
+            Accept: "application/json"
+            },
+            body: roleData
+            });
+        }
         this.setState({ ...INITIAL_STATE });
         this.props.history.push(ROUTES.HOME);
-      })
-      .catch((error: any) => {
-        this.setState({ error });
-      });
+      } catch (ex) {
+        console.log(ex);
+      }
   }
 
   onChange = (event: any) => {
+    if (event.target.name === "passwordTwo") {
+      if (event.target.value !== this.state.passwordOne) {
+        event.target.setCustomValidity("Passwords must match");
+      } else {
+        event.target.setCustomValidity("");
+      }
+    }
+
     this.setState({ [event.target.name]: event.target.value });
   }
 
   handleCheckboxChange = (event: any) =>
     this.setState({ checked: event.target.checked })
 
-  handleDropDownChange = (event: any) => this.setState({ role: event.value });
+  handleRoleChange = (event: any) => {
+    if (event !== null) {
+      this.setState({ role: event.map((item: any) =>
+        item.value) });
+    } else {
+      this.setState({ role: [] });
+    }
+  }
+  handleLanguageChange = (event: any) => {
+    if (event !== null) {
+      this.setState({languageOfResearch : event.map((item: any) =>
+        item.value) });
+    } else {
+      this.setState({languageOfResearch : [] });
+    }
+  }
 
   render() {
     const {
@@ -100,24 +141,18 @@ class SignUpFormBase extends React.Component<Props, State> {
       passwordOne,
       passwordTwo,
       institution,
-      role,
-      checked,
-      languageOfResearch,
       error,
     } = this.state;
-
-    const isInvalid =
-      passwordOne !== passwordTwo ||
-      passwordOne === "" ||
-      role === "" ||
-      email === "" ||
-      username === "" ||
-      checked === false;
-
-    const options = [
+    const roleOptions = [
       { value: "linguistic_researcher", label: "Linguistic Researcher" },
       { value: "teacher", label: "Teacher" },
       { value: "student", label: "Student" },
+      { value: "other", label: "Other" },
+    ];
+    const languageOptions = [
+      { value: "blackfoot", label: "Blackfoot" },
+      { value: "english", label: "English" },
+      { value: "french", label: "French" },
       { value: "other", label: "Other" },
     ];
 
@@ -132,28 +167,9 @@ class SignUpFormBase extends React.Component<Props, State> {
       }),
       input: (styles: any) => ({ ...styles, padding: "0px", margin: "0px" }),
     };
-    const customStyles = {
-      option: (provided: any, state: any) => ({
-        ...provided,
-        borderBottom: "1px dotted pink",
-        color: state.isSelected ? "red" : "blue",
-        padding: 20,
-      }),
-      control: () => ({
-        // none of react-select's styles are passed to <Control />
-        width: 200,
-        height: "1em",
-      }),
-      singleValue: (provided: any, state: any) => {
-        const opacity = state.isDisabled ? 0.5 : 1;
-        const transition = "opacity 300ms";
-
-        return { ...provided, opacity, transition };
-      },
-    };
     const Checkbox = (props: any) => <input type="checkbox" {...props} />;
     const TermsOfUseLink = () => (
-      <Link to={ROUTES.TERMS_OF_USE} className="terms_of_use_Link">
+      <Link to={ROUTES.TERMS_OF_USE} target="_blank" className="terms_of_use_Link">
         terms of use
       </Link>
     );
@@ -165,28 +181,32 @@ class SignUpFormBase extends React.Component<Props, State> {
           value={username}
           onChange={this.onChange}
           type="text"
-          placeholder="Full Name"
+          placeholder="Full Name *"
+          required
         />
         <input
           name="email"
           value={email}
           onChange={this.onChange}
           type="text"
-          placeholder="Email Address"
+          placeholder="Email Address *"
+          required
         />
         <input
           name="passwordOne"
           value={passwordOne}
           onChange={this.onChange}
           type="password"
-          placeholder="Password"
+          placeholder="Password *"
+          required
         />
         <input
           name="passwordTwo"
           value={passwordTwo}
           onChange={this.onChange}
           type="password"
-          placeholder="Confirm Password"
+          placeholder="Confirm Password *"
+          required
         />
         <input
           name="institution"
@@ -195,33 +215,37 @@ class SignUpFormBase extends React.Component<Props, State> {
           type="text"
           placeholder="University/Institution"
         />
-        <input
-          name="languageOfResearch"
-          value={languageOfResearch}
-          onChange={this.onChange}
-          type="text"
+        <Select isMulti
+          className="language_Options"
           placeholder="Research Language"
+          options={languageOptions}
+          styles={colourStyles}
+          onChange={this.handleLanguageChange}
         />
 
-        <Select
+        <Select isMulti
           className="roles_Options"
           placeholder="Role"
-          options={options}
+          options={roleOptions}
           styles={colourStyles}
-          onChange={this.handleDropDownChange}
+          onChange={this.handleRoleChange}
         />
         <label className="terms_of_use">
           <Checkbox
             checked={this.state.checked}
             onChange={this.handleCheckboxChange}
+            required
           />
           <span>
-            By clicking the checkbox, you agree to the {<TermsOfUseLink />}
+            By clicking the checkbox, you agree to the {<TermsOfUseLink />} *
           </span>
         </label>
-        <button disabled={isInvalid} type="submit" className="signup_Submit">
+        <button type="submit" className="signup_Submit">
           Sign Up
         </button>
+        <span className="mandatory_message">
+           Fields marked with * are mandatory
+          </span>
 
         {error && <p>{error.message}</p>}
       </form>
@@ -234,7 +258,7 @@ const SignUpLink = () => (
     Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
   </p>
 );
-// const SignUpForm = withRouter(withFirebase(SignUpFormBase as any));
+
 const SignUpForm = compose(
   withRouter,
   withFirebase

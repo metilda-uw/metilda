@@ -13,7 +13,7 @@ class Submenu extends React.Component<Props> {
     return (
       <ul className="nav__submenu">
         {this.props.navLinks.map((navLink: any, index: any) => (
-          <li className="nav__submenu-item ">
+          <li className="nav__submenu-item " key={index}>
             <Link to={navLink.link}>{navLink.name}</Link>
           </li>
         ))}

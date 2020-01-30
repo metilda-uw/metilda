@@ -23,9 +23,11 @@ import "./UploadAudio.css";
 export interface AudioAnalysisProps {
     speakerIndex: number;
     speakers: Speaker[];
+    firebase: any;
+    files: any[];
     addSpeaker: () => void;
     removeSpeaker: (speakerIndex: number) => void;
-    setUploadId: (speakerIndex: number, uploadId: string) => void;
+    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
@@ -218,8 +220,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             });
     }
 
-    setUploadId = (uploadId: string) => {
-        this.props.setUploadId(this.props.speakerIndex, uploadId);
+    setUploadId = (uploadId: string, uploadPath: string, fileIndex: number) => {
+    const storageRef = this.props.firebase.uploadFile();
+    storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
+        // `url` is the download URL for file
+        const response = await fetch(url);
+        const responseBlob = await response.blob();
+        const formData = new FormData();
+        formData.append("file", responseBlob, uploadId);
+        const analysisResponse = await fetch(`/api/audio/download-file`, {
+            method: "POST",
+            body: formData,
+        });
+        this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+      }).catch(function(error: any) {
+        // return;
+      });
     }
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {
@@ -549,7 +565,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 addSpeaker={this.props.addSpeaker}
                 removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
                 canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
-                canRemoveSpeaker={!isFirstSpeaker}/>
+                canRemoveSpeaker={!isFirstSpeaker}
+                firebase={this.props.firebase}/>
         );
     }
 
@@ -596,15 +613,16 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return (
             <div className="AudioAnalysis">
                 <div className="row">
-                    <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s4">
+                    <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
                         <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
-                        <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}/>
+                        <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}
+                         userFiles={this.props.files} firebase={this.props.firebase}/>
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
                         {this.renderSpeakerControl()}
                     </div>
-                    <div className="AudioAnalysis-analysis metilda-audio-analysis col s8">
+                    <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
                         <div>
                             <div className="metilda-audio-analysis-image-container">
                                 {nonAudioImg}
@@ -638,7 +656,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                                             minAudioTime={this.state.minAudioTime}
                                             maxAudioTime={this.state.maxAudioTime}
                                             targetPitchSelected={this.targetPitchSelected}
-                                            speakerIndex={this.props.speakerIndex}/>
+                                            speakerIndex={this.props.speakerIndex}
+                                            firebase={this.props.firebase}/>
                         </div>
                     </div>
                 </div>
@@ -654,10 +673,11 @@ const mapStateToProps = (state: AppState) => ({
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
     addSpeaker: () => dispatch(addSpeaker()),
     removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
-    setUploadId: (speakerIndex: number, uploadId: string) => dispatch(setUploadId(speakerIndex, uploadId)),
+    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
+     dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
-        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
+        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioAnalysis);

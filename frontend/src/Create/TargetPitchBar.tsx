@@ -1,23 +1,33 @@
 import React, {Component} from "react";
 import {connect} from "react-redux";
+import moment from "moment";
 import {ThunkDispatch} from "redux-thunk";
 import {AppState} from "../store";
-import {removeLetter, resetLetters, setLetterSyllable} from "../store/audio/actions";
+import {removeLetter, resetLetters, setLetterSyllable, setLatestAnalysisId, setSpeaker} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import AudioLetter from "./AudioLetter";
+import fileDownload from "js-file-download";
+import FileReaderInput, {Result} from "react-file-reader-input";
+import {uploadAnalysis, updateAnalysis, importSpeakerFile} from "./ImportUtils";
+import {SyntheticEvent} from "react";
 
 export interface TargetPitchBarProps {
+    letters: any;
     speakers: Speaker[];
     speakerIndex: number;
     minAudioTime: number;
     maxAudioTime: number;
     minAudioX: number;
     maxAudioX: number;
+    firebase: any;
     targetPitchSelected: (letterIndex: number) => void;
     removeLetter: (speakerIndex: number, index: number) => void;
     resetLetters: (speakerIndex: number) => void;
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
+    setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number,
+                          latestAnalysisName: string, lastUploadedLetters: Letter[]) => void;
+    setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
 }
 
 interface State {
@@ -137,9 +147,111 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.props.targetPitchSelected(-1);
     }
 
+    downloadAnalysis = () => {
+        const speaker = this.props.speakers[this.props.speakerIndex];
+        const metildaWord = {
+            uploadId: speaker.uploadId,
+            letters: speaker.letters
+        } as Speaker;
+        const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+        const fileName = `Speaker${this.props.speakerIndex + 1}_${timeStamp}.json`;
+        fileDownload(JSON.stringify(metildaWord, null, 2), fileName);
+    }
+
+    saveAnalysis = async () => {
+        const speaker = this.props.speakers[this.props.speakerIndex];
+        const metildaWord = {
+            uploadId: speaker.uploadId,
+            letters: speaker.letters
+        } as Speaker;
+        const isValidInput = false;
+        if (speaker.latestAnalysisId !== null && speaker.latestAnalysisId !== undefined &&
+            speaker.latestAnalysisName != null ) {
+                if (JSON.stringify(speaker.letters) === JSON.stringify(speaker.lastUploadedLetters)) {
+                    alert(`Analysis already saved`);
+                } else {
+                    const confirmMsg = `Do you want to save this to the existing analysis "${speaker.latestAnalysisName}"?`;
+                    const isOk: boolean = confirm(confirmMsg);
+                    if (isOk) {
+                        this.deletePreviousAnalysis(speaker.latestAnalysisId);
+                        const data = await updateAnalysis(metildaWord, speaker.latestAnalysisName,
+                            speaker.latestAnalysisId, this.props.firebase);
+                        this.props.setLatestAnalysisId(this.props.speakerIndex, speaker.latestAnalysisId,
+                            speaker.latestAnalysisName, speaker.letters);
+                    } else {
+                       this.uploadAnalysis(isValidInput, metildaWord, speaker);
+                    }
+                }
+        } else {
+            this.uploadAnalysis(isValidInput, metildaWord, speaker);
+        }
+    }
+
+    deletePreviousAnalysis = (analysisId: number) => {
+        fetch(`api/get-analysis-file-path/${analysisId.toString()}`, {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        }})
+        .then((response) => response.json())
+        .then((data) => {
+            const storageRef = this.props.firebase.uploadFile();
+            const fileRef = storageRef.child(data.result[0]);
+            // Delete the file
+            fileRef.delete().then(function() {
+            // File deleted successfully!
+             });
+        });
+    }
+
+    uploadAnalysis = async (isValidInput: boolean, metildaWord: Speaker, speaker: Speaker) => {
+        let fileName;
+        let updatedFileName;
+        while (!isValidInput) {
+            fileName = prompt("Enter new analysis name", "Ex: Analysis1.json");
+            if (fileName == null) {
+               // user canceled input
+                break;
+           }
+            updatedFileName = fileName.trim();
+            if (updatedFileName.length === 0) {
+               alert("Analyis name should contain at least one character");
+           } else {
+               isValidInput = true;
+           }
+       }
+        if (isValidInput && fileName !== null && fileName !== undefined) {
+       const data = await uploadAnalysis(metildaWord, speaker.fileIndex, fileName, this.props.firebase);
+       this.props.setLatestAnalysisId(this.props.speakerIndex, data,
+           fileName, speaker.letters);
+       } else {
+       alert("Analysis not uploaded. Analysis name is missing");
+       }
+    }
+    fileSelected = (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
+        importSpeakerFile(results, this.props.speakerIndex, this.props.setSpeaker);
+    }
+    checkIfSpeakerImportIsOk = (event: SyntheticEvent) => {
+        if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
+            return;
+        }
+
+        const isOk: boolean = confirm(
+            "The current speaker will be reset.\n\n" +
+            "Do you want to continue?"
+        );
+
+        if (!isOk) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }
+
     render() {
         const controller = this;
         const letters = this.scaleIntervals();
+        const speaker = this.props.speakers[this.props.speakerIndex];
         return (
             <div className="TargetPitchBar">
                 <div className="metilda-control-container metilda-target-pitch-bar">
@@ -163,10 +275,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                             })
                         }
                     </div>
-                    <div className="metilda-audio-analysis-image-col-3">
-                    </div>
                 </div>
-                <div className="right-align">
+                <div className="TargetPitchBarElements">
                     <button className="TargetPitchBar-set-syllable btn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
@@ -181,12 +291,32 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                             onClick={this.removeLetterEvent}>
                         Remove
                     </button>
-                    <button className="TargetPitchBar-clear-letter btn waves-effect waves-light"
+                    <button className="TargetPitchBar-clear-letter btn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
-                            disabled={this.props.speakers[this.props.speakerIndex].letters.length === 0}
+                            disabled={speaker.letters.length === 0}
                             onClick={this.resetAllLettersEvent}>
                         Clear
+                    </button>
+                    <button onClick={this.checkIfSpeakerImportIsOk}
+                            className="TargetPitchBar-open-analysis btn waves-effect waves-light m-r-16">
+                        <FileReaderInput as="binary" onChange={this.fileSelected}>
+                            Open
+                        </FileReaderInput>
+                    </button>
+                    <button className="TargetPitchBar-save-analysis btn waves-effect waves-light m-r-16"
+                            type="submit"
+                            name="action"
+                            disabled={speaker.letters.length === 0}
+                            onClick={this.saveAnalysis}>
+                        Save
+                    </button>
+                    <button className="TargetPitchBar-download-analysis btn waves-effect waves-light"
+                            type="submit"
+                            name="action"
+                            disabled={speaker.letters.length === 0}
+                            onClick={this.downloadAnalysis}>
+                        Download
                     </button>
                 </div>
             </div>
@@ -203,7 +333,11 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
     removeLetter: (speakerIndex: number, index: number) => dispatch(removeLetter(speakerIndex, index)),
     resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
-        dispatch(setLetterSyllable(speakerIndex, index, syllable))
+        dispatch(setLetterSyllable(speakerIndex, index, syllable)),
+    setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
+                          lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
+                            latestAnalysisName, lastUploadedLetters)),
+     setSpeaker: (speakerIndex: number, speaker: Speaker) => dispatch(setSpeaker(speakerIndex, speaker))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);

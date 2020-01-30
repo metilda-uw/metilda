@@ -23,7 +23,7 @@ const SignInPage = () => (
   <div className="login_Page">
     <h3> Welcome to MeTILDA!!</h3>
     <div className="signin__Form">
-      <h3>SignIn</h3>
+      <h3>Sign In</h3>
       <SignInForm />
       <PasswordForgetLink />
     </div>
@@ -54,7 +54,7 @@ class SignInFormBase extends React.Component<Props, State> {
       .then((authUser: any) => {
         this.setState({ ...INITIAL_STATE });
         const formData = new FormData();
-        formData.append("user_id", authUser.user.uid);
+        formData.append("user_id", authUser.user.email);
         fetch(`/api/update-user`, {
           method: "POST",
           headers: {
