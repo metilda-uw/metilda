@@ -13,6 +13,7 @@ import "./CreatePitchArt.css";
 import Header from "../Layout/Header";
 import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAudio} from "./ImportUtils";
+import {spinner} from "../Utils/LoadingSpinner";
 
 export interface CreatePitchArtProps {
     speakers: Speaker[];
@@ -109,11 +110,10 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
     render() {
         const { isLoading } = this.state;
         const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
-        const loadingComponent = isLoading ? <div className="loadingContainer">loading...</div> : <div />;
         return (
             <div>
             <Header/>
-            {/* {loadingComponent} */}
+            {isLoading && spinner()}
             <div className="CreatePitchArt">
                 <FileReaderInput as="binary" onChange={this.fileSelected}>
                     <button onClick={this.checkIfSpeakerImportIsOk} className="UploadFile waves-effect waves-light btn">

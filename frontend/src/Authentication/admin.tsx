@@ -23,23 +23,23 @@ class AdminPage extends React.Component<Props, State> {
   componentDidMount() {
     this.setState({ loading: true });
 
-    this.props.firebase.users().on("value", (snapshot: any) => {
-      const usersObject = snapshot.val();
+    // this.props.firebase.users().on("value", (snapshot: any) => {
+    //   const usersObject = snapshot.val();
 
-      const usersList = Object.keys(usersObject).map((key) => ({
-        ...usersObject[key],
-        uid: key,
-      }));
+    //   const usersList = Object.keys(usersObject).map((key) => ({
+    //     ...usersObject[key],
+    //     uid: key,
+    //   }));
 
-      this.setState({
-        users: usersList,
-        loading: false,
-      });
-    });
+    //   this.setState({
+    //     users: usersList,
+    //     loading: false,
+    //   });
+    // });
   }
 
   componentWillUnmount() {
-    this.props.firebase.users().off();
+    // this.props.firebase.users().off();
   }
 
   render() {

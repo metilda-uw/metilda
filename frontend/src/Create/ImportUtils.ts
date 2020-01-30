@@ -68,32 +68,70 @@ export function uploadRecording(
     recordingWordName: string,
     firebase: any
     ) {
-        const uid = firebase.auth.currentUser.email;
-        const storageRef = firebase.uploadFile();
-        const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
-        const filesRef = storageRef.child(`${uid}/Recordings/${timeStamp}_${fileName}`);
-        filesRef.put(result.blob).then((success: any) => {
-            const formData = new FormData();
-            formData.append("user_id", uid);
-            formData.append("file_name", fileName);
-            formData.append("file_path", `${uid}/Recordings/${timeStamp}_${fileName}`);
-            formData.append("file_type", "Recording");
-            formData.append("file_size", result.blob.size);
-            formData.append("number_of_syllables", numberOfSyllables);
-            formData.append("recording_word_name", recordingWordName);
-            formData.append("updated_by", uid);
-            fetch(`/api/create-file`, {
-              method: "POST",
-              headers: {
-                  Accept: "application/json"
-              },
-              body: formData
-          })
-          .then((response) => {
-              response.json();
-              window.confirm("Uploaded recording successfully!");
-            });
-           });
+        const filePromise = new Promise((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            const storageRef = firebase.uploadFile();
+            const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+            const filesRef = storageRef.child(`${uid}/Recordings/${recordingWordName}/${timeStamp}_${fileName}`);
+            filesRef.put(result.blob).then((success: any) => {
+                const formData = new FormData();
+                formData.append("user_id", uid);
+                formData.append("file_name", fileName);
+                formData.append("file_path", `${uid}/Recordings/${recordingWordName}/${timeStamp}_${fileName}`);
+                formData.append("file_type", "Recording");
+                formData.append("file_size", result.blob.size);
+                formData.append("number_of_syllables", numberOfSyllables);
+                formData.append("recording_word_name", recordingWordName);
+                formData.append("updated_by", uid);
+                fetch(`/api/create-file`, {
+                  method: "POST",
+                  headers: {
+                      Accept: "application/json"
+                  },
+                  body: formData
+              })
+              .then((response) => {
+                  response.json();
+                  window.confirm("Uploaded recording successfully!");
+                  resolve(response);
+                })
+              .catch((ex: any) => {
+                    reject(ex);
+                   });
+               });
+        });
+        return filePromise;
+}
+
+export function deleteRecording(
+    itemRef: any,
+    firebase: any
+    ) {
+        const filePromise = new Promise((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            itemRef.delete().then((success: any) => {
+                const formData = new FormData();
+                formData.append("user_id", uid);
+                formData.append("file_path", itemRef.location.path);
+                formData.append("file_type", "Recording");
+                fetch(`/api/delete-recording`, {
+                  method: "POST",
+                  headers: {
+                      Accept: "application/json"
+                  },
+                  body: formData
+              })
+              .then((response) => {
+                  response.json();
+                  window.confirm("Deleted recording successfully!");
+                  resolve(response);
+                })
+              .catch((ex: any) => {
+                    reject(ex);
+                   });
+               });
+        });
+        return filePromise;
 }
 
 export function uploadAnalysis(

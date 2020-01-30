@@ -4,6 +4,11 @@
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
 }
 
+.noImagesMessage{
+  width:750px;
+  margin: auto;
+}
+
 .ImagesForMyFiles {
   position: absolute;
   bottom: 0;
@@ -44,4 +49,13 @@
 }
 .image img{
   width:100%
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }

@@ -1,17 +1,26 @@
 import React, {createRef} from "react";
 import {withAuthorization} from "../Session";
 import "./AnalysesForImage.scss";
+import {spinner} from "../Utils/LoadingSpinner";
 
 export interface AnalysesForImageProps {
   firebase: any;
   showAnalyses: boolean;
   analysesBackButtonClicked: any;
   analysesForSelectedImage: any[];
-  selectedImageName: string;
+  imageName: string;
+  imageId: number;
+}
+
+interface AnalysisEntity {
+  name: string;
+  createdAt: any;
+  data: any;
 }
 
 interface State {
   isLoading: boolean;
+  analyses: AnalysisEntity[];
 }
 
 export class AnalysesForImage extends React.Component < AnalysesForImageProps, State > {
@@ -19,12 +28,47 @@ export class AnalysesForImage extends React.Component < AnalysesForImageProps, S
     super(props);
 
     this.state = {
-      isLoading: false
+      isLoading: false,
+      analyses: []
     };
+  }
+  async componentWillReceiveProps(nextProps: AnalysesForImageProps) {
+    const {imageId} = this.props;
+    if (nextProps.imageId !== imageId) {
+      this.setState({
+        analyses: [],
+        isLoading: true,
+      });
+
+      const response = await fetch(`/api/get-analyses-for-image/${nextProps.imageId.toString()}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/json"
+        }
+      });
+      const body = await response.json();
+      const storageRef = this.props.firebase.uploadFile();
+      body.result.forEach(async (analysis: any) => {
+        const analysisName = analysis[1];
+        const analysisPath = analysis[2];
+        const analysisCreatedAt = analysis[4];
+        const url = await storageRef.child(analysisPath).getDownloadURL();
+        const dataResponse = await fetch(url);
+        const analysisData = await dataResponse.json();
+        const newAnalysis = {name: analysisName, createdAt: analysisCreatedAt, data: analysisData};
+        this.setState({
+          analyses: [...this.state.analyses, newAnalysis]
+        });
+      });
+
+      this.setState({
+        isLoading: false,
+      });
+    }
   }
 
   renderAnalysisData() {
-    return this.props.analysesForSelectedImage.map((analysis, index) => {
+    return this.state.analyses.map((analysis, index) => {
       return (
         <tr key={index} className="analysisData">
            <td>{analysis.data.uploadId}</td>
@@ -63,12 +107,14 @@ export class AnalysesForImage extends React.Component < AnalysesForImageProps, S
     const className = `${showAnalyses
       ? "transition"
       : ""} AnalysisForImage`;
-    return(<div className={className}>
+    return(
+    <div className={className}>
+    {isLoading && spinner()}
     <button className="BackButton waves-effect waves-light btn" onClick={this.props.analysesBackButtonClicked}>
                     <i className="material-icons right">arrow_back</i>
       Back
     </button>
-    <h1 id="analysisTitle">Analysis for Image: {this.props.selectedImageName}</h1>
+    <h1 id="analysisTitle">Analysis for Image: {this.props.imageName}</h1>
     <div>
     <table id="analysisTable">
       <tbody>
