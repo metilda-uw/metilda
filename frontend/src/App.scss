@@ -18,6 +18,23 @@
   color: white;
 }
 
+.metilda-loading-spinner-image{
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0px;
+  z-index: 100;
+  background-color:#f2f2f2;
+}
+
+.metilda-loading-spinner-image .preloader-wrapper.big {
+  width: 160px;
+  height: 160px;
+}
+
 .App-link {
   color: #61dafb;
 }

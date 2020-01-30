@@ -55,7 +55,7 @@ class SignUpFormBase extends React.Component<Props, State> {
         this.setState({
           uid: authUser.user.uid
         });
-        this.props.firebase.user(authUser.user.uid).set({username, email});
+        // this.props.firebase.user(authUser.user.uid).set({username, email});
         const formData = new FormData();
         formData.append("user_id", this.state.email);
         formData.append("university", this.state.institution);

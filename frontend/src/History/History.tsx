@@ -5,6 +5,8 @@ import "./History.scss";
 import AnalysesForImage from "./AnalysesForImage";
 import * as FileSaver from "file-saver";
 import * as XLSX from "xlsx";
+import {spinner} from "../Utils/LoadingSpinner";
+import {exportExcel} from "../Utils/ExportExcel";
 
 export interface HistoryProps {
   firebase: any;
@@ -14,6 +16,7 @@ interface State {
   allUploadedImages: ImageEntity[];
   analysesForSelectedImage: AnalysisEntity[];
   selectedImageName: string;
+  selectedImageId: number | null;
   isImageClicked: boolean;
   isLoading: boolean;
 }
@@ -32,6 +35,12 @@ interface ImageEntity {
     checked: boolean;
 }
 
+interface ExcelEntity {
+    Image_Name: string;
+    Image_Url: string;
+    analyses: AnalysisEntity[];
+}
+
 export class History extends React.Component<HistoryProps, State> {
   constructor(props: HistoryProps) {
       super(props);
@@ -40,6 +49,7 @@ export class History extends React.Component<HistoryProps, State> {
         allUploadedImages: [],
         analysesForSelectedImage: [],
         selectedImageName: "",
+        selectedImageId: null,
         isImageClicked: false,
         isLoading: false
       };
@@ -49,6 +59,9 @@ export class History extends React.Component<HistoryProps, State> {
   }
 
   getUploadedImages = async () => {
+    this.setState({
+        isLoading: true,
+      });
     const currentUserId = this.props.firebase.auth.currentUser.email;
     const response = await fetch(`/api/get-all-images/${currentUserId}`, {
         method: "GET",
@@ -57,56 +70,29 @@ export class History extends React.Component<HistoryProps, State> {
         }
       });
     const body = await response.json();
-    const updatedImages: ImageEntity[] = [];
     const storageRef = this.props.firebase.uploadFile();
-    for (const image of body.result) {
+    body.result.forEach(async (image: any) => {
         const imageUrl = await storageRef.child(image[2]).getDownloadURL();
-        updatedImages.push({
-            id: image[0],
-            name: image[1],
-            createdAt: image[4],
-            imageUrl,
-            checked: false
+        const newImage = {id: image[0], name: image[1], createdAt: image[4], imageUrl, checked: false};
+        this.setState({
+          allUploadedImages: [...this.state.allUploadedImages, newImage]
         });
-    }
+      });
     this.setState({
-        allUploadedImages: updatedImages
-    });
+        isLoading: false,
+      });
   }
 
-  analysesBackButtonClicked = async () => {
+  analysesBackButtonClicked = () => {
     this.setState({
         isImageClicked: false
     });
   }
 
-  getAnalysesForImage = async (imageId: number, imageName: string) => {
-    const response = await fetch(`/api/get-analyses-for-image/${imageId.toString()}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        }
-      });
-    const body = await response.json();
-    const updatedAnalyses: AnalysisEntity[] = [];
-    for (const analysis of body.result) {
-        const analysisName = analysis[1];
-        const analysisPath = analysis[2];
-        const analysisCreatedAt = analysis[4];
-        const storageRef = this.props.firebase.uploadFile();
-        const url = await storageRef.child(analysisPath).getDownloadURL();
-        const dataResponse = await fetch(url);
-        const analysisData = await dataResponse.json();
-        updatedAnalyses.push(
-            {
-                name: analysisName,
-                createdAt: analysisCreatedAt,
-                data: analysisData
-            });
-        }
+  getAnalysesForImage = (imageId: number, imageName: string) => {
     this.setState({
         isImageClicked: true,
-        analysesForSelectedImage: updatedAnalyses,
+        selectedImageId: imageId,
         selectedImageName: imageName
       });
   }
@@ -137,8 +123,8 @@ export class History extends React.Component<HistoryProps, State> {
   }
 
    exportToExcel = async () => {
-       const allAnalyses: AnalysisEntity[] = [];
-       for (const image of this.state.allUploadedImages) {
+    const excelEntities: ExcelEntity[] = [];
+    await Promise.all(this.state.allUploadedImages.map(async (image: ImageEntity) => {
         if (image.checked) {
             const response = await fetch(`/api/get-analyses-for-image/${image.id.toString()}`, {
                 method: "GET",
@@ -146,12 +132,13 @@ export class History extends React.Component<HistoryProps, State> {
                   Accept: "application/json"
                 }
               });
-            const body = await response.json();
-            for (const analysis of body.result) {
+            const analysisBody = await response.json();
+            const storageRef = this.props.firebase.uploadFile();
+            const allAnalyses: AnalysisEntity[] = [];
+            for (const analysis of analysisBody.result) {
                 const analysisName = analysis[1];
                 const analysisPath = analysis[2];
                 const analysisCreatedAt = analysis[4];
-                const storageRef = this.props.firebase.uploadFile();
                 const url = await storageRef.child(analysisPath).getDownloadURL();
                 const dataResponse = await fetch(url);
                 const analysisData = await dataResponse.json();
@@ -162,38 +149,54 @@ export class History extends React.Component<HistoryProps, State> {
                         data: analysisData
                     });
             }
+            excelEntities.push(
+                {
+                    Image_Name: image.name,
+                    Image_Url: image.imageUrl,
+                    analyses: allAnalyses
+                });
         }
-     }
-       console.log(allAnalyses);
-       const fileType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8";
-       const fileExtension = ".xlsx";
-       const ws = XLSX.utils.json_to_sheet(allAnalyses);
-       console.log(ws);
-       const wb = { Sheets: { data: ws }, SheetNames: ["data"] };
-       const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-       const data = new Blob([excelBuffer], {type: fileType});
-       FileSaver.saveAs(data, "Analysis" + fileExtension);
+      }));
+
+    const excelData = excelEntities.map((excelEntity) => {
+        const { Image_Name, Image_Url, analyses  } = excelEntity;
+        const analysesMap = analyses.reduce((acc, val, index) => {
+            const key = "Analysis_" + (index + 1);
+            return {
+                ...acc,
+                [key]: JSON.stringify(val),
+            };
+        }, {});
+        return {
+            Image_Name,
+            Image_Url,
+            ...analysesMap
+
+        };
+    });
+    exportExcel(excelData, "data");
     }
 
     render() {
-    // const { isLoading } = this.state;
-    const customers = [{test1: "hello1", name1: "hey1"}, {test1: "hello2", name1: "hey2"}];
+    const { isLoading } = this.state;
     return (
         <div>
             <Header/>
+            {isLoading && spinner()}
+            <h1 id="imageTitle">History of Analyses</h1>
             <div className="imageContainer">
             {this.renderImageData()}
             </div>
+            {this.state.allUploadedImages.length > 0 &&
             <button className="ExportToExcel waves-effect waves-light btn" onClick={this.exportToExcel}>
                     <i className="material-icons right">file_download</i>
                     Export to Excel
             </button>
-
-            {/* <ExportExcel excelData={customers} fileName="hello" /> */}
-            <AnalysesForImage showAnalyses={this.state.isImageClicked}
+            }
+         <AnalysesForImage showAnalyses={this.state.isImageClicked}
           analysesBackButtonClicked={this.analysesBackButtonClicked}
-          analysesForSelectedImage={this.state.analysesForSelectedImage}
-          selectedImageName={this.state.selectedImageName}/>
+          imageId={this.state.selectedImageId}
+          imageName={this.state.selectedImageName}/>
         </div>
       );
   }

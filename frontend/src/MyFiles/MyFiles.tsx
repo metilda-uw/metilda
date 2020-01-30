@@ -3,7 +3,7 @@ import { withAuthorization } from "../Session";
 import "./MyFiles.scss";
 import Header from "../Layout/Header";
 import ImagesForMyFiles from "./ImagesForMyFiles";
-import AnalysesForMyFiles from "./AnalysesForMyFiles";
+import {spinner} from "../Utils/LoadingSpinner";
 
 export interface MyFilesProps {
   firebase: any;
@@ -20,6 +20,7 @@ interface State {
   analysesForSelectedFile: any[];
   selectedFileName: string;
   imagesForSelectedFile: any[];
+  selectedFileId: number | null;
 }
 
 interface FileEntity {
@@ -30,18 +31,6 @@ interface FileEntity {
     path: string;
     checked: boolean;
 }
-
-interface AnalysisEntity {
-    name: string;
-    createdAt: any;
-    data: any;
-  }
-
-interface ImageEntity {
-    name: string;
-    createdAt: any;
-    imageUrl: any;
-  }
 
 export class MyFiles extends React.Component<MyFilesProps, State> {
 
@@ -59,29 +48,32 @@ private downloadRef = createRef<HTMLAnchorElement>();
           fileIdSelectedForAnalyses: 0,
           analysesForSelectedFile: [],
           selectedFileName: "",
-          imagesForSelectedFile: []
+          imagesForSelectedFile: [],
+          selectedFileId: null,
       };
   }
   componentDidMount() {
       this.getUserFiles();
   }
 
-  getUserFiles = () => {
+  getUserFiles = async () => {
+      this.setState({
+          isLoading: true
+      });
       // Get files of a user
       const currentUserId = this.props.firebase.auth.currentUser.email;
-
-      fetch(`api/get-files/${currentUserId}`
+      console.log(this.props.firebase.auth.currentUser);
+      const response = await fetch(`api/get-files/${currentUserId}`
       + "?file-type=Upload", {
       method: "GET",
       headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
       },
-  })
-      .then((response) => response.json())
-      .then((data) => {
-        const updatedFiles: FileEntity[] = [];
-        data.result.map((item: any) => {
+        });
+      const body = await response.json();
+      const updatedFiles: FileEntity[] = [];
+      body.result.map((item: any) => {
             updatedFiles.push(
                 {
                     id: item[0],
@@ -93,13 +85,14 @@ private downloadRef = createRef<HTMLAnchorElement>();
                 }
             );
           });
-        this.setState({
-              files: updatedFiles
+      this.setState({
+              files: updatedFiles,
+              isLoading: false
           });
-      });
  }
+
 renderTableHeader() {
-  const headerNames = ["File Name", "File Size", "Created At", "Images for file", "Analyses for file"];
+  const headerNames = ["File Name", "File Size", "Created At", "Images for file"];
   const headers = [];
   headers.push(<th key="checkBoxHeader">
   {<label><input type="checkbox" onChange={this.handleCheckAll} checked={this.state.checkAll}/><span/>
@@ -120,7 +113,6 @@ handleCheckAll = () => {
             this.setState({
                 files: updatedFiles
             });
-
   });
 }
 
@@ -138,73 +130,11 @@ handleCheckboxChange = (event: any) => {
         });
 }
 
-handleGetImages = async (fileId: number, fileName: string) => {
-    const response = await fetch(`/api/get-analyses-for-file/${fileId.toString()}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        }
-      });
-    const body = await response.json();
-    const updatedImages: ImageEntity[] = [];
-    for (const analysis of body.result) {
-        const analysisId = analysis[0];
-        const imageResponse = await fetch(`/api/get-image-for-analysis/${analysisId.toString()}`, {
-            method: "GET",
-            headers: {
-              Accept: "application/json"
-            }
-          });
-
-        const imageBody = await imageResponse.json();
-        const storageRef = this.props.firebase.uploadFile();
-        for (const image of imageBody.result) {
-            const imageUrl = await storageRef.child(image[2]).getDownloadURL();
-            const dataResponse = await fetch(imageUrl);
-            updatedImages.push(
-                {
-                    name: image[1],
-                    createdAt: image[4],
-                    imageUrl
-                }
-            );
-          }
-        }
+handleGetImages = (fileId: number, fileName: string) => {
     this.setState({
         isGetImagesClicked: true,
-        imagesForSelectedFile: updatedImages,
-        selectedFileName: fileName
-    });
-}
-
-handleGetAnalyses = async (fileId: number, fileName: string) => {
-    const response = await fetch(`/api/get-analyses-for-file/${fileId.toString()}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        }
-      });
-    const body = await response.json();
-    const updatedAnalyses: AnalysisEntity[] = [];
-    for (const analysis of body.result) {
-    const analysisName = analysis[1];
-    const analysisPath = analysis[2];
-    const analysisCreatedAt = analysis[4];
-    const storageRef = this.props.firebase.uploadFile();
-    const url = await storageRef.child(analysisPath).getDownloadURL();
-    const dataResponse = await fetch(url);
-    const analysisData = await dataResponse.json();
-    updatedAnalyses.push(
-        {
-            name: analysisName,
-            createdAt: analysisCreatedAt,
-            data: analysisData
-        });
-    }
-    this.setState({
-        isGetAnalysesClicked: true,
-        analysesForSelectedFile: updatedAnalyses,
-        selectedFileName: fileName
+        selectedFileName: fileName,
+        selectedFileId: fileId
     });
 }
 
@@ -224,19 +154,12 @@ renderTableData() {
                     Get Images
                 </button>
             </td>
-            <td>
-                <button className="DeleteFile waves-effect waves-light btn"
-                onClick={() => (this.handleGetAnalyses(file.id, file.name))}>
-                    <i className="material-icons right">note</i>
-                    Get Analysis
-                </button>
-            </td>
         </tr>
      );
   });
 }
 
-    deleteFiles = async () => {
+deleteFiles = async () => {
     const uncheckedFiles = [];
     for (const file of this.state.files) {
         if (file.checked) {
@@ -265,7 +188,7 @@ renderTableData() {
     });
 }
 
-    downloadFiles = async () => {
+downloadFiles = async () => {
     for (const file of this.state.files) {
         if (file.checked) {
             // Download file from cloud
@@ -281,57 +204,54 @@ renderTableData() {
     }
 }
 
-    imagesBackButtonClicked = () => {
+imagesBackButtonClicked = () => {
     this.setState({
         isGetImagesClicked: false
     });
   }
 
-    analysesBackButtonClicked = () => {
+analysesBackButtonClicked = () => {
     this.setState({
         isGetAnalysesClicked: false
     });
   }
 
-    render() {
+render() {
     const { isLoading } = this.state;
     return (
-          <div className="myFilesContainer">
-          <div className="one">
-          <div>
-             <Header/>
-            <h1 id="myFilesTitle">My Files </h1>
-            <table id="myFiles">
-               <tbody>
-               <tr>{this.renderTableHeader()}</tr>
-                  {this.renderTableData()}
-               </tbody>
-            </table>
-          </div>
-          <div className="myFilesButtonContainer">
-          <button className="DownloadFile waves-effect waves-light btn" onClick={this.downloadFiles}>
-                    <i className="material-icons right">file_download</i>
-                    Download Files
-          </button>
-          <button className="DeleteFile waves-effect waves-light btn" onClick={this.deleteFiles}>
-                    <i className="material-icons right">delete</i>
-                    Delete Files
-          </button>
-          </div>
-          <a className="hide" ref={this.downloadRef} target="_blank">
-                    Hidden Download Link
-          </a>
-          </div>
-          <ImagesForMyFiles showImages={this.state.isGetImagesClicked}
-          imagesBackButtonClicked={this.imagesBackButtonClicked}
-          imagesForSelectedFile={this.state.imagesForSelectedFile}
-          selectedFileName={this.state.selectedFileName}/>
-          <AnalysesForMyFiles showAnalyses={this.state.isGetAnalysesClicked}
-          analysesBackButtonClicked={this.analysesBackButtonClicked}
-          analysesForSelectedFile={this.state.analysesForSelectedFile}
-          selectedFileName={this.state.selectedFileName}/>
-          </div>
-      );
+            <div className="myFilesContainer">
+            <div className="one">
+            <div>
+               <Header/>
+               {isLoading && spinner()}
+              <h1 id="myFilesTitle">My Files </h1>
+              <table id="myFiles">
+                 <tbody>
+                 <tr>{this.renderTableHeader()}</tr>
+                    {this.renderTableData()}
+                 </tbody>
+              </table>
+            </div>
+            <div className="myFilesButtonContainer">
+            <button className="DownloadFile waves-effect waves-light btn" onClick={this.downloadFiles}>
+                      <i className="material-icons right">file_download</i>
+                      Download Files
+            </button>
+            <button className="DeleteFile waves-effect waves-light btn" onClick={this.deleteFiles}>
+                      <i className="material-icons right">delete</i>
+                      Delete Files
+            </button>
+            </div>
+            <a className="hide" ref={this.downloadRef} target="_blank">
+                      Hidden Download Link
+            </a>
+            </div>
+            <ImagesForMyFiles showImages={this.state.isGetImagesClicked}
+            imagesBackButtonClicked={this.imagesBackButtonClicked}
+            fileId={this.state.selectedFileId}
+            fileName={this.state.selectedFileName}/>
+            </div>
+        );
   }
 }
 

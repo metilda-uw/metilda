@@ -20,7 +20,7 @@ class Firebase {
   constructor() {
     app.initializeApp(config);
     this.auth = app.auth();
-    this.db = app.database();
+    // this.db = app.database();
     this.storage = app.storage();
   }
 
@@ -41,9 +41,9 @@ class Firebase {
 
   // *** User API ***
 
-  user = (uid: string) => this.db.ref(`users/${uid}`);
+  // user = (uid: string) => this.db.ref(`users/${uid}`);
 
-  users = () => this.db.ref("users");
+  // users = () => this.db.ref("users");
 
   // *** Cloud Storage API ***/
   uploadFile = () =>  this.storage.ref();

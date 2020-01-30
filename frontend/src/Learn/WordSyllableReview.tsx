@@ -15,7 +15,10 @@ import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
-import {uploadRecording} from "../Create/ImportUtils";
+import {uploadRecording, deleteRecording} from "../Create/ImportUtils";
+import {controls, Media, Player} from "react-media-player";
+
+const {PlayPause, SeekBar} = controls;
 
 interface MatchParams {
     numSyllables: string;
@@ -25,6 +28,11 @@ interface Props extends RouteComponentProps<MatchParams> {
     firebase: any;
 }
 
+interface RecordingEntity {
+    recordingUrl: string;
+    itemRef: any;
+}
+
 interface State {
     activeWordIndex: number;
     userPitchValueLists: RawPitchValue[][];
@@ -32,6 +40,7 @@ interface State {
     isRecording: boolean;
     isLoadingPitchResults: boolean;
     showPrevPitchValueLists: boolean;
+    previousRecordings: RecordingEntity[];
 }
 
 function spinner() {
@@ -39,7 +48,7 @@ function spinner() {
         <div className="metilda-pitch-art-image-loading">
             <div className="preloader-wrapper big active">
                 <div className="spinner-layer spinner-blue-only">
-                    <div className="circle-clipper left">
+                    <div className="circle-clipper center">
                         <div className="circle"></div>
                     </div>
                     <div className="gap-patch">
@@ -90,15 +99,81 @@ class WordSyllableReview extends React.Component<Props, State> {
             ),
             isRecording: false,
             isLoadingPitchResults: false,
-            showPrevPitchValueLists: false
+            showPrevPitchValueLists: false,
+            previousRecordings: []
         };
+    }
+
+    componentDidMount() {
+        this.getPreviousRecordings();
+    }
+
+    componentDidUpdate(prevProps: Props, prevState: State) {
+        if (this.state.activeWordIndex !== prevState.activeWordIndex) {
+            this.getPreviousRecordings();
+        }
+    }
+
+    getPreviousRecordings = async () => {
+        this.setState({
+            previousRecordings: []
+          });
+        const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+        console.log(recordingWordName);
+        const storageRef = this.props.firebase.uploadFile();
+        const uid = this.props.firebase.auth.currentUser.email;
+        const fileRef = storageRef.child(uid + "/Recordings/" + recordingWordName);
+        const response = await fileRef.listAll();
+        response.items.forEach(async (itemRef: any) => {
+             const recordingUrl = await itemRef.getDownloadURL();
+             const newRecording = {recordingUrl, itemRef};
+             this.setState({
+               previousRecordings: [...this.state.previousRecordings, newRecording]
+             });
+          });
+    }
+
+    deleteFiles = async (itemRef: any, url: string) => {
+        const responseFromCloud = await deleteRecording(itemRef, this.props.firebase);
+        const updatedRecordings = this.state.previousRecordings.filter((recording) => recording.itemRef !== itemRef);
+        this.setState({
+            previousRecordings: updatedRecordings
+        });
+
+    }
+
+    renderPreviousRecordings = () => {
+        return this.state.previousRecordings.map((recording, index) => {
+            return(
+                <Media key={index}>
+                <div className="media">
+                    <div className="media-player">
+                        <Player src={recording.recordingUrl} vendor="audio"/>
+                    </div>
+                    <div className="media-controls metilda-control-container">
+                        <div className="metilda-previous-recordings-image-col-1">
+                            <PlayPause/>
+                        </div>
+                        <div className="metilda-previous-recordings-image-col-2 vert-center">
+                            <SeekBar className="no-border"/>
+                        </div>
+                        <div className="metilda-previous-recordings-image-col-3">
+                        <button className="btn-floating btn-small waves-effect waves-light"
+                        onClick={() => this.deleteFiles(recording.itemRef, recording.recordingUrl)}>
+                            <i className="material-icons right">clear</i>
+                        </button>
+                        </div>
+                    </div>
+                </div>
+            </Media>);
+        });
     }
 
     wordClicked = (index: number) => {
         this.setState({activeWordIndex: index});
     }
 
-    toggleRecord = () => {
+    toggleRecord = async () => {
         const audioClass = (window as any).AudioContext || (window as any).webkitAudioContext;
         const audioContext = new audioClass();
 
@@ -110,60 +185,65 @@ class WordSyllableReview extends React.Component<Props, State> {
             this.setState({isRecording: true});
         } else {
             const controller = this;
-            this.recorder.stop().then((result: any) => {
-                const isOk: boolean = confirm(
-                    "Do you want to save the recording to cloud?"
-                );
-                if (isOk) {
-                    let isValidInput = false;
-                    let updatedFileName = "";
-                    let fileName;
-                    while (!isValidInput) {
-                         fileName = prompt("Enter recording name", "Ex: Recording1.wav");
-                         if (fileName == null) {
-                            // user canceled input
-                             break;
-                        }
-
-                         updatedFileName = fileName.trim();
-                         if (updatedFileName.length === 0) {
-                            alert("Recording name should contain at least one character");
-                        } else {
-                            isValidInput = true;
-                        }
+            const result = await this.recorder.stop();
+            const isOk: boolean = confirm(
+                "Do you want to save the recording to cloud?"
+            );
+            if (isOk) {
+                let isValidInput = false;
+                let updatedFileName = "";
+                let fileName;
+                while (!isValidInput) {
+                     fileName = prompt("Enter recording name", "Ex: Recording1.wav");
+                     if (fileName == null) {
+                        // user canceled input
+                         break;
                     }
-                    const numberOfSyllables = this.props.match.params.numSyllables;
-                    const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
-                    if (isValidInput) {
-                    uploadRecording(result, fileName, numberOfSyllables, recordingWordName, this.props.firebase);
+
+                     updatedFileName = fileName.trim();
+                     if (updatedFileName.length === 0) {
+                        alert("Recording name should contain at least one character");
                     } else {
-                    alert("Recording not uploaded. Recording name is missing");
+                        isValidInput = true;
                     }
                 }
-                controller.setState({isLoadingPitchResults: true});
-                const formData = new FormData();
-                formData.append("file", result.blob);
-                fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                    .then((response) => response.json())
-                    .then(function(data) {
-                        const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
-                            (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
-                        );
-                        controller.recorder = null;
-                        controller.setState(
-                            {
-                                userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
-                                isRecording: false,
-                                isLoadingPitchResults: false
-                            });
-                    });
-            });
+                const numberOfSyllables = this.props.match.params.numSyllables;
+                const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+                if (isValidInput) {
+                    try {
+                        const response = await uploadRecording(result, fileName, numberOfSyllables,
+                            recordingWordName, this.props.firebase);
+                        this.getPreviousRecordings();
+                    } catch (ex) {
+                        console.log(ex);
+                    }
+                } else {
+                alert("Recording not uploaded. Recording name is missing");
+                }
+            }
+            controller.setState({isLoadingPitchResults: true});
+            const formData = new FormData();
+            formData.append("file", result.blob);
+            fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: formData
+            })
+                .then((response) => response.json())
+                .then(function(data) {
+                    const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
+                        (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
+                    );
+                    controller.recorder = null;
+                    controller.setState(
+                        {
+                            userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
+                            isRecording: false,
+                            isLoadingPitchResults: false
+                        });
+                });
         }
     }
 
@@ -268,6 +348,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                                     }
                                 </ul>
                             </div>
+                            <h6 className="metilda-control-header">Previous Recordings</h6>
+                            {this.renderPreviousRecordings()}
                             <h6 className="metilda-control-header">Pitch Art</h6>
                             <div className="metilda-pitch-art-container-control-list col s12">
                                 <PitchArtPrevPitchValueToggle

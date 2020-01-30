@@ -62,3 +62,27 @@
     width: 160px;
     height: 160px;
 }
+
+.metilda-previous-recordings-image-col-1,
+.metilda-previous-recordings-image-col-2 {
+    border: 1px solid black;
+    height: 38px;
+}
+
+.metilda-previous-recordings-image-col-1 {
+    width: 8%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: lightgray;
+}
+
+.metilda-previous-recordings-image-col-2 {
+    width: 32%;
+}
+.metilda-previous-recordings-image-col-3 {
+    width: 5%;
+}
+.media{
+     margin:8px;
+}
