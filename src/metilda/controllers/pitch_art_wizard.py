@@ -42,6 +42,7 @@ def audio(upload_id):
         return "", 204
 
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+    print(sound_path)
     tmin = request.args.get('tmin', -1, type=float)
     tmax = request.args.get('tmax', -1, type=float)
     file_bytes = audio_analysis.get_audio(sound_path, tmin=tmin, tmax=tmax)
@@ -167,6 +168,14 @@ def delete_file():
     with Postgres() as connection:
         postgres_select_query = """ DELETE FROM audio WHERE AUDIO_ID = %s"""
         results = connection.execute_update_query(postgres_select_query, (request.form['file_id'],))
+    return jsonify({'result': results})
+
+@app.route('/api/delete-recording', methods=["POST"])
+def delete_recording():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM audio WHERE USER_ID = %s AND FILE_PATH LIKE %s AND FILE_TYPE= %s"""
+        record_to_delete = (request.form['user_id'], "%"+request.form['file_path']+"%", request.form['file_type'])
+        results = connection.execute_update_query(postgres_select_query, record_to_delete)
     return jsonify({'result': results})
 
 @app.route('/api/get-files/<string:user_id>', methods=["GET"])
