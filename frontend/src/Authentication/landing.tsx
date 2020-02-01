@@ -31,8 +31,6 @@ export class Landing extends React.Component<Props> {
           Login/Sign Up
         </button>
         <p />
-        <p> '[Insert a demo of the application here]'</p>
-        {/* <img src={metilda} alt="Logo" className='metilda_Logo'/>; */}
       </div>
     );
   }
