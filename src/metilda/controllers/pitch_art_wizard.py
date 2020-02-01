@@ -7,7 +7,6 @@ from Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
-from flask_accept import accept
 from werkzeug.utils import secure_filename
 import wave
 
