@@ -41,7 +41,6 @@ def audio(upload_id):
         return "", 204
 
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-    print(sound_path)
     tmin = request.args.get('tmin', -1, type=float)
     tmax = request.args.get('tmax', -1, type=float)
     file_bytes = audio_analysis.get_audio(sound_path, tmin=tmin, tmax=tmax)
@@ -117,9 +116,9 @@ def available_files():
 @app.route('/api/create-user', methods=["POST"])
 def create_db_user():
     with Postgres() as connection:
-        postgres_insert_query = """ INSERT INTO users (USER_ID, UNIVERSITY,
-        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
-        record_to_insert = (request.form['user_id'], request.form['university'])
+        postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
+        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
+        record_to_insert = (request.form['user_id'], request.form['user_name'], request.form['university'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
@@ -212,8 +211,8 @@ def update_analysis():
 @app.route('/api/create-image', methods=["POST"])
 def create_image():
     with Postgres() as connection:
-        postgres_insert_query = """ INSERT INTO image (IMAGE_ID, IMAGE_NAME, IMAGE_PATH, CREATED_AT) VALUES (DEFAULT,%s,%s,CURRENT_TIMESTAMP) RETURNING IMAGE_ID"""
-        record_to_insert = (request.form['image_name'], request.form['image_path'])
+        postgres_insert_query = """ INSERT INTO image (IMAGE_ID, IMAGE_NAME, IMAGE_PATH, USER_ID, CREATED_AT) VALUES (DEFAULT,%s,%s,%s, CURRENT_TIMESTAMP) RETURNING IMAGE_ID"""
+        record_to_insert = (request.form['image_name'], request.form['image_path'], request.form['user_id'])
         last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
@@ -246,7 +245,6 @@ def get_all_images(user_id):
     with Postgres() as connection:
         postgres_select_query = """ SELECT * FROM IMAGE WHERE IMAGE_PATH LIKE %s"""
         filter_values=("%"+user_id+"%")
-        print(filter_values)
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
 
@@ -255,5 +253,13 @@ def get_analyses_for_image(image_id):
     with Postgres() as connection:
         postgres_select_query = """ SELECT ANALYSIS.* FROM ANALYSIS, IMAGE_ANALYSIS WHERE IMAGE_ANALYSIS.IMAGE_ID = %s AND ANALYSIS.ANALYSIS_ID=IMAGE_ANALYSIS.ANALYSIS_ID"""
         filter_values= (image_id)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-all-students', methods=["GET"])
+def get_student_recordings():
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT USERS.USER_NAME, USERS.USER_ID,USERS.LAST_LOGIN FROM USERS, USER_ROLE WHERE USER_ROLE= %s AND USERS.USER_ID=USER_ROLE.USER_ID"""
+        filter_values= ('student')
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})

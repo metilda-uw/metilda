@@ -119,7 +119,6 @@ class WordSyllableReview extends React.Component<Props, State> {
             previousRecordings: []
           });
         const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
-        console.log(recordingWordName);
         const storageRef = this.props.firebase.uploadFile();
         const uid = this.props.firebase.auth.currentUser.email;
         const fileRef = storageRef.child(uid + "/Recordings/" + recordingWordName);
@@ -133,20 +132,28 @@ class WordSyllableReview extends React.Component<Props, State> {
           });
     }
 
-    deleteFiles = async (itemRef: any, url: string) => {
-        const responseFromCloud = await deleteRecording(itemRef, this.props.firebase);
-        const updatedRecordings = this.state.previousRecordings.filter((recording) => recording.itemRef !== itemRef);
-        this.setState({
+    deleteRecordings = async (itemRef: any, url: string) => {
+        const isOk: boolean = confirm(
+            "Are you sure you want to delete the recording?"
+        );
+        if (isOk) {
+            const responseFromCloud = await deleteRecording(itemRef, this.props.firebase);
+            const updatedRecordings = this.state.previousRecordings.filter((recording) =>
+             recording.itemRef !== itemRef);
+            this.setState({
             previousRecordings: updatedRecordings
         });
+        }
 
     }
 
     renderPreviousRecordings = () => {
         return this.state.previousRecordings.map((recording, index) => {
+            const recordingName = recording.itemRef.location.path.split("_");
             return(
                 <Media key={index}>
                 <div className="media">
+                {recordingName[recordingName.length - 1]}
                     <div className="media-player">
                         <Player src={recording.recordingUrl} vendor="audio"/>
                     </div>
@@ -159,8 +166,8 @@ class WordSyllableReview extends React.Component<Props, State> {
                         </div>
                         <div className="metilda-previous-recordings-image-col-3">
                         <button className="btn-floating btn-small waves-effect waves-light"
-                        onClick={() => this.deleteFiles(recording.itemRef, recording.recordingUrl)}>
-                            <i className="material-icons right">clear</i>
+                        onClick={() => this.deleteRecordings(recording.itemRef, recording.recordingUrl)}>
+                            <i className="material-icons right">delete</i>
                         </button>
                         </div>
                     </div>
