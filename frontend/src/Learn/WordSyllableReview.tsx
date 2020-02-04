@@ -193,6 +193,30 @@ class WordSyllableReview extends React.Component<Props, State> {
         } else {
             const controller = this;
             const result = await this.recorder.stop();
+            controller.setState({isLoadingPitchResults: true});
+            const formData = new FormData();
+            formData.append("file", result.blob);
+            const response = await  fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: formData
+            });
+            const data = await response.json();
+            const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
+                        (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
+                    );
+            controller.recorder = null;
+            controller.setState(
+            {
+                    userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
+                    isRecording: false,
+                    isLoadingPitchResults: false
+            });
+            const url = URL.createObjectURL(result.blob);
+            const audio = new Audio(url);
+            const recording = await audio.play();
             const isOk: boolean = confirm(
                 "Do you want to save the recording to cloud?"
             );
@@ -218,7 +242,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                 const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
                 if (isValidInput) {
                     try {
-                        const response = await uploadRecording(result, fileName, numberOfSyllables,
+                        const uploadResponse = await uploadRecording(result, fileName, numberOfSyllables,
                             recordingWordName, this.props.firebase);
                         this.getPreviousRecordings();
                     } catch (ex) {
@@ -228,41 +252,18 @@ class WordSyllableReview extends React.Component<Props, State> {
                 alert("Recording not uploaded. Recording name is missing");
                 }
             }
-            controller.setState({isLoadingPitchResults: true});
-            const formData = new FormData();
-            formData.append("file", result.blob);
-            fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json"
-                },
-                body: formData
-            })
-                .then((response) => response.json())
-                .then(function(data) {
-                    const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
-                        (item) => ({t0: item[0], t1: item[0], pitch: item[1]}) as RawPitchValue
-                    );
-                    controller.recorder = null;
-                    controller.setState(
-                        {
-                            userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
-                            isRecording: false,
-                            isLoadingPitchResults: false
-                        });
-                });
         }
     }
 
-    playPitchArt = () => {
+playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
     }
 
-    saveImage = () => {
+saveImage = () => {
         this.pitchArtRef.current!.saveImage();
     }
 
-    minPitchArtTime = () => {
+minPitchArtTime = () => {
         if (this.state.words.length === 0
             || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
@@ -273,7 +274,7 @@ class WordSyllableReview extends React.Component<Props, State> {
             0);
     }
 
-    maxPitchArtTime = () => {
+maxPitchArtTime = () => {
         if (this.state.words.length === 0
             || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
@@ -284,7 +285,7 @@ class WordSyllableReview extends React.Component<Props, State> {
             + WordSyllableReview.AUDIO_BUFFER_TIME);
     }
 
-    pageTitle = () => {
+pageTitle = () => {
         const syllableStr = `${this.props.match.params.numSyllables} Syllables`;
 
         const values = queryString.parse(this.props.location.search);
@@ -303,11 +304,11 @@ class WordSyllableReview extends React.Component<Props, State> {
         return syllableStr + ", " + accentStr;
     }
 
-    clearPrevious = () => {
+clearPrevious = () => {
         this.setState({userPitchValueLists: []});
     }
 
-    handleInputChange = (event: ChangeEvent) => {
+handleInputChange = (event: ChangeEvent) => {
         const target = event.target as HTMLInputElement;
 
         let value: boolean | File | string;
@@ -324,11 +325,10 @@ class WordSyllableReview extends React.Component<Props, State> {
         this.setState({[name]: value} as any);
     }
 
-    render() {
+render() {
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];
-
         return (
             <div>
                 <Header/>
