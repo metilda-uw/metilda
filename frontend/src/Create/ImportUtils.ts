@@ -219,6 +219,7 @@ export function uploadImage(
         const filesRef = storageRef.child(`${uid}/Images/${timeStamp}_${imageName}`);
         filesRef.putString(dataURL, "data_url").then((success: any) => {
             const formData = new FormData();
+            formData.append("user_id", `${uid}`);
             formData.append("image_name", `${imageName}`);
             formData.append("image_path", `${uid}/Images/${timeStamp}_${imageName}`);
             fetch(`/api/create-image`, {

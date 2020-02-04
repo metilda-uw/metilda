@@ -51,23 +51,6 @@
   width: 100%;
 }
 
-.ImagesForMyFiles {
-  position: absolute;
-  bottom: 0;
-  left: 100%;
-  right: 0;
-  background-color:  #f2f2f2;
-  overflow: hidden;
-  width: 0;
-  height: 100%;
-  transition: .5s ease;
-  z-index:1;
-  top: 70px;
-  bottom: 0px;
-}
-.transition {
-  width: 100%;
-  left: 0;
-  overflow:auto;
-  height:90vh
+.DeleteFile {
+  pointer-events: auto;
 }

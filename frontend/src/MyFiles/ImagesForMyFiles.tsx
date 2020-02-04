@@ -118,11 +118,6 @@ State > {
   }
 
   renderImageData() {
-    if (this.state.images.length === 0) {
-    return (
-        <h3 className="noImagesMessage">No images found for the file</h3>
-    );
-    }
     return this.state.images.map((image, index) => {
           return (
             <div key={image.key} className="image">
@@ -131,7 +126,8 @@ State > {
                     value={index}/><span/></label><br/>
                    {image.name}
             </div>
-            <input type="image" src={image.imageUrl} onClick={() => (this.getAnalysesForImage(image.key, image.name))}/>
+            <input type="image" title="Click image to see analysis" src={image.imageUrl}
+            onClick={() => (this.getAnalysesForImage(image.key, image.name))}/>
             </div>
        );
     });
@@ -179,7 +175,7 @@ State > {
             const key = "Analysis_" + (index + 1);
             return {
                 ...acc,
-                [key]: JSON.stringify(val),
+                [key]: JSON.stringify(val, null, 4),
             };
         }, {});
         return {
@@ -205,7 +201,12 @@ State > {
           <i className="material-icons right">arrow_back</i>
           Back
         </button>
-        {this.state.images.length > 0 && <h1 id="imageTitle">Images for File: {this.props.fileName}</h1>}
+        {this.state.images.length > 0 && <div>
+          <h1 id="imageTitle">Images for File: {this.props.fileName}</h1>
+          <p><i><b>Note:</b> 1) Click on each image to view analysis <br/>
+        2)  Select checkboxes for images and click on 'Export to Excel'
+        button at the bottom of the page to export image-analysis data to excel </i></p><br/>
+          </div>}
         <div className="imageContainer">
           {this.renderImageData()}
         </div>

@@ -49,17 +49,17 @@ class SignUpFormBase extends React.Component<Props, State> {
 
   onSubmit = async (event: any) => {
       event.preventDefault();
-      const { username, email, passwordOne } = this.state;
+      const { username, email, passwordOne, institution, role } = this.state;
       try {
         const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
         this.setState({
           uid: authUser.user.uid
         });
-        // this.props.firebase.user(authUser.user.uid).set({username, email});
         const formData = new FormData();
-        formData.append("user_id", this.state.email);
-        formData.append("university", this.state.institution);
-        formData.append("role", this.state.role.toString());
+        formData.append("user_id", email);
+        formData.append("user_name", username);
+        formData.append("university", institution);
+        formData.append("role", role.toString());
 
         const response = await fetch(`/api/create-user`, {
           method: "POST",
@@ -82,11 +82,11 @@ class SignUpFormBase extends React.Component<Props, State> {
             body: recordingData
             });
         }
-        for (const role of this.state.role) {
+        for (const userRole of this.state.role) {
           const roleData = new FormData();
           const userId = body.result;
           roleData.append("user_id", userId);
-          roleData.append("user_role", role);
+          roleData.append("user_role", userRole);
           const result =  await fetch(`/api/create-user-role`, {
             method: "POST",
             headers: {

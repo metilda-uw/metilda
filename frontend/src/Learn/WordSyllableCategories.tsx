@@ -13,8 +13,20 @@ import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
 import "./WordSyllableCategories.css";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
+import StudentsInfo from "./StudentsInfo";
 
-class WordSyllableCategories extends React.Component<RouteComponentProps> {
+interface State {
+    viewStudentsClicked: boolean;
+}
+
+class WordSyllableCategories extends React.Component<RouteComponentProps, State> {
+    constructor(props: RouteComponentProps) {
+        super(props);
+
+        this.state = {
+            viewStudentsClicked: false
+        };
+      }
 
     handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
         const name = event.currentTarget.name;
@@ -46,11 +58,26 @@ class WordSyllableCategories extends React.Component<RouteComponentProps> {
         }
     }
 
+    displayStudents = async () => {
+        this.setState({
+            viewStudentsClicked: true
+        });
+     }
+
+    studentsInfoBackButtonClicked = () => {
+        this.setState({
+            viewStudentsClicked: false
+        });
+      }
+
     render() {
         const numSyllables = this.getNumSyllables();
         return (
             <div>
                 <Header/>
+                <button onClick={this.displayStudents} className="ViewStudentsRecordings waves-effect waves-light btn">
+                        View Students
+                </button>
                 <div className="metilda-page-header">
                     <h5>
                         Blackfoot Words
@@ -116,6 +143,8 @@ class WordSyllableCategories extends React.Component<RouteComponentProps> {
                         </div>
                     </div>
                 </div>
+            <StudentsInfo showStudentsInfo={this.state.viewStudentsClicked}
+            studentsInfoBackButtonClicked={this.studentsInfoBackButtonClicked}/>
             </div>
         );
     }

@@ -1,0 +1,80 @@
+.StudentRecordings {
+  position: absolute;
+  bottom: 0;
+  left: 100%;
+  right: 0;
+  background-color:  #f2f2f2;
+  overflow: hidden;
+  width: 0;
+  height: 100%;
+  transition: .5s ease;
+  z-index:1;
+  top: 15px;
+  bottom: 0px;
+}
+.transition {
+  width: 100%;
+  left: 0;
+  overflow:auto;
+  height:150vh
+}
+
+.BackButton{
+  position:absolute;
+  top:40px;
+  left:40px
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.metilda-student-recordings-image-col-1,
+.metilda-student-recordings-image-col-2 {
+    border: 1px solid black;
+    height: 38px;
+}
+
+.metilda-student-recordings-image-col-1 {
+    width: 13%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: lightgray;
+}
+
+.metilda-student-recordings-image-col-2 {
+    width: 60%;
+}
+
+#studentRecordings {
+  text-align: center;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  border: 3px solid #ddd;
+  width: 75%;
+  margin-left:auto; 
+  margin-right:auto;
+}
+
+#studentRecordings td, #studentRecordings th {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+#studentRecordings tr:nth-child(even){background-color: #f2f2f2;}
+
+#studentRecordings tr:hover {background-color: #ddd;}
+
+#studentRecordings th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  background-color: #4CAF50;
+  color: white;
+}

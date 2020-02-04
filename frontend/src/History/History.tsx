@@ -113,10 +113,12 @@ export class History extends React.Component<HistoryProps, State> {
             <div key={image.id} className="image">
             <div className="imageCheckBox">
                 <label><input type="checkbox" checked={image.checked} onChange={this.handleCheckboxChange}
-                    value={index}/><span/></label><br/>
+                    value={index}/><span/></label>
                    {image.name}
             </div>
-            <input type="image" src={image.imageUrl} onClick={() => (this.getAnalysesForImage(image.id, image.name))}/>
+            <br/>
+            <input type="image" title="Click image to see analysis"src={image.imageUrl}
+            onClick={() => (this.getAnalysesForImage(image.id, image.name))}/>
             </div>
         );
     });
@@ -164,7 +166,7 @@ export class History extends React.Component<HistoryProps, State> {
             const key = "Analysis_" + (index + 1);
             return {
                 ...acc,
-                [key]: JSON.stringify(val),
+                [key]: JSON.stringify(val, null, 4),
             };
         }, {});
         return {
@@ -184,6 +186,9 @@ export class History extends React.Component<HistoryProps, State> {
             <Header/>
             {isLoading && spinner()}
             <h1 id="imageTitle">History of Analyses</h1>
+            <p><i><b>Note:</b> 1) Click on each image to view analysis <br/>
+        2)  Select checkboxes for images and click on 'Export to Excel'
+        button at the bottom of the page to export image-analysis data to excel </i></p><br/>
             <div className="imageContainer">
             {this.renderImageData()}
             </div>

@@ -62,7 +62,6 @@ private downloadRef = createRef<HTMLAnchorElement>();
       });
       // Get files of a user
       const currentUserId = this.props.firebase.auth.currentUser.email;
-      console.log(this.props.firebase.auth.currentUser);
       const response = await fetch(`api/get-files/${currentUserId}`
       + "?file-type=Upload", {
       method: "GET",
@@ -90,19 +89,6 @@ private downloadRef = createRef<HTMLAnchorElement>();
               isLoading: false
           });
  }
-
-renderTableHeader() {
-  const headerNames = ["File Name", "File Size", "Created At", "Images for file"];
-  const headers = [];
-  headers.push(<th key="checkBoxHeader">
-  {<label><input type="checkbox" onChange={this.handleCheckAll} checked={this.state.checkAll}/><span/>
-  </label>}
-  </th>);
-  for (let i = 0; i < headerNames.length; i++) {
-        headers.push(<th key={i}>{headerNames[i].toUpperCase()}</th>);
-    }
-  return headers;
-}
 
 handleCheckAll = () => {
     this.setState({
@@ -138,6 +124,19 @@ handleGetImages = (fileId: number, fileName: string) => {
     });
 }
 
+renderTableHeader() {
+    const headerNames = ["File Name", "File Size", "Created At", "Images for file"];
+    const headers = [];
+    headers.push(<th key="checkBoxHeader">
+    {<label><input type="checkbox" onChange={this.handleCheckAll} checked={this.state.checkAll}/><span/>
+    </label>}
+    </th>);
+    for (let i = 0; i < headerNames.length; i++) {
+          headers.push(<th key={i}>{headerNames[i].toUpperCase()}</th>);
+      }
+    return headers;
+  }
+
 renderTableData() {
     return this.state.files.map((file, index) => {
         return (
@@ -148,7 +147,7 @@ renderTableData() {
            <td>{(file.size / 1024).toFixed(2)} KB</td>
            <td>{file.createdAt}</td>
            <td>
-                <button className="DeleteFile waves-effect waves-light btn"
+                <button className="DeleteFile waves-effect waves-light btn" title="Get images for the file"
                  onClick={() => (this.handleGetImages(file.id, file.name))}>
                     <i className="material-icons right">image</i>
                     Get Images
@@ -225,6 +224,8 @@ render() {
                <Header/>
                {isLoading && spinner()}
               <h1 id="myFilesTitle">My Files </h1>
+              <p><i><b>Note:</b> Select checkboxes for files and click on 'Download Files' or
+              'Delete Files' button at the bottom of the page to download or delete files. </i></p><br/>
               <table id="myFiles">
                  <tbody>
                  <tr>{this.renderTableHeader()}</tr>
