@@ -49,3 +49,4 @@ ZConfig==3.3.0
 ZODB==5.5.1
 zodbpickle==1.0.2
 zope.interface==4.6.0
+firebase_admin==3.2.1
