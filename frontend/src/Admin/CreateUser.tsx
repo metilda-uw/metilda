@@ -60,6 +60,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
         });
     const body = await response.json();
     if (!body.result.includes("Error")) {
+      if (this.state.languageOfResearch !== null) {
       const recordings = await Promise.all(this.state.languageOfResearch.map(async (researchLanguage: any) => {
         const recordingData = new FormData();
         const userId = body.result;
@@ -74,6 +75,8 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
           });
         return researchLanguage.value;
       }));
+    }
+      if (this.state.role !== null) {
       const roles = await Promise.all(this.state.role.map(async (userRole: any) => {
         const roleData = new FormData();
         const userId = body.result;
@@ -88,6 +91,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
           });
         return userRole.value;
       }));
+    }
       window.confirm("Added user successfully!");
     } else {
       window.confirm(body.result);
