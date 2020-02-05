@@ -47,8 +47,9 @@ export class EditUser extends React.Component<EditUserProps, State> {
         email: nextProps.editedUser.email,
         passwordOne: "",
         institution: nextProps.editedUser.institution,
-        role: nextProps.editedUser.role,
-        languageOfResearch: nextProps.editedUser.languageOfResearch
+        role: nextProps.editedUser.role.length > 0 ? nextProps.editedUser.role : [],
+        languageOfResearch: nextProps.editedUser.languageOfResearch.length > 0 ?
+        nextProps.editedUser.languageOfResearch : []
       });
      }
   }
@@ -73,6 +74,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
           body: formData
         });
     const body = await response.json();
+    const result = body.result;
     if (!body.result.includes("Error")) {
       if (languageOfResearch !== this.props.editedUser.languageOfResearch) {
         // Delete previous research languages from DB
@@ -82,7 +84,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
           const userId = email;
           recordingData.append("user_id", userId);
           recordingData.append("language", researchLanguage.value);
-          const result =  await fetch(`/api/delete-previous-user-research-language`, {
+          await fetch(`/api/delete-previous-user-research-language`, {
             method: "POST",
             headers: {
             Accept: "application/json"
@@ -91,20 +93,22 @@ export class EditUser extends React.Component<EditUserProps, State> {
             });
         }));
         // Add newly selected languages to the DB
-       const recordings =  languageOfResearch.map((researchLanguage: any) => {
-        const recordingData = new FormData();
-        const userId = email;
-        recordingData.append("user_id", userId);
-        recordingData.append("language", researchLanguage.value);
-        const result =  fetch(`/api/create-user-research-language`, {
-          method: "POST",
-          headers: {
-          Accept: "application/json"
-          },
-          body: recordingData
+       if (languageOfResearch !== null) {
+          const recordings =  languageOfResearch.map((researchLanguage: any) => {
+            const recordingData = new FormData();
+            const userId = email;
+            recordingData.append("user_id", userId);
+            recordingData.append("language", researchLanguage.value);
+            fetch(`/api/create-user-research-language`, {
+              method: "POST",
+              headers: {
+              Accept: "application/json"
+              },
+              body: recordingData
+              });
+            return researchLanguage.value;
           });
-        return researchLanguage.value;
-      });
+        }
     }
       if (role !== this.props.editedUser.role) {
       await Promise.all(
@@ -113,7 +117,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
             const userId = email;
             recordingData.append("user_id", userId);
             recordingData.append("user_role", currentRole.value);
-            const result =  await fetch(`/api/delete-previous-user-roles`, {
+            await fetch(`/api/delete-previous-user-roles`, {
               method: "POST",
               headers: {
               Accept: "application/json"
@@ -121,20 +125,22 @@ export class EditUser extends React.Component<EditUserProps, State> {
               body: recordingData
               });
           }));
-      const roles =  role.map((userRole: any) => {
-        const roleData = new FormData();
-        const userId = email;
-        roleData.append("user_id", userId);
-        roleData.append("user_role", userRole.value);
-        const result = fetch(`/api/create-user-role`, {
-          method: "POST",
-          headers: {
-          Accept: "application/json"
-          },
-          body: roleData
-          });
-        return userRole.value;
-      });
+      if (role != null) {
+            const roles =  role.map((userRole: any) => {
+              const roleData = new FormData();
+              const userId = email;
+              roleData.append("user_id", userId);
+              roleData.append("user_role", userRole.value);
+              fetch(`/api/create-user-role`, {
+                method: "POST",
+                headers: {
+                Accept: "application/json"
+                },
+                body: roleData
+                });
+              return userRole.value;
+            });
+          }
     }
       window.confirm("Updated user successfully!");
       this.setState({
@@ -147,8 +153,9 @@ export class EditUser extends React.Component<EditUserProps, State> {
         email: this.props.editedUser.email,
         passwordOne: "",
         institution: this.props.editedUser.institution,
-        role: this.props.editedUser.role,
-        languageOfResearch: this.props.editedUser.languageOfResearch,
+        role: this.props.editedUser.role.length > 0 ? this.props.editedUser.role : [],
+        languageOfResearch: this.props.editedUser.languageOfResearch.length > 0 ?
+        this.props.editedUser.languageOfResearch : [],
         isLoading: false
       });
     }

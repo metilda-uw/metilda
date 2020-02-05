@@ -337,7 +337,7 @@ def add_new_user_from_admin():
             CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
             record_to_insert = (request.form['email'], request.form['user_name'], request.form['university'])
             last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
-        return jsonify({'result': last_row_id})
+        return jsonify({'result': str(last_row_id)})
     except Exception as e:
         print(str(e))
         return jsonify({'result': 'Error: '+str(e)})
@@ -366,7 +366,7 @@ def update_user_from_admin():
             postgres_insert_query = """ UPDATE users SET USER_ID=%s,USER_NAME=%s, UNIVERSITY=%s WHERE USER_ID = %s"""
             record_to_insert = (email, username, university, previous_email)
             last_row_id = connection.execute_update_query(postgres_insert_query, record_to_insert)
-        return jsonify({'result': last_row_id})
+        return jsonify({'result': str(last_row_id)})
     except Exception as e:
         print(str(e))
         return jsonify({'result': 'Error: '+str(e)})

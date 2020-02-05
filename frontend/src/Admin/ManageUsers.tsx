@@ -168,16 +168,20 @@ renderTableData() {
     const userRoles = [];
     const userLanguages = [];
     for (const currentRole of roles) {
+      if (currentRole !== "") {
       userRoles.push({
         value: currentRole,
         label: currentRole
       });
     }
+    }
     for (const currentLanguage of researchLanguages) {
+      if (currentLanguage !== "") {
       userLanguages.push({
         value: currentLanguage,
         label: currentLanguage
       });
+      }
     }
     const newUser = {
       username,
