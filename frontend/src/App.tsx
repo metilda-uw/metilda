@@ -17,6 +17,7 @@ import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
 import adminPage from "./Authentication/admin";
+import ManageUsers from "./Admin/ManageUsers";
 import { withAuthentication } from "./Session";
 
 interface Props {
@@ -38,6 +39,7 @@ const App = () => (<Router>
     <Route exact={true} path={ROUTES.ADMIN} component={adminPage} />
     <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
     <Route path="/home" component={Home} />
+    <Route path="/manage-users" component={ManageUsers} />
     <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
     <Route exact={true} path="/learn/words/syllables" component={WordSyllableCategories} />
     <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />

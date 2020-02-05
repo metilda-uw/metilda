@@ -114,7 +114,6 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
 }
 
   render() {
-    console.log(this.state.studentRecordings);
     const {isLoading} = this.state;
     const {showStudentRecordings} = this.props;
     const className = `${showStudentRecordings

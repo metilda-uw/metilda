@@ -8,7 +8,10 @@ from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io
 from werkzeug.utils import secure_filename
+import firebase_admin
+from firebase_admin import credentials, db, auth
 import wave
+
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
@@ -263,3 +266,80 @@ def get_student_recordings():
         filter_values= ('student')
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
+
+
+@app.route('/api/get-admin', methods=["GET"])
+def get_admin():
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT USER_ID FROM USER_ROLE WHERE USER_ROLE= %s AND VERIFIED = true"""
+        filter_values= ('Admin')
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-users', methods=["GET"])
+def get_users():
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM USERS """
+        filter_values=()
+        results = connection.execute_select_query(postgres_select_query,(filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-user-roles/<string:user_id>', methods=["GET"])
+def get_user_roles(user_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT USER_ROLE FROM USER_ROLE WHERE USER_ID = %s """
+        filter_values=(user_id)
+        results = connection.execute_select_query(postgres_select_query,(filter_values,))
+    return jsonify({'result': results})
+
+
+@app.route('/api/get-user-research-language/<string:user_id>', methods=["GET"])
+def get_user_research_language(user_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT USER_LANGUAGE FROM USER_RESEARCH_LANGUAGE WHERE USER_ID = %s """
+        filter_values=(user_id)
+        results = connection.execute_select_query(postgres_select_query,(filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/delete-user', methods=["POST"])
+def delete_user():
+    user_id=request.form['user_id']
+    # Delete user from firebase
+    if (not len(firebase_admin._apps)):
+        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
+        service_account_credential = credentials.Certificate(certificate_path)
+        firebase_admin.initialize_app(service_account_credential)
+    user = auth.get_user_by_email(user_id)
+    auth.delete_user(user.uid)
+    print('Successfully deleted user from firebase')
+    # Delete user from DB
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM USERS WHERE USER_ID = %s """
+        filter_values=(user_id)
+        results = connection.execute_update_query(postgres_select_query,(filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/add-new-user-from-admin', methods=["POST"])
+def add_new_user_from_admin():
+    if (not len(firebase_admin._apps)):
+        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
+        service_account_credential = credentials.Certificate(certificate_path)
+        firebase_admin.initialize_app(service_account_credential)
+    try:
+        # Insert user into firebase
+        user = auth.create_user(
+        email=request.form['email'],
+        password=request.form['password'])
+        print('Sucessfully created new user: {0}'.format(user.uid))
+        # Insert user into DB
+        with Postgres() as connection:
+            postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
+            CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
+            record_to_insert = (request.form['email'], request.form['user_name'], request.form['university'])
+            last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+        return jsonify({'result': last_row_id})
+    except Exception as e:
+        print(str(e))
+        return jsonify({'result': 'exception'})
+    
+   

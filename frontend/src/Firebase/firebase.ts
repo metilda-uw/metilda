@@ -15,12 +15,10 @@ const config = {
 
 class Firebase {
   private auth: any;
-  private db: any;
   private storage: any;
   constructor() {
     app.initializeApp(config);
     this.auth = app.auth();
-    // this.db = app.database();
     this.storage = app.storage();
   }
 
@@ -38,12 +36,6 @@ class Firebase {
 
   doPasswordUpdate = (password: string) =>
     this.auth.currentUser.updatePassword(password)
-
-  // *** User API ***
-
-  // user = (uid: string) => this.db.ref(`users/${uid}`);
-
-  // users = () => this.db.ref("users");
 
   // *** Cloud Storage API ***/
   uploadFile = () =>  this.storage.ref();
