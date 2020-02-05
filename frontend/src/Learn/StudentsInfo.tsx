@@ -61,7 +61,6 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
   }
 
   getStudentRecordings(selectedStudentName: string, selectedStudentEmail: string) {
-    console.log(selectedStudentName);
     this.setState({
       isViewRecordingsClicked: true,
       selectedStudentName,

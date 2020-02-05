@@ -4,11 +4,38 @@ import "./Header.scss";
 import { withAuthorization } from "../Session";
 import Submenu from "./DropdownComponent";
 import { Link } from "react-router-dom";
+interface HeaderProps {
+  firebase: any;
+}
+interface State {
+  anchorEl: any;
+  isAdmin: boolean;
+}
+class Header extends Component<HeaderProps, State> {
+  constructor(props: HeaderProps) {
+    super(props);
 
-class Header extends Component {
-  state = {
-    anchorEl: null,
-  };
+    this.state = {
+      anchorEl: null,
+      isAdmin: false
+    };
+ }
+
+ async componentDidMount() {
+  const response = await fetch(`/api/get-admin`, {
+    method: "GET",
+    headers: {
+      Accept: "application/json"
+    }
+  });
+  const body = await response.json();
+  if (body.result.length > 0) {
+    this.setState({
+      isAdmin: this.props.firebase.auth.currentUser.email === body.result[0][0]
+    });
+  }
+ }
+
   handleClick = (event: any) => {
     this.setState({ anchorEl: event.currentTarget });
   }
@@ -78,6 +105,9 @@ class Header extends Component {
                 ]}
               />
             </li>
+            {this.state.isAdmin && <li className="nav__menu-item">
+              <Link to="/manage-users">Manage Users</Link>
+            </li>}
           </ul>
         </nav>
       </div>

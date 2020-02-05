@@ -134,6 +134,29 @@ export function deleteRecording(
         return filePromise;
 }
 
+export function deleteUser(
+    userId: any,
+    firebase: any
+    ) {
+        const filePromise = new Promise((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            const formData = new FormData();
+            formData.append("user_id", userId);
+            fetch(`/api/delete-user`, {
+              method: "POST",
+              headers: {
+                  Accept: "application/json"
+              },
+              body: formData
+          })
+          .then((response) => {
+              response.json();
+              resolve(response);
+            });
+        });
+        return filePromise;
+}
+
 export function uploadAnalysis(
     metildaWord: object,
     fileIndex: any,

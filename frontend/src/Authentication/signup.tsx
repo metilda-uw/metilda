@@ -59,7 +59,6 @@ class SignUpFormBase extends React.Component<Props, State> {
         formData.append("user_id", email);
         formData.append("user_name", username);
         formData.append("university", institution);
-        formData.append("role", role.toString());
 
         const response = await fetch(`/api/create-user`, {
           method: "POST",
@@ -144,16 +143,16 @@ class SignUpFormBase extends React.Component<Props, State> {
       error,
     } = this.state;
     const roleOptions = [
-      { value: "linguistic_researcher", label: "Linguistic Researcher" },
-      { value: "teacher", label: "Teacher" },
-      { value: "student", label: "Student" },
-      { value: "other", label: "Other" },
+      { value: "Linguistic Researcher", label: "Linguistic Researcher" },
+      { value: "Teacher", label: "Teacher" },
+      { value: "Student", label: "Student" },
+      { value: "Other", label: "Other" },
     ];
     const languageOptions = [
-      { value: "blackfoot", label: "Blackfoot" },
-      { value: "english", label: "English" },
-      { value: "french", label: "French" },
-      { value: "other", label: "Other" },
+      { value: "Blackfoot", label: "Blackfoot" },
+      { value: "English", label: "English" },
+      { value: "French", label: "French" },
+      { value: "Other", label: "Other" },
     ];
 
     const colourStyles = {
