@@ -340,6 +340,51 @@ def add_new_user_from_admin():
         return jsonify({'result': last_row_id})
     except Exception as e:
         print(str(e))
-        return jsonify({'result': 'exception'})
-    
+        return jsonify({'result': 'Error: '+str(e)})
+
+@app.route('/api/update-user-from-admin', methods=["POST"])
+def update_user_from_admin():
+    if (not len(firebase_admin._apps)):
+        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
+        service_account_credential = credentials.Certificate(certificate_path)
+        firebase_admin.initialize_app(service_account_credential)
+    try:
+        # Update user in firebase
+        previous_email=request.form['previous_email']
+        email=request.form['email']
+        username=request.form['user_name']
+        university=request.form['university']
+        password=request.form['password']
+        uid = auth.get_user_by_email(previous_email).uid
+        user = auth.update_user(
+        uid,
+        email=email,
+        password=password)
+        print('Sucessfully updated new user: {0}'.format(user.uid))
+        # Update user in DB
+        with Postgres() as connection:
+            postgres_insert_query = """ UPDATE users SET USER_ID=%s,USER_NAME=%s, UNIVERSITY=%s WHERE USER_ID = %s"""
+            record_to_insert = (email, username, university, previous_email)
+            last_row_id = connection.execute_update_query(postgres_insert_query, record_to_insert)
+        return jsonify({'result': last_row_id})
+    except Exception as e:
+        print(str(e))
+        return jsonify({'result': 'Error: '+str(e)})
+
+@app.route('/api/delete-previous-user-roles', methods=["POST"])
+def delete_previous_user_roles():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM user_role WHERE USER_ID = %s AND USER_ROLE=%s"""
+        record_to_delete = (request.form['user_id'], request.form['user_role'])
+        results = connection.execute_update_query(postgres_select_query, record_to_delete)
+    return jsonify({'result': results})
+
+@app.route('/api/delete-previous-user-research-language', methods=["POST"])
+def delete_previous_user_research_language():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM user_research_language WHERE USER_ID = %s AND USER_LANGUAGE=%s"""
+        record_to_delete = (request.form['user_id'], request.form['language'])
+        results = connection.execute_update_query(postgres_select_query, record_to_delete)
+    return jsonify({'result': results})
+   
    
