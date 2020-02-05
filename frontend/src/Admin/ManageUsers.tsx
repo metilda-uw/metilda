@@ -200,13 +200,13 @@ renderTableData() {
   }
 
   editUserBackButtonClicked = () => {
-    // this.getUsers();
+    this.getUsers();
     this.setState({
     isEditUserClicked: false
   });
   }
 
-render() {
+  render() {
     const { isLoading } = this.state;
     return (
             <div className="userContainer">

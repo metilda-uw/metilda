@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { withAuthorization } from "../Session";
 import {spinner} from "../Utils/LoadingSpinner";
 import "./ManageUsers.scss";
@@ -34,7 +33,6 @@ const INITIAL_STATE = {
 };
 
 export class EditUser extends React.Component<EditUserProps, State> {
-
   constructor(props: EditUserProps) {
       super(props);
 
@@ -57,18 +55,17 @@ export class EditUser extends React.Component<EditUserProps, State> {
 
   onSubmit = async (event: any) => {
     event.preventDefault();
-    const { username, email, passwordOne, institution, role } = this.state;
+    const { username, email, passwordOne, institution, role, languageOfResearch } = this.state;
     this.setState({
       isLoading: true
     });
     const formData = new FormData();
     formData.append("email", email);
+    formData.append("previous_email", this.props.editedUser.email);
     formData.append("user_name", username);
     formData.append("university", institution);
-    formData.append("role", role.toString());
     formData.append("password", passwordOne);
-
-    const response = await fetch(`/api/add-new-user-from-admin`, {
+    const response = await fetch(`/api/update-user-from-admin`, {
           method: "POST",
           headers: {
               Accept: "application/json"
@@ -76,13 +73,30 @@ export class EditUser extends React.Component<EditUserProps, State> {
           body: formData
         });
     const body = await response.json();
-    if (body.result !== "exception") {
-      const recordings = await Promise.all(this.state.languageOfResearch.map(async (researchLanguage: any) => {
+    if (!body.result.includes("Error")) {
+      if (languageOfResearch !== this.props.editedUser.languageOfResearch) {
+        // Delete previous research languages from DB
+       const previousRecordings = await Promise.all(
+        this.props.editedUser.languageOfResearch.map(async (researchLanguage: any) => {
+          const recordingData = new FormData();
+          const userId = email;
+          recordingData.append("user_id", userId);
+          recordingData.append("language", researchLanguage.value);
+          const result =  await fetch(`/api/delete-previous-user-research-language`, {
+            method: "POST",
+            headers: {
+            Accept: "application/json"
+            },
+            body: recordingData
+            });
+        }));
+        // Add newly selected languages to the DB
+       const recordings =  languageOfResearch.map((researchLanguage: any) => {
         const recordingData = new FormData();
-        const userId = body.result;
+        const userId = email;
         recordingData.append("user_id", userId);
         recordingData.append("language", researchLanguage.value);
-        const result =  await fetch(`/api/create-user-research-language`, {
+        const result =  fetch(`/api/create-user-research-language`, {
           method: "POST",
           headers: {
           Accept: "application/json"
@@ -90,13 +104,29 @@ export class EditUser extends React.Component<EditUserProps, State> {
           body: recordingData
           });
         return researchLanguage.value;
-      }));
-      const roles = await Promise.all(this.state.role.map(async (userRole: any) => {
+      });
+    }
+      if (role !== this.props.editedUser.role) {
+      await Promise.all(
+          this.props.editedUser.role.map(async (currentRole: any) => {
+            const recordingData = new FormData();
+            const userId = email;
+            recordingData.append("user_id", userId);
+            recordingData.append("user_role", currentRole.value);
+            const result =  await fetch(`/api/delete-previous-user-roles`, {
+              method: "POST",
+              headers: {
+              Accept: "application/json"
+              },
+              body: recordingData
+              });
+          }));
+      const roles =  role.map((userRole: any) => {
         const roleData = new FormData();
-        const userId = body.result;
+        const userId = email;
         roleData.append("user_id", userId);
         roleData.append("user_role", userRole.value);
-        const result =  await fetch(`/api/create-user-role`, {
+        const result = fetch(`/api/create-user-role`, {
           method: "POST",
           headers: {
           Accept: "application/json"
@@ -104,57 +134,67 @@ export class EditUser extends React.Component<EditUserProps, State> {
           body: roleData
           });
         return userRole.value;
-      }));
-      window.confirm("Added user successfully!");
-    } else {
-      window.confirm("User already exists!");
+      });
     }
-    this.setState({ ...INITIAL_STATE });
+      window.confirm("Updated user successfully!");
+      this.setState({
+        isLoading: false
+      });
+    } else {
+      window.confirm(body.result);
+      this.setState({
+        username: this.props.editedUser.username,
+        email: this.props.editedUser.email,
+        passwordOne: "",
+        institution: this.props.editedUser.institution,
+        role: this.props.editedUser.role,
+        languageOfResearch: this.props.editedUser.languageOfResearch,
+        isLoading: false
+      });
+    }
 }
-onChange = (event: any) => {
+  onChange = (event: any) => {
   this.setState({ [event.target.name]: event.target.value });
 }
 
-backButtonClicked = () => {
-  this.setState({ ...INITIAL_STATE });
+  backButtonClicked = () => {
   this.props.editUserBackButtonClicked();
 }
 
-handleRoleChange = (option: any) => {
+    handleRoleChange = (option: any) => {
   this.setState({
     role: option
   });
 }
-handleLanguageChange = (option: any) => {
+    handleLanguageChange = (option: any) => {
   this.setState({
     languageOfResearch: option
   });
 }
 
-render() {
-  console.log(this.props.editedUser);
-  const {
-    username,
-    email,
-    passwordOne,
-    institution,
-    role,
-    languageOfResearch
-  } = this.state;
-  const roleOptions = [
-    { value: "linguistic_researcher", label: "Linguistic Researcher" },
-    { value: "teacher", label: "Teacher" },
-    { value: "student", label: "Student" },
-    { value: "other", label: "Other" },
-  ];
-  const languageOptions = [
-    { value: "blackfoot", label: "Blackfoot" },
-    { value: "english", label: "English" },
-    { value: "french", label: "French" },
-    { value: "other", label: "Other" },
-  ];
+  render() {
+    const {
+        username,
+        email,
+        passwordOne,
+        institution,
+        role,
+        languageOfResearch
+      } = this.state;
+    const roleOptions = [
+        { value: "Linguistic Researcher", label: "Linguistic Researcher" },
+        { value: "Teacher", label: "Teacher" },
+        { value: "Student", label: "Student" },
+        { value: "Other", label: "Other" },
+      ];
+    const languageOptions = [
+        { value: "Blackfoot", label: "Blackfoot" },
+        { value: "English", label: "English" },
+        { value: "French", label: "French" },
+        { value: "Other", label: "Other" },
+      ];
 
-  const colourStyles = {
+    const colourStyles = {
     control: (styles: any) => ({ ...styles, backgroundColor: "white" }),
     option: (styles: any) => ({
       ...styles,
@@ -166,12 +206,12 @@ render() {
     input: (styles: any) => ({ ...styles, padding: "0px", margin: "0px" }),
   };
 
-  const { isLoading } = this.state;
-  const {editUserClicked} = this.props;
-  const className = `${editUserClicked
+    const { isLoading } = this.state;
+    const {editUserClicked} = this.props;
+    const className = `${editUserClicked
     ? "transition"
     : ""} CreateUser`;
-  return (
+    return (
     <div className={className}>
     <div className="CreateUserContainer">
     <button className="BackButton waves-effect waves-light btn" onClick={this.backButtonClicked}>

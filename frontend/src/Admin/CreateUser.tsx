@@ -50,9 +50,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
     formData.append("email", email);
     formData.append("user_name", username);
     formData.append("university", institution);
-    formData.append("role", role.toString());
     formData.append("password", passwordOne);
-
     const response = await fetch(`/api/add-new-user-from-admin`, {
           method: "POST",
           headers: {
@@ -61,7 +59,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
           body: formData
         });
     const body = await response.json();
-    if (body.result !== "exception") {
+    if (!body.result.includes("Error")) {
       const recordings = await Promise.all(this.state.languageOfResearch.map(async (researchLanguage: any) => {
         const recordingData = new FormData();
         const userId = body.result;
@@ -92,7 +90,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
       }));
       window.confirm("Added user successfully!");
     } else {
-      window.confirm("User already exists!");
+      window.confirm(body.result);
     }
     this.setState({ ...INITIAL_STATE });
 }
