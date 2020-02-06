@@ -263,7 +263,7 @@ def get_analyses_for_image(image_id):
 def get_student_recordings():
     with Postgres() as connection:
         postgres_select_query = """ SELECT USERS.USER_NAME, USERS.USER_ID,USERS.LAST_LOGIN FROM USERS, USER_ROLE WHERE USER_ROLE= %s AND USERS.USER_ID=USER_ROLE.USER_ID"""
-        filter_values= ('student')
+        filter_values= ('Student')
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
 
