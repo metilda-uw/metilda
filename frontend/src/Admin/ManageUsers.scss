@@ -1,5 +1,4 @@
 #usersTitle {
-  display: inline-block;
   text-align: center;
   font-size:50px;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
@@ -49,7 +48,11 @@
 }
 
 .AddUser {
-//  float: right;
 top:0px;
-left: 300px;
+left: 375px;
+}
+
+.AuthorizeUser {
+top:0px;
+left: 390px;
 }

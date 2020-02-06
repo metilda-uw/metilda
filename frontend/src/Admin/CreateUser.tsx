@@ -207,7 +207,6 @@ render() {
         styles={colourStyles}
         onChange={this.handleLanguageChange}
       />
-
       <Select isMulti
         className="roles_Options"
         placeholder="Role"

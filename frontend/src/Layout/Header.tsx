@@ -22,16 +22,17 @@ class Header extends Component<HeaderProps, State> {
  }
 
  async componentDidMount() {
-  const response = await fetch(`/api/get-admin`, {
+   const response = await fetch(`/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` + "?user-role=Admin", {
     method: "GET",
     headers: {
-      Accept: "application/json"
+      "Accept": "application/json",
+      "Content-Type": "application/json",
     }
   });
-  const body = await response.json();
-  if (body.result.length > 0) {
+   const body = await response.json();
+   if (body.result != null && body.result.length > 0) {
     this.setState({
-      isAdmin: this.props.firebase.auth.currentUser.email === body.result[0][0]
+      isAdmin: true
     });
   }
  }
