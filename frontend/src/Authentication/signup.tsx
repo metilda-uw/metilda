@@ -62,6 +62,7 @@ class SignUpFormBase extends React.Component<Props, State> {
         ReactGA.event({
           category: "Sign Up",
           action: "User pressed sign up button",
+          transport: "beacon"
         });
         const formData = new FormData();
         formData.append("user_id", email);

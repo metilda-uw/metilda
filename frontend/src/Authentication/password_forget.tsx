@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import "./password_forget.scss";
+import ReactGA from "react-ga";
 
 interface Props {
   firebase: any;
@@ -39,6 +40,11 @@ class PasswordForgetFormBase extends React.Component<Props, State> {
     this.props.firebase
       .doPasswordReset(email)
       .then(() => {
+        ReactGA.event({
+          category: "Password Forget",
+          action: "User pressed Forgot Password",
+          transport: "beacon"
+        });
         this.setState({ ...INITIAL_STATE });
       })
       .catch((error: any) => {

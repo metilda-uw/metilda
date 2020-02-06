@@ -17,6 +17,7 @@ import {ThunkDispatch} from "redux-thunk";
 import {AppState} from "../../store/index";
 import {AudioAction} from "../../store/audio/types";
 import {setLatestAnalysisId} from "../../store/audio/actions";
+import ReactGA from "react-ga";
 
 export interface PitchArtDrawingWindowProps {
     speakers: Speaker[];
@@ -126,6 +127,10 @@ class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, 
         // this.downloadRef.current!.href = dataURL;
         // const imageTimeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
         // this.downloadRef.current!.download = `${this.props.fileName}_${imageTimeStamp}.png`;
+        ReactGA.event({
+            category: "Save Image",
+            action: "User pressed Save Image button"
+          });
         const speakerIndicesForUnsavedAnalysis: number[] = [];
         const allAnalysisIds: number[] = [];
         this.props.speakers.forEach((item, index) => {

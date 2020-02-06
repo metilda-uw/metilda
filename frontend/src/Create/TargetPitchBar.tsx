@@ -11,6 +11,7 @@ import fileDownload from "js-file-download";
 import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAnalysis, updateAnalysis, importSpeakerFile} from "./ImportUtils";
 import {SyntheticEvent} from "react";
+import ReactGA from "react-ga";
 
 export interface TargetPitchBarProps {
     letters: any;
@@ -159,6 +160,10 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     }
 
     saveAnalysis = async () => {
+        ReactGA.event({
+            category: "Save Analysis",
+            action: "User pressed Save Analysis button"
+          });
         const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
             uploadId: speaker.uploadId,
