@@ -19,6 +19,8 @@ import History from "./History/History";
 import adminPage from "./Authentication/admin";
 import ManageUsers from "./Admin/ManageUsers";
 import { withAuthentication } from "./Session";
+import { createBrowserHistory } from "history";
+import ReactGA from "react-ga";
 
 interface Props {
   firebase: any;
@@ -27,6 +29,12 @@ interface Props {
 interface State {
   authUser: any;
 }
+const history = createBrowserHistory();
+history.listen((location) => {
+  ReactGA.set({ page: location.pathname }); // Update the user's current page
+  ReactGA.pageview(location.pathname); // Record a pageview for the given page
+});
+
 const App = () => (<Router>
   <div className="App">
     <Route exact={true} path={ROUTES.LANDING} component={Landing} />
