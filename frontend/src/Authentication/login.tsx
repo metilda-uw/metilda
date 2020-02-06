@@ -6,6 +6,7 @@ import { PasswordForgetLink } from "./password_forget";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import { SignUpPage } from "./signup";
+import ReactGA from "react-ga";
 
 interface Props {
   firebase: any;
@@ -52,6 +53,9 @@ class SignInFormBase extends React.Component<Props, State> {
     this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then((authUser: any) => {
+        ReactGA.set({
+          userId: authUser.user.uid
+        });
         this.setState({ ...INITIAL_STATE });
         const formData = new FormData();
         formData.append("user_id", authUser.user.email);

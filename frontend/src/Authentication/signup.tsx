@@ -47,10 +47,6 @@ class SignUpFormBase extends React.Component<Props, State> {
 
     this.state = { ...INITIAL_STATE };
   }
-  componentDidMount() {
-    const trackingId = "UA-157894331-1";
-    ReactGA.initialize(trackingId);
-  }
 
   onSubmit = async (event: any) => {
     event.preventDefault();
