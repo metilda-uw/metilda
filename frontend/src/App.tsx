@@ -1,6 +1,6 @@
 import "materialize-css/dist/css/materialize.min.css";
 import * as React from "react";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
 import CreatePitchArt from "./Create/CreatePitchArt";
 import WordSyllableCategories from "./Learn/WordSyllableCategories";
 import WordSyllableReview from "./Learn/WordSyllableReview";
@@ -29,13 +29,15 @@ interface Props {
 interface State {
   authUser: any;
 }
+
 const history = createBrowserHistory();
 history.listen((location) => {
   ReactGA.set({ page: location.pathname }); // Update the user's current page
   ReactGA.pageview(location.pathname); // Record a pageview for the given page
 });
 
-const App = () => (<Router>
+const App = () => (
+<Router history={history}>
   <div className="App">
     <Route exact={true} path={ROUTES.LANDING} component={Landing} />
     <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
