@@ -4,6 +4,7 @@ import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import Select from "react-select";
+import ReactGA from "react-ga";
 
 interface Props {
   firebase: any;
@@ -46,14 +47,25 @@ class SignUpFormBase extends React.Component<Props, State> {
 
     this.state = { ...INITIAL_STATE };
   }
+  componentDidMount() {
+    const trackingId = "UA-157894331-1";
+    ReactGA.initialize(trackingId);
+  }
 
   onSubmit = async (event: any) => {
-      event.preventDefault();
-      const { username, email, passwordOne, institution, role } = this.state;
-      try {
+    event.preventDefault();
+    const { username, email, passwordOne, institution, role } = this.state;
+    try {
         const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
         this.setState({
           uid: authUser.user.uid
+        });
+        ReactGA.set({
+          userId: this.state.uid
+        });
+        ReactGA.event({
+          category: "Sign Up",
+          action: "User pressed sign up button",
         });
         const formData = new FormData();
         formData.append("user_id", email);
