@@ -2,7 +2,6 @@ import app from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
 import "firebase/storage";
-import ReactGA from "react-ga";
 
 const config = {
   apiKey: "AIzaSyBO-NeTgR5i13a4fawJylwyoOfTXigvYmU",
@@ -21,8 +20,6 @@ class Firebase {
     app.initializeApp(config);
     this.auth = app.auth();
     this.storage = app.storage();
-    const trackingId = "UA-157894331-1";
-    ReactGA.initialize(trackingId);
   }
 
   // *** Auth API ***

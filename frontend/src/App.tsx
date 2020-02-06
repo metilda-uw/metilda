@@ -37,6 +37,33 @@ history.listen((location) => {
   ReactGA.pageview(location.pathname); // Record a pageview for the given page
 });
 
+const latencyPerformanceCallback = (list: any) => {
+  list.getEntries().forEach((entry: any) => {
+    ReactGA.timing({
+      category: "Load Performace",
+      variable: "Server Latency",
+      value: entry.responseStart - entry.requestStart
+    });
+});
+};
+const renderingPerformanceCallback = (list: any) => {
+  list.getEntries().forEach((entry: any) => {
+    if (entry.name.includes("App") ) {
+      ReactGA.timing({
+        category: "App Render Performace",
+        variable: entry.name,
+        value: entry.duration
+      });
+    }
+});
+};
+
+const latencyPerformanceObserver = new PerformanceObserver(latencyPerformanceCallback);
+latencyPerformanceObserver.observe({entryTypes: ["navigation"] });
+
+const renderingPerformanceObserver = new PerformanceObserver(renderingPerformanceCallback);
+renderingPerformanceObserver.observe({entryTypes: ["mark", "measure"] });
+
 const App = () => (
 <Router history={history}>
   <div className="App">

@@ -5,6 +5,7 @@ import {spinner} from "../Utils/LoadingSpinner";
 import "./ManageUsers.scss";
 import Select from "react-select";
 import "./CreateUser.scss";
+import ReactGA from "react-ga";
 
 export interface CreateUsersProps {
   addUserClicked: any;
@@ -42,6 +43,11 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
 
   onSubmit = async (event: any) => {
     event.preventDefault();
+    ReactGA.event({
+      category: "Admin Action",
+      action: "Create User Form Submit",
+      transport: "beacon"
+    });
     const { username, email, passwordOne, institution, role } = this.state;
     this.setState({
       isLoading: true

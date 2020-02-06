@@ -14,6 +14,7 @@ import Header from "../Layout/Header";
 import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAudio} from "./ImportUtils";
 import {spinner} from "../Utils/LoadingSpinner";
+import ReactGA from "react-ga";
 
 export interface CreatePitchArtProps {
     speakers: Speaker[];
@@ -82,6 +83,10 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
         try {
             const response = await uploadAudio(results, this.props.firebase);
             this.getUserFiles();
+            ReactGA.event({
+                category: "Upload File",
+                action: "User pressed Upload File button"
+              });
         } catch (ex) {
             console.log(ex);
         }

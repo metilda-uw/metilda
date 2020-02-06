@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { withFirebase } from "../Firebase";
+import ReactGA from "react-ga";
 
 interface Props {
   firebase: any;
@@ -31,6 +32,11 @@ class PasswordChangeForm extends Component<Props, State> {
     this.props.firebase
       .doPasswordUpdate(passwordOne)
       .then(() => {
+        ReactGA.event({
+          category: "Password Change",
+          action: "User pressed Change Password",
+          transport: "beacon"
+        });
         this.setState({ ...INITIAL_STATE });
       })
       .catch((error: any) => {

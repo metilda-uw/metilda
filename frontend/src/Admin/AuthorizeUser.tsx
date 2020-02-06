@@ -4,6 +4,7 @@ import {spinner} from "../Utils/LoadingSpinner";
 import "./ManageUsers.scss";
 import Select from "react-select";
 import "./AuthorizeUser.scss";
+import ReactGA from "react-ga";
 
 export interface AuthorizeUserProps {
   authorizeUserClicked: any;
@@ -33,6 +34,11 @@ export class AuthorizeUser extends React.Component<AuthorizeUserProps, State> {
 
   onSubmit = async (event: any) => {
     event.preventDefault();
+    ReactGA.event({
+      category: "Admin Action",
+      action: "Authorize User Form Submit",
+      transport: "beacon"
+    });
     const { email, role } = this.state;
     this.setState({
       isLoading: true

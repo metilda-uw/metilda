@@ -49,7 +49,11 @@ class SignInFormBase extends React.Component<Props, State> {
 
   onSubmit = (event: any) => {
     const { email, password } = this.state;
-
+    ReactGA.event({
+      category: "Login",
+      action: "User pressed login button",
+      transport: "beacon"
+    });
     this.props.firebase
       .doSignInWithEmailAndPassword(email, password)
       .then((authUser: any) => {

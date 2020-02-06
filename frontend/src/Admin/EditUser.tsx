@@ -4,6 +4,7 @@ import {spinner} from "../Utils/LoadingSpinner";
 import "./ManageUsers.scss";
 import Select from "react-select";
 import "./EditUser.scss";
+import ReactGA from "react-ga";
 
 export interface EditUserProps {
   editUserClicked: any;
@@ -56,6 +57,11 @@ export class EditUser extends React.Component<EditUserProps, State> {
 
   onSubmit = async (event: any) => {
     event.preventDefault();
+    ReactGA.event({
+      category: "Admin Action",
+      action: "Edit User Form Submit",
+      transport: "beacon"
+    });
     const { username, email, passwordOne, institution, role, languageOfResearch } = this.state;
     this.setState({
       isLoading: true
