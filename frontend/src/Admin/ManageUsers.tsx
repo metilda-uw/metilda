@@ -6,6 +6,7 @@ import "./ManageUsers.scss";
 import {deleteUser} from "../Create/ImportUtils";
 import CreateUser from "./CreateUser";
 import EditUser from "./EditUser";
+import AuthorizeUser from "./AuthorizeUser";
 
 export interface ManageUsersProps {
   firebase: any;
@@ -16,6 +17,7 @@ interface State {
   isLoading: boolean;
   isCreateUserClicked: boolean;
   isEditUserClicked: boolean;
+  isauthorizeUserClicked: boolean;
   editedUser: any;
 }
 
@@ -47,6 +49,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
           isLoading: false,
           isCreateUserClicked: false,
           isEditUserClicked: false,
+          isauthorizeUserClicked: false,
           editedUser: null
       };
   }
@@ -120,7 +123,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
     }
  }
 
-renderTableHeader() {
+  renderTableHeader() {
   if (this.state.users.length > 0) {
     const headerNames = [" Name", "Email", "Role", "Research Language", "University", "Last Login", "Modify"];
     const headers = [];
@@ -131,7 +134,7 @@ renderTableHeader() {
   }
   }
 
-renderTableData() {
+  renderTableData() {
     return this.state.users.map((user, index) => {
         return (
         <tr key={index}>
@@ -193,7 +196,12 @@ renderTableData() {
       editedUser: newUser,
       isEditUserClicked: true
     });
+  }
 
+  authorizeUser = () => {
+    this.setState({
+      isauthorizeUserClicked: true
+    });
   }
 
   addUserBackButtonClicked = () => {
@@ -209,6 +217,11 @@ renderTableData() {
     isEditUserClicked: false
   });
   }
+  authorizeUserBackButtonClicked = () => {
+    this.setState({
+      isauthorizeUserClicked: false
+    });
+  }
 
   render() {
     const { isLoading } = this.state;
@@ -216,15 +229,7 @@ renderTableData() {
             <div className="userContainer">
                <Header/>
                {isLoading && spinner()}
-               <div>
                <h1 id="usersTitle">MeTILDA Users </h1>
-               <button onClick={this.addUser} className="AddUser waves-effect waves-light btn">
-                        <i className="material-icons right">
-                            add
-                        </i>
-                       Add User
-              </button>
-              </div>
               <table id="allUsers">
                  <tbody>
                  <tr>{this.renderTableHeader()}</tr>
@@ -236,11 +241,25 @@ renderTableData() {
                <div className="manageUsersButtonContainer">
                </div>
               }
+              <button onClick={this.addUser} className="AddUser waves-effect waves-light btn">
+                        <i className="material-icons right">
+                            add
+                        </i>
+                       Add User
+              </button>
+              <button onClick={this.authorizeUser} className="AuthorizeUser waves-effect waves-light btn">
+                        <i className="material-icons right">
+                            add
+                        </i>
+                       Authorize User
+              </button>
             <CreateUser addUserClicked={this.state.isCreateUserClicked}
             addUserBackButtonClicked={this.addUserBackButtonClicked}/>
             <EditUser editUserClicked={this.state.isEditUserClicked}
             editUserBackButtonClicked={this.editUserBackButtonClicked}
             editedUser={this.state.editedUser}/>
+            <AuthorizeUser authorizeUserClicked={this.state.isauthorizeUserClicked}
+            authorizeUserBackButtonClicked={this.authorizeUserBackButtonClicked}/>
             </div>
         );
   }

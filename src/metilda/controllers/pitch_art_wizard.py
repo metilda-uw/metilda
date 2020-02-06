@@ -268,12 +268,13 @@ def get_student_recordings():
     return jsonify({'result': results})
 
 
-@app.route('/api/get-admin', methods=["GET"])
-def get_admin():
+@app.route('/api/get-user-with-verified-role/<string:user_id>', methods=["GET"])
+def get_admin(user_id):
+    user_role = request.args.get('user-role', type=None)
     with Postgres() as connection:
-        postgres_select_query = """ SELECT USER_ID FROM USER_ROLE WHERE USER_ROLE= %s AND VERIFIED = true"""
-        filter_values= ('Admin')
-        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+        postgres_select_query = """ SELECT * FROM USER_ROLE WHERE USER_ROLE= %s AND USER_ID=%s AND VERIFIED = true"""
+        filter_values= (user_role,user_id)
+        results = connection.execute_select_query(postgres_select_query, filter_values)
     return jsonify({'result': results})
 
 @app.route('/api/get-users', methods=["GET"])
@@ -386,5 +387,13 @@ def delete_previous_user_research_language():
         record_to_delete = (request.form['user_id'], request.form['language'])
         results = connection.execute_update_query(postgres_select_query, record_to_delete)
     return jsonify({'result': results})
+
+@app.route('/api/authorize-user', methods=["POST"])
+def authorize_user():
+    with Postgres() as connection:
+        postgres_insert_query = """ UPDATE user_role SET VERIFIED = true WHERE USER_ID=%s AND USER_ROLE=%s"""
+        record_to_insert = (request.form['email'], request.form['user_role'])
+        last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
    
    

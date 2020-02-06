@@ -17,15 +17,40 @@ import StudentsInfo from "./StudentsInfo";
 
 interface State {
     viewStudentsClicked: boolean;
+    isTeacher: boolean;
+}
+interface Props extends RouteComponentProps {
+    firebase: any;
 }
 
-class WordSyllableCategories extends React.Component<RouteComponentProps, State> {
-    constructor(props: RouteComponentProps) {
+class WordSyllableCategories extends React.Component<Props, State> {
+    constructor(props: Props) {
         super(props);
 
         this.state = {
-            viewStudentsClicked: false
+            viewStudentsClicked: false,
+            isTeacher: false
         };
+      }
+
+    async componentDidMount() {
+        const roles = ["Teacher", "Admin"];
+        roles.forEach(async (role: any) => {
+            const query = "?user-role=" + role;
+            const response = await fetch(`/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` + query, {
+                method: "GET",
+                headers: {
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                }
+              });
+            const body = await response.json();
+            if (body.result != null && body.result.length > 0) {
+                this.setState({
+                  isTeacher: true
+                });
+              }
+          });
       }
 
     handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -75,9 +100,9 @@ class WordSyllableCategories extends React.Component<RouteComponentProps, State>
         return (
             <div>
                 <Header/>
-                <button onClick={this.displayStudents} className="ViewStudentsRecordings waves-effect waves-light btn">
+                {this.state.isTeacher && <button onClick={this.displayStudents} className="ViewStudentsRecordings waves-effect waves-light btn">
                         View Students
-                </button>
+                </button>}
                 <div className="metilda-page-header">
                     <h5>
                         Blackfoot Words
@@ -133,7 +158,8 @@ class WordSyllableCategories extends React.Component<RouteComponentProps, State>
                         <div className="col s6">
                             <div className="col s12 pitch-art-img-list">
                                 {this.imageSrcList().map((item, index) =>
-                                    <Link to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
+                                    <Link key={index}
+                                    to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
                                              className="pitch-art-img-list-item"/>
