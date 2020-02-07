@@ -7,7 +7,7 @@ import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
 import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 import {AppState} from "../store";
-import {addLetter, addSpeaker, removeSpeaker, setLetterPitch, setUploadId} from "../store/audio/actions";
+import {addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import "./AudioAnalysis.css";
@@ -28,6 +28,7 @@ export interface AudioAnalysisProps {
     addSpeaker: () => void;
     removeSpeaker: (speakerIndex: number) => void;
     setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
+    resetLetters: (speakerIndex: number) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
 }
@@ -233,6 +234,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             body: formData,
         });
         this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+        this.props.resetLetters(this.props.speakerIndex);
       }).catch(function(error: any) {
         // return;
       });
@@ -676,6 +678,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
     setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
      dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
+    resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
         dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch))
 });
