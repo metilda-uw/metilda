@@ -53,6 +53,7 @@
     "react-data-export": "^0.6.0",
     "react-dom": "^16.5.2",
     "react-export-excel": "^0.5.2",
+    "react-file-reader": "^1.1.4",
     "react-file-reader-input": "^2.0.0",
     "react-ga": "^2.7.0",
     "react-konva": "^16.5.2",

@@ -18,13 +18,13 @@ export function importSpeakerFile(
 }
 
 export function uploadAudio(
-    results: Result[],
+    results: FileList,
     firebase: any,
     ) {
         const filePromise = new Promise((resolve, reject) => {
             if (results.length === 1) {
                 const uid = firebase.auth.currentUser.email;
-                const file = results[0][1];
+                const file = results[0];
                 const blob = new Blob([file], {type: "audio/wav"});
                 const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
                 const fileName = file.name;
