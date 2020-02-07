@@ -9,7 +9,8 @@ class UploadAudio extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            updateCounter: 0
+            updateCounter: 0,
+            selectedFileName: this.props.initFileName || ''
         };
 
         this.sendFormSubmit = this.sendFormSubmit.bind(this);
@@ -26,10 +27,13 @@ class UploadAudio extends Component {
     }
 
 
-    componentDidUpdate() {
+    componentDidUpdate(nextProps) {
         // We reset the select field to force the select input to re-render with the
         // correct file.
         this.initInputField();
+        if (nextProps.initFileName !== this.props.initFileName) {
+            this.setState({ selectedFileName: nextProps.initFileName })
+          }
     }
 
     initInputField() {
@@ -58,21 +62,23 @@ class UploadAudio extends Component {
     }
 
     render() {
-        const availableFilesList = this.props.userFiles.map((item, index) => {
+        const { userFiles } = this.props;
+        const availableFilesList = userFiles.map((item, index) => {
             return (
                 <option key={index} value={index}>{item[1]}</option>
             )
         });
+        const selectedIndex = userFiles.findIndex(file => file[1] === this.props.initFileName);
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12"
                  key={this.state.updateCounter}>
                 <label className="group-label">Audio File</label>
                 <div className="metilda-audio-analysis-controls-list-item-row">
                     <select id="audioFileInput"
-                            value={this.props.initFileName || ''}
+                            value={selectedIndex}
                             name="audioFileName"
                             onChange={this.sendFormSubmit}>
-                        <option value={''} disabled="disabled">Choose audio file</option>
+                        <option value={'-1'} disabled="disabled">Choose audio file</option>
                         {availableFilesList}
                     </select>
                 </div>

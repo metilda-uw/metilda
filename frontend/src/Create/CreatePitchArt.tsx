@@ -15,6 +15,7 @@ import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAudio} from "./ImportUtils";
 import {spinner} from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
+import ReactFileReader from "react-file-reader";
 
 export interface CreatePitchArtProps {
     speakers: Speaker[];
@@ -76,12 +77,12 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
             item)}));
    }
 
-    fileSelected = async (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
+    fileSelected = async (files: any) => {
         this.setState({
             isLoading: true,
         });
         try {
-            const response = await uploadAudio(results, this.props.firebase);
+            const response = await uploadAudio(files, this.props.firebase);
             this.getUserFiles();
             ReactGA.event({
                 category: "Upload File",
@@ -95,23 +96,6 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
         });
     }
 
-    checkIfSpeakerImportIsOk = (event: SyntheticEvent) => {
-        // TO DO:: CHECK IF FILE TRYING TO UPLOAD IS ALREADY PRESENT IN CLOUD OR NOT
-        // if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
-        //     return;
-        // }
-
-        // const isOk: boolean = confirm(
-        //     "The current speaker will be reset.\n\n" +
-        //     "Do you want to continue?"
-        // );
-
-        // if (!isOk) {
-        //     event.preventDefault();
-        //     event.stopPropagation();
-        // }
-    }
-
     render() {
         const { isLoading } = this.state;
         const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
@@ -120,14 +104,14 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
             <Header/>
             {isLoading && spinner()}
             <div className="CreatePitchArt">
-                <FileReaderInput as="binary" onChange={this.fileSelected}>
-                    <button onClick={this.checkIfSpeakerImportIsOk} className="UploadFile waves-effect waves-light btn">
+                <ReactFileReader fileTypes={[".wav"]} multipleFiles={false} handleFiles={this.fileSelected}>
+                    <button className="UploadFile waves-effect waves-light btn">
                         <i className="material-icons right">
                             cloud_upload
                         </i>
                         Upload File to cloud
                     </button>
-                </FileReaderInput>
+                    </ReactFileReader>
                 <div className="metilda-page-content">
                     {this.renderSpeakers()}
                     <div className="row">
