@@ -181,6 +181,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                         this.deletePreviousAnalysis(speaker.latestAnalysisId);
                         const data = await updateAnalysis(metildaWord, speaker.latestAnalysisName,
                             speaker.latestAnalysisId, this.props.firebase);
+                        const response = this.deletePreviousImages(speaker.latestAnalysisId, this.props.firebase);
                         this.props.setLatestAnalysisId(this.props.speakerIndex, speaker.latestAnalysisId,
                             speaker.latestAnalysisName, speaker.letters);
                     } else {
@@ -191,6 +192,33 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             this.uploadAnalysis(isValidInput, metildaWord, speaker);
         }
     }
+
+    deletePreviousImages = async (latestAnalysisId: any, firebase: any ) => {
+        const imageResponse = await fetch(`/api/get-image-for-analysis/${latestAnalysisId.toString()}`, {
+            method: "GET",
+            headers: {
+            Accept: "application/json"
+            }
+        });
+        const imageBody = await imageResponse.json();
+        const storageRef = firebase.uploadFile();
+        imageBody.result.forEach(async (image: any) => {
+        // Delete image from cloud
+        const imagePath = image[2];
+        const imageRef = storageRef.child(imagePath);
+        const responseFromCloud = imageRef.delete();
+        // Delete image from DB
+        const formData = new FormData();
+        formData.append("image_id", image[0]);
+        const response = await fetch(`/api/delete-image`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                    });
+                });
+            }
 
     deletePreviousAnalysis = (analysisId: number) => {
         fetch(`api/get-analysis-file-path/${analysisId.toString()}`, {

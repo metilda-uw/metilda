@@ -164,11 +164,19 @@ def create_file():
             connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
-@app.route('/api/delete-file/', methods=["POST"])
+@app.route('/api/delete-file', methods=["POST"])
 def delete_file():
     with Postgres() as connection:
         postgres_select_query = """ DELETE FROM audio WHERE AUDIO_ID = %s"""
         results = connection.execute_update_query(postgres_select_query, (request.form['file_id'],))
+    return jsonify({'result': results})
+
+
+@app.route('/api/delete-image', methods=["POST"])
+def delete_image():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM image WHERE IMAGE_ID = %s"""
+        results = connection.execute_update_query(postgres_select_query, (request.form['image_id'],))
     return jsonify({'result': results})
 
 @app.route('/api/delete-recording', methods=["POST"])

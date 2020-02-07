@@ -170,7 +170,7 @@ deleteFiles = async () => {
             // Delete file from DB
             const formData = new FormData();
             formData.append("file_id", file.id);
-            const response = await fetch(`/api/delete-file/`, {
+            const response = await fetch(`/api/delete-file`, {
             method: "POST",
             headers: {
                 Accept: "application/json"
