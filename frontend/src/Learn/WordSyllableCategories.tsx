@@ -100,7 +100,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
         return (
             <div>
                 <Header/>
-                {this.state.isTeacher && <button onClick={this.displayStudents} className="ViewStudentsRecordings waves-effect waves-light btn">
+                {this.state.isTeacher && <button onClick={this.displayStudents} className="ViewStudentsRecordings waves-effect waves-light btn globalbtn">
                         View Students
                 </button>}
                 <div className="metilda-page-header">

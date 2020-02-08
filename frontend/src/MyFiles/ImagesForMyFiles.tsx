@@ -197,7 +197,8 @@ State > {
     return (
       <div className={className}>
         {isLoading && spinner()}
-        <button className="BackButton waves-effect waves-light btn" onClick={this.props.imagesBackButtonClicked}>
+        <button className="BackButton waves-effect waves-light btn globalbtn"
+        onClick={this.props.imagesBackButtonClicked}>
           <i className="material-icons right">arrow_back</i>
           Back
         </button>
@@ -211,7 +212,7 @@ State > {
           {this.renderImageData()}
         </div>
         {this.state.images.length > 0 &&
-        <button className="ExportToExcel waves-effect waves-light btn" onClick={this.exportToExcel}>
+        <button className="ExportToExcel waves-effect waves-light btn globalbtn" onClick={this.exportToExcel}>
                     <i className="material-icons right">file_download</i>
                     Export to Excel
         </button>}

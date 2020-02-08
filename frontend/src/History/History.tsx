@@ -193,7 +193,7 @@ export class History extends React.Component<HistoryProps, State> {
             {this.renderImageData()}
             </div>
             {this.state.allUploadedImages.length > 0 &&
-            <button className="ExportToExcel waves-effect waves-light btn" onClick={this.exportToExcel}>
+            <button className="ExportToExcel waves-effect waves-light btn globalbtn" onClick={this.exportToExcel}>
                     <i className="material-icons right">file_download</i>
                     Export to Excel
             </button>

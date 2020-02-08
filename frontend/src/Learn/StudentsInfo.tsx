@@ -91,7 +91,7 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
            <td>{student.email}</td>
            <td>{student.lastLogin}</td>
            <td>
-                <button className="DeleteFile waves-effect waves-light btn" title="Get images for the file"
+                <button className="DeleteFile waves-effect waves-light btn globalbtn" title="Get images for the file"
                  onClick={() => (this.getStudentRecordings(student.name, student.email))}>
                     <i className="material-icons right">image</i>
                     View Recordings
@@ -111,7 +111,7 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
     return (
       <div className={className}>
           {isLoading && spinner()}
-          <button className="BackButton waves-effect waves-light btn"
+          <button className="BackButton waves-effect waves-light btn globalbtn"
           onClick={this.props.studentsInfoBackButtonClicked}>
             <i className="material-icons right">arrow_back</i>
               Back

@@ -310,21 +310,21 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                     </div>
                 </div>
                 <div className="TargetPitchBarElements">
-                    <button className="TargetPitchBar-set-syllable btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterSyllableEvent}>
                         Set Syllable
                     </button>
-                    <button className="TargetPitchBar-remove-letter btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.removeLetterEvent}>
                         Remove
                     </button>
-                    <button className="TargetPitchBar-clear-letter btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-clear-letter btn globalbtn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={speaker.letters.length === 0}
@@ -332,19 +332,19 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                         Clear
                     </button>
                     <button onClick={this.checkIfSpeakerImportIsOk}
-                            className="TargetPitchBar-open-analysis btn waves-effect waves-light m-r-16">
+                            className="TargetPitchBar-open-analysis btn globalbtn waves-effect waves-light m-r-16">
                         <FileReaderInput as="binary" onChange={this.fileSelected}>
                             Open
                         </FileReaderInput>
                     </button>
-                    <button className="TargetPitchBar-save-analysis btn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
                             type="submit"
                             name="action"
                             disabled={speaker.letters.length === 0}
                             onClick={this.saveAnalysis}>
                         Save
                     </button>
-                    <button className="TargetPitchBar-download-analysis btn waves-effect waves-light"
+                    <button className="TargetPitchBar-download-analysis btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={speaker.letters.length === 0}

@@ -107,7 +107,7 @@ class SignInFormBase extends React.Component<Props, State> {
           placeholder="Password"
           className="signin_Password"
         />
-        <button disabled={isInvalid} type="submit" className="signin_Submit">
+        <button disabled={isInvalid} type="submit" className="signin_Submit globalbtn">
           Sign In
         </button>
 

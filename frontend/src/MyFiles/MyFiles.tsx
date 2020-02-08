@@ -147,7 +147,7 @@ renderTableData() {
            <td>{(file.size / 1024).toFixed(2)} KB</td>
            <td>{file.createdAt}</td>
            <td>
-                <button className="DeleteFile waves-effect waves-light btn" title="Get images for the file"
+                <button className="DeleteFile waves-effect waves-light btn globalbtn" title="Get images for the file"
                  onClick={() => (this.handleGetImages(file.id, file.name))}>
                     <i className="material-icons right">image</i>
                     Get Images
@@ -234,11 +234,11 @@ render() {
               </table>
             </div>
             <div className="myFilesButtonContainer">
-            <button className="DownloadFile waves-effect waves-light btn" onClick={this.downloadFiles}>
+            <button className="DownloadFile waves-effect waves-light btn globalbtn" onClick={this.downloadFiles}>
                       <i className="material-icons right">file_download</i>
                       Download Files
             </button>
-            <button className="DeleteFile waves-effect waves-light btn" onClick={this.deleteFiles}>
+            <button className="DeleteFile waves-effect waves-light btn globalbtn" onClick={this.deleteFiles}>
                       <i className="material-icons right">delete</i>
                       Delete Files
             </button>

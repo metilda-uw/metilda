@@ -26,7 +26,7 @@ export class Landing extends React.Component<Props> {
           Learning and Analysis Platform for Linguistic Researchers and
           teachers/students
         </p>
-        <button className="login_Button" onClick={this.displayLoginPage}>
+        <button className="login_Button globalbtn" onClick={this.displayLoginPage}>
           {" "}
           Login/Sign Up
         </button>

@@ -95,7 +95,7 @@ class PitchArt extends React.Component<Props> {
                     {hiddenPitchArt}
                 </div>
                 <div id="metilda-pitch-art-btn-container">
-                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                    <button className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
                             disabled={this.props.speakers.length !== 1 || this.props.speakers[0].letters.length === 0}
                             onClick={this.playPitchArt}>
                         <i className="material-icons right">
@@ -103,7 +103,7 @@ class PitchArt extends React.Component<Props> {
                         </i>
                         Play Tones
                     </button>
-                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                    <button className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
                             disabled={this.props.speakers.length === 0}
                             onClick={this.saveImage}>
                         <i className="material-icons right">
@@ -111,7 +111,7 @@ class PitchArt extends React.Component<Props> {
                         </i>
                         Save Image
                     </button>
-                    <button className="waves-effect waves-light btn metilda-pitch-art-btn"
+                    <button className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
                             disabled={this.props.speakers.length === 0}
                             onClick={this.downloadImage}>
                         Download Image

@@ -55,13 +55,16 @@
       padding-left: 0;
       margin-top: 0;
       margin-bottom: 0;
+      a {
+        color: #000000
+      }
     }
   }
   
   .nav {
     display: inline-block;
     background: #ee6e73;
-    color: white;
+    color: #000000;
     text-align: left;
     position: sticky;
     top: 0;

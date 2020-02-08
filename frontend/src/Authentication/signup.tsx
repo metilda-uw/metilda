@@ -248,7 +248,7 @@ class SignUpFormBase extends React.Component<Props, State> {
             By clicking the checkbox, you agree to the {<TermsOfUseLink />} *
           </span>
         </label>
-        <button type="submit" className="signup_Submit">
+        <button type="submit" className="signup_Submit globalbtn">
           Sign Up
         </button>
         <span className="mandatory_message">
