@@ -122,7 +122,7 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
     return (
       <div className={className}>
           {isLoading && spinner()}
-          <button className="BackButton waves-effect waves-light btn"
+          <button className="BackButton waves-effect waves-light btn globalbtn"
           onClick={this.props.studentRecordingsBackButtonClicked}>
             <i className="material-icons right">arrow_back</i>
               Back

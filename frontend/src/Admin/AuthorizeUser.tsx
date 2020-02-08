@@ -112,7 +112,7 @@ render() {
   return (
     <div className={className}>
     <div className="CreateUserContainer">
-    <button className="BackButton waves-effect waves-light btn" onClick={this.backButtonClicked}>
+    <button className="BackButton waves-effect waves-light btn globalbtn" onClick={this.backButtonClicked}>
           <i className="material-icons right">arrow_back</i>
           Back
     </button>
@@ -136,7 +136,7 @@ render() {
         styles={colourStyles}
         onChange={this.handleRoleChange}
       />
-      <button type="submit" className="signup_Submit" >
+      <button type="submit" className="signup_Submit globalbtn" >
         Authorize
       </button>
     </form>

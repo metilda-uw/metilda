@@ -3,6 +3,10 @@
     justify-content: flex-start;
 }
 
+label{
+    color:#000000
+}
+
 .top-label {
     margin-bottom: 8px;
     display: flex;
@@ -60,4 +64,7 @@
     align-items: flex-start;
     justify-content: flex-start;
     margin-top: 8px;
+}
+.globalbtn{
+    color: #000000;
 }

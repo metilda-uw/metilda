@@ -75,7 +75,7 @@ class PasswordForgetFormBase extends React.Component<Props, State> {
         <button
           disabled={isInvalid}
           type="submit"
-          className="reset_Password_Button"
+          className="reset_Password_Button globalbtn"
         >
           Reset My Password
         </button>

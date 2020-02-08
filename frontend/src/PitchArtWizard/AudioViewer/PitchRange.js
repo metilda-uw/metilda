@@ -86,6 +86,7 @@ class PitchRange extends Component {
                     {this.state.errors.map((item, index) => <p key={index} className="pitch-range-err-list-item">{item}</p>)}
                 </span>
                 <div className="metilda-audio-analysis-controls-list-item-row">
+                <label>
                     <input name="minPitch"
                            id="minPitch"
                            ref={this.minPitchRef}
@@ -97,9 +98,11 @@ class PitchRange extends Component {
                            pattern="(\d+)(\.\d+)?"
                            required={true}
                            type="text"/>
+                </label>
                     <div>
                         <p>to</p>
                     </div>
+                <label>
                     <input name="maxPitch"
                            id="maxPitch"
                            ref={this.maxPitchRef}
@@ -111,7 +114,8 @@ class PitchRange extends Component {
                            pattern="(\d+)(\.\d+)?"
                            required={true}
                            type="text"/>
-                    <button className="waves-effect waves-light btn"
+                </label>
+                    <button className="waves-effect waves-light btn globalbtn"
                             type="submit"
                             onClick={(event) => this.submitMaxPitch(event)}>
                         Apply

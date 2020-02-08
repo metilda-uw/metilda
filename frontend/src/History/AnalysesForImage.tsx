@@ -110,7 +110,8 @@ export class AnalysesForImage extends React.Component < AnalysesForImageProps, S
     return(
     <div className={className}>
     {isLoading && spinner()}
-    <button className="BackButton waves-effect waves-light btn" onClick={this.props.analysesBackButtonClicked}>
+    <button className="BackButton waves-effect waves-light btn globalbtn"
+    onClick={this.props.analysesBackButtonClicked}>
                     <i className="material-icons right">arrow_back</i>
       Back
     </button>

@@ -165,7 +165,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                             <SeekBar className="no-border"/>
                         </div>
                         <div className="metilda-previous-recordings-image-col-3">
-                        <button className="btn-floating btn-small waves-effect waves-light"
+                        <button className="btn-floating btn-small waves-effect waves-light globalbtn"
                         onClick={() => this.deleteRecordings(recording.itemRef, recording.recordingUrl)}>
                             <i className="material-icons right">delete</i>
                         </button>
@@ -401,19 +401,19 @@ render() {
                                     this.maxPitchArtTime()
                                 )}/>
                                 <div className="pitch-art-controls-container">
-                                    <button className="waves-effect waves-light btn metilda-btn align-left"
+                                    <button className="waves-effect waves-light btn metilda-btn align-left globalbtn"
                                             onClick={this.clearPrevious}
                                             disabled={this.state.isRecording
                                                       || this.state.userPitchValueLists.length === 0}>
                                         Clear
                                     </button>
                                     <div className="pitch-art-btn-container">
-                                        <button className="waves-effect waves-light btn metilda-btn"
+                                        <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
                                             {!this.state.isRecording ? "Start Record" : "Stop Record"}
                                         </button>
-                                        <button className="waves-effect waves-light btn metilda-btn"
+                                        <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.playPitchArt}
                                                 disabled={this.state.isRecording}>
                                             <i className="material-icons right">
@@ -421,7 +421,7 @@ render() {
                                             </i>
                                             Play Tones
                                         </button>
-                                        <button className="waves-effect waves-light btn metilda-btn"
+                                        <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.saveImage}
                                                 disabled={this.state.isRecording}>
                                             <i className="material-icons right">

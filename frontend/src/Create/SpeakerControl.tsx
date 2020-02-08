@@ -26,7 +26,7 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
         }
 
         return (
-            <button className="SpeakerControl-remove-speaker waves-effect waves-light btn"
+            <button className="SpeakerControl-remove-speaker waves-effect waves-light btn globalbtn"
                     onClick={this.checkIfSpeakerRemovalIsOk}>
                  <i className="material-icons right">
                     remove_circle
@@ -42,7 +42,7 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
         }
 
         return (
-            <button className="SpeakerControl-add-speaker waves-effect waves-light btn"
+            <button className="SpeakerControl-add-speaker waves-effect waves-light btn globalbtn"
                     onClick={this.props.addSpeaker}>
                 <i className="material-icons right">
                     person_add

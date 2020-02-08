@@ -1,6 +1,5 @@
 import * as React from "react";
 import {connect} from "react-redux";
-import {SyntheticEvent} from "react";
 import {ThunkDispatch} from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import {AppState} from "../store";
@@ -11,7 +10,6 @@ import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
 import "./CreatePitchArt.css";
 import Header from "../Layout/Header";
-import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAudio} from "./ImportUtils";
 import {spinner} from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
@@ -105,7 +103,7 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
             {isLoading && spinner()}
             <div className="CreatePitchArt">
                 <ReactFileReader fileTypes={[".wav"]} multipleFiles={false} handleFiles={this.fileSelected}>
-                    <button className="UploadFile waves-effect waves-light btn">
+                    <button className="UploadFile waves-effect waves-light btn globalbtn">
                         <i className="material-icons right">
                             cloud_upload
                         </i>

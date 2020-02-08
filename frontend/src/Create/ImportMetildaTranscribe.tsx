@@ -2,10 +2,9 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import FileReaderInput, {Result} from "react-file-reader-input";
 import {connect} from "react-redux";
-import {RouteComponentProps} from "react-router-dom";
 import {ThunkDispatch} from "redux-thunk";
 import "../PitchArtWizard/GlobalStyling.css";
-import {setLetterPitch, setSpeaker} from "../store/audio/actions";
+import {setSpeaker} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {AppState} from "../store/index";
 import {Speaker} from "../types/types";
@@ -29,7 +28,7 @@ export class ImportMetildaTranscribe extends React.Component<ImportMetildaTransc
             <div className="ImportMetildaTranscribe">
                 <FileReaderInput as="binary" onChange={this.fileSelected}>
                     <button onClick={this.props.onImport}
-                            className="ImportMetildaTranscribe-open waves-effect waves-light btn">
+                            className="ImportMetildaTranscribe-open waves-effect waves-light btn globalbtn">
                         Open
                     </button>
                 </FileReaderInput>

@@ -145,12 +145,12 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
            <td>{user.university}</td>
            <td>{user.lastLogin}</td>
            <td>
-              <button className="btn-floating btn-small waves-effect waves-light"
+              <button className="btn-floating btn-small waves-effect waves-light globalbtn"
                         onClick={() => this.editUser(user.name, user.id, user.role,
                         user.researchLanguage, user.university)}>
                             <i className="material-icons right">edit</i>
               </button>
-              <button className="btn-floating btn-small waves-effect waves-light"
+              <button className="btn-floating btn-small waves-effect waves-light globalbtn"
                         onClick={() => this.deleteUser(user.id)}>
                             <i className="material-icons right">delete</i>
               </button>
@@ -241,13 +241,13 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
                <div className="manageUsersButtonContainer">
                </div>
               }
-              <button onClick={this.addUser} className="AddUser waves-effect waves-light btn">
+              <button onClick={this.addUser} className="AddUser waves-effect waves-light btn globalbtn">
                         <i className="material-icons right">
                             add
                         </i>
                        Add User
               </button>
-              <button onClick={this.authorizeUser} className="AuthorizeUser waves-effect waves-light btn">
+              <button onClick={this.authorizeUser} className="AuthorizeUser waves-effect waves-light btn globalbtn">
                         <i className="material-icons right">
                             add
                         </i>
