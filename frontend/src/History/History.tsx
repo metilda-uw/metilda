@@ -63,7 +63,7 @@ export class History extends React.Component<HistoryProps, State> {
         isLoading: true,
       });
     const currentUserId = this.props.firebase.auth.currentUser.email;
-    const response = await fetch(`/api/get-all-images/${currentUserId}`, {
+    const response = await fetch(`/api/get-all-images-for-user/${currentUserId}`, {
         method: "GET",
         headers: {
           Accept: "application/json"

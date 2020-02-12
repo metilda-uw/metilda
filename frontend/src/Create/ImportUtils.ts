@@ -273,7 +273,7 @@ export function uploadImageAnalysisIds(
             const formData = new FormData();
             formData.append("image_id", imageId.toString());
             formData.append("analysis_id", analysisId.toString());
-            fetch(`/api/insert-image-analysis-ids`, {
+            fetch(`/api/create-image-analysis`, {
               method: "POST",
               headers: {
                   Accept: "application/json"
