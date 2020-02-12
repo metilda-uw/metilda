@@ -74,7 +74,6 @@ class UploadAudio extends Component {
                  key={this.state.updateCounter}>
                 <label className="group-label">Audio File</label>
                 <div className="metilda-audio-analysis-controls-list-item-row">
-                <label>
                     <select id="audioFileInput"
                             value={selectedIndex}
                             name="audioFileName"
@@ -82,7 +81,6 @@ class UploadAudio extends Component {
                         <option value={'-1'} disabled="disabled">Choose audio file</option>
                         {availableFilesList}
                     </select>
-                </label>
                 </div>
             </div>
         );
