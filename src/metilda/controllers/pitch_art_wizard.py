@@ -227,7 +227,7 @@ def create_image():
         last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
-@app.route('/api/insert-image-analysis-ids', methods=["POST"])
+@app.route('/api/create-image-analysis', methods=["POST"])
 def insert_image_analysis_ids():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO image_analysis (IMAGE_ID, ANALYSIS_ID) VALUES (%s,%s) RETURNING ANALYSIS_ID"""
@@ -251,7 +251,7 @@ def get_image_for_analysis(analysis_id):
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
 
-@app.route('/api/get-all-images/<string:user_id>', methods=["GET"])
+@app.route('/api/get-all-images-for-user/<string:user_id>', methods=["GET"])
 def get_all_images(user_id):
     with Postgres() as connection:
         postgres_select_query = """ SELECT * FROM IMAGE WHERE IMAGE_PATH LIKE %s"""
@@ -274,7 +274,6 @@ def get_student_recordings():
         filter_values= ('Student')
         results = connection.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
-
 
 @app.route('/api/get-user-with-verified-role/<string:user_id>', methods=["GET"])
 def get_admin(user_id):
