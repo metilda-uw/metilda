@@ -56,6 +56,7 @@
     "react-file-reader": "^1.1.4",
     "react-file-reader-input": "^2.0.0",
     "react-ga": "^2.7.0",
+    "react-https-redirect": "^1.1.0",
     "react-konva": "^16.5.2",
     "react-media-player": "^0.7.5",
     "react-pie-menu": "^0.2.4",

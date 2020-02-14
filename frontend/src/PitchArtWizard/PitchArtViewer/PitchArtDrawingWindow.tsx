@@ -64,7 +64,7 @@ export interface ColorScheme {
  * are marked with "// @ts-ignore". These are functional parts of
  * the code, they just don't have explicit types yet.
  */
-class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, State> {
+export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindowProps, State> {
     private readonly innerWidth: number;
     private readonly innerHeight: number;
     private readonly pointDx0: number;

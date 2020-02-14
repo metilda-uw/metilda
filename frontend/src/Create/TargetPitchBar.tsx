@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import moment from "moment";
 import {ThunkDispatch} from "redux-thunk";
 import {AppState} from "../store";
-import {removeLetter, resetLetters, setLetterSyllable, setLatestAnalysisId, setSpeaker} from "../store/audio/actions";
+import {removeLetter, resetLetters, setLetterSyllable, setLatestAnalysisId, setSpeaker, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import AudioLetter from "./AudioLetter";
@@ -15,6 +15,7 @@ import ReactGA from "react-ga";
 
 export interface TargetPitchBarProps {
     letters: any;
+    files: any;
     speakers: Speaker[];
     speakerIndex: number;
     minAudioTime: number;
@@ -25,6 +26,7 @@ export interface TargetPitchBarProps {
     targetPitchSelected: (letterIndex: number) => void;
     removeLetter: (speakerIndex: number, index: number) => void;
     resetLetters: (speakerIndex: number) => void;
+    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number,
                           latestAnalysisName: string, lastUploadedLetters: Letter[]) => void;
@@ -170,6 +172,18 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             letters: speaker.letters
         } as Speaker;
         const isValidInput = false;
+        let matchingFile = [];
+        if (speaker.fileIndex === undefined) {
+             matchingFile = this.props.files.filter((currentRow: any[]) => currentRow[1] === speaker.uploadId);
+            // Check if the upload id from the analysis file loaded using 'Open' option
+            // matches any of the existing files
+             if (matchingFile.length === 0) {
+                    alert(`Please select file before saving analysis`);
+                    return;
+                } else {
+                    this.props.setUploadId(this.props.speakerIndex, speaker.uploadId, matchingFile[0][0]);
+                }
+        }
         if (speaker.latestAnalysisId !== null && speaker.latestAnalysisId !== undefined &&
             speaker.latestAnalysisName != null ) {
                 if (JSON.stringify(speaker.letters) === JSON.stringify(speaker.lastUploadedLetters)) {
@@ -185,11 +199,11 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                         this.props.setLatestAnalysisId(this.props.speakerIndex, speaker.latestAnalysisId,
                             speaker.latestAnalysisName, speaker.letters);
                     } else {
-                       this.uploadAnalysis(isValidInput, metildaWord, speaker);
+                       this.uploadAnalysis(isValidInput, metildaWord, speaker, matchingFile);
                     }
                 }
         } else {
-            this.uploadAnalysis(isValidInput, metildaWord, speaker);
+            this.uploadAnalysis(isValidInput, metildaWord, speaker, matchingFile);
         }
     }
 
@@ -238,7 +252,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         });
     }
 
-    uploadAnalysis = async (isValidInput: boolean, metildaWord: Speaker, speaker: Speaker) => {
+    uploadAnalysis = async (isValidInput: boolean, metildaWord: Speaker, speaker: Speaker, matchingFile: any[]) => {
         let fileName;
         let updatedFileName;
         while (!isValidInput) {
@@ -255,8 +269,9 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
            }
        }
         if (isValidInput && fileName !== null && fileName !== undefined) {
-       const data = await uploadAnalysis(metildaWord, speaker.fileIndex, fileName, this.props.firebase);
-       this.props.setLatestAnalysisId(this.props.speakerIndex, data,
+            const fileIndex = speaker.fileIndex !== undefined ? speaker.fileIndex : matchingFile[0][0];
+            const data = await uploadAnalysis(metildaWord, fileIndex, fileName, this.props.firebase);
+            this.props.setLatestAnalysisId(this.props.speakerIndex, data,
            fileName, speaker.letters);
        } else {
        alert("Analysis not uploaded. Analysis name is missing");
@@ -365,6 +380,8 @@ const mapStateToProps = (state: AppState) => ({
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
     removeLetter: (speakerIndex: number, index: number) => dispatch(removeLetter(speakerIndex, index)),
     resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
+    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
+     dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
         dispatch(setLetterSyllable(speakerIndex, index, syllable)),
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,

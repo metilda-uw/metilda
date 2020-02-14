@@ -1,17 +1,19 @@
 import {shallow} from "enzyme";
-import * as React from "react";
+import React, {createRef} from "react";
+import {Stage} from "react-konva";
 import {expect} from "../../setupTests";
-import {Speaker} from "../../types/types";
-import PitchArtDrawingWindow, {PitchArtDrawingWindowProps} from "./PitchArtDrawingWindow";
+import {Letter, Speaker} from "../../types/types";
+import {PitchArtDrawingWindow, PitchArtDrawingWindowProps} from "./PitchArtDrawingWindow";
 import PitchArtGeometry from "./PitchArtGeometry";
 import {RawPitchValue} from "./types";
 import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import UserPitchView from "./UserPitchView";
 import {arbitraryRawPitchValue} from "../../testSupport/arbitraryObjects";
 
+const stageRef = createRef<Stage>();
 describe("PitchArtDrawingWindow", () => {
     it("renders a PitchArtDrawingWindow", () => {
-        const subject = shallowRender({});
+        const subject = shallowRender({ref: stageRef});
         expect(subject.find(".PitchArtDrawingWindow")).to.be.present();
         expect(subject.find(".PitchArtDrawingWindow-pitchart")).to.be.present();
         expect(subject.find(PitchArtGeometry)).to.be.present();
@@ -19,25 +21,26 @@ describe("PitchArtDrawingWindow", () => {
 
     describe("pitch scale", () => {
         it("does not render pitch scale when showPitchScale is false", () => {
-            const subject = shallowRender({showPitchScale: false});
+            const subject = shallowRender({showPitchScale: false, ref: stageRef});
             expect(subject.find(PitchArtCoordinateSystem)).to.not.be.present();
         });
 
         it("renders pitch scale when showPitchScale is true", () => {
-            const subject = shallowRender({showPitchScale: true});
+            const subject = shallowRender({showPitchScale: true, ref: stageRef});
             expect(subject.find(PitchArtCoordinateSystem)).to.be.present();
         });
     });
 
     describe("user pitch view", () => {
         it("does not render user pitch view when rawPitchValueLists is undefined", () => {
-            const subject = shallowRender({rawPitchValueLists: undefined});
+            const subject = shallowRender({rawPitchValueLists: undefined, ref: stageRef});
             expect(subject.find(UserPitchView)).to.not.be.present();
         });
 
         it("renders user pitch view when rawPitchValueLists is a non-empty list", () => {
             const subject = shallowRender({
-                rawPitchValueLists: [[arbitraryRawPitchValue()]]
+                rawPitchValueLists: [[arbitraryRawPitchValue()]],
+                ref: stageRef
             });
             expect(subject.find(UserPitchView)).to.be.present();
         });
@@ -65,6 +68,10 @@ interface OptionalProps {
     showPitchArtImageColor?: boolean;
     showPrevPitchValueLists?: boolean;
     rawPitchValueLists?: RawPitchValue[][];
+    firebase?: any;
+    setLatestAnalysisId?: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
+                           lastUploadedLetters: Letter[]) => void;
+    ref: any;
 }
 
 function shallowRender(props: OptionalProps) {
@@ -93,5 +100,8 @@ function makeProps(props: OptionalProps): PitchArtDrawingWindowProps {
         showPitchArtImageColor: props.showPitchArtImageColor || false,
         showPrevPitchValueLists: props.showPrevPitchValueLists || false,
         rawPitchValueLists: props.rawPitchValueLists || undefined,
+        firebase: props.firebase || undefined,
+        setLatestAnalysisId: props.setLatestAnalysisId || (() => undefined),
+        ref: props.ref
     };
 }

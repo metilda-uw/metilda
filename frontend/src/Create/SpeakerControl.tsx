@@ -5,8 +5,6 @@ import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store";
 import {Speaker} from "../types/types";
 import "./CreatePitchArt.css";
-import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
-import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 import "./SpeakerControl.css";
 
 export interface SpeakerControlProps {
@@ -16,7 +14,6 @@ export interface SpeakerControlProps {
     removeSpeaker: () => void;
     canAddSpeaker: boolean;
     canRemoveSpeaker: boolean;
-    firebase: any;
 }
 
 export class SpeakerControl extends React.Component<SpeakerControlProps> {
@@ -89,13 +86,7 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
     render() {
         return (
             <div className="SpeakerControl metilda-audio-analysis-controls-list-item col s12">
-                {/* <label className="SpeakerControl-title group-label">Speaker</label> */}
                 <div className="metilda-audio-analysis-controls-list-item-row-left-align">
-                    {/* <ImportMetildaTranscribe
-                        onImport={this.checkIfSpeakerImportIsOk}
-                        speakerIndex={this.props.speakerIndex}
-                    /> */}
-                    <ExportMetildaTranscribe speakerIndex={this.props.speakerIndex} firebase={this.props.firebase}/>
                     {this.maybeRenderRemoveSpeaker()}
                     {this.maybeRenderAddSpeaker()}
                 </div>
