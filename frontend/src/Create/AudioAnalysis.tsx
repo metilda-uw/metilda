@@ -567,8 +567,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 addSpeaker={this.props.addSpeaker}
                 removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
                 canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
-                canRemoveSpeaker={!isFirstSpeaker}
-                firebase={this.props.firebase}/>
+                canRemoveSpeaker={!isFirstSpeaker}/>
         );
     }
 
@@ -653,6 +652,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                             </div>
                             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
                             <TargetPitchBar letters={this.props.speakers}
+                                            files={this.props.files}
                                             minAudioX={this.state.minAudioX}
                                             maxAudioX={this.state.maxAudioX}
                                             minAudioTime={this.state.minAudioTime}

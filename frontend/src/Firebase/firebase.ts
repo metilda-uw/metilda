@@ -14,7 +14,7 @@ const config = {
 };
 
 class Firebase {
-  private auth: any;
+   auth: any;
   private storage: any;
   constructor() {
     app.initializeApp(config);

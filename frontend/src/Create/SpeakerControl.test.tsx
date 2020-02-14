@@ -3,21 +3,12 @@ import * as React from "react";
 import {expect} from "../setupTests";
 import {arbitrarySpeaker} from "../testSupport/arbitraryObjects";
 import {Speaker} from "../types/types";
-import ExportMetildaTranscribe from "./ExportMetildaTranscribe";
-import ImportMetildaTranscribe from "./ImportMetildaTranscribe";
 import {SpeakerControl, SpeakerControlProps} from "./SpeakerControl";
 
 describe("SpeakerControl", () => {
     it("renders the speaker control", () => {
         const subject = shallowRender({});
         expect(subject.find(".SpeakerControl")).to.be.present();
-        expect(subject.find(".SpeakerControl-title")).to.have.text("Speaker");
-    });
-
-    it("renders import and export options", () => {
-        const subject = shallowRender({});
-        expect(subject.find(ImportMetildaTranscribe)).to.be.present();
-        expect(subject.find(ExportMetildaTranscribe)).to.be.present();
     });
 
     describe("add speaker", () => {
@@ -52,6 +43,7 @@ interface OptionalProps {
     removeSpeaker?: () => void;
     canAddSpeaker?: boolean;
     canRemoveSpeaker?: boolean;
+    firebase?: any;
 }
 
 function shallowRender(props: OptionalProps) {

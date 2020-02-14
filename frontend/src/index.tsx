@@ -6,13 +6,16 @@ import App from "./App";
 import configureStore from "./configureStore";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
+import HttpsRedirect from "react-https-redirect";
 import Firebase, { FirebaseContext } from "./Firebase";
 
 ReactDOM.render(
     <Provider store={configureStore()}>
         <BrowserRouter>
         <FirebaseContext.Provider value = {new Firebase()}>
+        <HttpsRedirect>
             <App/>
+        </HttpsRedirect>
         </FirebaseContext.Provider>
         </BrowserRouter>
     </Provider>,

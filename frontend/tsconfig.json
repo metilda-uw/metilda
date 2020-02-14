@@ -22,8 +22,8 @@
   "include": [
       "src"
     ],
-  "exclude": [
-      "src/Lib/**/*",
-      "src/**/*.test.*"
-  ]
+  // "exclude": [
+  //     "src/Lib/**/*",
+  //     "src/**/*.test.*"
+  // ]
 }
