@@ -170,16 +170,12 @@ export class EditUser extends React.Component<EditUserProps, State> {
   this.setState({ [event.target.name]: event.target.value });
 }
 
-  backButtonClicked = () => {
-  this.props.editUserBackButtonClicked();
-}
-
-    handleRoleChange = (option: any) => {
+  handleRoleChange = (option: any) => {
   this.setState({
     role: option
   });
 }
-    handleLanguageChange = (option: any) => {
+  handleLanguageChange = (option: any) => {
   this.setState({
     languageOfResearch: option
   });
@@ -227,15 +223,17 @@ export class EditUser extends React.Component<EditUserProps, State> {
     return (
     <div className={className}>
     <div className="CreateUserContainer">
-    <button className="BackButton waves-effect waves-light btn globalbtn" onClick={this.backButtonClicked}>
+    <button className="BackButton waves-effect waves-light btn globalbtn"
+    onClick={this.props.editUserBackButtonClicked()}>
           <i className="material-icons right">arrow_back</i>
           Back
     </button>
     <div className="CreateUserSpinner">
     {isLoading && spinner()}
     <h1 id="newUserTitle">Enter new user details</h1>
-      <form  className="CreateUserForm" onSubmit={this.onSubmit}>
+    <form  className="CreateUserForm" onSubmit={this.onSubmit}>
       <input
+        className="username"
         name="username"
         value={username}
         onChange={this.onChange}
@@ -244,6 +242,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
         required
       />
       <input
+        className="email"
         name="email"
         value={email}
         onChange={this.onChange}
@@ -252,6 +251,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
         required
       />
       <input
+        className="passwordOne"
         name="passwordOne"
         value={passwordOne}
         onChange={this.onChange}
@@ -260,6 +260,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
         required
       />
       <input
+        className="institution"
         name="institution"
         value={institution}
         onChange={this.onChange}

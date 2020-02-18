@@ -7,7 +7,7 @@ import Select from "react-select";
 import "./CreateUser.scss";
 import ReactGA from "react-ga";
 
-export interface CreateUsersProps {
+export interface CreateUserProps {
   addUserClicked: any;
   addUserBackButtonClicked: any;
 }
@@ -33,9 +33,9 @@ const INITIAL_STATE = {
   isLoading: false
 };
 
-export class CreateUser extends React.Component<CreateUsersProps, State> {
+export class CreateUser extends React.Component<CreateUserProps, State> {
 
-  constructor(props: CreateUsersProps) {
+  constructor(props: CreateUserProps) {
       super(props);
 
       this.state = { ...INITIAL_STATE };
@@ -48,7 +48,7 @@ export class CreateUser extends React.Component<CreateUsersProps, State> {
       action: "Create User Form Submit",
       transport: "beacon"
     });
-    const { username, email, passwordOne, institution, role } = this.state;
+    const { username, email, passwordOne, institution } = this.state;
     this.setState({
       isLoading: true
     });
@@ -173,8 +173,9 @@ render() {
     <div className="CreateUserSpinner">
     {isLoading && spinner()}
     <h1 id="newUserTitle">Enter new user details</h1>
-      <form  className="CreateUserForm" onSubmit={this.onSubmit}>
+    <form  className="CreateUserForm" onSubmit={this.onSubmit}>
       <input
+        className="username"
         name="username"
         value={username}
         onChange={this.onChange}
@@ -183,6 +184,7 @@ render() {
         required
       />
       <input
+        className="email"
         name="email"
         value={email}
         onChange={this.onChange}
@@ -191,6 +193,7 @@ render() {
         required
       />
       <input
+        className="passwordOne"
         name="passwordOne"
         value={passwordOne}
         onChange={this.onChange}
@@ -199,6 +202,7 @@ render() {
         required
       />
       <input
+        className="institution"
         name="institution"
         value={institution}
         onChange={this.onChange}
