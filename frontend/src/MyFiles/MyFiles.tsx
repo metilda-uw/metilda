@@ -57,6 +57,7 @@ private downloadRef = createRef<HTMLAnchorElement>();
   }
 
   getUserFiles = async () => {
+      try {
       this.setState({
           isLoading: true
       });
@@ -88,6 +89,9 @@ private downloadRef = createRef<HTMLAnchorElement>();
               files: updatedFiles,
               isLoading: false
           });
+        } catch (ex) {
+            console.log(ex);
+          }
  }
 
 handleCheckAll = () => {
@@ -128,7 +132,8 @@ renderTableHeader() {
     const headerNames = ["File Name", "File Size", "Created At", "Images for file"];
     const headers = [];
     headers.push(<th key="checkBoxHeader">
-    {<label><input type="checkbox" onChange={this.handleCheckAll} checked={this.state.checkAll}/><span/>
+    {<label><input className="checkBoxForAllFiles" type="checkbox"
+    onChange={this.handleCheckAll} checked={this.state.checkAll}/><span/>
     </label>}
     </th>);
     for (let i = 0; i < headerNames.length; i++) {
@@ -141,13 +146,14 @@ renderTableData() {
     return this.state.files.map((file, index) => {
         return (
         <tr key={index}>
-           <td><label><input type="checkbox" checked={file.checked} onChange={this.handleCheckboxChange}
+           <td><label><input className="checkBoxForFile"type="checkbox"
+           checked={file.checked} onChange={this.handleCheckboxChange}
            value={index}/><span/></label></td>
            <td>{file.name}</td>
            <td>{(file.size / 1024).toFixed(2)} KB</td>
            <td>{file.createdAt}</td>
            <td>
-                <button className="DeleteFile waves-effect waves-light btn globalbtn" title="Get images for the file"
+                <button className="GetImages waves-effect waves-light btn globalbtn" title="Get images for the file"
                  onClick={() => (this.handleGetImages(file.id, file.name))}>
                     <i className="material-icons right">image</i>
                     Get Images
@@ -160,6 +166,7 @@ renderTableData() {
 
 deleteFiles = async () => {
     const uncheckedFiles = [];
+    try {
     for (const file of this.state.files) {
         if (file.checked) {
             // Delete file from cloud
@@ -185,9 +192,13 @@ deleteFiles = async () => {
     this.setState({
         files: uncheckedFiles
     });
+} catch (ex) {
+    console.log(ex);
+  }
 }
 
 downloadFiles = async () => {
+    try {
     for (const file of this.state.files) {
         if (file.checked) {
             // Download file from cloud
@@ -201,6 +212,9 @@ downloadFiles = async () => {
             this.downloadRef.current!.click();
         }
     }
+    } catch (ex) {
+        console.log(ex);
+      }
 }
 
 imagesBackButtonClicked = () => {
