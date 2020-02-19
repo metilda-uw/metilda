@@ -17,6 +17,18 @@ describe("EditUser", () => {
 
   it("renders the Edit User with form inputs pre-populated with the selected user details", () => {
       const initialUser = { };
+      const roleOptions = [
+        { value: "Linguistic Researcher", label: "Linguistic Researcher" },
+        { value: "Teacher", label: "Teacher" },
+        { value: "Student", label: "Student" },
+        { value: "Other", label: "Other" },
+      ];
+      const languageOptions = [
+        { value: "Blackfoot", label: "Blackfoot" },
+        { value: "English", label: "English" },
+        { value: "French", label: "French" },
+        { value: "Other", label: "Other" },
+      ];
       const subject = shallowRender({editedUser: initialUser});
       const testUser = {
         username: "test_user",
@@ -30,14 +42,14 @@ describe("EditUser", () => {
       const email = subject.find("input").get(1).props.value;
       const passwordOne = subject.find("input").get(2).props.value;
       const institution = subject.find("input").get(3).props.value;
-      const languageOptions = subject.find(".language_Options").props().value;
-      const roleOptions = subject.find(".roles_Options").props().value;
+      const researchLanguage = subject.find(".language_Options").props();
+      const role = subject.find(".roles_Options").props();
       expect(username).to.equal("test_user");
       expect(email).to.equal("test_user@gmail.com");
       expect(passwordOne).to.equal("");
       expect(institution).to.equal("test_institution");
-      expect(languageOptions).to.deep.equal(["test_language"]);
-      expect(roleOptions).to.deep.equal(["test_role"]);
+      expect(researchLanguage.options).to.deep.equal(languageOptions);
+      expect(role.options).to.deep.equal(roleOptions);
   });
 
   it("triggers click when back button is clicked", () => {

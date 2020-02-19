@@ -145,12 +145,12 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
            <td>{user.university}</td>
            <td>{user.lastLogin}</td>
            <td>
-              <button className="btn-floating btn-small waves-effect waves-light globalbtn"
+              <button className="EditUser btn-floating btn-small waves-effect waves-light globalbtn"
                         onClick={() => this.editUser(user.name, user.id, user.role,
                         user.researchLanguage, user.university)}>
                             <i className="material-icons right">edit</i>
               </button>
-              <button className="btn-floating btn-small waves-effect waves-light globalbtn"
+              <button className="DeleteUser btn-floating btn-small waves-effect waves-light globalbtn"
                         onClick={() => this.deleteUser(user.id)}>
                             <i className="material-icons right">delete</i>
               </button>

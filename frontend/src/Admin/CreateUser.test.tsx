@@ -15,20 +15,32 @@ describe("CreateUser", () => {
     });
 
   it("renders the Create User with form empty inputs", () => {
-      const initialUser = { };
-      const subject = shallowRender({});
-      const username = subject.find("input").get(0).props.value;
-      const email = subject.find("input").get(1).props.value;
-      const passwordOne = subject.find("input").get(2).props.value;
-      const institution = subject.find("input").get(3).props.value;
-      const languageOptions = subject.find(".language_Options").props().value;
-      const roleOptions = subject.find(".roles_Options").props().value;
-      expect(username).to.equal("");
-      expect(email).to.equal("");
-      expect(passwordOne).to.equal("");
-      expect(institution).to.equal("");
-      expect(languageOptions).to.deep.equal([]);
-      expect(roleOptions).to.deep.equal([]);
+    const roleOptions = [
+      { value: "Linguistic Researcher", label: "Linguistic Researcher" },
+      { value: "Teacher", label: "Teacher" },
+      { value: "Student", label: "Student" },
+      { value: "Other", label: "Other" },
+    ];
+    const languageOptions = [
+      { value: "Blackfoot", label: "Blackfoot" },
+      { value: "English", label: "English" },
+      { value: "French", label: "French" },
+      { value: "Other", label: "Other" },
+    ];
+    const initialUser = { };
+    const subject = shallowRender({});
+    const username = subject.find("input").get(0).props.value;
+    const email = subject.find("input").get(1).props.value;
+    const passwordOne = subject.find("input").get(2).props.value;
+    const institution = subject.find("input").get(3).props.value;
+    const researchLanguage = subject.find(".language_Options").props();
+    const role = subject.find(".roles_Options").props();
+    expect(username).to.equal("");
+    expect(email).to.equal("");
+    expect(passwordOne).to.equal("");
+    expect(institution).to.equal("");
+    expect(researchLanguage.options).to.deep.equal(languageOptions);
+    expect(role.options).to.deep.equal(roleOptions);
   });
 
   it("renders spinner when page is loading", () => {

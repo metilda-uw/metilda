@@ -6,7 +6,7 @@ import * as ROUTES from "../constants/routes";
 import Select from "react-select";
 import ReactGA from "react-ga";
 
-interface Props {
+export interface Props {
   firebase: any;
   history: any;
 }
@@ -15,7 +15,6 @@ interface State {
   email: string;
   passwordOne: string;
   passwordTwo: string;
-  error: any;
   role: any[];
   uid: string;
   languageOfResearch: any[];
@@ -37,8 +36,7 @@ const INITIAL_STATE = {
   role: [],
   uid: "",
   languageOfResearch: [],
-  checked: false,
-  error: null,
+  checked: false
 };
 
 class SignUpFormBase extends React.Component<Props, State> {
@@ -50,7 +48,7 @@ class SignUpFormBase extends React.Component<Props, State> {
 
   onSubmit = async (event: any) => {
     event.preventDefault();
-    const { username, email, passwordOne, institution, role } = this.state;
+    const { username, email, passwordOne, institution } = this.state;
     try {
         const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
         this.setState({
@@ -81,7 +79,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           const recordingData = new FormData();
           const userId = body.result;
           recordingData.append("user_id", userId);
-          recordingData.append("language", researchLanguage);
+          recordingData.append("language", researchLanguage.value);
           const result =  await fetch(`/api/create-user-research-language`, {
             method: "POST",
             headers: {
@@ -94,7 +92,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           const roleData = new FormData();
           const userId = body.result;
           roleData.append("user_id", userId);
-          roleData.append("user_role", userRole);
+          roleData.append("user_role", userRole.value);
           const result =  await fetch(`/api/create-user-role`, {
             method: "POST",
             headers: {
@@ -125,22 +123,16 @@ class SignUpFormBase extends React.Component<Props, State> {
   handleCheckboxChange = (event: any) =>
     this.setState({ checked: event.target.checked })
 
-  handleRoleChange = (event: any) => {
-    if (event !== null) {
-      this.setState({ role: event.map((item: any) =>
-        item.value) });
-    } else {
-      this.setState({ role: [] });
+  handleRoleChange = (option: any) => {
+      this.setState({
+        role: option
+      });
     }
-  }
-  handleLanguageChange = (event: any) => {
-    if (event !== null) {
-      this.setState({languageOfResearch : event.map((item: any) =>
-        item.value) });
-    } else {
-      this.setState({languageOfResearch : [] });
+  handleLanguageChange = (option: any) => {
+      this.setState({
+        languageOfResearch: option
+      });
     }
-  }
 
   render() {
     const {
@@ -149,7 +141,8 @@ class SignUpFormBase extends React.Component<Props, State> {
       passwordOne,
       passwordTwo,
       institution,
-      error,
+      role,
+      languageOfResearch,
     } = this.state;
     const roleOptions = [
       { value: "Linguistic Researcher", label: "Linguistic Researcher" },
@@ -183,8 +176,9 @@ class SignUpFormBase extends React.Component<Props, State> {
     );
 
     return (
-      <form onSubmit={this.onSubmit}>
+      <form onSubmit={this.onSubmit} className="SignUpForm">
         <input
+          className="username"
           name="username"
           value={username}
           onChange={this.onChange}
@@ -193,6 +187,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           required
         />
         <input
+          className="email"
           name="email"
           value={email}
           onChange={this.onChange}
@@ -201,6 +196,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           required
         />
         <input
+          className="passwordOne"
           name="passwordOne"
           value={passwordOne}
           onChange={this.onChange}
@@ -209,6 +205,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           required
         />
         <input
+          className="passwordTwo"
           name="passwordTwo"
           value={passwordTwo}
           onChange={this.onChange}
@@ -217,6 +214,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           required
         />
         <input
+          className="institution"
           name="institution"
           value={institution}
           onChange={this.onChange}
@@ -226,6 +224,7 @@ class SignUpFormBase extends React.Component<Props, State> {
         <Select isMulti
           className="language_Options"
           placeholder="Research Language"
+          value={languageOfResearch}
           options={languageOptions}
           styles={colourStyles}
           onChange={this.handleLanguageChange}
@@ -235,11 +234,13 @@ class SignUpFormBase extends React.Component<Props, State> {
           className="roles_Options"
           placeholder="Role"
           options={roleOptions}
+          value={role}
           styles={colourStyles}
           onChange={this.handleRoleChange}
         />
         <label className="terms_of_use">
           <Checkbox
+            className="TermsOfUseCheckBox"
             checked={this.state.checked}
             onChange={this.handleCheckboxChange}
             required
@@ -253,9 +254,7 @@ class SignUpFormBase extends React.Component<Props, State> {
         </button>
         <span className="mandatory_message">
            Fields marked with * are mandatory
-          </span>
-
-        {error && <p>{error.message}</p>}
+        </span>
       </form>
     );
   }
@@ -272,4 +271,4 @@ const SignUpForm = compose(
   withFirebase
 )(SignUpFormBase);
 export default SignUpPage;
-export { SignUpForm, SignUpLink, SignUpPage };
+export { SignUpForm, SignUpLink, SignUpPage, SignUpFormBase };
