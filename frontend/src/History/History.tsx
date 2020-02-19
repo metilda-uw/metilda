@@ -1,10 +1,8 @@
-import React, {createRef} from "react";
+import React from "react";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 import "./History.scss";
 import AnalysesForImage from "./AnalysesForImage";
-import * as FileSaver from "file-saver";
-import * as XLSX from "xlsx";
 import {spinner} from "../Utils/LoadingSpinner";
 import {exportExcel} from "../Utils/ExportExcel";
 
