@@ -3,7 +3,7 @@ import { withRouter } from "react-router-dom";
 import * as ROUTES from "../constants/routes";
 import "./landing.scss";
 
-interface Props {
+export interface Props {
   history: any;
 }
 

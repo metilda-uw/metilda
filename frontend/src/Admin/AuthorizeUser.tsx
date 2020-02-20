@@ -65,6 +65,7 @@ export class AuthorizeUser extends React.Component<AuthorizeUserProps, State> {
     }
     this.setState({ ...INITIAL_STATE });
 }
+
 onChange = (event: any) => {
   this.setState({ [event.target.name]: event.target.value });
 }
@@ -119,8 +120,9 @@ render() {
     <div className="CreateUserSpinner">
     {isLoading && spinner()}
     <h1 id="newUserTitle">Enter user details</h1>
-      <form  className="CreateUserForm" onSubmit={this.onSubmit}>
+    <form  className="CreateUserForm" onSubmit={this.onSubmit}>
       <input
+        className="email"
         name="email"
         value={email}
         onChange={this.onChange}
