@@ -49,7 +49,7 @@ describe("Signup", () => {
     expect(role.options).to.deep.equal(roleOptions);
   });
 
-  it("triggers onchange event on input value change ", (done) => {
+  it("triggers onchange event on input value change", (done) => {
   const subject = shallowRender({});
   const setCustomValidity = sinon.stub();
   subject.find(".username").simulate("change", {target: {name: "username", value: "test_user_1"}});

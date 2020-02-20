@@ -8,7 +8,7 @@ import * as ROUTES from "../constants/routes";
 import { SignUpPage } from "./signup";
 import ReactGA from "react-ga";
 
-interface Props {
+export interface Props {
   firebase: any;
   history: any;
 }
@@ -16,7 +16,6 @@ interface Props {
 interface State {
   email: string;
   password: string;
-  error: any;
   [key: string]: any;
 }
 
@@ -36,34 +35,33 @@ const SignInPage = () => (
 
 const INITIAL_STATE = {
   email: "",
-  password: "",
-  error: null,
+  password: ""
 };
 
 class SignInFormBase extends React.Component<Props, State> {
-  constructor(props: any) {
+
+constructor(props: any) {
     super(props);
 
     this.state = { ...INITIAL_STATE };
   }
 
-  onSubmit = (event: any) => {
+  onSubmit = async (event: any) => {
+    event.preventDefault();
     const { email, password } = this.state;
     ReactGA.event({
       category: "Login",
       action: "User pressed login button",
       transport: "beacon"
     });
-    this.props.firebase
-      .doSignInWithEmailAndPassword(email, password)
-      .then((authUser: any) => {
-        ReactGA.set({
+    const authUser =  await this.props.firebase.doSignInWithEmailAndPassword(email, password);
+    ReactGA.set({
           userId: authUser.user.uid
         });
-        this.setState({ ...INITIAL_STATE });
-        const formData = new FormData();
-        formData.append("user_id", authUser.user.email);
-        fetch(`/api/update-user`, {
+    this.setState({ ...INITIAL_STATE });
+    const formData = new FormData();
+    formData.append("user_id", authUser.user.email);
+    fetch(`/api/update-user`, {
           method: "POST",
           headers: {
               Accept: "application/json"
@@ -71,26 +69,20 @@ class SignInFormBase extends React.Component<Props, State> {
           body: formData
       })
       .then((response) => response.json());
-        this.props.history.push(ROUTES.HOME);
-      })
-      .catch((error: any) => {
-        this.setState({ error });
-      });
-
-    event.preventDefault();
+    this.props.history.push(ROUTES.HOME);
   }
 
-  onChange = (event: any) => {
+onChange = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });
   }
 
-  render() {
-    const { email, password, error } = this.state;
+render() {
+    const { email, password } = this.state;
 
     const isInvalid = password === "" || email === "";
 
     return (
-      <form onSubmit={this.onSubmit}>
+      <form className="SignInForm" onSubmit={this.onSubmit}>
         <input
           name="email"
           value={email}
@@ -110,8 +102,6 @@ class SignInFormBase extends React.Component<Props, State> {
         <button disabled={isInvalid} type="submit" className="signin_Submit globalbtn">
           Sign In
         </button>
-
-        {error && <p>{error.message}</p>}
       </form>
     );
   }
@@ -124,4 +114,4 @@ const SignInForm = compose(
 
 export default SignInPage;
 
-export { SignInForm };
+export { SignInForm, SignInFormBase };

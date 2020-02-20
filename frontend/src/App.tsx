@@ -16,7 +16,6 @@ import passwordForget from "./Authentication/password_forget";
 import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
-import adminPage from "./Authentication/admin";
 import ManageUsers from "./Admin/ManageUsers";
 import { withAuthentication } from "./Session";
 import { createBrowserHistory } from "history";
@@ -74,7 +73,6 @@ const App = () => (
     <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
     <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
     <Route exact={true} path={ROUTES.HISTORY} component={History} />
-    <Route exact={true} path={ROUTES.ADMIN} component={adminPage} />
     <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
     <Route path="/home" component={Home} />
     <Route path="/manage-users" component={ManageUsers} />
