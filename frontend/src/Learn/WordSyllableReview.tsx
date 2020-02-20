@@ -6,7 +6,7 @@ import Recorder from "recorder-js";
 import AudioAnalysis from "../Create/AudioAnalysis";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import "../PitchArtWizard/GlobalStyling.css";
-import PitchArtDrawingWindow, { PitchArtDrawingWindowProps } from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
+import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
 import {PitchRangeDTO, RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Speaker} from "../types/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
@@ -24,7 +24,7 @@ interface MatchParams {
     numSyllables: string;
 }
 
-interface Props extends RouteComponentProps<MatchParams> {
+export interface Props extends RouteComponentProps<MatchParams> {
     firebase: any;
 }
 
@@ -63,7 +63,7 @@ function spinner() {
     );
 }
 
-class WordSyllableReview extends React.Component<Props, State> {
+export class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
         return 653;
     }
@@ -132,7 +132,7 @@ class WordSyllableReview extends React.Component<Props, State> {
           });
     }
 
-    deleteRecordings = async (itemRef: any, url: string) => {
+    deleteRecordings = async (itemRef: any) => {
         const isOk: boolean = confirm(
             "Are you sure you want to delete the recording?"
         );
@@ -166,7 +166,7 @@ class WordSyllableReview extends React.Component<Props, State> {
                         </div>
                         <div className="metilda-previous-recordings-image-col-3">
                         <button className="btn-floating btn-small waves-effect waves-light globalbtn"
-                        onClick={() => this.deleteRecordings(recording.itemRef, recording.recordingUrl)}>
+                        onClick={() => this.deleteRecordings(recording.itemRef)}>
                             <i className="material-icons right">delete</i>
                         </button>
                         </div>
