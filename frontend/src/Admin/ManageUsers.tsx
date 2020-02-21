@@ -71,7 +71,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
       },
         });
       const body = await response.json();
-      await Promise.all(body.result.map(async (user: any) => {
+      body.result.forEach(async (user: any) => {
         const userRoleResponse = await fetch(`api/get-user-roles/${user[0]}`, {
       method: "GET",
       headers: {
@@ -102,7 +102,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
         this.setState({
                users: [...this.state.users, newUser]
              });
-      }));
+      });
       this.setState({
               isLoading: false
           });
