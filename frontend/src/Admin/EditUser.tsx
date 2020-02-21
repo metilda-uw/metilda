@@ -170,6 +170,10 @@ export class EditUser extends React.Component<EditUserProps, State> {
   this.setState({ [event.target.name]: event.target.value });
 }
 
+  backButtonClicked = () => {
+  this.props.editUserBackButtonClicked();
+}
+
   handleRoleChange = (option: any) => {
   this.setState({
     role: option
@@ -224,7 +228,7 @@ export class EditUser extends React.Component<EditUserProps, State> {
     <div className={className}>
     <div className="CreateUserContainer">
     <button className="BackButton waves-effect waves-light btn globalbtn"
-    onClick={this.props.editUserBackButtonClicked()}>
+    onClick={this.backButtonClicked}>
           <i className="material-icons right">arrow_back</i>
           Back
     </button>
