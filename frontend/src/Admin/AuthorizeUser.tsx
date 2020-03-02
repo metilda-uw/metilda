@@ -5,6 +5,7 @@ import "./ManageUsers.scss";
 import Select from "react-select";
 import "./AuthorizeUser.scss";
 import ReactGA from "react-ga";
+import {NotificationManager} from "react-notifications";
 
 export interface AuthorizeUserProps {
   authorizeUserClicked: any;
@@ -56,12 +57,12 @@ export class AuthorizeUser extends React.Component<AuthorizeUserProps, State> {
         });
     const body = await response.json();
     if (body.result === 1) {
-    window.confirm("Authorized user successfully!");
+      NotificationManager.success("Authorized user successfully!");
     } else {
-      window.confirm("User email or role is incorrect. Please update the user before authorizing");
+      NotificationManager.error("User email or role is incorrect. Please update the user before authorizing");
     }
     } else {
-    window.confirm("Please select role");
+      NotificationManager.error("Please select role");
     }
     this.setState({ ...INITIAL_STATE });
 }

@@ -1,6 +1,8 @@
 import {Result} from "react-file-reader-input";
 import {Speaker} from "../types/types";
 import moment from "moment";
+import "react-notifications/lib/notifications.css";
+import {NotificationManager} from "react-notifications";
 
 export function importSpeakerFile(
     results: Result[],
@@ -49,12 +51,13 @@ export function uploadAudio(
                       body: formData
                   })
                   .then((response) => {
-                    window.confirm("Uploaded file successfully!");
+                    NotificationManager.success("Uploaded file successfully!");
                     resolve(response);
                     });
                    })
                    .catch((ex: any) => {
                     reject(ex);
+                    NotificationManager.error("Error: File not uploaded");
                    });
                  }
         });
@@ -92,11 +95,12 @@ export function uploadRecording(
               })
               .then((response) => {
                   response.json();
-                  window.confirm("Uploaded recording successfully!");
+                  NotificationManager.success("Uploaded recording successfully!");
                   resolve(response);
                 })
               .catch((ex: any) => {
                     reject(ex);
+                    NotificationManager.error("Error: Recording not uploaded");
                    });
                });
         });
@@ -123,11 +127,12 @@ export function deleteRecording(
               })
               .then((response) => {
                   response.json();
-                  window.confirm("Deleted recording successfully!");
+                  NotificationManager.success("Deleted recording successfully!");
                   resolve(response);
                 })
               .catch((ex: any) => {
-                    reject(ex);
+                reject(ex);
+                NotificationManager.error("Error: Recording not deleted");
                    });
                });
         });
@@ -184,11 +189,12 @@ export function uploadAnalysis(
             .then((response) => response.json())
             .then((data) => {
                  resolve(data.result);
-                 window.confirm("Uploaded analysis successfully!");
+                 NotificationManager.success("Uploaded analysis successfully!");
               });
         })
         .catch((ex: any) => {
             reject(ex);
+            NotificationManager.error("Error: Analysis not uploaded");
            });
     });
         return promise;
@@ -220,11 +226,12 @@ export function updateAnalysis(
             .then((response) => response.json())
             .then((data) => {
                  resolve(data.result);
-                 window.confirm("Updated analysis successfully!");
+                 NotificationManager.success("Updated analysis successfully!");
               });
         })
         .catch((ex: any) => {
             reject(ex);
+            NotificationManager.error("Error: Analysis not updated");
            });
     });
         return promise;
@@ -255,11 +262,12 @@ export function uploadImage(
             .then((response) => response.json())
             .then((data) => {
                  resolve(data.result);
-                 window.confirm("Uploaded image successfully!");
+                 NotificationManager.success("Uploaded image successfully!");
               });
         })
         .catch((ex: any) => {
             reject(ex);
+            NotificationManager.error("Error: Image not uploaded");
            });
     });
         return promise;

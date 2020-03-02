@@ -6,6 +6,7 @@ import "./ManageUsers.scss";
 import Select from "react-select";
 import "./CreateUser.scss";
 import ReactGA from "react-ga";
+import {NotificationManager} from "react-notifications";
 
 export interface CreateUserProps {
   addUserClicked: any;
@@ -98,9 +99,9 @@ export class CreateUser extends React.Component<CreateUserProps, State> {
         return userRole.value;
       }));
     }
-      window.confirm("Added user successfully!");
+      NotificationManager.success("Added user successfully!");
     } else {
-      window.confirm(body.result);
+      NotificationManager.error(body.result);
     }
     this.setState({ ...INITIAL_STATE });
 }

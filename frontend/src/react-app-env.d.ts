@@ -4,6 +4,7 @@ declare module "recorder-js";
 declare module "react-pie-menu";
 declare module "react-file-reader";
 declare module "react-https-redirect";
+declare module "react-notifications";
 declare module "*.jpg" {
   const content: any;
   export default content;

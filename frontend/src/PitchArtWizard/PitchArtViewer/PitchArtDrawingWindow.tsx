@@ -18,6 +18,15 @@ import {AppState} from "../../store/index";
 import {AudioAction} from "../../store/audio/types";
 import {setLatestAnalysisId} from "../../store/audio/actions";
 import ReactGA from "react-ga";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import {NotificationManager} from "react-notifications";
 
 export interface PitchArtDrawingWindowProps {
     speakers: Speaker[];
@@ -48,6 +57,10 @@ export interface PitchArtDrawingWindowProps {
 
 interface State {
     activePlayIndex: number;
+    showNewImageModal: boolean;
+    currentImageName: string;
+    allAnalysisIds: any[];
+    [key: string]: any;
 }
 
 export interface ColorScheme {
@@ -57,6 +70,39 @@ export interface ColorScheme {
     activePlayColor: string;
     manualDotFillColor: string;
 }
+
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+  });
+
+export interface DialogTitleProps extends WithStyles<typeof styles> {
+    id: string;
+    children: React.ReactNode;
+    onClose: () => void;
+  }
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </MuiDialogTitle>
+    );
+  });
 
 /**
  * NOTE: There are a number of places throughout this component that
@@ -85,7 +131,10 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
     constructor(props: PitchArtDrawingWindowProps) {
         super(props);
         this.state = {
-            activePlayIndex: -1
+            activePlayIndex: -1,
+            showNewImageModal: false,
+            allAnalysisIds: [],
+            currentImageName: ""
         };
         this.saveImage = this.saveImage.bind(this);
         this.playPitchArt = this.playPitchArt.bind(this);
@@ -119,14 +168,62 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.downloadRef.current!.click();
     }
 
-    saveImage = async () => {
-        // follows example from:
+    handleCloseImageModal = () => {
+        this.setState({
+            currentImageName: "",
+            showNewImageModal: false
+        });
+      }
+    onChange = (event: any) => {
+        this.setState({ [event.target.name]: event.target.value });
+      }
+
+    saveNewImageModal = () => {
+        return(
+            <Dialog fullWidth={true} maxWidth="xs" open={this.state.showNewImageModal}
+            onClose={this.handleCloseImageModal}aria-labelledby="form-dialog-title">
+                <DialogTitle onClose={this.handleCloseImageModal} id="form-dialog-title">
+                    Enter image name</DialogTitle>
+                <DialogContent>
+                <input className="imageName" name="currentImageName" value={this.state.currentImageName}
+                onChange={this.onChange} type="text" placeholder="Ex: Image1.png" required/>
+                </DialogContent>
+                <DialogActions>
+                    <button className="SaveImage waves-effect waves-light btn globalbtn"
+                    onClick={this.uploadImage}>
+                        <i className="material-icons right">cloud_upload</i>
+                        Save
+                    </button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    uploadImage = async () => {
+         // follows example from:
         // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
         // @ts-ignore (TypeScript doesn't like the toDataURL call below, but it works fine)
         const dataURL = this.stageRef.current!.getStage().toDataURL();
-        // this.downloadRef.current!.href = dataURL;
-        // const imageTimeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
-        // this.downloadRef.current!.download = `${this.props.fileName}_${imageTimeStamp}.png`;
+        this.setState( {
+            showNewImageModal: false
+        });
+        if (this.state.currentImageName !== "") {
+            const updatedImageName = this.state.currentImageName.trim();
+            const imageId = await uploadImage(`${updatedImageName}`, dataURL, this.props.firebase);
+            if (typeof(imageId) === "number") {
+                for (const id of this.state.allAnalysisIds) {
+                const imageAnalysisId = await uploadImageAnalysisIds(imageId, id);
+            }
+            }
+        } else {
+            NotificationManager.error("Image not uploaded. Image name is missing");
+        }
+        this.setState({
+            currentImageName: ""
+        });
+    }
+
+    saveImage = async () => {
         ReactGA.event({
             category: "Save Image",
             action: "User pressed Save Image button"
@@ -134,76 +231,23 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         const speakerIndicesForUnsavedAnalysis: number[] = [];
         const allAnalysisIds: number[] = [];
         this.props.speakers.forEach((item, index) => {
-            if (item.latestAnalysisId == null || JSON.stringify(item.letters) !==
-            JSON.stringify(item.lastUploadedLetters)) {
+            if (item.letters.length > 0 && JSON.stringify(item.letters) !== JSON.stringify(item.lastUploadedLetters)) {
                 speakerIndicesForUnsavedAnalysis.push(index);
-            } else {
+            } else if (item.letters.length > 0 && JSON.stringify(item.letters) ===
+            JSON.stringify(item.lastUploadedLetters)) {
+                if (item.latestAnalysisId !== null && item.latestAnalysisId !== undefined) {
                 allAnalysisIds.push(item.latestAnalysisId);
+                }
             }
         });
         if (speakerIndicesForUnsavedAnalysis.length !== 0) {
-                for (const index of speakerIndicesForUnsavedAnalysis) {
-                    const speaker = this.props.speakers[index];
-                    const metildaWord = {
-                    uploadId: speaker.uploadId,
-                    letters: speaker.letters
-                    } as Speaker;
-                    let isValidAnalysisInput = false;
-                    let updatedAnalysisName = "";
-                    let analysisName;
-                    while (!isValidAnalysisInput) {
-                        analysisName = prompt("Analysis should be saved before saving the image. Enter analysis name", "Ex: Analysis1.json");
-                        if (analysisName == null) {
-                            // user canceled input
-                             break;
-                        }
-                        updatedAnalysisName = analysisName.trim();
-                        if (updatedAnalysisName.length === 0) {
-                            alert("Analysis name should contain at least one character");
-                        } else {
-                            isValidAnalysisInput = true;
-                        }
-                    }
-                    if (isValidAnalysisInput && analysisName !== null && analysisName !== undefined) {
-                        const analysisId = await uploadAnalysis(metildaWord, speaker.fileIndex,
-                            analysisName, this.props.firebase);
-                        if (typeof(analysisId) === "number") {
-                           this.props.setLatestAnalysisId(index, analysisId, analysisName, speaker.letters);
-                           allAnalysisIds.push(analysisId);
-                       }
-                    } else {
-                        alert("Analysis not uploaded. Analysis name is missing");
-                        }
-
-            }
-        }
-        let isValidImageInput = false;
-        let updatedImageName = "";
-        let imageName;
-        while (!isValidImageInput) {
-            imageName = prompt(" Enter image name", "Ex: Image1.png");
-            if (imageName == null) {
-                // user canceled input
-                break;
-            }
-            updatedImageName = imageName.trim();
-            if (updatedImageName.length === 0) {
-                alert("Image name should contain at least one character");
+            NotificationManager.error("Please save all the analyses before saving the image.");
             } else {
-                isValidImageInput = true;
-            }
+                this.setState({
+                    showNewImageModal: true,
+                    allAnalysisIds
+                });
         }
-        if (isValidImageInput && imageName !== null && imageName !== undefined) {
-        const imageId = await uploadImage(`${imageName}`, dataURL, this.props.firebase);
-        if (typeof(imageId) === "number") {
-        for (const id of allAnalysisIds) {
-                const imageAnalysisId = await uploadImageAnalysisIds(imageId, id);
-            }
-        }
-        // this.downloadRef.current!.click();
-        } else {
-            alert("Image not uploaded. Image name is missing");
-            }
     }
 
 playPitchArt() {
@@ -427,6 +471,7 @@ render() {
 
         return (
             <div className="PitchArtDrawingWindow">
+            {this.saveNewImageModal()}
                 <Stage className="PitchArtDrawingWindow-pitchart"
                        ref={this.stageRef}
                        width={this.props.width}

@@ -135,6 +135,7 @@ class SignUpFormBase extends React.Component<Props, State> {
     }
 
   render() {
+    const passwordLength = 10;
     const {
       username,
       email,
@@ -203,6 +204,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           type="password"
           placeholder="Password *"
           required
+          minLength={passwordLength}
         />
         <input
           className="passwordTwo"

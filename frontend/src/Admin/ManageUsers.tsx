@@ -7,6 +7,15 @@ import {deleteUser} from "../Create/ImportUtils";
 import CreateUser from "./CreateUser";
 import EditUser from "./EditUser";
 import AuthorizeUser from "./AuthorizeUser";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import {NotificationManager} from "react-notifications";
 
 export interface ManageUsersProps {
   firebase: any;
@@ -18,6 +27,8 @@ interface State {
   isCreateUserClicked: boolean;
   isEditUserClicked: boolean;
   isauthorizeUserClicked: boolean;
+  deleteUserModal: boolean;
+  deletedUserId: any;
   editedUser: any;
 }
 
@@ -39,6 +50,39 @@ interface EditedUserEntity {
   languageOfResearch: any[];
 }
 
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+  });
+
+export interface DialogTitleProps extends WithStyles<typeof styles> {
+    id: string;
+    children: React.ReactNode;
+    onClose: () => void;
+  }
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </MuiDialogTitle>
+    );
+  });
+
 export class ManageUsers extends React.Component<ManageUsersProps, State> {
 
   constructor(props: ManageUsersProps) {
@@ -50,6 +94,8 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
           isCreateUserClicked: false,
           isEditUserClicked: false,
           isauthorizeUserClicked: false,
+          deleteUserModal: false,
+          deletedUserId: "",
           editedUser: null
       };
   }
@@ -108,20 +154,50 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
           });
  }
 
- deleteUser = async (userId: string) => {
-   const isOk: boolean = confirm(
-    "Are you sure you want to delete the user?"
-  );
-   if (isOk) {
+ handleCloseDeleteUserModal = () => {
+  this.setState({
+    deleteUserModal: false,
+  });
+}
 
-     const responseFromCloud =  deleteUser(userId, this.props.firebase);
-     const updatedUsers = this.state.users.filter((user) =>
-     user.id !== userId);
-     this.setState({
-        users: updatedUsers
-      });
-    }
- }
+handleOkDeleteUserModal = async () => {
+  const responseFromCloud =  deleteUser(this.state.deletedUserId, this.props.firebase);
+  const updatedUsers = this.state.users.filter((user) =>
+     user.id !== this.state.deletedUserId);
+  this.setState({
+      users: updatedUsers,
+      deleteUserModal: false
+  });
+  NotificationManager.success("Deleted user successfully");
+}
+
+ deleteUserModal = () => {
+  return(
+      <Dialog fullWidth={true} maxWidth="sm" open={this.state.deleteUserModal}
+      onClose={this.handleCloseDeleteUserModal}
+      aria-labelledby="form-dialog-title">
+           <DialogTitle id="alert-dialog-title" onClose={this.handleCloseDeleteUserModal}>
+           Are you sure you want to delete the user?
+           </DialogTitle>
+          <DialogActions>
+          <button className="DeleteUser_Yes waves-effect waves-light btn globalbtn"
+              onClick={this.handleOkDeleteUserModal}>
+                  Yes
+          </button>
+          <button className="DeleteUser_No waves-effect waves-light btn globalbtn"
+              onClick={this.handleCloseDeleteUserModal}>
+                  No
+          </button>
+          </DialogActions>
+      </Dialog>
+  );
+}
+handleClickDeleteUser = (userId: any) => {
+  this.setState({
+      deleteUserModal: true,
+      deletedUserId: userId
+  });
+}
 
   renderTableHeader() {
   if (this.state.users.length > 0) {
@@ -151,7 +227,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
                             <i className="material-icons right">edit</i>
               </button>
               <button className="DeleteUser btn-floating btn-small waves-effect waves-light globalbtn"
-                        onClick={() => this.deleteUser(user.id)}>
+                        onClick={() => this.handleClickDeleteUser(user.id)}>
                             <i className="material-icons right">delete</i>
               </button>
             </td>
@@ -228,6 +304,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
     return (
             <div className="userContainer">
                <Header/>
+               {this.deleteUserModal()}
                {isLoading && spinner()}
                <h1 id="usersTitle">MeTILDA Users </h1>
               <table id="allUsers">

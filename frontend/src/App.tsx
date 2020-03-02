@@ -20,6 +20,7 @@ import ManageUsers from "./Admin/ManageUsers";
 import { withAuthentication } from "./Session";
 import { createBrowserHistory } from "history";
 import ReactGA from "react-ga";
+import {NotificationContainer} from "react-notifications";
 
 interface Props {
   firebase: any;
@@ -66,6 +67,7 @@ renderingPerformanceObserver.observe({entryTypes: ["mark", "measure"] });
 const App = () => (
 <Router history={history}>
   <div className="App">
+    <NotificationContainer/>
     <Route exact={true} path={ROUTES.LANDING} component={Landing} />
     <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
     <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />

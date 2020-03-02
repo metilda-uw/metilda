@@ -52,13 +52,6 @@ describe("EditUser", () => {
       expect(role.options).to.deep.equal(roleOptions);
   });
 
-  it("triggers click when back button is clicked", () => {
-      const editUserBackButtonClicked = sinon.stub();
-      const subject = shallowRender({ editUserBackButtonClicked});
-      subject.simulate("click");
-      sinon.assert.calledOnce(editUserBackButtonClicked);
-    });
-
   it("renders spinner when page is loading", () => {
       const initialState = {
         username: "",
