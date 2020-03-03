@@ -19,6 +19,7 @@ import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
+import {NotificationManager} from "react-notifications";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;
@@ -433,7 +434,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             isValidNumber = !isNaN(manualPitch);
 
             if (!isValidNumber) {
-                alert(`Invalid frequency, expected a number`);
+                NotificationManager.error("Invalid frequency, expected a number");
                 continue;
             }
 
@@ -442,7 +443,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 const errorMsg
                     = `${manualPitch}Hz is not between between ${this.state.minPitch.toFixed(2)}Hz `
                     + `and ${this.state.maxPitch.toFixed(2)}Hz`;
-                alert(errorMsg);
+                NotificationManager.error(errorMsg);
             }
         }
 

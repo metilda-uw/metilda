@@ -12,6 +12,15 @@ import FileReaderInput, {Result} from "react-file-reader-input";
 import {uploadAnalysis, updateAnalysis, importSpeakerFile} from "./ImportUtils";
 import {SyntheticEvent} from "react";
 import ReactGA from "react-ga";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import {NotificationManager} from "react-notifications";
 
 export interface TargetPitchBarProps {
     letters: any;
@@ -35,6 +44,10 @@ export interface TargetPitchBarProps {
 
 interface State {
     selectedIndex: number;
+    showNewAnalysisModal: boolean;
+    showExistingAnalysisModal: boolean;
+    currentAnalysisName: string;
+    [key: string]: any;
 }
 
 interface PitchBarLetter extends Letter {
@@ -42,12 +55,47 @@ interface PitchBarLetter extends Letter {
     leftX: number;
     rightX: number;
 }
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+  });
+
+export interface DialogTitleProps extends WithStyles<typeof styles> {
+    id: string;
+    children: React.ReactNode;
+    onClose: () => void;
+  }
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </MuiDialogTitle>
+    );
+  });
 
 export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     constructor(props: TargetPitchBarProps) {
         super(props);
         this.state = {
-            selectedIndex: -1
+            selectedIndex: -1,
+            showNewAnalysisModal: false,
+            showExistingAnalysisModal: false,
+            currentAnalysisName: ""
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -139,7 +187,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
 
             syllable = response.trim();
             if (syllable.length === 0) {
-                alert("Syllable should contain at least one character");
+                NotificationManager.error("Syllable should contain at least one character");
             } else {
                 isValidInput = true;
             }
@@ -171,15 +219,14 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             uploadId: speaker.uploadId,
             letters: speaker.letters
         } as Speaker;
-        const isValidInput = false;
         let matchingFile = [];
         if (speaker.fileIndex === undefined) {
              matchingFile = this.props.files.filter((currentRow: any[]) => currentRow[1] === speaker.uploadId);
             // Check if the upload id from the analysis file loaded using 'Open' option
             // matches any of the existing files
              if (matchingFile.length === 0) {
-                    alert(`Please select file before saving analysis`);
-                    return;
+                NotificationManager.error("Please select file before saving analysis");
+                return;
                 } else {
                     this.props.setUploadId(this.props.speakerIndex, speaker.uploadId, matchingFile[0][0]);
                 }
@@ -187,23 +234,16 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         if (speaker.latestAnalysisId !== null && speaker.latestAnalysisId !== undefined &&
             speaker.latestAnalysisName != null ) {
                 if (JSON.stringify(speaker.letters) === JSON.stringify(speaker.lastUploadedLetters)) {
-                    alert(`Analysis already saved`);
+                    NotificationManager.info("Analysis already saved");
                 } else {
-                    const confirmMsg = `Do you want to save this to the existing analysis "${speaker.latestAnalysisName}"?`;
-                    const isOk: boolean = confirm(confirmMsg);
-                    if (isOk) {
-                        this.deletePreviousAnalysis(speaker.latestAnalysisId);
-                        const data = await updateAnalysis(metildaWord, speaker.latestAnalysisName,
-                            speaker.latestAnalysisId, this.props.firebase);
-                        const response = this.deletePreviousImages(speaker.latestAnalysisId, this.props.firebase);
-                        this.props.setLatestAnalysisId(this.props.speakerIndex, speaker.latestAnalysisId,
-                            speaker.latestAnalysisName, speaker.letters);
-                    } else {
-                       this.uploadAnalysis(isValidInput, metildaWord, speaker, matchingFile);
-                    }
+                    this.setState({
+                        showExistingAnalysisModal: true
+                    });
                 }
         } else {
-            this.uploadAnalysis(isValidInput, metildaWord, speaker, matchingFile);
+            this.setState( {
+                showNewAnalysisModal: true
+            });
         }
     }
 
@@ -252,30 +292,114 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         });
     }
 
-    uploadAnalysis = async (isValidInput: boolean, metildaWord: Speaker, speaker: Speaker, matchingFile: any[]) => {
-        let fileName;
-        let updatedFileName;
-        while (!isValidInput) {
-            fileName = prompt("Enter new analysis name", "Ex: Analysis1.json");
-            if (fileName == null) {
-               // user canceled input
-                break;
-           }
-            updatedFileName = fileName.trim();
-            if (updatedFileName.length === 0) {
-               alert("Analyis name should contain at least one character");
-           } else {
-               isValidInput = true;
-           }
-       }
-        if (isValidInput && fileName !== null && fileName !== undefined) {
+    handleCloseNewAnalysis = () => {
+        this.setState({
+            currentAnalysisName: "",
+            showNewAnalysisModal: false
+        });
+      }
+   onChange = (event: any) => {
+        this.setState({ [event.target.name]: event.target.value });
+      }
+
+    saveNewAnalysisModal = () => {
+        return(
+            <Dialog fullWidth={true} maxWidth="xs" open={this.state.showNewAnalysisModal}
+            onClose={this.handleCloseNewAnalysis}aria-labelledby="form-dialog-title">
+                <DialogTitle onClose={this.handleCloseNewAnalysis} id="form-dialog-title">
+                Enter analysis name</DialogTitle>
+                <DialogContent>
+                <input className="analysisName" name="currentAnalysisName" value={this.state.currentAnalysisName}
+                onChange={this.onChange} type="text" placeholder="Ex: Analysis1.json" required/>
+                </DialogContent>
+                <DialogActions>
+                    <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
+                    onClick={this.uploadAnalysis}>
+                        <i className="material-icons right">cloud_upload</i>
+                        Save
+                    </button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    handleCloseExistingAnalysis = () => {
+        this.setState({
+            showExistingAnalysisModal: false
+        });
+      }
+
+    handleNoExistingAnalysis = () => {
+        this.setState({
+            showNewAnalysisModal: true,
+            showExistingAnalysisModal: false
+        });
+      }
+    handleOkExistingAnalysis = async () => {
+        const speaker = this.props.speakers[this.props.speakerIndex];
+        const metildaWord = {
+            uploadId: speaker.uploadId,
+            letters: speaker.letters
+        } as Speaker;
+        if (speaker.latestAnalysisId !== null && speaker.latestAnalysisId !== undefined &&
+            speaker.latestAnalysisName != null ) {
+                this.deletePreviousAnalysis(speaker.latestAnalysisId);
+                const data = await updateAnalysis(metildaWord, speaker.latestAnalysisName,
+                                    speaker.latestAnalysisId, this.props.firebase);
+                const response = this.deletePreviousImages(speaker.latestAnalysisId, this.props.firebase);
+                this.props.setLatestAnalysisId(this.props.speakerIndex, speaker.latestAnalysisId,
+                                    speaker.latestAnalysisName, speaker.letters);
+            }
+        this.setState({
+            showExistingAnalysisModal: false
+        });
+    }
+
+    saveExisitingAnalysisModal = () => {
+        const speaker = this.props.speakers[this.props.speakerIndex];
+        return(
+            <Dialog fullWidth={true} maxWidth="sm" open={this.state.showExistingAnalysisModal}
+            onClose={this.handleCloseExistingAnalysis}
+            aria-labelledby="form-dialog-title">
+                 <DialogTitle id="alert-dialog-title" onClose={this.handleCloseExistingAnalysis}>
+                 Do you want to save this to the existing analysis {speaker.latestAnalysisName}
+                 </DialogTitle>
+                <DialogActions>
+                <button className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={this.handleOkExistingAnalysis}>
+                        Yes
+                </button>
+                <button className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={this.handleNoExistingAnalysis}>
+                        No
+                </button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    uploadAnalysis = async () => {
+        this.setState( {
+            showNewAnalysisModal: false
+        });
+        const speaker = this.props.speakers[this.props.speakerIndex];
+        const metildaWord = {
+            uploadId: speaker.uploadId,
+            letters: speaker.letters
+        } as Speaker;
+        const matchingFile = this.props.files.filter((currentRow: any[]) => currentRow[1] === speaker.uploadId);
+        if (this.state.currentAnalysisName !== "") {
+            const updatedAnalysisName = this.state.currentAnalysisName.trim();
             const fileIndex = speaker.fileIndex !== undefined ? speaker.fileIndex : matchingFile[0][0];
-            const data = await uploadAnalysis(metildaWord, fileIndex, fileName, this.props.firebase);
+            const data = await uploadAnalysis(metildaWord, fileIndex, updatedAnalysisName, this.props.firebase);
             this.props.setLatestAnalysisId(this.props.speakerIndex, data,
-           fileName, speaker.letters);
-       } else {
-       alert("Analysis not uploaded. Analysis name is missing");
-       }
+                updatedAnalysisName, speaker.letters);
+               } else {
+            NotificationManager.error("Analysis not uploaded. Analysis name is missing");
+        }
+        this.setState( {
+            currentAnalysisName: ""
+        });
     }
     fileSelected = (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
         importSpeakerFile(results, this.props.speakerIndex, this.props.setSpeaker);
@@ -284,7 +408,6 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
             return;
         }
-
         const isOk: boolean = confirm(
             "The current speaker will be reset.\n\n" +
             "Do you want to continue?"
@@ -302,6 +425,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         const speaker = this.props.speakers[this.props.speakerIndex];
         return (
             <div className="TargetPitchBar">
+            {this.saveNewAnalysisModal()}
+            {this.saveExisitingAnalysisModal()}
                 <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
                         <span>Target Pitch</span>

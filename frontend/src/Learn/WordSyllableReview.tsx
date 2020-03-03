@@ -17,6 +17,16 @@ import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 import {uploadRecording, deleteRecording} from "../Create/ImportUtils";
 import {controls, Media, Player} from "react-media-player";
+import {spinner} from "../Utils/LoadingSpinner";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import {NotificationManager} from "react-notifications";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -41,27 +51,47 @@ interface State {
     isLoadingPitchResults: boolean;
     showPrevPitchValueLists: boolean;
     previousRecordings: RecordingEntity[];
+    showRecordingModal: boolean;
+    showRecordingConfirmationModal: boolean;
+    deleteRecordingModal: boolean;
+    deleteRecordingItemRef: any;
+    currentRecordingName: string;
+    recordingResult: any;
+    [key: string]: any;
 }
 
-function spinner() {
+const styles = (theme: Theme) =>
+  createStyles({
+    root: {
+      margin: 0,
+      padding: theme.spacing(2),
+    },
+    closeButton: {
+      position: "absolute",
+      right: theme.spacing(1),
+      top: theme.spacing(1),
+      color: theme.palette.grey[500],
+    },
+  });
+
+export interface DialogTitleProps extends WithStyles<typeof styles> {
+    id: string;
+    children: React.ReactNode;
+    onClose: () => void;
+  }
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+    const { children, classes, onClose, ...other } = props;
     return (
-        <div className="metilda-pitch-art-image-loading">
-            <div className="preloader-wrapper big active">
-                <div className="spinner-layer spinner-blue-only">
-                    <div className="circle-clipper center">
-                        <div className="circle"></div>
-                    </div>
-                    <div className="gap-patch">
-                        <div className="circle"></div>
-                    </div>
-                    <div className="circle-clipper right">
-                        <div className="circle"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
+      <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+          <IconButton aria-label="close" className={classes.closeButton} onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        ) : null}
+      </MuiDialogTitle>
     );
-}
+  });
 
 export class WordSyllableReview extends React.Component<Props, State> {
     static get AUDIO_IMG_WIDTH(): number {
@@ -100,7 +130,13 @@ export class WordSyllableReview extends React.Component<Props, State> {
             isRecording: false,
             isLoadingPitchResults: false,
             showPrevPitchValueLists: false,
-            previousRecordings: []
+            previousRecordings: [],
+            showRecordingModal: false,
+            showRecordingConfirmationModal: false,
+            deleteRecordingModal: false,
+            deleteRecordingItemRef: "",
+            recordingResult: "",
+            currentRecordingName: ""
         };
     }
 
@@ -132,19 +168,49 @@ export class WordSyllableReview extends React.Component<Props, State> {
           });
     }
 
-    deleteRecordings = async (itemRef: any) => {
-        const isOk: boolean = confirm(
-            "Are you sure you want to delete the recording?"
-        );
-        if (isOk) {
-            const responseFromCloud = await deleteRecording(itemRef, this.props.firebase);
-            const updatedRecordings = this.state.previousRecordings.filter((recording) =>
-             recording.itemRef !== itemRef);
-            this.setState({
-            previousRecordings: updatedRecordings
+    handleCloseDeleteRecordingModal = () => {
+        this.setState({
+            deleteRecordingModal: false,
         });
-        }
+    }
 
+    handleOkDeleteRecordingModal = async () => {
+        const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
+        const updatedRecordings = this.state.previousRecordings.filter((recording) =>
+             recording.itemRef !== this.state.deleteRecordingItemRef);
+        this.setState({
+            previousRecordings: updatedRecordings,
+            deleteRecordingModal: false
+        });
+    }
+
+    deleteRecordingModal = () => {
+        return(
+            <Dialog fullWidth={true} maxWidth="sm" open={this.state.deleteRecordingModal}
+            onClose={this.handleCloseDeleteRecordingModal}
+            aria-labelledby="form-dialog-title">
+                 <DialogTitle id="alert-dialog-title" onClose={this.handleCloseDeleteRecordingModal}>
+                 Are you sure you want to delete the recording?
+                 </DialogTitle>
+                <DialogActions>
+                <button className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={this.handleOkDeleteRecordingModal}>
+                        Yes
+                </button>
+                <button className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={this.handleCloseDeleteRecordingModal}>
+                        No
+                </button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    handleClickDeleteRecordings = (itemRef: any) => {
+        this.setState({
+            deleteRecordingModal: true,
+            deleteRecordingItemRef: itemRef
+        });
     }
 
     renderPreviousRecordings = () => {
@@ -166,7 +232,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
                         </div>
                         <div className="metilda-previous-recordings-image-col-3">
                         <button className="btn-floating btn-small waves-effect waves-light globalbtn"
-                        onClick={() => this.deleteRecordings(recording.itemRef)}>
+                        onClick={() => this.handleClickDeleteRecordings(recording.itemRef)}>
                             <i className="material-icons right">delete</i>
                         </button>
                         </div>
@@ -178,6 +244,102 @@ export class WordSyllableReview extends React.Component<Props, State> {
 
     wordClicked = (index: number) => {
         this.setState({activeWordIndex: index});
+    }
+
+    handleCloseRecordingModal = () => {
+        this.setState({
+            currentRecordingName: "",
+            showRecordingModal: false
+        });
+      }
+    onChange = (event: any) => {
+        this.setState({ [event.target.name]: event.target.value });
+      }
+
+    saveRecordingModal = () => {
+        return(
+            <Dialog fullWidth={true} maxWidth="xs" open={this.state.showRecordingModal}
+            onClose={this.handleCloseRecordingModal}aria-labelledby="form-dialog-title">
+                <DialogTitle onClose={this.handleCloseRecordingModal} id="form-dialog-title">
+                    Enter recording name</DialogTitle>
+                <DialogContent>
+                <input className="recordingName" name="currentRecordingName" value={this.state.currentRecordingName}
+                onChange={this.onChange} type="text" placeholder="Ex: Recording1.wav" required/>
+                </DialogContent>
+                <DialogActions>
+                    <button className="SaveRecording waves-effect waves-light btn globalbtn"
+                    onClick={this.uploadRecording}>
+                        <i className="material-icons right">cloud_upload</i>
+                        Save
+                    </button>
+                </DialogActions>
+            </Dialog>
+        );
+    }
+
+    uploadRecording = async () => {
+       this.setState({
+            showRecordingModal: false
+       });
+       const numberOfSyllables = this.props.match.params.numSyllables;
+       const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+       const controller = this;
+       if (this.state.currentRecordingName !== "") {
+           const updatedRecordingName = this.state.currentRecordingName;
+           try {
+                controller.setState({
+                        isLoadingPitchResults: true
+                    });
+                const uploadResponse = await uploadRecording(this.state.recordingResult, updatedRecordingName,
+                    numberOfSyllables, recordingWordName, this.props.firebase);
+                this.getPreviousRecordings();
+                    } catch (ex) {
+                        console.log(ex);
+                    }
+           controller.setState({
+                        isLoadingPitchResults: false
+                    });
+                } else {
+                NotificationManager.error("Recording not uploaded. Recording name is missing");
+                }
+       this.setState({
+            currentRecordingName: ""
+        });
+   }
+
+   handleCloseRecordingConfirmationModal = () => {
+    this.setState({
+        showRecordingConfirmationModal: false
+    });
+  }
+
+    handleOkRecordingConfirmationModal = () => {
+        this.setState({
+            showRecordingModal: true,
+            showRecordingConfirmationModal: false
+        });
+    }
+
+    recordingConfirmationModal = () => {
+        return(
+        <Dialog fullWidth={true} maxWidth="sm" open={this.state.showRecordingConfirmationModal}
+        onClose={this.handleCloseRecordingConfirmationModal}
+        aria-labelledby="form-dialog-title">
+            <DialogTitle id="alert-dialog-title" onClose={this.handleCloseRecordingConfirmationModal}>
+                Do you want to save the recording to cloud?
+            </DialogTitle>
+            <DialogActions>
+            <button className="RecordingOption_Yes waves-effect waves-light btn globalbtn"
+                onClick={this.handleOkRecordingConfirmationModal}>
+                    Yes
+            </button>
+            <button className="RecordingOption_No waves-effect waves-light btn globalbtn"
+                onClick={this.handleCloseRecordingConfirmationModal}>
+                    No
+            </button>
+            </DialogActions>
+        </Dialog>
+        );
     }
 
     toggleRecord = async () => {
@@ -193,7 +355,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
         } else {
             const controller = this;
             const result = await this.recorder.stop();
-            controller.setState({isLoadingPitchResults: true});
             const formData = new FormData();
             formData.append("file", result.blob);
             const response = await  fetch(`/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`, {
@@ -212,46 +373,14 @@ export class WordSyllableReview extends React.Component<Props, State> {
             {
                     userPitchValueLists: controller.state.userPitchValueLists.concat([pitchValues]),
                     isRecording: false,
-                    isLoadingPitchResults: false
             });
             const url = URL.createObjectURL(result.blob);
             const audio = new Audio(url);
             const recording = await audio.play();
-            const isOk: boolean = confirm(
-                "Do you want to save the recording to cloud?"
-            );
-            if (isOk) {
-                let isValidInput = false;
-                let updatedFileName = "";
-                let fileName;
-                while (!isValidInput) {
-                     fileName = prompt("Enter recording name", "Ex: Recording1.wav");
-                     if (fileName == null) {
-                        // user canceled input
-                         break;
-                    }
-
-                     updatedFileName = fileName.trim();
-                     if (updatedFileName.length === 0) {
-                        alert("Recording name should contain at least one character");
-                    } else {
-                        isValidInput = true;
-                    }
-                }
-                const numberOfSyllables = this.props.match.params.numSyllables;
-                const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
-                if (isValidInput) {
-                    try {
-                        const uploadResponse = await uploadRecording(result, fileName, numberOfSyllables,
-                            recordingWordName, this.props.firebase);
-                        this.getPreviousRecordings();
-                    } catch (ex) {
-                        console.log(ex);
-                    }
-                } else {
-                alert("Recording not uploaded. Recording name is missing");
-                }
-            }
+            this.setState({
+                showRecordingConfirmationModal: true,
+                recordingResult: result
+            });
         }
     }
 
@@ -331,6 +460,9 @@ render() {
         ];
         return (
             <div>
+                {this.recordingConfirmationModal()}
+                {this.saveRecordingModal()}
+                {this.deleteRecordingModal()}
                 <Header/>
                 <div className="metilda-page-header">
                     <h5>
@@ -364,6 +496,7 @@ render() {
                                     showPrevPitchValueLists={this.state.showPrevPitchValueLists}/>
                             </div>
                         </div>
+                        {this.state.isLoadingPitchResults && spinner()}
                         <div className="col s8">
                             <div className="metilda-syllable-pitch-art">
                                 {
@@ -392,9 +525,7 @@ render() {
                                         rawPitchValueLists={this.state.userPitchValueLists}
                                         firebase={this.props.firebase}
                                     />
-
                                 }
-                                {this.state.isLoadingPitchResults && spinner()}
                                 <PlayerBar audioUrl={AudioAnalysis.formatAudioUrl(
                                     this.state.words[this.state.activeWordIndex].uploadId,
                                     this.minPitchArtTime(),

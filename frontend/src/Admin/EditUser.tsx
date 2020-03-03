@@ -5,6 +5,7 @@ import "./ManageUsers.scss";
 import Select from "react-select";
 import "./EditUser.scss";
 import ReactGA from "react-ga";
+import {NotificationManager} from "react-notifications";
 
 export interface EditUserProps {
   editUserClicked: any;
@@ -148,12 +149,12 @@ export class EditUser extends React.Component<EditUserProps, State> {
             });
           }
     }
-      window.confirm("Updated user successfully!");
+      NotificationManager.success("Updated user successfully!");
       this.setState({
         isLoading: false
       });
     } else {
-      window.confirm(body.result);
+      NotificationManager.error(body.result);
       this.setState({
         username: this.props.editedUser.username,
         email: this.props.editedUser.email,

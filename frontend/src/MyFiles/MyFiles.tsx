@@ -4,6 +4,7 @@ import "./MyFiles.scss";
 import Header from "../Layout/Header";
 import ImagesForMyFiles from "./ImagesForMyFiles";
 import {spinner} from "../Utils/LoadingSpinner";
+import {NotificationManager} from "react-notifications";
 
 export interface MyFilesProps {
   firebase: any;
@@ -189,6 +190,7 @@ deleteFiles = async () => {
             uncheckedFiles.push(file);
         }
     }
+    NotificationManager.success("Deleted files successfully");
     this.setState({
         files: uncheckedFiles
     });
