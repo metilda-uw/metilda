@@ -45,8 +45,8 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
   }
 
   async componentWillReceiveProps(nextProps: StudentRecordingsProps) {
-    const {studentName} = this.props;
-    if (nextProps.studentName !== studentName) {
+    const {studentUid} = this.props;
+    if (nextProps.studentUid !== studentUid) {
       this.setState({
         studentRecordings: [],
         isLoading: true,
