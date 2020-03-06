@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withFirebase } from "../Firebase";
 import ReactGA from "react-ga";
+import "./password_change.scss";
 
 interface Props {
   firebase: any;
@@ -71,7 +72,7 @@ class PasswordChangeForm extends Component<Props, State> {
           type="password"
           placeholder="Confirm New Password"
         />
-        <button disabled={isInvalid} type="submit" className="globalbtn">
+        <button disabled={isInvalid} type="submit" className="change_Password_Button globalbtn">
           Reset My Password
         </button>
 
