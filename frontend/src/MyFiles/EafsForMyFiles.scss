@@ -1,0 +1,72 @@
+#eafTitle {
+    text-align: center;
+    font-size:36px;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+}
+
+#eafFileTitle {
+    left: 50px;
+    font-size:24px;
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    color: black;
+}
+
+#noEafsMessage {
+    font-size: 36px;
+}
+  
+.EafsForMyFiles {
+    position: absolute;
+    bottom: 0;
+    left: 100%;
+    right: 0;
+    background-color:  #f2f2f2;
+    overflow: hidden;
+    width: 0;
+    height: 100%;
+    transition: .5s ease;
+    z-index:1;
+    top: 70px;
+    bottom: 0px;
+}
+  
+.transition {
+    width: 100%;
+    left: 0;
+    overflow:auto;
+    height:90vh
+}
+  
+.BackButton{
+    position:absolute;
+    top:40px;
+    left:40px
+}
+  
+.eafContainer {
+    display: flex;
+    padding-left: 40px;
+    flex-flow:row wrap;
+}
+
+@keyframes slideInFromLeft {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+#eafData {
+    border: 1px solid black;
+    margin-left: 50px;
+    margin-right: 50px;
+    font-size: 16px;
+    text-align: inherit;
+}
+
+.CloseFile {
+    position: absolute;
+    right: 50px;
+}

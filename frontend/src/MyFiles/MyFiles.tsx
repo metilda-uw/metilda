@@ -3,8 +3,10 @@ import { withAuthorization } from "../Session";
 import "./MyFiles.scss";
 import Header from "../Layout/Header";
 import ImagesForMyFiles from "./ImagesForMyFiles";
+import {AddFolder, MoveToFolder} from "../Create/ImportUtils"
 import {spinner} from "../Utils/LoadingSpinner";
 import {NotificationManager} from "react-notifications";
+import EafsForMyFiles from "./EafsForMyFiles";
 
 export interface MyFilesProps {
   firebase: any;
@@ -17,9 +19,12 @@ interface State {
   checkAll: boolean;
   isGetImagesClicked: boolean;
   isGetAnalysesClicked: boolean;
+  isGetEafsClicked: boolean;
+  isGetSubFolderClicked: boolean;
   fileIdSelectedForAnalyses: number;
   analysesForSelectedFile: any[];
   selectedFileName: string;
+  selectedFolderName: string;
   imagesForSelectedFile: any[];
   selectedFileId: number | null;
 }
@@ -31,6 +36,7 @@ interface FileEntity {
     createdAt: any;
     path: string;
     checked: boolean;
+    type: string;
 }
 
 export class MyFiles extends React.Component<MyFilesProps, State> {
@@ -46,13 +52,17 @@ private downloadRef = createRef<HTMLAnchorElement>();
           checkAll: false,
           isGetImagesClicked: false,
           isGetAnalysesClicked: false,
+          isGetEafsClicked: false,
+          isGetSubFolderClicked: false,
           fileIdSelectedForAnalyses: 0,
           analysesForSelectedFile: [],
           selectedFileName: "",
+          selectedFolderName: "Uploads",
           imagesForSelectedFile: [],
           selectedFileId: null,
       };
   }
+
   componentDidMount() {
       this.getUserFiles();
   }
@@ -64,8 +74,8 @@ private downloadRef = createRef<HTMLAnchorElement>();
       });
       // Get files of a user
       const currentUserId = this.props.firebase.auth.currentUser.email;
-      const response = await fetch(`api/get-files/${currentUserId}`
-      + "?file-type=Upload", {
+      const folderName = this.state.selectedFolderName;
+      const response = await fetch(`api/get-files-and-folders/${currentUserId}/${folderName}?file-type1=Folder&file-type2=Upload`, {
       method: "GET",
       headers: {
           "Accept": "application/json",
@@ -82,11 +92,12 @@ private downloadRef = createRef<HTMLAnchorElement>();
                     size: item[3],
                     createdAt: item[5],
                     path: item[2],
-                    checked: false
+                    checked: false,
+                    type: item[4],
                 }
             );
           });
-      this.setState({
+          this.setState({
               files: updatedFiles,
               isLoading: false
           });
@@ -129,8 +140,16 @@ handleGetImages = (fileId: number, fileName: string) => {
     });
 }
 
+handleGetEafs = (fileId: number, fileName: string) => {
+    this.setState({
+        isGetEafsClicked: true,
+        selectedFileName: fileName,
+        selectedFileId: fileId
+    });
+}
+
 renderTableHeader() {
-    const headerNames = ["File Name", "File Size", "Created At", "Images for file"];
+    const headerNames = ["File Name", "File Size", "Created At", "Images for file", "ELAN Annotation files"];
     const headers = [];
     headers.push(<th key="checkBoxHeader">
     {<label><input className="checkBoxForAllFiles" type="checkbox"
@@ -147,22 +166,110 @@ renderTableData() {
     return this.state.files.map((file, index) => {
         return (
         <tr key={index}>
+            {file.type === 'Upload' &&
            <td><label><input className="checkBoxForFile"type="checkbox"
            checked={file.checked} onChange={this.handleCheckboxChange}
            value={index}/><span/></label></td>
+            }
+            {file.type === 'Folder' &&
+           <td><i className="material-icons center">folder</i></td>
+            }
            <td>{file.name}</td>
-           <td>{(file.size / 1024).toFixed(2)} KB</td>
+           <td>
+                {file.type === "Upload" &&
+                   <p> {(file.size / 1024).toFixed(2)} KB</p>
+                }
+                {file.type === "Folder" &&
+                <p>-</p>
+                }
+            </td>
            <td>{file.createdAt}</td>
            <td>
+                {file.type === "Upload" &&
                 <button className="GetImages waves-effect waves-light btn globalbtn" title="Get images for the file"
                  onClick={() => (this.handleGetImages(file.id, file.name))}>
                     <i className="material-icons right">image</i>
                     Get Images
                 </button>
+                }
+                {file.type === "Folder" &&
+                <button className="OpenFolder waves-effect waves-light btn globalbtn" title="Open Folder"
+                onClick={() => (this.openFolder(file))}>
+                   <i className="material-icons right">folder_open</i>
+                   Open Folder
+                </button>
+                }
+            </td>
+            <td>
+                {file.type === "Upload" &&
+                <button className="GetImages waves-effect waves-light btn globalbtn" title="Move selected audio files to folder"
+                 onClick={() => (this.handleGetEafs(file.id, file.name))}>
+                     <i className="material-icons right">insert_drive_file</i>
+                    Get EAFs
+                </button>
+                }
+                {file.type === "Folder" &&
+                <button className="MoveToFolder waves-effect waves-light btn globalbtn" title="Get images for the file"
+                onClick={() => (this.handleMoveFiles(file))}>
+                   <i className="material-icons right">add_box</i>
+                   Move to Folder
+                </button>
+                }
             </td>
         </tr>
      );
   });
+}
+
+openFolder = async (file: FileEntity) => {
+    const newFolderName = file.name;
+    await this.setState({
+        selectedFolderName: newFolderName,
+        isGetSubFolderClicked: true,
+        selectedFileId: file.id,
+    });
+   await this.getUserFiles();
+}
+
+handleMoveFiles = async (folder: FileEntity) => {
+    const uncheckedFiles = [];
+    const newFolderName = folder.name;
+    try {
+    for (const file of this.state.files) {
+        if (file.checked) {
+            // Download file from cloud
+            const filePath = file.path;
+            const storageRef = this.props.firebase.uploadFile();
+            const url = await storageRef.child(filePath).getDownloadURL();
+            const response = await fetch(url);
+            const fileData = await response.blob();
+            // update file path
+            const newFilePath = filePath.replace("/Uploads/", "/Uploads/" + newFolderName + "/");
+            MoveToFolder(file.id, newFilePath, fileData, this.props.firebase);
+            await this.deleteFile(file);
+        } else {
+            uncheckedFiles.push(file);
+        }
+    }
+    await this.setState({
+        files: uncheckedFiles
+    });
+    } catch (ex) {
+        console.log(ex);
+    }
+}
+
+deleteFile = async (file: FileEntity) => {
+    try {
+        // Delete file from cloud
+        const filePath = file.path;
+        console.log(filePath);
+        const storageRef = this.props.firebase.uploadFile();
+        const fileRef = storageRef.child(filePath);
+        await fileRef.delete();
+    } catch (ex) {
+        console.log(ex);
+    }
 }
 
 deleteFiles = async () => {
@@ -231,45 +338,144 @@ analysesBackButtonClicked = () => {
     });
   }
 
+eafsBackButtonClicked = () => {
+    this.setState({
+        isGetEafsClicked: false
+    });
+}
+
+subFolderBackButtonClicked = async () => {
+    await this.setState({
+        isGetSubFolderClicked: false,
+        selectedFolderName: "Uploads",     
+    });
+    await this.getUserFiles();
+}
+
+addSubfolder = () => {
+    const folderName = prompt("Enter name of the subfolder: ", "untitled folder");
+    AddFolder(folderName, this.props.firebase);
+}
+
+deleteFolder = async () => {
+    const isOk: boolean = confirm("The content of the folder will be deleted. Are you sure you want to delete folder?");
+
+    if( isOk ) {	
+        try {
+            // Delete folder from cloud and DB
+            if (this.state.selectedFileId !== null ) {
+                const formData = new FormData();
+                formData.append("file_id", this.state.selectedFileId.toString());
+                await fetch(`/api/delete-folder`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+            }
+            const storageRef = this.props.firebase.uploadFile();
+            const uid = this.props.firebase.auth.currentUser.email;
+            for (const file of this.state.files) {
+                const fileRef = storageRef.child(file.path);
+                await fileRef.delete();
+                const formData = new FormData();
+                formData.append("file_id", file.id);
+                await fetch(`/api/delete-folder`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+            }
+            console.log(uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore");
+            const path = uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore";
+            const fileRef = storageRef.child(path);
+            const response = await fileRef.delete(); 
+            this.subFolderBackButtonClicked();
+        } catch (ex) {
+            console.log(ex);
+        } 
+    }
+}
+
 render() {
     const { isLoading } = this.state;
     return (
             <div className="myFilesContainer">
             <div className="one">
-            <div>
-               <Header/>
-               {isLoading && spinner()}
-              <h1 id="myFilesTitle">My Files </h1>
-              <p><i><b>Note:</b> Select checkboxes for files and click on 'Download Files' or
-              'Delete Files' button at the bottom of the page to download or delete files. </i></p><br/>
-              <table id="myFiles">
-                 <tbody>
-                 <tr>{this.renderTableHeader()}</tr>
-                    {this.renderTableData()}
-                 </tbody>
-              </table>
-            </div>
-            <div className="myFilesButtonContainer">
-            <button className="DownloadFile waves-effect waves-light btn globalbtn" onClick={this.downloadFiles}>
-                      <i className="material-icons right">file_download</i>
-                      Download Files
-            </button>
-            <button className="DeleteFile waves-effect waves-light btn globalbtn" onClick={this.deleteFiles}>
-                      <i className="material-icons right">delete</i>
-                      Delete Files
-            </button>
-            </div>
-            <a className="hide" ref={this.downloadRef} target="_blank">
-                      Hidden Download Link
-            </a>
+                <Header/>
+                {isLoading && spinner()}
+                {!this.state.isGetSubFolderClicked &&
+                    <button className="AddSubfolder waves-effect waves-light btn globalbtn" onClick={this.addSubfolder}>
+                        <i className="material-icons right">create_new_folder</i>
+                        Add Subfolder
+                    </button>
+                }
+                {this.state.isGetSubFolderClicked &&
+                    <div>
+                    <button className="FolderBackButton waves-effect waves-light btn globalbtn" onClick={this.subFolderBackButtonClicked}>
+                        <i className="material-icons right">arrow_back</i>
+                        Back
+                    </button>
+                    <button className="DeleteFolder waves-effect waves-light btn globalbtn" onClick={() => this.deleteFolder()}>
+                        <i className="material-icons right">delete</i>
+                        Delete {this.state.selectedFolderName}
+                    </button>
+                    </div>
+                }
+                {this.state.files.length > 0 &&
+                <div>
+                {this.state.isGetSubFolderClicked &&
+                    <h1 id="myFilesTitle">My Files: {this.state.selectedFolderName}</h1>
+                }
+                {!this.state.isGetSubFolderClicked &&
+                    <h1 id="myFilesTitle">My Files</h1>
+                }
+                <p>
+                    <i>
+                        <b>Note:</b>
+                        Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the bottom of the page to download or delete files. 
+                    </i>
+                </p><br/>
+                <table id="myFiles">
+                    <tbody>
+                        <tr>{this.renderTableHeader()}</tr>
+                        {this.renderTableData()}
+                    </tbody>
+                </table>
+                <div className="myFilesButtonContainer">
+                    <button className="DownloadFile waves-effect waves-light btn globalbtn" onClick={this.downloadFiles}>
+                        <i className="material-icons right">file_download</i>
+                        Download Files
+                    </button>
+                    <button className="DeleteFile waves-effect waves-light btn globalbtn" onClick={this.deleteFiles}>
+                        <i className="material-icons right">delete</i>
+                        Delete Files
+                    </button>
+                </div>
+                <a className="hide" ref={this.downloadRef} target="_blank">
+                    Hidden Download Link
+                </a>
+                </div>}
+                {this.state.files.length === 0 &&
+                <div>
+                    <p id="noAudioFilesMessage">No audio files found!</p>
+                </div>
+                }
             </div>
             <ImagesForMyFiles showImages={this.state.isGetImagesClicked}
             imagesBackButtonClicked={this.imagesBackButtonClicked}
             fileId={this.state.selectedFileId}
             fileName={this.state.selectedFileName}/>
-            </div>
+            <EafsForMyFiles showEafs={this.state.isGetEafsClicked} 
+            eafsBackButtonClicked={this.eafsBackButtonClicked}
+            fileId={this.state.selectedFileId}
+            fileName={this.state.selectedFileName}/>
+        </div>
         );
-  }
+    }
 }
 
 const authCondition = (authUser: any) => !!authUser;

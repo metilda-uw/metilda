@@ -7,8 +7,8 @@ class Postgres(object):
     
     def __enter__(self):
       
-        DATABASE_URL = os.environ['DATABASE_URL']
-        print(DATABASE_URL)
+        DATABASE_URL = 'postgres://jphpsdahxkaoiw:3d39eb97981c1ecd7aae48ddf5a0114655bec6aff9a29dc77b764c6f4b0f106a@ec2-23-21-66-88.compute-1.amazonaws.com:5432/d294qe44mi8a5v'
+        print("====>" + DATABASE_URL)
         try:
             print('connecting to PostgreSQL database...')
             self.connection =  psycopg2.connect(DATABASE_URL, sslmode='require')

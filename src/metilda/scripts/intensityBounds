@@ -1,0 +1,11 @@
+form Get Bounds 
+   sentence name_of_sound sp1.wav
+   sentence sounds_dir "sounds/"
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+To Intensity: 100,0,1
+Get minimum: 0,0,"Parabolic"
+Get maximum: 0,0,"Parabolic"
+Get mean: 0,0,"energy"
+

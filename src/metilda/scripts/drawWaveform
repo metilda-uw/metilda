@@ -1,0 +1,17 @@
+form Draw Waveform
+   sentence name_of_sound sp1.wav
+   real start_time 0
+   real end_time 0
+   boolean show_pitch 0
+   sentence sounds_dir sounds/
+   sentence images_dir images/
+   sentence image_name
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+Select outer viewport: 0,6,0,3
+Colour: "Black"
+Draw: start_time, end_time, 0, 0, "yes"
+
+Select outer viewport: 0,5.50,0.25,5.60
+Save as 300-dpi PNG file: "../"+image_name$

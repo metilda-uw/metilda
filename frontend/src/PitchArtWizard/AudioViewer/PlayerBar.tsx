@@ -17,7 +17,7 @@ class PlayerBar extends React.Component<Props> {
                             <Player src={this.props.audioUrl} vendor="audio"/>
                         </div>
                         <div className="media-controls metilda-control-container">
-                            <div className="metilda-audio-analysis-image-col-1">
+                            <div className="metilda-audio-analysis-image-col-11">
                                 <PlayPause/>
                             </div>
                             <div className="metilda-audio-analysis-image-col-2 vert-center">

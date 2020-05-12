@@ -51,6 +51,28 @@
   width: 100%;
 }
 
-.DeleteFile, .GetImages {
+.DeleteFile, .GetImages, .OpenFolder, .MoveToFolder {
   pointer-events: auto;
+}
+
+#noAudioFilesMessage {
+  font-size: 36px;
+}
+
+.AddSubfolder {
+  position: absolute;
+  right: 40px;
+  top: 120px;
+}
+
+.DeleteFolder {
+  position: absolute;
+  right: 40px;
+  top: 120px;
+}
+
+.FolderBackButton{
+  position:absolute;
+  top:120px;
+  left:40px
 }

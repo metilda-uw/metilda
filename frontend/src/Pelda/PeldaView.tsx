@@ -1,0 +1,1266 @@
+import * as React from "react";
+import {connect} from "react-redux";
+import {ThunkDispatch} from "redux-thunk";
+import {AppState} from "../store";
+import {setLetterPitch} from "../store/audio/actions";
+import {AudioAction} from "../store/audio/types";
+import {Speaker} from "../types/types";
+import PeldaAudioAnalysis from "./PeldaAudioAnalysis";
+import { withAuthorization } from "../Session";
+import "../Create/CreatePitchArt.css";
+import Header from "../Layout/Header";
+import {uploadAudio, uploadEaf} from "../Create/ImportUtils";
+import {spinner} from "../Utils/LoadingSpinner";
+import ReactGA from "react-ga";
+import ReactFileReader from "react-file-reader";
+import "./PeldaView.css";
+
+export interface PeldaViewProps {
+    speakers: Speaker[];
+	setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
+	firebase: any;
+}
+
+interface State {
+	files: any[];
+	selectedFolderName: string;
+	isLoading: boolean;
+	energy: any;
+	voicedFrames: any;
+	pitchValueAtTime: any;
+	pitchValueInFrame: any;
+	lowFrequency: any;
+	highFrequency: any;
+	minIntensity: any;
+	maxIntensity: any;
+	meanIntensity: any;
+	noOfFrames: any;
+	noOfFormants: any;
+	formantValueAtTime: any;
+	minHarmonicity: any;
+	maxHarmonicity: any;
+	harmonicityValueAtTime: any;
+	noOfPeriods: any;
+	noOfPoints: any;
+	localJitter: any;
+	tier1Value: any;
+	tier2Value: any;
+	tier3Value: any;
+	tier4Value: any;
+	tier5Value: any;
+	tier6Value: any;
+	soundLength: number;
+	minAudioTime: number;
+	maxAudioTime: number;
+	selectStartTime: number;
+	selectEndTime: number;
+}
+
+export class PeldaView extends React.Component<PeldaViewProps, State> {
+    constructor(props: PeldaViewProps) {
+        super(props);
+        this.state = {
+			files: [],
+			selectedFolderName: "Uploads",
+			isLoading: false,
+			energy: null,
+			voicedFrames: null,
+			pitchValueAtTime: null,
+			pitchValueInFrame: null,
+			lowFrequency: null,
+			highFrequency: null,
+			minIntensity: null,
+			maxIntensity: null,
+			meanIntensity: null,
+			noOfFrames: null,
+			noOfFormants: null,
+			formantValueAtTime: null,
+			minHarmonicity: null,
+			maxHarmonicity: null,
+			harmonicityValueAtTime: null,
+			noOfPeriods: null,
+			noOfPoints: null,
+			localJitter: null,
+			tier1Value: "",
+			tier2Value: "",
+			tier3Value: "",
+			tier4Value: "",
+			tier5Value: "",
+			tier6Value: "",
+			soundLength: -1.0,
+			minAudioTime: 0.0,
+			maxAudioTime: 0.0,
+			selectStartTime: -1.0,
+			selectEndTime: -1.0,
+        };
+	}
+	
+    componentDidMount() {
+        this.getUserFiles();
+	}
+	
+	callBackSelectionInterval = (childSoundLength: number, childMinAudioTime: number, childMaxAudioTime: number, childSelectStartTime: number, childSelectEndTime: number,
+	childSelectedFolderName: string ) => {
+		this.setState ({
+			soundLength: childSoundLength,
+			minAudioTime: childMinAudioTime,
+			maxAudioTime: childMaxAudioTime,
+			selectStartTime: childSelectStartTime,
+			selectEndTime: childSelectEndTime,
+			selectedFolderName: childSelectedFolderName,
+		});
+		if (this.state.selectedFolderName !== "Uploads")
+			this.getUserFiles();
+	}
+
+	callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2Enabled: boolean, tier2text: string, isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean, tier4text: string, isTier5Enabled: boolean, tier5text: string, isTier6Enabled: boolean, tier6text: string) => {
+		const element = document.getElementById("elan-annotation");
+		const elementTier1 = document.getElementById("tier1label");
+		const elementTier2 = document.getElementById("tier2label");
+		const elementTier3 = document.getElementById("tier3label");
+		const elementTier4 = document.getElementById("tier4label");
+		const elementTier5 = document.getElementById("tier5label");
+		const elementTier6 = document.getElementById("tier6label");
+
+		if (element !== null) {
+			element.setAttribute("class", "unhidden"); 
+		}
+
+		if ((this.state.tier1Value !== "") || (this.state.tier2Value !== "") || 
+			(this.state.tier3Value !== "") || (this.state.tier4Value !== "") ||
+			(this.state.tier5Value !== "") || (this.state.tier6Value !== "")) {
+			const isOk: boolean = confirm("The existing content of tiers will be lost. Are you sure you want to view eaf file data?");
+
+			if( isOk ) {	
+				await this.setState({
+					tier1Value: tier1text,
+					tier2Value: tier2text,			
+					tier3Value: tier3text,
+					tier4Value: tier4text,
+					tier5Value: tier5text,
+					tier6Value: tier6text,
+				});
+
+				if (elementTier1 !== null) {
+					if (isTier1Enabled) {
+						elementTier1.setAttribute("class", "unhidden");
+					} else {
+						elementTier1.setAttribute("class", "hidden");
+					}
+				}
+
+				if (elementTier2 !== null) {
+					if (isTier2Enabled)
+						elementTier2.setAttribute("class", "unhidden");
+					else 
+						elementTier2.setAttribute("class", "hidden");
+				}
+
+				if (elementTier3 !== null) {
+					if (isTier3Enabled)
+						elementTier3.setAttribute("class", "unhidden");
+					else
+						elementTier3.setAttribute("class", "hidden");
+				}
+
+				if (elementTier4 !== null) {
+					if (isTier4Enabled) 
+						elementTier4.setAttribute("class", "unhidden");
+					else
+						elementTier4.setAttribute("class", "hidden");
+				}
+
+				if (elementTier5 !== null) {
+					if (isTier5Enabled) 
+						elementTier5.setAttribute("class", "unhidden");
+					else 
+						elementTier5.setAttribute("class", "hidden");
+				}
+
+				if (elementTier6 !== null) {
+					if (isTier6Enabled) 
+						elementTier6.setAttribute("class", "unhidden");
+					else 
+						elementTier6.setAttribute("class", "hidden");
+				}
+			} else {
+				alert("Please save your exisiting annotation details!!")
+			}
+		} else {
+			await this.setState({
+				tier1Value: tier1text,
+				tier2Value: tier2text,			
+				tier3Value: tier3text,
+				tier4Value: tier4text,
+				tier5Value: tier5text,
+				tier6Value: tier6text,
+			});
+
+			if (elementTier1 !== null) {
+				if (isTier1Enabled) {
+					elementTier1.setAttribute("class", "unhidden");
+				} else {
+					elementTier1.setAttribute("class", "hidden");
+				}
+			}
+
+			if (elementTier2 !== null) {
+				if (isTier2Enabled)
+					elementTier2.setAttribute("class", "unhidden");
+				else 
+					elementTier2.setAttribute("class", "hidden");
+			}
+
+			if (elementTier3 !== null) {
+				if (isTier3Enabled)
+					elementTier3.setAttribute("class", "unhidden");
+				else
+					elementTier3.setAttribute("class", "hidden");
+			}
+
+			if (elementTier4 !== null) {
+				if (isTier4Enabled) 
+					elementTier4.setAttribute("class", "unhidden");
+				else
+					elementTier4.setAttribute("class", "hidden");
+			}
+
+			if (elementTier5 !== null) {
+				if (isTier5Enabled) 
+					elementTier5.setAttribute("class", "unhidden");
+				else 
+					elementTier5.setAttribute("class", "hidden");
+			}
+
+			if (elementTier6 !== null) {
+				if (isTier6Enabled) 
+					elementTier6.setAttribute("class", "unhidden");
+				else 
+					elementTier6.setAttribute("class", "hidden");
+			}			
+		}
+	}
+
+	renderSpeakers = () => {
+		const index = 0;
+        return (
+                <PeldaAudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${this.props.speakers[index].uploadId}`}
+				firebase={this.props.firebase} files={this.state.files} parentCallBack={this.callBackSelectionInterval}
+				eafTierDataCallBack={this.callBackEafTierData} />
+		);
+	}
+	
+    getUserFiles = () => {
+        // Get files of a user
+        const currentUserId = this.props.firebase.auth.currentUser.email;
+        fetch(`api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}`
+        + "?file-type1=Folder&file-type2=Upload", {
+        method: "GET",
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => this.setState({
+			files: data.result.map((item: any) => item)
+		}));
+    }
+
+    fileSelected = async (files: any) => {
+        this.setState({
+            isLoading: true,
+        });
+        try {		
+			await uploadAudio(files, this.props.firebase);
+            this.getUserFiles();
+            ReactGA.event({
+                category: "Upload File",
+                action: "User pressed Upload File button"
+			  });
+        } catch (ex) {
+            console.log(ex);
+        }
+        this.setState({
+            isLoading: false,
+        });
+    }
+
+	getBounds() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				soundLength: data.end,
+				minAudioTime: data.min,
+				maxAudioTime: data.max,
+			})
+		).catch(console.log);
+	}
+
+	getEnergy() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/get-energy/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				energy: data.energy,
+			}))
+		.then(() =>
+			alert("Energy: " + this.state.energy)
+		).catch(console.log);
+	}
+
+	countVoicedFrames() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/pitch/count-voiced-frames/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				voicedFrames: data.voicedFrames,
+			}))
+		.then(() =>
+			alert(this.state.voicedFrames)
+		).catch(console.log);
+	}
+
+	getPitchValueAtTime() {
+		var time = prompt("Enter Time(s): ", "0.5");
+
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(time !== null) {
+			fetch(`/pitch/value-at-time/${this.props.speakers[0].uploadId}/${time}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					pitchValueAtTime: data.pitchValueAtTime,
+				}))
+			.then(() =>
+				alert(this.state.pitchValueAtTime)
+			).catch(console.log);
+		}
+	}
+
+	getPitchValueInFrame() {
+		var frame = prompt("Enter Frame Number: ", "50");
+		
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(frame !== null) {
+			fetch(`/pitch/value-in-frame/${this.props.speakers[0].uploadId}/${frame}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					pitchValueInFrame: data.pitchValueInFrame,
+				}))
+			.then(() =>
+				alert(this.state.pitchValueInFrame)
+			).catch(console.log);
+		}
+	}
+
+	getLowestFrequency() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/spectrum/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				lowFrequency: data.lowFrequency,
+			}))
+		.then(() =>
+			alert("Lowest Frequency: " + this.state.lowFrequency + " Hz")
+		).catch(console.log);
+	}
+
+	getHighestFrequency() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/spectrum/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				highFrequency: data.highFrequency,
+			}))
+		.then(() =>
+			alert("Highest Frequency: " + this.state.highFrequency + " Hz")
+		).catch(console.log);
+	}
+
+	getMinimumIntensity() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/intensity/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				minIntensity: data.minIntensity,
+			}))
+		.then(() =>
+			alert("Minimum Intensity: " + this.state.minIntensity + " dB")
+		).catch(console.log);
+	}
+
+	getMaximumIntensity() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/intensity/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				maxIntensity: data.maxIntensity,
+			}))
+		.then(() =>
+			alert("Maximum Intensity: " + this.state.maxIntensity + " dB")
+		).catch(console.log);
+	}
+
+	getMeanIntensity() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/intensity/get-bounds/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				meanIntensity: data.meanIntensity,
+			}))
+		.then(() =>
+			alert("Mean Intensity: " + this.state.meanIntensity + " dB")
+		).catch(console.log);
+	}
+
+	getNoOfFrames() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/formant/number-of-frames/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				noOfFrames: data.noOfFrames,
+			}))
+		.then(() =>
+			alert(this.state.noOfFrames)
+		).catch(console.log);
+	}
+
+	getNoOfFormants() {
+		var frame = prompt("Enter Frame Number: ", "50");
+		
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(frame !== null) {
+			fetch(`/formant/number-of-formants/${this.props.speakers[0].uploadId}/${frame}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					noOfFormants: data.noOfFormants,
+				}))
+			.then(() =>
+				alert(this.state.noOfFormants)
+			).catch(console.log);
+		}
+	}
+
+	getFormantFrequencyAtTime() {
+		var formant = prompt("Enter Formant Number: ", "1");
+		var time = prompt("Enter Time(s): ", "0.5");
+
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(formant !== null && time !== null) {
+			fetch(`/formant/value-at-time/${this.props.speakers[0].uploadId}/${formant}/${time}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					formantValueAtTime: data.formantValueAtTime,
+				}))
+			.then(() =>
+				alert(this.state.formantValueAtTime)
+			).catch(console.log);
+		}
+	}
+
+	getMinimumHarmonicity() {
+		var startTime = prompt("Enter Start Time(s): ", "0.0");
+		var endTime = prompt("Enter End Time(s): ", "0.0");
+
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(startTime !== null && endTime !== null) {
+			fetch(`/harmonicity/get-min/${this.props.speakers[0].uploadId}/${startTime}/${endTime}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					minHarmonicity: data.minHarmonicity,
+				}))
+			.then(() =>
+				alert(this.state.minHarmonicity)
+			).catch(console.log);
+		}
+	}
+
+	getMaximumHarmonicity() {
+		var startTime = prompt("Enter Start Time(s): ", "0.0");
+		var endTime = prompt("Enter End Time(s): ", "0.0");
+
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(startTime !== null && endTime !== null) {
+			fetch(`/harmonicity/get-max/${this.props.speakers[0].uploadId}/${startTime}/${endTime}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					maxHarmonicity: data.maxHarmonicity,
+				}))
+			.then(() =>
+				alert(this.state.maxHarmonicity)
+			).catch(console.log);
+		}
+	}
+
+	getHarmonicityValueAtTime() {
+		var time = prompt("Enter Time(s): ", "0.5");
+
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(time !== null) {
+			fetch(`/harmonicity/value-at-time/${this.props.speakers[0].uploadId}/${time}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					harmonicityValueAtTime: data.harmonicityValueAtTime,
+				}))
+			.then(() =>
+				alert(this.state.harmonicityValueAtTime)
+			).catch(console.log);
+		}
+	}
+
+	getNoOfPeriods() {
+		var startTime = prompt("Enter Start Time(s): ", "0.0");
+		var endTime = prompt("Enter End Time(s): ", "0.0");
+		
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(startTime !== null && endTime !== null) {
+			fetch(`/pointprocess/number-of-periods/${this.props.speakers[0].uploadId}/${startTime}/${endTime}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					noOfPeriods: data.noOfPeriods,
+				}))
+			.then(() =>
+				alert(this.state.noOfPeriods)
+			).catch(console.log);
+		}
+	}
+
+	getNoOfPoints() {
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		fetch(`/pointprocess/number-of-points/${this.props.speakers[0].uploadId}`, request)
+		.then(response => response.json())
+		.then(data =>
+			this.setState({
+				noOfPoints: data.noOfPoints,
+			}))
+		.then(() =>
+			alert(this.state.noOfPoints)
+		).catch(console.log);
+	}
+
+	getJitter() {
+		var startTime = prompt("Enter Start Time(s): ", "0.0");
+		var endTime = prompt("Enter End Time(s): ", "0.0");
+		
+		const request: RequestInit = {
+			method: "GET",
+			headers: {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+			}
+		};
+		
+		if(startTime !== null && endTime !== null) {
+			fetch(`/pointprocess/get-jitter/${this.props.speakers[0].uploadId}/${startTime}/${endTime}`, request)
+			.then(response => response.json())
+			.then(data =>
+				this.setState({
+					localJitter: data.localJitter,
+				}))
+			.then(() =>
+				alert(this.state.localJitter)
+			).catch(console.log);
+		}
+	}
+
+	addTiers() {
+		if (this.props.speakers[0].uploadId !== null && this.props.speakers[0].uploadId !== "") {
+			if(this.state.selectStartTime > 0 && this.state.selectEndTime > 0 && this.state.selectStartTime !== this.state.selectEndTime ) {
+				const element = document.getElementById("elan-annotation");
+				const timeInterval = document.getElementById("selection-interval");
+		
+				if (element !== null && timeInterval !== null) {
+					element.setAttribute("class","unhidden");
+					timeInterval.setAttribute("class","unhidden");
+
+					const elementTier1 = document.getElementById("tier1label");
+					const elementTier2 = document.getElementById("tier2label");
+					const elementTier3 = document.getElementById("tier3label");
+					const elementTier4 = document.getElementById("tier4label");
+					const elementTier5 = document.getElementById("tier5label");
+					const elementTier6 = document.getElementById("tier6label");
+
+					if (elementTier1 !== null && elementTier1.getAttribute("class") === "hidden") {
+						elementTier1.setAttribute("class","unhidden");
+					} else if (elementTier2 !== null && elementTier2.getAttribute("class") === "hidden") {
+						elementTier2.setAttribute("class","unhidden");
+					} else if (elementTier3 !== null && elementTier3.getAttribute("class") === "hidden") {
+						elementTier3.setAttribute("class","unhidden");
+					} else if (elementTier4 !== null && elementTier4.getAttribute("class") === "hidden") {
+						elementTier4.setAttribute("class","unhidden");
+					} else if (elementTier5 !== null && elementTier5.getAttribute("class") === "hidden") {
+						elementTier5.setAttribute("class","unhidden");
+					} else if (elementTier6 !== null && elementTier6.getAttribute("class") === "hidden") {
+						elementTier6.setAttribute("class","unhidden");
+					}else {
+						alert("Only 6 tiers are allowed!!");
+					}
+				}
+			} else {
+				alert("Please select a time window to add annotation details!!");
+			}
+		}
+	}
+
+	removeTiers = async (event: any) => {
+		const element = document.getElementById("elan-annotation");
+		const elementTier1 = document.getElementById("tier1label");
+		const elementTier2 = document.getElementById("tier2label");
+		const elementTier3 = document.getElementById("tier3label");
+		const elementTier4 = document.getElementById("tier4label");
+		const elementTier5 = document.getElementById("tier5label");
+		const elementTier6 = document.getElementById("tier6label");
+
+		if (element !== null && element.getAttribute("class") !== "hidden") { 
+			if ((this.state.tier1Value !== "") || (this.state.tier2Value !== "") || 
+				(this.state.tier3Value !== "") || (this.state.tier4Value !== "") ||
+				(this.state.tier5Value !== "") || (this.state.tier6Value !== "")) {
+				const isOk: boolean = confirm("The content of tiers will be lost. Are you sure you want to remove all tiers?");
+
+				if( isOk ) {
+					if (element !== null) {
+						element.setAttribute("class","hidden");
+						
+						if (elementTier1 !== null) {
+							elementTier1.setAttribute("class", "hidden");
+						}
+						if (elementTier2 !== null) {
+							elementTier2.setAttribute("class", "hidden");
+						}
+						if (elementTier3 !== null) {
+							elementTier3.setAttribute("class", "hidden");
+						}
+						if (elementTier4 !== null) {
+							elementTier4.setAttribute("class", "hidden");
+						}
+						if (elementTier5 !== null) {
+							elementTier5.setAttribute("class", "hidden");
+						}
+						if (elementTier6 !== null) {
+							elementTier6.setAttribute("class", "hidden");
+						}
+						
+						await this.setState({
+							tier1Value: "",
+							tier2Value: "",
+							tier3Value: "",
+							tier4Value: "",
+							tier5Value: "",
+							tier6Value: "",
+						});
+					}
+				}
+			} else {
+				const isOk: boolean = confirm("Are you sure you want to remove all tiers?");
+
+				if( isOk ) {
+					if (element !== null) {
+						element.setAttribute("class","hidden");
+
+						if (elementTier1 !== null) {
+							elementTier1.setAttribute("class", "hidden");
+						}
+						if (elementTier2 !== null) {
+							elementTier2.setAttribute("class", "hidden");
+						}
+						if (elementTier3 !== null) {
+							elementTier3.setAttribute("class", "hidden");
+						}
+						if (elementTier4 !== null) {
+							elementTier4.setAttribute("class", "hidden");
+						}
+						if (elementTier5 !== null) {
+							elementTier5.setAttribute("class", "hidden");
+						}
+						if (elementTier6 !== null) {
+							elementTier6.setAttribute("class", "hidden");
+						}
+					}
+				}
+			}
+		}
+	}
+
+	removeTier = async (event: any) => {
+		const buttonId = event.target.id;
+		if (buttonId === "removeTier1") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier1Value !== "")
+				isTextboxEmpty = "Tier 1 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 1?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier1label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier1Value: "",
+					}); 
+				}
+			}
+		}
+
+		if (buttonId === "removeTier2") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier2Value !== "")
+				isTextboxEmpty = "Tier 2 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 2?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier2label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier2Value: "",
+					}); 
+				}
+			}
+		}
+
+		if (buttonId === "removeTier3") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier3Value !== "")
+				isTextboxEmpty = "Tier 3 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 3?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier3label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier3Value: "",
+					}); 
+				}
+			}
+		}
+
+		if (buttonId === "removeTier4") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier4Value !== "")
+				isTextboxEmpty = "Tier 4 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 4?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier4label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier4Value: "",
+					}); 
+				}
+			}
+		}
+
+		if (buttonId === "removeTier5") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier5Value !== "")
+				isTextboxEmpty = "Tier 5 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 5?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier5label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier5Value: "",
+					});
+				}
+			}
+		}
+
+		if (buttonId === "removeTier6") {
+			var isTextboxEmpty: string = "";
+
+			if (this.state.tier6Value !== "")
+				isTextboxEmpty = "Tier 6 content will be lost. ";
+			
+			const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 6?");
+
+			if( isOk ) {
+				const element = document.getElementById("tier6label");
+				if (element !== null) {
+					element.setAttribute("class","hidden");
+					await this.setState ({
+						tier6Value: "",
+					}); 
+				}
+			}
+		}
+	}
+
+	handleTierValue = async (event: any) => {
+		const tierId = event.target.id;
+		const value = event.target.value;
+		if (tierId === "textbox1") {
+			await this.setState({
+				tier1Value: value,
+			});
+		}
+
+		if (tierId === "textbox2") {
+			await this.setState({
+				tier2Value: value,
+			});
+		}
+
+		if (tierId === "textbox3") {
+			await this.setState({
+				tier3Value: value,
+			});
+		}
+
+		if (tierId === "textbox4") {
+			await this.setState({
+				tier4Value: value,
+			});
+		}
+
+		if (tierId === "textbox5") {
+			await this.setState({
+				tier5Value: value,
+			});
+		}
+
+		if (tierId === "textbox6") {
+			await this.setState({
+				tier6Value: value,
+			});
+		}
+	}
+
+	saveAnnotations() {
+		if ((this.state.selectStartTime >= 0 && this.state.selectEndTime >=0) &&
+			(this.state.tier1Value !== "" || this.state.tier2Value !== "" ||
+			this.state.tier3Value !== "" || this.state.tier4Value !== "" ||
+			this.state.tier5Value !== "" || this.state.tier6Value !== "")) {
+			const element = document.getElementById("elan-annotation");
+			var tiersValue: string = "";
+
+			if (element !== null && element.getAttribute("class") === "unhidden") {
+				const elementTier1 = document.getElementById("tier1label");
+				const elementTier2 = document.getElementById("tier2label");
+				const elementTier3 = document.getElementById("tier3label");
+				const elementTier4 = document.getElementById("tier4label");
+				const elementTier5 = document.getElementById("tier5label");
+				const elementTier6 = document.getElementById("tier6label");
+				
+				if (elementTier1 !== null && elementTier1.getAttribute("class") === "unhidden") {
+					if (this.state.tier1Value !== "") {
+						tiersValue += ("\nTier 1: " + this.state.tier1Value);
+					} else {
+						alert("Tier1 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}
+				}
+				 
+				if (elementTier2 !== null && elementTier2.getAttribute("class") === "unhidden") {
+					if (this.state.tier2Value !== "") {
+						tiersValue += ("\nTier 2: " + this.state.tier2Value);
+					} else {
+						alert("Tier2 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}
+				}
+				
+				if (elementTier3 !== null && elementTier3.getAttribute("class") === "unhidden") {
+					if (this.state.tier3Value !== "") {
+						tiersValue += ("\nTier 3: " + this.state.tier3Value);
+					} else {
+						alert("Tier3 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}
+				}
+
+				if (elementTier4 !== null && elementTier4.getAttribute("class") === "unhidden") {
+					if (this.state.tier4Value !== "") {
+						tiersValue += ("\nTier 4: " + this.state.tier4Value);	
+					} else {
+						alert("Tier4 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}
+				}
+
+				if (elementTier5 !== null && elementTier5.getAttribute("class") === "unhidden") {
+					if (this.state.tier5Value !== "") {
+						tiersValue += ("\nTier 5: " + this.state.tier5Value);	
+					} else {
+						alert("Tier5 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}
+				}
+
+				if (elementTier6 !== null && elementTier6.getAttribute("class") === "unhidden") {
+					if (this.state.tier6Value !== "") {
+						tiersValue += ("\nTier 6: " + this.state.tier6Value);	
+					} else {
+						alert("Tier6 content cannot be empty. Please either enter the content or remove the tier!");
+						return;
+					}	
+				}
+			}
+
+			const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want proceed to save an eaf file?");
+		
+			if ( isOk ) {
+				var eafFileName = prompt("Enter name for EAF: ", "testeaf.eaf");	
+
+				const request: RequestInit = {
+					method: "GET",
+					headers: {
+						"Accept": "application/json",
+						"Content-Type": "application/json",
+					}
+				};
+				
+				if (eafFileName !== null && (this.state.tier1Value !== "" || this.state.tier2Value !== "" || this.state.tier3Value !== "" || this.state.tier4Value !== "" || this.state.tier5Value !== "" || this.state.tier6Value !== "")) {
+					var tier1text = this.state.tier1Value;
+					var tier2text = this.state.tier2Value;
+					var tier3text = this.state.tier3Value;
+					var tier4text = this.state.tier4Value;
+					var tier5text = this.state.tier5Value;
+					var tier6text = this.state.tier6Value;
+
+					if (tier1text === "")
+						tier1text = "EMPTY";
+					if (tier2text === "")
+						tier2text = "EMPTY";
+					if (tier3text === "")
+						tier3text = "EMPTY";
+					if (tier4text === "")
+						tier4text = "EMPTY";
+					if (tier5text === "")
+						tier5text = "EMPTY";
+					if (tier6text === "")
+						tier6text = "EMPTY";
+
+					fetch(`/annotation/${eafFileName}/${this.props.speakers[0].uploadId}/${this.state.selectStartTime}/${this.state.selectEndTime}/${tier1text}/${tier2text}/${tier3text}/${tier4text}/${tier5text}/${tier6text}`, request)
+					.then(response => response.text())
+					.then((eafData) => {
+						uploadEaf(eafFileName, this.props.speakers.map(item => item.fileIndex), eafData, this.props.firebase); }
+					).catch(console.log);
+				}
+			}
+		}
+	}
+
+	folderBackButtonClicked = async () => {
+		await this.setState({
+			selectedFolderName: "Uploads",
+		});
+		this.getUserFiles();
+	}
+
+    render() {
+		const { isLoading } = this.state;
+		if (this.props.speakers[0].uploadId !== null && 
+			this.props.speakers[0].uploadId !== "" && 
+			this.state.soundLength <= 0 ) {
+			this.getBounds();
+		} 
+        return (
+            <div>
+            	<Header/>
+            	{isLoading && spinner()}
+            	<div className="peldaview">
+                	<ReactFileReader fileTypes={[".wav", ".mp3", ".mpeg"]} multipleFiles={false} handleFiles={this.fileSelected}>
+                    	<button className="UploadPeldaFile waves-effect waves-light btn globalbtn">
+                        	<i className="material-icons right">
+                            	cloud_upload
+                        	</i>
+                        	Upload Audio File to cloud
+                    	</button>
+                	</ReactFileReader>
+					<div className="metilda-page-content">
+						<div id="drop-down-back-button">
+							{this.state.selectedFolderName === "Uploads" &&
+							<button disabled={true} className="audioBackButtonDisabled" onClick={() => this.folderBackButtonClicked()}>
+								<i className="material-icons">arrow_back</i>
+							</button>
+							}
+							{this.state.selectedFolderName !== "Uploads" &&
+							<button className="audioBackButton" onClick={() => this.folderBackButtonClicked()}>
+								<i className="material-icons">arrow_back</i>
+							</button>
+							}
+							{this.renderSpeakers()} 
+						</div>
+					
+						<div id="audioLength">
+							<p>Audio Time Duration:</p>
+							{this.state.soundLength > 0 && 
+								<p id="audio-length-label">{this.state.soundLength.toFixed(5)} s</p>
+							}
+                		</div>
+                 		<div className="leftMenuBar"> 			
+							<div className="menu"> 
+								<button className="mainmenu"> Sound </button>
+								<div className="drop-content">
+									<button onClick={() => this.getEnergy()}> Get energy </button>
+								</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> Pitch </button>
+	 							<div className="drop-content">
+		 							<button onClick={() => this.countVoicedFrames()}> Count voiced frames </button>
+				 					<button onClick={() => this.getPitchValueAtTime()}> Get value at time </button>
+		 							<button onClick={() => this.getPitchValueInFrame()}> Get value in frame </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu">Spectrum</button>
+	 							<div className="drop-content">
+		 							<button onClick={() => this.getLowestFrequency()}> Get lowest frequency </button>
+		 							<button onClick={() => this.getHighestFrequency()}> Get highest frequency </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> Intensity </button>
+	 							<div className="drop-content">
+		 							<button onClick={() => this.getMinimumIntensity()}> Get minimum intensity </button>
+		 							<button onClick={() => this.getMaximumIntensity()}> Get maximum intensity </button>
+		 							<button onClick={() => this.getMeanIntensity()}> Get mean intensity </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> Formant </button>
+	 							<div className="drop-content">
+		 							<button onClick={() => this.getNoOfFrames()}> Get number of frames </button>
+		 							<button onClick={() => this.getNoOfFormants()}> Get numbers of formants </button>
+		 							<button onClick={() => this.getFormantFrequencyAtTime()}> Get value at time </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> Harmonicity </button>
+					 			<div className="drop-content">
+		 							<button onClick={() => this.getMinimumHarmonicity()}> Get minimum </button>
+		 							<button onClick={() => this.getMaximumHarmonicity()}> Get maximum </button>
+		 							<button onClick={() => this.getHarmonicityValueAtTime()}> Get value at time </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> PointProcess </button>
+	 							<div className="drop-content">
+		 							<button onClick={() => this.getNoOfPeriods()} > Get number of periods </button>
+		 							<button onClick={() => this.getNoOfPoints()} > Get number of points </button>
+		 							<button onClick={() => this.getJitter()} > Get jitter (local) </button>
+	 							</div>
+							</div> <br /> <br />
+
+							<div className="menu">
+	 							<button className="mainmenu"> ELAN Annotation </button>
+	 							<div className="drop-content">
+									<button onClick={() => this.addTiers()}  id='addButton' className='addtier'> Add a Tier </button>
+									<button onClick={(e) => this.removeTiers(e)}  id='removeButton' className='removetier'> Remove all Tiers </button>
+									<button onClick={() => this.saveAnnotations()}  id='saveannotationbutton' className= 'saveannotation'> Save Annotation </button>
+	 							</div>
+							</div> <br /> <br />
+						</div>	
+
+						{this.state.selectStartTime > 0 && this.state.selectStartTime > 0 && this.state.selectStartTime !== this.state.selectEndTime &&
+						<div id="selection-interval">
+								<p id="select-start-time">Start Time: {this.state.selectStartTime.toFixed(1)}</p><p id="select-end-time">End Time: {this.state.selectEndTime.toFixed(1)}</p>
+						</div>}
+						
+						<div id="elan-annotation" className="hidden">
+							<div id="tier1label" className="hidden">
+								<p>Tier 1: <input id="textbox1" onChange={(e) => this.handleTierValue(e)} value={this.state.tier1Value} placeholder="E.g. orthographic transcription [blackfoot text]" /> <button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier1" onClick={this.removeTier} > <i className="material-icons right">delete</i>Delete Tier 1</button></p>
+							</div>
+
+							<div id="tier2label" className="hidden">
+								<p>Tier 2: <input id="textbox2" onChange={(e) => this.handleTierValue(e)} value={this.state.tier2Value} placeholder="E.g. free translation [english text]" /> <button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier2" onClick={this.removeTier}> <i className="material-icons right">delete</i>Delete Tier 2</button></p>
+							</div>
+
+							<div id="tier3label" className="hidden">
+								<p>Tier 3: <input id="textbox3" onChange={(e) => this.handleTierValue(e)} value={this.state.tier3Value} placeholder="E.g. additional information" /><button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier3" onClick={this.removeTier}> <i className="material-icons right">delete</i>Delete Tier 3</button></p>
+							</div>
+
+							<div id="tier4label" className="hidden">
+								<p>Tier 4: <input id="textbox4" onChange={(e) => this.handleTierValue(e)} value={this.state.tier4Value} placeholder="E.g. additional information" /><button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier4" onClick={this.removeTier}> <i className="material-icons right">delete</i>Delete Tier 4</button></p>
+							</div>
+
+							<div id="tier5label" className="hidden">
+								<p>Tier 5: <input id="textbox5" onChange={(e) => this.handleTierValue(e)} value={this.state.tier5Value} placeholder="E.g. additional information" /><button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier5" onClick={this.removeTier}> <i className="material-icons right">delete</i>Delete Tier 5</button></p>
+							</div>
+
+							<div id="tier6label" className="hidden">
+								<p>Tier 6: <input id="textbox6" onChange={(e) => this.handleTierValue(e)} value={this.state.tier6Value} placeholder="E.g. additional information" /><button className="DeleteFile waves-effect waves-light btn globalbtn" id="removeTier6" onClick={this.removeTier}> <i className="material-icons right">delete</i>Delete Tier 6</button></p>
+							</div>
+						</div>		
+					</div>
+				</div>
+			</div>
+        );
+    }
+}
+
+const mapStateToProps = (state: AppState) => ({
+    speakers: state.audio.speakers,
+});
+
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
+    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
+        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
+});
+
+const authCondition = (authUser: any) => !!authUser;
+export default connect(mapStateToProps, mapDispatchToProps)(withAuthorization(authCondition)(PeldaView as any));

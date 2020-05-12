@@ -80,6 +80,10 @@ class Header extends Component<HeaderProps, State> {
                     name: "Learn",
                     link: "/learn/words/syllables",
                   },
+                  {
+                    name: "PELDA",
+                    link: "/peldaview",
+                  },
                 ]}
               />
             </li>
