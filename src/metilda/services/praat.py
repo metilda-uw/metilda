@@ -11,7 +11,7 @@ _linkElanPraat_dir = "combined/"
 
 # Run script 'scriptName' with the provided parameters
 def runScript(scriptName, args):
-   praatExec = ["/Applications/Praat.app/Contents/MacOS/Praat", "--run", "--no-pref-files", scriptName];
+   praatExec = ["/app/src/metilda/scripts/praat", "--run", "--no-pref-files", scriptName];
    praatExec.extend(args)
    print "script is: " + str(praatExec)
    output = subprocess.check_output(praatExec);
