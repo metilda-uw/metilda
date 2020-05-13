@@ -1,0 +1,293 @@
+/**************************
+ CSS for the menus
+ ***************************/
+.leftMenuBar {
+  position: absolute;
+  top: 210px;
+  left: 30px; }
+
+#audioLength {
+  position: absolute;
+  display: inline;
+  top: 160px;
+  left: 10px; }
+
+#audioLength p:nth-child(1) {
+  float: left;
+  padding-right: 5px; }
+
+#audioLength p:nth-child(2) {
+  float: right;
+  padding-left: 5px; }
+
+#selection-interval {
+  position: absolute;
+  margin-top: -30px;
+  display: inline;
+  letter-spacing: 0.5px;
+  font-size: 16px; }
+
+#selection-interval p:nth-child(1) {
+  float: left;
+  padding-left: 65px; }
+
+#selection-interval p:nth-child(2) {
+  float: right;
+  padding-left: 150px; }
+
+.menu {
+  display: block; }
+
+.mainmenu {
+  background-color: #26a69a;
+  color: black;
+  font-size: 14px;
+  cursor: pointer;
+  height: 35px;
+  width: 150px;
+  border: none;
+  text-align: center;
+  letter-spacing: 0.5px;
+  position: relative;
+  border-radius: 5px; }
+
+.drop-content {
+  background-color: #f9f9f9;
+  display: none;
+  min-width: 124px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  border: 1px solid #111010;
+  z-index: 1;
+  width: 190px;
+  position: absolute;
+  font-size: 14px;
+  left: 140px;
+  margin-top: -33px; }
+
+.drop-content button {
+  background-color: #bef6f1;
+  border-bottom: 1px solid #000000;
+  color: black;
+  width: 188px;
+  letter-spacing: 0.5px;
+  display: block;
+  padding: 5px; }
+
+.drop-content button:hover {
+  background-color: #2bbbad; }
+
+.menu:hover .drop-content {
+  display: block; }
+
+.menu:hover .mainmenu {
+  background-color: #2bbbad;
+  height: 35px;
+  width: 150px;
+  text-align: center;
+  font-size: 14px; }
+
+.checkboxes {
+  position: absolute;
+  left: 1170px;
+  top: 150px;
+  text-align: left;
+  letter-spacing: 0.5px;
+  padding-top: 0px;
+  width: 200px;
+  font-size: 100%;
+  line-height: 3.5; }
+
+.savePrint {
+  left: 1170px;
+  top: 655px;
+  position: absolute; }
+
+.savePrint button {
+  width: 180px;
+  line-height: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  height: 35px;
+  background-color: #26a69a;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 20px; }
+
+.savePrint button:hover {
+  background-color: #2bbbad; }
+
+.hidden {
+  display: none; }
+
+.unhidden {
+  display: block; }
+
+#elan-annotation {
+  position: relative;
+  top: 50px;
+  left: 280px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#tier1label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#tier2label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#tier3label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#tier4label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#tier5label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#tier6label {
+  position: relative;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 16px; }
+
+#textbox1 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#textbox2 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#textbox3 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#textbox4 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#textbox5 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+#textbox6 {
+  position: relative;
+  width: 600px;
+  letter-spacing: 0.5px;
+  color: black;
+  font-size: 14px; }
+
+.eaf-dropdown {
+  position: absolute;
+  left: 1115px;
+  top: 450px;
+  width: 300px; }
+
+.viewEaf {
+  left: 55px;
+  background-color: #26a69a;
+  color: black;
+  font-size: 14px;
+  cursor: pointer;
+  height: 35px;
+  width: 180px;
+  border: none;
+  text-align: center;
+  letter-spacing: 0.5px;
+  position: relative;
+  border-radius: 5px;
+  display: block; }
+
+.viewEaf button {
+  width: 180px;
+  font-size: 14px;
+  cursor: pointer;
+  height: 35px;
+  background-color: #26a69a;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block;
+  padding: 5px; }
+
+.UploadPeldaFile {
+  position: absolute;
+  top: 85px;
+  right: 40px; }
+
+#drop-down-back-button .audioBackButton {
+  position: relative;
+  left: 15px;
+  top: 50px;
+  width: 40px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  height: 40px;
+  background-color: #26a69a;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block; }
+
+#drop-down-back-button .audioBackButtonDisabled {
+  position: relative;
+  left: 15px;
+  top: 50px;
+  width: 40px;
+  font-size: 14px;
+  text-align: center;
+  cursor: not-allowed;
+  height: 40px;
+  background-color: #c7c7c7;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block; }
+
+#button-drop-down-image-side-by-side {
+  display: flex;
+  flex-direction: row; }
