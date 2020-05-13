@@ -543,7 +543,6 @@ def drawSound(upload_id):
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>')
 def drawSoundWithTime(sound, startTime, endTime):
 
-    print "starttime endtime" + startTime+ "===" + endTime
     # Get URL parameters
     showSpectrogram = '0' if request.args.get("spectrogram") is None else '1'
     showPitch = '0' if request.args.get("pitch") is None else '1'
@@ -713,13 +712,6 @@ def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2,
     if text5 == "EMPTY":
         text5 = ""
 
-    print(text0)
-    print(text1)
-    print(text2)
-    print(text3)
-    print(text4)
-    print(text5)
-
     #Create a new EAF file
     filepath = praat._eaf_dir + nameoffile + ".eaf"
     startTime = int(round(float(start)))
@@ -749,7 +741,6 @@ def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2,
     tier4 = "Tier4"
     tier5 = "Tier5"
 
-    print("Hi 5 "+text5)
     if (text0 != "undefined" and text0 != ""):
         eafob.add_annotation(defaulttier, startTime, endTime, text0)
         eafob.add_linguistic_type(ltype, ltcon)

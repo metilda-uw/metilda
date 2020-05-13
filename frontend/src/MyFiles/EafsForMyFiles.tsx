@@ -48,7 +48,7 @@ State > {
 
   async componentWillReceiveProps(nextProps: EafsForMyFilesProps) {
     const {fileId} = this.props;
-    if (nextProps.fileId !== fileId) {
+    if (nextProps.fileId !== null && nextProps.fileId !== fileId) {
       this.setState({
         eafs: [],
         isLoading: true,

@@ -57,7 +57,7 @@ State > {
 
   async componentWillReceiveProps(nextProps: ImagesForMyFilesProps) {
     const {fileId} = this.props;
-    if (nextProps.fileId !== fileId) {
+    if (nextProps.fileId !== null && nextProps.fileId !== fileId) {
       this.setState({
         images: [],
         isLoading: true,

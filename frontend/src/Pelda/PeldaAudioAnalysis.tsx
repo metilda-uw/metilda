@@ -12,6 +12,7 @@ import AudioImg from "../Create/AudioImg";
 import AudioImgDefault from "../Create/AudioImgDefault";
 import AudioImgLoading from "../Create/AudioImgLoading";
 import PeldaUploadAudio from "../Create/UploadAudio";
+import {NotificationManager} from "react-notifications";
 import "../Create/UploadAudio.css";
 import "./PeldaAudioAnalysis.css";
 
@@ -77,9 +78,6 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
      * below were altered slightly, the bug went away. Likely it
      * was a result of a weird, undocumented edge case in that library.
      */
-    static SPEAKER_LIMIT(): number {
-        return 1;
-    }
 
     static get MIN_IMAGE_XPERC(): number {
         return 282.0 / 2800.0;
@@ -107,7 +105,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
         return url;
     }
 
-static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
+    static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
         if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
             return `/api/audio/${uploadId}/file?tmin=${tmin}&tmax=${tmax}`;
         } else {
@@ -136,7 +134,7 @@ static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
             pulsesChecked: false,
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
-                "&spectrogram&pitch&intensity&"),
+                "?spectrogram&pitch&intensity&"),
             audioUrl: PeldaAudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
@@ -202,33 +200,32 @@ static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
                 });
             });
 
-            try{
-                this.getEafFiles();
-            } catch (ex) {
-                console.log(ex);
-            }
+        try{
+            this.getEafFiles();
+        } catch (ex) {
+            console.log(ex);
+        }
     }
 
     setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
         if (fileType !== "Folder") {
-        const storageRef = this.props.firebase.uploadFile();
-        storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
-            // `url` is the download URL for file
-            const response = await fetch(url);
-            const responseBlob = await response.blob();
-            const formData = new FormData();
-            formData.append("file", responseBlob, uploadId);
-            const analysisResponse = await fetch(`/api/audio/download-file`, {
-                method: "POST",
-                body: formData,
+            const storageRef = this.props.firebase.uploadFile();
+            storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
+                // `url` is the download URL for file
+                const response = await fetch(url);
+                const responseBlob = await response.blob();
+                const formData = new FormData();
+                formData.append("file", responseBlob, uploadId);
+                const analysisResponse = await fetch(`/api/audio/download-file`, {
+                    method: "POST",
+                    body: formData,
+                });
+                this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+                this.props.resetLetters(this.props.speakerIndex);
+            }).catch(function(error: any) {
+                // return;
             });
-            this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
-            this.props.resetLetters(this.props.speakerIndex);
-        }).catch(function(error: any) {
-            // return;
-        });
         } else {
-            alert("aavi gayo");
             await this.setState ({
                 selectedFolderName:  uploadId,
             });
@@ -299,20 +296,17 @@ static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
                           tsOverride?: number[]) {
         const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
                     
-            fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
-                + "?t0=" + ts[0]
-                + "&t1=" + ts[1]
-                + "&max-pitch=" + this.state.maxPitch
-                + "&min-pitch=" + this.state.minPitch, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json",
-                        "Content-Type": "application/json",
-                    },
-            })
-                .then((response) => response.json())
-                .then((data) => {},
-            );
+        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
+            + "?t0=" + ts[0]
+            + "&t1=" + ts[1]
+            + "&max-pitch=" + this.state.maxPitch
+            + "&min-pitch=" + this.state.minPitch, {
+                method: "GET",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json",
+                },
+        }).then((response) => response.json());
 
         this.sendData();
     }
@@ -636,15 +630,14 @@ static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
     downloadEaf = async (filePath: string ) => {
         let eafData: string = "";
         try {
-                // Download file from cloud
-                const storageRef = this.props.firebase.uploadFile();
-                const url = await storageRef.child(filePath).getDownloadURL();
-                console.log(url);
-                await fetch(url)
-                    .then(response => response.text())
-                    .then(data => {
-                        eafData = data;
-                    });
+            // Download file from cloud
+            const storageRef = this.props.firebase.uploadFile();
+            const url = await storageRef.child(filePath).getDownloadURL();
+            await fetch(url)
+                .then(response => response.text())
+                .then(data => {
+                    eafData = data;
+            });
         } catch (ex) {
             console.log(ex);
         }
@@ -653,13 +646,12 @@ static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
 
     viewEaf = async () => {
         if ( this.state.selectedEafId === '-1' ) {
-            alert( "Please select an eaf file to view the annotation details!!");
+            NotificationManager.info( "Please select an eaf file to view the annotation details!!");
             return;
         }
 
         const eafFilePath = await this.getEafFilePath();
         const eafData = await this.downloadEaf(eafFilePath);
-        console.log("returned eafData" + eafData);
 
         const parser = new DOMParser();
         const xml = parser.parseFromString(eafData, 'text/xml');

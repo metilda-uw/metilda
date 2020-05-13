@@ -317,58 +317,64 @@ export function uploadEaf(
                 formData.append("uploaded_at", timeStamp);
                 formData.append("eaf_file_path", `${uid}/Eafs/${timeStamp}_${fileName}`);
                 fetch(`/api/create-eaf`, {
-                  method: "POST",
-                  headers: {
-                      Accept: "application/json"
-                  },
-                  body: formData
-              })
-                .then((response) => response.json())
-                .then((data) => {
-                     resolve(data.result);
-                     window.confirm("Uploaded " + fileName + " successfully!!");
-                  });
-            })
-            .catch((ex: any) => {
-                reject(ex);
-               });
-        });
-            return promise;
-}
-
-export function AddFolder(
-    folderName: any,
-    firebase: any,
-    ) {
-        const filePromise = new Promise((resolve, reject) => {
-            const uid = firebase.auth.currentUser.email;
-            const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
-            const storageRef = firebase.uploadFile();
-            const filesRef = storageRef.child(`${uid}/Uploads/${folderName}/.ignore`);
-            filesRef.put(new Blob())
-                .then((success: any) => {
-                const formData = new FormData();
-                formData.append("user_id", uid);
-                formData.append("file_name", folderName);
-                formData.append("file_path", `${uid}/Uploads/${folderName}`);
-                formData.append("file_type", "Folder");
-                formData.append("file_size", "0");
-                formData.append("updated_by", uid);
-                fetch(`/api/create-folder`, {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
                     },
                     body: formData
-                }).then((response) => {
-                    window.confirm("Created subfolder successfully!");
-                    resolve(response);
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    resolve(data.result);
+                    NotificationManager.success("Uploaded " + fileName + " successfully!");
                 });
-            }).catch((ex: any) => {
+            })
+            .catch((ex: any) => {
                 reject(ex);
+                NotificationManager.error("Error: EAF not uploaded");
             });
         });
-        return filePromise;
+    return promise;
+}
+
+export function AddFolder(
+    folderName: any,
+    firebase: any 
+    ) {
+        const filePromise = new Promise((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            const storageRef = firebase.uploadFile();
+            const filesRef = storageRef.child(`${uid}/Uploads/${folderName}/.ignore`);
+            
+            filesRef.getMetadata().then(function () {
+                NotificationManager.error(folderName + " already exists!");
+            }).catch(function () {
+                filesRef.put(new Blob())
+                .then((success: any) => {
+                    const formData = new FormData();
+                    formData.append("user_id", uid);
+                    formData.append("file_name", folderName);
+                    formData.append("file_path", `${uid}/Uploads/${folderName}`);
+                    formData.append("file_type", "Folder");
+                    formData.append("file_size", "0");
+                    formData.append("updated_by", uid);
+                    fetch(`/api/create-folder`, {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    }).then((response) => {
+                        NotificationManager.success("Created " + folderName + " successfully!");
+                        resolve(response);
+                    });
+                }).catch((ex: any) => {
+                    reject(ex);
+                    NotificationManager.success("Error: Subfolder not uploaded");
+                 });
+            });
+        });   
+        return filePromise; 
 }
 
 export function MoveToFolder(
@@ -380,7 +386,6 @@ export function MoveToFolder(
         const filePromise = new Promise((resolve, reject) => {
             const storageRef = firebase.uploadFile();
             const filesRef = storageRef.child(filePath);
-            console.log(fileId + " " + filePath + " ");
             filesRef.put(new Blob([fileData], {type: "audio/wav"}))
                 .then((success: any) => {
                 const formData = new FormData();
@@ -396,7 +401,6 @@ export function MoveToFolder(
                     resolve(response);
                 });
             }).catch((ex: any) => {
-                console.log("exception"+ex);
                 reject(ex);
             });
         });

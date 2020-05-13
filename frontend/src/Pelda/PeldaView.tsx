@@ -13,6 +13,7 @@ import {uploadAudio, uploadEaf} from "../Create/ImportUtils";
 import {spinner} from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
+import {NotificationManager} from "react-notifications";
 import "./PeldaView.css";
 
 export interface PeldaViewProps {
@@ -142,49 +143,66 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 				});
 
 				if (elementTier1 !== null) {
-					if (isTier1Enabled) {
+					const textbox1 = document.getElementById("textbox1");
+					if (isTier1Enabled && textbox1 != null) {
 						elementTier1.setAttribute("class", "unhidden");
+						textbox1.focus();
 					} else {
 						elementTier1.setAttribute("class", "hidden");
 					}
 				}
 
 				if (elementTier2 !== null) {
-					if (isTier2Enabled)
+					const textbox2 = document.getElementById("textbox2");
+					if (isTier2Enabled && textbox2 != null) {
 						elementTier2.setAttribute("class", "unhidden");
-					else 
+						textbox2.focus();
+					} else { 
 						elementTier2.setAttribute("class", "hidden");
+					}
 				}
 
 				if (elementTier3 !== null) {
-					if (isTier3Enabled)
+					const textbox3 = document.getElementById("textbox3");
+					if (isTier3Enabled && textbox3 != null) {
 						elementTier3.setAttribute("class", "unhidden");
-					else
+						textbox3.focus();
+					} else { 
 						elementTier3.setAttribute("class", "hidden");
+					}
 				}
 
 				if (elementTier4 !== null) {
-					if (isTier4Enabled) 
+					const textbox4 = document.getElementById("textbox4");
+					if (isTier4Enabled && textbox4 != null) {
 						elementTier4.setAttribute("class", "unhidden");
-					else
+						textbox4.focus();
+					} else { 
 						elementTier4.setAttribute("class", "hidden");
+					}
 				}
 
 				if (elementTier5 !== null) {
-					if (isTier5Enabled) 
+					const textbox5 = document.getElementById("textbox5");
+					if (isTier5Enabled && textbox5 != null) {
 						elementTier5.setAttribute("class", "unhidden");
-					else 
+						textbox5.focus();
+					} else { 
 						elementTier5.setAttribute("class", "hidden");
+					}
 				}
 
 				if (elementTier6 !== null) {
-					if (isTier6Enabled) 
+					const textbox6 = document.getElementById("textbox6");
+					if (isTier6Enabled && textbox6 != null) {
 						elementTier6.setAttribute("class", "unhidden");
-					else 
+						textbox6.focus();
+					} else { 
 						elementTier6.setAttribute("class", "hidden");
+					}
 				}
 			} else {
-				alert("Please save your exisiting annotation details!!")
+				NotificationManager.info("Please save your exisiting annotation details!!")
 			}
 		} else {
 			await this.setState({
@@ -197,47 +215,64 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 			});
 
 			if (elementTier1 !== null) {
-				if (isTier1Enabled) {
+				const textbox1 = document.getElementById("textbox1");
+				if (isTier1Enabled && textbox1 != null) {
 					elementTier1.setAttribute("class", "unhidden");
+					textbox1.focus();
 				} else {
 					elementTier1.setAttribute("class", "hidden");
 				}
 			}
 
 			if (elementTier2 !== null) {
-				if (isTier2Enabled)
+				const textbox2 = document.getElementById("textbox2");
+				if (isTier2Enabled && textbox2 != null) {
 					elementTier2.setAttribute("class", "unhidden");
-				else 
+					textbox2.focus();
+				} else { 
 					elementTier2.setAttribute("class", "hidden");
+				}
 			}
 
 			if (elementTier3 !== null) {
-				if (isTier3Enabled)
+				const textbox3 = document.getElementById("textbox3");
+				if (isTier3Enabled && textbox3 != null) {
 					elementTier3.setAttribute("class", "unhidden");
-				else
+					textbox3.focus();
+				} else { 
 					elementTier3.setAttribute("class", "hidden");
+				}
 			}
 
 			if (elementTier4 !== null) {
-				if (isTier4Enabled) 
+				const textbox4 = document.getElementById("textbox4");
+				if (isTier4Enabled && textbox4 != null) {
 					elementTier4.setAttribute("class", "unhidden");
-				else
+					textbox4.focus();
+				} else { 
 					elementTier4.setAttribute("class", "hidden");
+				}
 			}
 
 			if (elementTier5 !== null) {
-				if (isTier5Enabled) 
+				const textbox5 = document.getElementById("textbox5");
+				if (isTier5Enabled && textbox5 != null) {
 					elementTier5.setAttribute("class", "unhidden");
-				else 
+					textbox5.focus();
+				} else { 
 					elementTier5.setAttribute("class", "hidden");
+				}
 			}
 
 			if (elementTier6 !== null) {
-				if (isTier6Enabled) 
+				const textbox6 = document.getElementById("textbox6");
+				if (isTier6Enabled && textbox6 != null) {
 					elementTier6.setAttribute("class", "unhidden");
-				else 
+					textbox6.focus();
+				} else { 
 					elementTier6.setAttribute("class", "hidden");
-			}			
+				}
+			}
 		}
 	}
 
@@ -709,7 +744,7 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 
 	addTiers() {
 		if (this.props.speakers[0].uploadId !== null && this.props.speakers[0].uploadId !== "") {
-			if(this.state.selectStartTime > 0 && this.state.selectEndTime > 0 && this.state.selectStartTime !== this.state.selectEndTime ) {
+			if((this.state.selectEndTime - this.state.selectStartTime) >= 1 ) {
 				const element = document.getElementById("elan-annotation");
 				const timeInterval = document.getElementById("selection-interval");
 		
@@ -726,22 +761,46 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 
 					if (elementTier1 !== null && elementTier1.getAttribute("class") === "hidden") {
 						elementTier1.setAttribute("class","unhidden");
+						const textbox1 = document.getElementById("textbox1");
+						if (textbox1 !== null) {
+							textbox1.focus();
+						}
 					} else if (elementTier2 !== null && elementTier2.getAttribute("class") === "hidden") {
 						elementTier2.setAttribute("class","unhidden");
+						const textbox2 = document.getElementById("textbox2");
+						if (textbox2 !== null) {
+							textbox2.focus();
+						}
 					} else if (elementTier3 !== null && elementTier3.getAttribute("class") === "hidden") {
 						elementTier3.setAttribute("class","unhidden");
+						const textbox3 = document.getElementById("textbox3");
+						if (textbox3 !== null) {
+							textbox3.focus();
+						}
 					} else if (elementTier4 !== null && elementTier4.getAttribute("class") === "hidden") {
 						elementTier4.setAttribute("class","unhidden");
+						const textbox4 = document.getElementById("textbox4");
+						if (textbox4 !== null) {
+							textbox4.focus();
+						}
 					} else if (elementTier5 !== null && elementTier5.getAttribute("class") === "hidden") {
 						elementTier5.setAttribute("class","unhidden");
+						const textbox5 = document.getElementById("textbox5");
+						if (textbox5 !== null) {
+							textbox5.focus();
+						}
 					} else if (elementTier6 !== null && elementTier6.getAttribute("class") === "hidden") {
 						elementTier6.setAttribute("class","unhidden");
+						const textbox6 = document.getElementById("textbox6");
+						if (textbox6 !== null) {
+							textbox6.focus();
+						}
 					}else {
-						alert("Only 6 tiers are allowed!!");
+						NotificationManager.info("Only 6 tiers are allowed!");
 					}
 				}
 			} else {
-				alert("Please select a time window to add annotation details!!");
+				NotificationManager.info("Please select a time window of atleast 1 second to add annotation details!");
 			}
 		}
 	}
@@ -983,117 +1042,118 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 	}
 
 	saveAnnotations() {
-		if ((this.state.selectStartTime >= 0 && this.state.selectEndTime >=0) &&
-			(this.state.tier1Value !== "" || this.state.tier2Value !== "" ||
-			this.state.tier3Value !== "" || this.state.tier4Value !== "" ||
-			this.state.tier5Value !== "" || this.state.tier6Value !== "")) {
-			const element = document.getElementById("elan-annotation");
-			var tiersValue: string = "";
+		if ((this.state.selectEndTime - this.state.selectStartTime) >= 1) { 
+			if (this.state.tier1Value !== "" || this.state.tier2Value !== "" || this.state.tier3Value !== "" || this.state.tier4Value !== "" || this.state.tier5Value !== "" || this.state.tier6Value !== "") {
+				const element = document.getElementById("elan-annotation");
+				var tiersValue: string = "";
 
-			if (element !== null && element.getAttribute("class") === "unhidden") {
-				const elementTier1 = document.getElementById("tier1label");
-				const elementTier2 = document.getElementById("tier2label");
-				const elementTier3 = document.getElementById("tier3label");
-				const elementTier4 = document.getElementById("tier4label");
-				const elementTier5 = document.getElementById("tier5label");
-				const elementTier6 = document.getElementById("tier6label");
-				
-				if (elementTier1 !== null && elementTier1.getAttribute("class") === "unhidden") {
-					if (this.state.tier1Value !== "") {
-						tiersValue += ("\nTier 1: " + this.state.tier1Value);
-					} else {
-						alert("Tier1 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
+				if (element !== null && element.getAttribute("class") === "unhidden") {
+					const elementTier1 = document.getElementById("tier1label");
+					const elementTier2 = document.getElementById("tier2label");
+					const elementTier3 = document.getElementById("tier3label");
+					const elementTier4 = document.getElementById("tier4label");
+					const elementTier5 = document.getElementById("tier5label");
+					const elementTier6 = document.getElementById("tier6label");
+					
+					if (elementTier1 !== null && elementTier1.getAttribute("class") === "unhidden") {
+						if (this.state.tier1Value !== "") {
+							tiersValue += ("\nTier 1: " + this.state.tier1Value);
+						} else {
+							NotificationManager.info("Tier1 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}
 					}
-				}
-				 
-				if (elementTier2 !== null && elementTier2.getAttribute("class") === "unhidden") {
-					if (this.state.tier2Value !== "") {
-						tiersValue += ("\nTier 2: " + this.state.tier2Value);
-					} else {
-						alert("Tier2 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
+					
+					if (elementTier2 !== null && elementTier2.getAttribute("class") === "unhidden") {
+						if (this.state.tier2Value !== "") {
+							tiersValue += ("\nTier 2: " + this.state.tier2Value);
+						} else {
+							NotificationManager.info("Tier2 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}
 					}
-				}
-				
-				if (elementTier3 !== null && elementTier3.getAttribute("class") === "unhidden") {
-					if (this.state.tier3Value !== "") {
-						tiersValue += ("\nTier 3: " + this.state.tier3Value);
-					} else {
-						alert("Tier3 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
+					
+					if (elementTier3 !== null && elementTier3.getAttribute("class") === "unhidden") {
+						if (this.state.tier3Value !== "") {
+							tiersValue += ("\nTier 3: " + this.state.tier3Value);
+						} else {
+							NotificationManager.info("Tier3 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}
+					}
+
+					if (elementTier4 !== null && elementTier4.getAttribute("class") === "unhidden") {
+						if (this.state.tier4Value !== "") {
+							tiersValue += ("\nTier 4: " + this.state.tier4Value);	
+						} else {
+							NotificationManager.info("Tier4 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}
+					}
+
+					if (elementTier5 !== null && elementTier5.getAttribute("class") === "unhidden") {
+						if (this.state.tier5Value !== "") {
+							tiersValue += ("\nTier 5: " + this.state.tier5Value);	
+						} else {
+							NotificationManager.info("Tier5 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}
+					}
+
+					if (elementTier6 !== null && elementTier6.getAttribute("class") === "unhidden") {
+						if (this.state.tier6Value !== "") {
+							tiersValue += ("\nTier 6: " + this.state.tier6Value);	
+						} else {
+							NotificationManager.info("Tier6 content cannot be empty. Please either enter the content or remove the tier!");
+							return;
+						}	
 					}
 				}
 
-				if (elementTier4 !== null && elementTier4.getAttribute("class") === "unhidden") {
-					if (this.state.tier4Value !== "") {
-						tiersValue += ("\nTier 4: " + this.state.tier4Value);	
-					} else {
-						alert("Tier4 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
-					}
-				}
+				const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want proceed to save an eaf file?");
+			
+				if ( isOk ) {
+					var eafFileName = prompt("Enter name for EAF: ", "testeaf.eaf");	
 
-				if (elementTier5 !== null && elementTier5.getAttribute("class") === "unhidden") {
-					if (this.state.tier5Value !== "") {
-						tiersValue += ("\nTier 5: " + this.state.tier5Value);	
-					} else {
-						alert("Tier5 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
-					}
-				}
+					const request: RequestInit = {
+						method: "GET",
+						headers: {
+							"Accept": "application/json",
+							"Content-Type": "application/json",
+						}
+					};
+					
+					if (eafFileName !== null && (this.state.tier1Value !== "" || this.state.tier2Value !== "" || this.state.tier3Value !== "" || this.state.tier4Value !== "" || this.state.tier5Value !== "" || this.state.tier6Value !== "")) {
+						var tier1text = this.state.tier1Value;
+						var tier2text = this.state.tier2Value;
+						var tier3text = this.state.tier3Value;
+						var tier4text = this.state.tier4Value;
+						var tier5text = this.state.tier5Value;
+						var tier6text = this.state.tier6Value;
 
-				if (elementTier6 !== null && elementTier6.getAttribute("class") === "unhidden") {
-					if (this.state.tier6Value !== "") {
-						tiersValue += ("\nTier 6: " + this.state.tier6Value);	
-					} else {
-						alert("Tier6 content cannot be empty. Please either enter the content or remove the tier!");
-						return;
-					}	
+						if (tier1text === "")
+							tier1text = "EMPTY";
+						if (tier2text === "")
+							tier2text = "EMPTY";
+						if (tier3text === "")
+							tier3text = "EMPTY";
+						if (tier4text === "")
+							tier4text = "EMPTY";
+						if (tier5text === "")
+							tier5text = "EMPTY";
+						if (tier6text === "")
+							tier6text = "EMPTY";
+
+						fetch(`/annotation/${eafFileName}/${this.props.speakers[0].uploadId}/${this.state.selectStartTime}/${this.state.selectEndTime}/${tier1text}/${tier2text}/${tier3text}/${tier4text}/${tier5text}/${tier6text}`, request)
+						.then(response => response.text())
+						.then((eafData) => {
+							uploadEaf(eafFileName, this.props.speakers.map(item => item.fileIndex), eafData, this.props.firebase); }
+						).catch(console.log);
+					}
 				}
 			}
-
-			const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want proceed to save an eaf file?");
-		
-			if ( isOk ) {
-				var eafFileName = prompt("Enter name for EAF: ", "testeaf.eaf");	
-
-				const request: RequestInit = {
-					method: "GET",
-					headers: {
-						"Accept": "application/json",
-						"Content-Type": "application/json",
-					}
-				};
-				
-				if (eafFileName !== null && (this.state.tier1Value !== "" || this.state.tier2Value !== "" || this.state.tier3Value !== "" || this.state.tier4Value !== "" || this.state.tier5Value !== "" || this.state.tier6Value !== "")) {
-					var tier1text = this.state.tier1Value;
-					var tier2text = this.state.tier2Value;
-					var tier3text = this.state.tier3Value;
-					var tier4text = this.state.tier4Value;
-					var tier5text = this.state.tier5Value;
-					var tier6text = this.state.tier6Value;
-
-					if (tier1text === "")
-						tier1text = "EMPTY";
-					if (tier2text === "")
-						tier2text = "EMPTY";
-					if (tier3text === "")
-						tier3text = "EMPTY";
-					if (tier4text === "")
-						tier4text = "EMPTY";
-					if (tier5text === "")
-						tier5text = "EMPTY";
-					if (tier6text === "")
-						tier6text = "EMPTY";
-
-					fetch(`/annotation/${eafFileName}/${this.props.speakers[0].uploadId}/${this.state.selectStartTime}/${this.state.selectEndTime}/${tier1text}/${tier2text}/${tier3text}/${tier4text}/${tier5text}/${tier6text}`, request)
-					.then(response => response.text())
-					.then((eafData) => {
-						uploadEaf(eafFileName, this.props.speakers.map(item => item.fileIndex), eafData, this.props.firebase); }
-					).catch(console.log);
-				}
-			}
+		} else {
+			NotificationManager.info("Please select a time window of atleast 1 second to add annotation details!");
 		}
 	}
 
@@ -1125,20 +1185,24 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
                     	</button>
                 	</ReactFileReader>
 					<div className="metilda-page-content">
-						<div id="drop-down-back-button">
-							{this.state.selectedFolderName === "Uploads" &&
-							<button disabled={true} className="audioBackButtonDisabled" onClick={() => this.folderBackButtonClicked()}>
-								<i className="material-icons">arrow_back</i>
-							</button>
-							}
-							{this.state.selectedFolderName !== "Uploads" &&
-							<button className="audioBackButton" onClick={() => this.folderBackButtonClicked()}>
-								<i className="material-icons">arrow_back</i>
-							</button>
-							}
+						<div id="button-drop-down-image-side-by-side">
+							<div id="drop-down-back-button">
+								{this.state.selectedFolderName === "Uploads" &&
+								<button className="audioBackButtonDisabled"  disabled={true}>
+									<i className="material-icons">arrow_back</i>
+								</button>
+								}
+								{this.state.selectedFolderName !== "Uploads" &&
+								<button className="audioBackButton" onClick={() => this.folderBackButtonClicked()}>
+									<i className="material-icons">arrow_back</i>
+								</button>
+								}
+							</div>
+							<div id="drop-down-and-image">
 							{this.renderSpeakers()} 
+							</div>
 						</div>
-					
+
 						<div id="audioLength">
 							<p>Audio Time Duration:</p>
 							{this.state.soundLength > 0 && 
@@ -1216,7 +1280,7 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
 							</div> <br /> <br />
 						</div>	
 
-						{this.state.selectStartTime > 0 && this.state.selectStartTime > 0 && this.state.selectStartTime !== this.state.selectEndTime &&
+						{this.state.selectStartTime >= 0 && this.state.selectEndTime >= 0 && (this.state.selectEndTime - this.state.selectStartTime) > 0 &&
 						<div id="selection-interval">
 								<p id="select-start-time">Start Time: {this.state.selectStartTime.toFixed(1)}</p><p id="select-end-time">End Time: {this.state.selectEndTime.toFixed(1)}</p>
 						</div>}

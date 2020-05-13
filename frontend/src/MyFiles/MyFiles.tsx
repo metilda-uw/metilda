@@ -263,7 +263,6 @@ deleteFile = async (file: FileEntity) => {
     try {
         // Delete file from cloud
         const filePath = file.path;
-        console.log(filePath);
         const storageRef = this.props.firebase.uploadFile();
         const fileRef = storageRef.child(filePath);
         await fileRef.delete();
@@ -276,7 +275,7 @@ deleteFiles = async () => {
     const uncheckedFiles = [];
     try {
     for (const file of this.state.files) {
-        if (file.checked) {
+        if (file.checked && file.type !== "Folder") {
             // Delete file from cloud
             const filePath = file.path;
             const storageRef = this.props.firebase.uploadFile();
@@ -347,14 +346,16 @@ eafsBackButtonClicked = () => {
 subFolderBackButtonClicked = async () => {
     await this.setState({
         isGetSubFolderClicked: false,
-        selectedFolderName: "Uploads",     
+        selectedFolderName: "Uploads", 
+        selectedFileId: null,    
     });
     await this.getUserFiles();
 }
 
-addSubfolder = () => {
+addSubfolder = async () => {
     const folderName = prompt("Enter name of the subfolder: ", "untitled folder");
-    AddFolder(folderName, this.props.firebase);
+    await AddFolder(folderName, this.props.firebase);
+    await this.getUserFiles();
 }
 
 deleteFolder = async () => {
@@ -389,7 +390,6 @@ deleteFolder = async () => {
                     body: formData
                 });
             }
-            console.log(uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore");
             const path = uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore";
             const fileRef = storageRef.child(path);
             const response = await fileRef.delete(); 

@@ -58,7 +58,6 @@ class UploadAudio extends Component {
         }
 
         const index = event.target.value;
-        console.log(this.props.userFiles[index]);
         this.props.setUploadId(this.props.userFiles[index][1], this.props.userFiles[index][2], this.props.userFiles[index][0], this.props.userFiles[index][4]);
     }
 
