@@ -334,21 +334,20 @@ export function uploadEaf(
                 NotificationManager.error("Error: EAF not uploaded");
             });
         });
-    return promise;
+        return promise;
 }
 
 export function AddFolder(
     folderName: any,
-    firebase: any 
+    firebase: any
     ) {
         const filePromise = new Promise((resolve, reject) => {
             const uid = firebase.auth.currentUser.email;
             const storageRef = firebase.uploadFile();
             const filesRef = storageRef.child(`${uid}/Uploads/${folderName}/.ignore`);
-            
-            filesRef.getMetadata().then(function () {
+            filesRef.getMetadata().then(function() {
                 NotificationManager.error(folderName + " already exists!");
-            }).catch(function () {
+            }).catch(function() {
                 filesRef.put(new Blob())
                 .then((success: any) => {
                     const formData = new FormData();
@@ -373,8 +372,8 @@ export function AddFolder(
                     NotificationManager.success("Error: Subfolder not uploaded");
                  });
             });
-        });   
-        return filePromise; 
+        });
+        return filePromise;
 }
 
 export function MoveToFolder(

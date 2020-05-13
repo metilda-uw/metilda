@@ -22,8 +22,8 @@
   "include": [
       "src"
     ],
-  "exclude": [
-      "src/**/**/*",
-       "src/**/*.test.*"
-   ]
+  //"exclude": [
+  //    "src/**/**/*",
+  //     "src/**/*.test.*"
+  // ]
 }

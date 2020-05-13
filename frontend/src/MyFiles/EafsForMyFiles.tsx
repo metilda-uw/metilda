@@ -92,7 +92,7 @@ State > {
         const updatedEafFiles = [...this.state.eafs];
         updatedEafFiles.map((eaf) =>
           eaf.checked = this.state.checkAllEaf);
-          this.setState({
+        this.setState({
             eafs: updatedEafFiles
           });
         });
@@ -207,15 +207,15 @@ State > {
       const storageRef = this.props.firebase.uploadFile();
       const url = await storageRef.child(eaf.path).getDownloadURL();
       await fetch(url)
-        .then(response => response.text())
-        .then(data => {
+        .then((response) => response.text())
+        .then((data) => {
             eafData = data;
       });
     } catch (ex) {
       console.log(ex);
     }
     const element = document.getElementById("eafDataContainer");
-    if(element !== null) {
+    if (element !== null) {
       element.setAttribute("class", "unhide");
       const titleElement = document.getElementById("eafFileTitle");
       if (titleElement !== null) {
@@ -230,7 +230,7 @@ State > {
 
   closeEafFile() {
     const element = document.getElementById("eafDataContainer");
-    if(element !== null) {
+    if (element !== null) {
       element.setAttribute("class", "hide");
     }
   }
@@ -249,15 +249,15 @@ State > {
           <i className="material-icons right">arrow_back</i>
           Back
         </button>
-        {this.state.eafs.length == 0 && 
+        {this.state.eafs.length === 0 &&
         <div>
           <p id="noEafsMessage">No annotation files found!</p>
         </div>}
-        {this.state.eafs.length > 0 && 
+        {this.state.eafs.length > 0 &&
         <div> <br/> <br/>
           <h1 id="eafTitle">Annotaion Files for Audio: {this.props.fileName}</h1><br/>
         </div>}
-        {this.state.eafs.length > 0 && 
+        {this.state.eafs.length > 0 &&
         <div className="eafContainer">
           <table id="myFiles">
             <tbody>
@@ -290,7 +290,7 @@ State > {
             </button>
             <h1 id="eafFileTitle">File Content</h1>
             <p id="eafContent"></p>
-          </p>  
+          </p>
         </div>
       </div>
     );

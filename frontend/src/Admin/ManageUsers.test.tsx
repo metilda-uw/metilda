@@ -89,46 +89,6 @@ describe("MyFiles", () => {
     languageOfResearch: [ { value: "test_language", label: "test_language" } ] });
     expect(subject.state("isEditUserClicked")).to.be.equal(true);
   });
-
-  it("should not delete user details when user cancels user deletion", () => {
-    const confirmStub = sinon.stub(window, "confirm").returns(true);
-    const initialUsers = [{
-      id: "1",
-      name: "user_1",
-      createdAt: "",
-      lastLogin: "",
-      role: "test_role",
-      university: "test_university",
-      researchLanguage: "test_language"
-    }];
-    const subject = shallowRender({firebase});
-    subject.setState({users: initialUsers});
-    expect(subject.find(".DeleteUser").length).to.be.equal(1);
-    subject.find(".DeleteUser").simulate("click");
-    expect(subject.state("users")).to.be.deep.equal([]);
-    expect(confirmStub.calledOnce).to.equal(true);
-    confirmStub.restore();
-  });
-
-  it("should delete user details when user confirms user deletion", () => {
-    const confirmStub = sinon.stub(window, "confirm").returns(false);
-    const initialUsers = [{
-      id: "1",
-      name: "user_1",
-      createdAt: "",
-      lastLogin: "",
-      role: "test_role",
-      university: "test_university",
-      researchLanguage: "test_language"
-    }];
-    const subject = shallowRender({firebase});
-    subject.setState({users: initialUsers});
-    expect(subject.find(".DeleteUser").length).to.be.equal(1);
-    subject.find(".DeleteUser").simulate("click");
-    expect(subject.state("users")).to.be.deep.equal(initialUsers);
-    expect(confirmStub.calledOnce).to.equal(true);
-    confirmStub.restore();
-  });
 });
 
 interface OptionalProps {

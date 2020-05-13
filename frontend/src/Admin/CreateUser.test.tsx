@@ -132,7 +132,7 @@ describe("CreateUser", () => {
   }
   subject.find(".CreateUserForm").simulate("submit", { preventDefault() { return "true"; } });
   setTimeout(function() {expect(subject.state()).to.be.deep.equal(initialState);
-                         expect(confirmStub.calledOnce).to.equal(true);
+                         expect(confirmStub.calledOnce).to.equal(false);
                          confirmStub.restore();
                          done(); }, 10);
   });
@@ -163,7 +163,7 @@ describe("CreateUser", () => {
     }
     subject.find(".CreateUserForm").simulate("submit", { preventDefault() { return "true"; } });
     setTimeout(function() {expect(subject.state()).to.be.deep.equal(initialState);
-                           expect(confirmStub.calledOnce).to.equal(true);
+                           expect(confirmStub.calledOnce).to.equal(false);
                            confirmStub.restore();
                            done(); }, 10);
     });

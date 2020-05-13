@@ -1,12 +1,12 @@
-import React, {createRef} from "react";
-import { withAuthorization } from "../Session";
-import "./MyFiles.scss";
+import React, { createRef } from "react";
+import { NotificationManager } from "react-notifications";
+import { AddFolder, MoveToFolder } from "../Create/ImportUtils";
 import Header from "../Layout/Header";
-import ImagesForMyFiles from "./ImagesForMyFiles";
-import {AddFolder, MoveToFolder} from "../Create/ImportUtils"
-import {spinner} from "../Utils/LoadingSpinner";
-import {NotificationManager} from "react-notifications";
+import { withAuthorization } from "../Session";
+import { spinner } from "../Utils/LoadingSpinner";
 import EafsForMyFiles from "./EafsForMyFiles";
+import ImagesForMyFiles from "./ImagesForMyFiles";
+import "./MyFiles.scss";
 
 export interface MyFilesProps {
   firebase: any;
@@ -97,7 +97,7 @@ private downloadRef = createRef<HTMLAnchorElement>();
                 }
             );
           });
-          this.setState({
+      this.setState({
               files: updatedFiles,
               isLoading: false
           });
@@ -166,12 +166,12 @@ renderTableData() {
     return this.state.files.map((file, index) => {
         return (
         <tr key={index}>
-            {file.type === 'Upload' &&
+            {file.type === "Upload" &&
            <td><label><input className="checkBoxForFile"type="checkbox"
            checked={file.checked} onChange={this.handleCheckboxChange}
            value={index}/><span/></label></td>
             }
-            {file.type === 'Folder' &&
+            {file.type === "Folder" &&
            <td><i className="material-icons center">folder</i></td>
             }
            <td>{file.name}</td>
@@ -228,7 +228,7 @@ openFolder = async (file: FileEntity) => {
         isGetSubFolderClicked: true,
         selectedFileId: file.id,
     });
-   await this.getUserFiles();
+    await this.getUserFiles();
 }
 
 handleMoveFiles = async (folder: FileEntity) => {
@@ -346,8 +346,8 @@ eafsBackButtonClicked = () => {
 subFolderBackButtonClicked = async () => {
     await this.setState({
         isGetSubFolderClicked: false,
-        selectedFolderName: "Uploads", 
-        selectedFileId: null,    
+        selectedFolderName: "Uploads",
+        selectedFileId: null,
     });
     await this.getUserFiles();
 }
@@ -361,7 +361,7 @@ addSubfolder = async () => {
 deleteFolder = async () => {
     const isOk: boolean = confirm("The content of the folder will be deleted. Are you sure you want to delete folder?");
 
-    if( isOk ) {	
+    if ( isOk ) {
         try {
             // Delete folder from cloud and DB
             if (this.state.selectedFileId !== null ) {
@@ -391,12 +391,12 @@ deleteFolder = async () => {
                 });
             }
             const path = uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore";
-            const fileRef = storageRef.child(path);
-            const response = await fileRef.delete(); 
+            const fRef = storageRef.child(path);
+            const response = await fRef.delete();
             this.subFolderBackButtonClicked();
         } catch (ex) {
             console.log(ex);
-        } 
+        }
     }
 }
 
@@ -415,11 +415,13 @@ render() {
                 }
                 {this.state.isGetSubFolderClicked &&
                     <div>
-                    <button className="FolderBackButton waves-effect waves-light btn globalbtn" onClick={this.subFolderBackButtonClicked}>
+                    <button className="FolderBackButton waves-effect waves-light btn globalbtn" onClick=
+                    {this.subFolderBackButtonClicked}>
                         <i className="material-icons right">arrow_back</i>
                         Back
                     </button>
-                    <button className="DeleteFolder waves-effect waves-light btn globalbtn" onClick={() => this.deleteFolder()}>
+                    <button className="DeleteFolder waves-effect waves-light btn globalbtn" onClick=
+                    {() => this.deleteFolder()}>
                         <i className="material-icons right">delete</i>
                         Delete {this.state.selectedFolderName}
                     </button>
@@ -436,7 +438,8 @@ render() {
                 <p>
                     <i>
                         <b>Note:</b>
-                        Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the bottom of the page to download or delete files. 
+                        Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the
+                         bottom of the page to download or delete files.
                     </i>
                 </p><br/>
                 <table id="myFiles">
@@ -446,11 +449,13 @@ render() {
                     </tbody>
                 </table>
                 <div className="myFilesButtonContainer">
-                    <button className="DownloadFile waves-effect waves-light btn globalbtn" onClick={this.downloadFiles}>
+                    <button className="DownloadFile waves-effect waves-light btn globalbtn" onClick=
+                    {this.downloadFiles}>
                         <i className="material-icons right">file_download</i>
                         Download Files
                     </button>
-                    <button className="DeleteFile waves-effect waves-light btn globalbtn" onClick={this.deleteFiles}>
+                    <button className="DeleteFile waves-effect waves-light btn globalbtn" onClick
+                    ={this.deleteFiles}>
                         <i className="material-icons right">delete</i>
                         Delete Files
                     </button>
@@ -469,7 +474,7 @@ render() {
             imagesBackButtonClicked={this.imagesBackButtonClicked}
             fileId={this.state.selectedFileId}
             fileName={this.state.selectedFileName}/>
-            <EafsForMyFiles showEafs={this.state.isGetEafsClicked} 
+            <EafsForMyFiles showEafs={this.state.isGetEafsClicked}
             eafsBackButtonClicked={this.eafsBackButtonClicked}
             fileId={this.state.selectedFileId}
             fileName={this.state.selectedFileName}/>

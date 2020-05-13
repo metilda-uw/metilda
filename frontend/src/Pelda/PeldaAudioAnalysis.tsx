@@ -25,12 +25,12 @@ export interface PeldaAudioAnalysisProps {
     resetLetters: (speakerIndex: number) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
-    parentCallBack: (soundLength: number, minAudioTime: number, maxAudioTime: number, 
-        selectStartTime: number, selectEndTime: number, selectedFolderName: string ) => void;
+    parentCallBack: (soundLength: number, minAudioTime: number, maxAudioTime: number,
+                     selectStartTime: number, selectEndTime: number, selectedFolderName: string ) => void;
     eafTierDataCallBack: (isTier1Enabled: boolean, tier1text: string, isTier2Enabled: boolean,
-        tier2text: string, isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean,
-        tier4text: string, isTier5Enabled: boolean, tier5text: string, 
-        isTier6Enabled: boolean, tier6text: string) => void;
+                          tier2text: string, isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean,
+                          tier4text: string, isTier5Enabled: boolean, tier5text: string,
+                          isTier6Enabled: boolean, tier6text: string) => void;
 }
 
 interface State {
@@ -45,9 +45,9 @@ interface State {
     maxPitch: number;
     minPitch: number;
     spectrumChecked: boolean;
-	pitchChecked: boolean;
-	intensityChecked: boolean;
-	formantChecked: boolean;
+    pitchChecked: boolean;
+    intensityChecked: boolean;
+    formantChecked: boolean;
     pulsesChecked: boolean;
     imageUrl: string;
     audioUrl: string;
@@ -128,9 +128,9 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             maxPitch: PeldaAudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
             minPitch: PeldaAudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
             spectrumChecked: true,
-	        pitchChecked: true,
-	        intensityChecked: true,
-	        formantChecked: false,
+            pitchChecked: true,
+            intensityChecked: true,
+            formantChecked: false,
             pulsesChecked: false,
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
@@ -147,7 +147,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             maxZoomStatus: [],
             audioImgWidth: (PeldaAudioAnalysis.MAX_IMAGE_XPERC - PeldaAudioAnalysis.MIN_IMAGE_XPERC)
                 * PeldaAudioAnalysis.AUDIO_IMG_WIDTH,
-            selectedEafId: '-1',
+            selectedEafId: "-1",
             closeImgSelectionCallback: () => (null),
             selectionCallback: (t1, t2) => (null),
         };
@@ -200,7 +200,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                 });
             });
 
-        try{
+        try {
             this.getEafFiles();
         } catch (ex) {
             console.log(ex);
@@ -295,7 +295,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                           rightX: number,
                           tsOverride?: number[]) {
         const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
-                    
+
         fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
             + "?t0=" + ts[0]
             + "&t1=" + ts[1]
@@ -380,13 +380,13 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
     }
 
     showZoomOutAudio() {
-        if(this.state.minZoomStatus.length !== 0 && this.state.maxZoomStatus.length !== 0) {
+        if (this.state.minZoomStatus.length !== 0 && this.state.maxZoomStatus.length !== 0) {
             const minZoomStatusArray = this.state.minZoomStatus;
             const maxZoomStatusArray = this.state.maxZoomStatus;
             const lastMinZoomStatus = minZoomStatusArray.pop();
             const lastMaxZoomStatus = maxZoomStatusArray.pop();
-            
-            let newImageUrl = `/draw-sound/${this.getSpeaker().uploadId}/${lastMinZoomStatus}/${lastMaxZoomStatus}`
+
+            const newImageUrl = `/draw-sound/${this.getSpeaker().uploadId}/${lastMinZoomStatus}/${lastMaxZoomStatus}`
             + this.checkStatus();
 
             this.state.closeImgSelectionCallback();
@@ -400,7 +400,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             });
 
             this.sendData();
-        } 
+        }
     }
 
     imageIntervalToTimeInterval(x1: number, x2: number) {
@@ -414,16 +414,16 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
         return [t0, t1];
     }
 
-    selectionIntervalClicked () {
+    selectionIntervalClicked() {
         // Compute the new time scale
         const config = this.getAudioConfigForSelection(
             this.state.minSelectX,
             this.state.maxSelectX);
-        
-        let newImageUrl = `/draw-sound/${this.getSpeaker().uploadId}/${config.minAudioTime}/${config.maxAudioTime}`
+
+        const newImageUrl = `/draw-sound/${this.getSpeaker().uploadId}/${config.minAudioTime}/${config.maxAudioTime}`
             + this.checkStatus();
-        
-        if(this.state.minAudioTime !== config.minAudioTime || this.state.maxAudioTime !== config.maxAudioTime) {
+
+        if (this.state.minAudioTime !== config.minAudioTime || this.state.maxAudioTime !== config.maxAudioTime) {
             this.setState({
                 minZoomStatus: [...this.state.minZoomStatus, this.state.minAudioTime],
                 maxZoomStatus: [...this.state.maxZoomStatus, this.state.maxAudioTime],
@@ -466,99 +466,99 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
     }
 
     handleSpectrumCheckboxChange = async (event: any) => {
-        await this.setState(state => {
-            return {   
+        await this.setState((state) => {
+            return {
                 spectrumChecked: !this.state.spectrumChecked,
-            }
+            };
         });
-		await this.setState(state => {
-            return {               
+        await this.setState((state) => {
+            return {
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
                 this.checkStatus()),
-            }
-        });
-	}
-
-	handlePitchCheckboxChange = async (event: any) => {
-        await this.setState(state => {
-            return {   
-                pitchChecked: !this.state.pitchChecked,
-            }
-        });
-		await this.setState(state => {
-            return {               
-            imageUrl: PeldaAudioAnalysis.formatImageUrl(
-                this.getSpeaker().uploadId,
-                this.checkStatus()),
-            }
+            };
         });
     }
 
-	handleIntensityCheckboxChange = async (event: any) => {
-        await this.setState(state => {
-            return {   
+    handlePitchCheckboxChange = async (event: any) => {
+        await this.setState((state) => {
+            return {
+                pitchChecked: !this.state.pitchChecked,
+            };
+        });
+        await this.setState((state) => {
+            return {
+            imageUrl: PeldaAudioAnalysis.formatImageUrl(
+                this.getSpeaker().uploadId,
+                this.checkStatus()),
+            };
+        });
+    }
+
+    handleIntensityCheckboxChange = async (event: any) => {
+        await this.setState((state) => {
+            return {
                 intensityChecked: !this.state.intensityChecked,
-            }
+            };
         });
-		await this.setState(state => {
-            return {               
+        await this.setState((state) => {
+            return {
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
                 this.checkStatus()),
-            }
+            };
         });
-	}
+    }
 
-	handleFormantCheckboxChange = async (event: any) => {
-        await this.setState(state => {
-            return {   
+    handleFormantCheckboxChange = async (event: any) => {
+        await this.setState((state) => {
+            return {
                 formantChecked: !this.state.formantChecked,
-            }
+            };
         });
-		await this.setState(state => {
-            return {               
+        await this.setState((state) => {
+            return {
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
                 this.checkStatus()),
-            }
+            };
         });
-	}
+    }
 
-	handlePulsesCheckboxChange = async (event: any) => {
-        await this.setState(state => {
-            return {   
+    handlePulsesCheckboxChange = async (event: any) => {
+        await this.setState((state) => {
+            return {
                 pulsesChecked: !this.state.pulsesChecked,
-            }
+            };
         });
-		await this.setState(state => {
-            return {               
+        await this.setState((state) => {
+            return {
             imageUrl: PeldaAudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
                 this.checkStatus()),
-            }
+            };
         });
-	}
+    }
 
-	checkStatus = () => {
-		var status = '?';
-		if (this.state.spectrumChecked) {
-			status += 'spectrogram&';
-		} 
-		if (this.state.pitchChecked) {
-			status += 'pitch&';
-		} 
-		if (this.state.intensityChecked) {
-			status += 'intensity&';
-		} 
-		if (this.state.formantChecked) {
-			status += 'formants&';
-		} 
-		if (this.state.pulsesChecked) {
-			status += 'pulses&';
-		} 
-		return status;
-	}
+    checkStatus = () => {
+        let status = "?";
+        if (this.state.spectrumChecked) {
+            status += "spectrogram&";
+        }
+        if (this.state.pitchChecked) {
+            status += "pitch&";
+        }
+        if (this.state.intensityChecked) {
+            status += "intensity&";
+        }
+        if (this.state.formantChecked) {
+            status += "formants&";
+        }
+        if (this.state.pulsesChecked) {
+            status += "pulses&";
+        }
+        return status;
+    }
 
     handleInputChange(event: Event) {
         const target = event.target as HTMLInputElement;
@@ -579,8 +579,8 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
 
     sendData = () => {
         const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
-
-        this.props.parentCallBack(this.state.soundLength, this.state.minAudioTime, this.state.maxAudioTime, ts[0], ts[1], this.state.selectedFolderName);
+        this.props.parentCallBack(this.state.soundLength, this.state.minAudioTime, this.state.maxAudioTime,
+            ts[0], ts[1], this.state.selectedFolderName);
     }
 
     save() {
@@ -589,8 +589,8 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
 
     getEafFiles = () => {
         // Get all eaf files related to the selected audio file
-        const audioId = this.props.speakers.map(item => item.fileIndex);
-        if(audioId[0] !== null) {
+        const audioId = this.props.speakers.map((item) => item.fileIndex);
+        if (audioId[0] !== null) {
             fetch(`api/get-eaf-files/${audioId[0]}`, {
                 method: "GET",
                 headers: {
@@ -601,10 +601,10 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             .then((response) => response.json())
             .then((data) => {
                 if (data.result !== null) {
-                this.setState({
-			        eafFiles: data.result.map((item: any) => item)
-                })
-            }
+                    this.setState({
+                        eafFiles: data.result.map((item: any) => item)
+                    });
+                }
             });
         }
     }
@@ -617,15 +617,15 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                 "Content-Type": "application/json",
             }
         };
-        
-        var filePath: string = ""
+
+        let filePath: string = "";
         await fetch(`/api/get-eaf-file-path/${this.state.selectedEafId}`, request)
             .then((response) => response.json())
             .then(function(eafFilePath: any) {
                 filePath = eafFilePath.result;
             });
         return filePath[0];
-    } 
+    }
 
     downloadEaf = async (filePath: string ) => {
         let eafData: string = "";
@@ -634,8 +634,8 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             const storageRef = this.props.firebase.uploadFile();
             const url = await storageRef.child(filePath).getDownloadURL();
             await fetch(url)
-                .then(response => response.text())
-                .then(data => {
+                .then((response) => response.text())
+                .then((data) => {
                     eafData = data;
             });
         } catch (ex) {
@@ -645,7 +645,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
     }
 
     viewEaf = async () => {
-        if ( this.state.selectedEafId === '-1' ) {
+        if ( this.state.selectedEafId === "-1" ) {
             NotificationManager.info( "Please select an eaf file to view the annotation details!!");
             return;
         }
@@ -654,25 +654,25 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
         const eafData = await this.downloadEaf(eafFilePath);
 
         const parser = new DOMParser();
-        const xml = parser.parseFromString(eafData, 'text/xml');
+        const xml = parser.parseFromString(eafData, "text/xml");
 
         if (xml !== null) {
-            const tiers = xml.querySelectorAll('TIER');
-            var isTier1Enabled: boolean = false;
-            var isTier2Enabled: boolean = false;
-            var isTier3Enabled: boolean = false;
-            var isTier4Enabled: boolean = false;
-            var isTier5Enabled: boolean = false;
-            var isTier6Enabled: boolean = false;
-            var tier1text: string = "";
-            var tier2text: string = "";
-            var tier3text: string = "";
-            var tier4text: string = "";
-            var tier5text: string = "";
-            var tier6text: string = "";
+            const tiers = xml.querySelectorAll("TIER");
+            let isTier1Enabled: boolean = false;
+            let isTier2Enabled: boolean = false;
+            let isTier3Enabled: boolean = false;
+            let isTier4Enabled: boolean = false;
+            let isTier5Enabled: boolean = false;
+            let isTier6Enabled: boolean = false;
+            let tier1text: string = "";
+            let tier2text: string = "";
+            let tier3text: string = "";
+            let tier4text: string = "";
+            let tier5text: string = "";
+            let tier6text: string = "";
 
-            if(tiers.length > 0) {
-                tiers.forEach(element => {
+            if (tiers.length > 0) {
+                tiers.forEach((element) => {
                     const annotationElement = element.querySelector("ANNOTATION");
                     if ( annotationElement !== null ) {
                         const alignableAnnotationElement = annotationElement.querySelector("ALIGNABLE_ANNOTATION");
@@ -704,8 +704,9 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                 });
             }
 
-            this.props.eafTierDataCallBack(isTier1Enabled, tier1text, isTier2Enabled, tier2text, 
-                isTier3Enabled, tier3text, isTier4Enabled, tier4text, isTier5Enabled, tier5text, isTier6Enabled, tier6text);
+            this.props.eafTierDataCallBack(isTier1Enabled, tier1text, isTier2Enabled, tier2text,
+                isTier3Enabled, tier3text, isTier4Enabled, tier4text, isTier5Enabled, tier5text,
+                isTier6Enabled, tier6text);
         }
     }
 
@@ -722,9 +723,9 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
         const availableEafFilesList = this.state.eafFiles.map((item, index) => {
             return (
                 <option key={index} value={item[0]}>{item[1]}</option>
-            )
+            );
         });
-    
+
         return (
             <div className="PeldaAudioAnalysis">
                 <div className="row">
@@ -763,38 +764,60 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
                         </div>
                         <div className="checkboxes">
-							<label>	<input type="checkbox" id="spectrogram" className="spectrogram" checked={this.state.spectrumChecked} onChange={this.handleSpectrumCheckboxChange} /> <span> Spectogram </span> <br /> </label>
-							<label> <input type="checkbox" id="pitch"  className="pitch" checked={this.state.pitchChecked} onChange={this.handlePitchCheckboxChange} /> <span> Pitch </span> <br /> </label>
-							<label> <input type="checkbox" id="intensity" className="intensity" checked={this.state.intensityChecked} onChange={this.handleIntensityCheckboxChange} /> <span> Intensity </span> <br /> </label>
-							<label> <input type="checkbox" id="formant" className="formant" checked={this.state.formantChecked} onChange={this.handleFormantCheckboxChange} /> <span> Formant </span> <br /> </label>
-							<label> <input type="checkbox" id="pulses" className="pulses" checked={this.state.pulsesChecked} onChange={this.handlePulsesCheckboxChange} /> <span> Pulses </span> <br />	</label>
-						</div>
+                            <label>
+                                <input type="checkbox" id="spectrogram" className="spectrogram"
+                                checked={this.state.spectrumChecked} onChange={this.handleSpectrumCheckboxChange} />
+                                <span> Spectogram </span> <br />
+                            </label>
+                            <label>
+                                <input type="checkbox" id="pitch"  className="pitch" checked={this.state.pitchChecked}
+                                onChange={this.handlePitchCheckboxChange} />
+                                <span> Pitch </span> <br />
+                            </label>
+                            <label>
+                                <input type="checkbox" id="intensity" className="intensity"
+                                checked={this.state.intensityChecked} onChange={this.handleIntensityCheckboxChange} />
+                                <span> Intensity </span> <br />
+                            </label>
+                            <label>
+                                <input type="checkbox" id="formant" className="formant"
+                                checked={this.state.formantChecked} onChange={this.handleFormantCheckboxChange} />
+                                <span> Formant </span> <br />
+                            </label>
+                            <label>
+                                <input type="checkbox" id="pulses" className="pulses"
+                                checked={this.state.pulsesChecked} onChange={this.handlePulsesCheckboxChange} />
+                                <span> Pulses </span> <br />
+                            </label>
+                        </div>
                         <div className="eaf-dropdown">
                             <label className="group-label">EAF File</label>
                             <div className="metilda-audio-analysis-controls-list-item-row">
-                                <select id="audioFileInput" value={this.state.selectedEafId} className="eafFileName" placeholder="Choose eaf file" onChange={async (event) => await this.setState( {selectedEafId: event.target.value})}>
-                                    <option value={'-1'} disabled>Choose eaf file</option>
+                                <select id="audioFileInput" value={this.state.selectedEafId}
+                                className="eafFileName" placeholder="Choose eaf file"
+                                onChange={async (event) => await this.setState( {selectedEafId: event.target.value})}>
+                                    <option value={"-1"} disabled>Choose eaf file</option>
                                     {availableEafFilesList}
-                                </select> 
+                                </select>
                             </div>
                             <div className="viewEaf">
                                 <button onClick={() => this.viewEaf()} >View Selected EAF</button>
                             </div>
                         </div>
-                        <div className="savePrint">   
+                        <div className="savePrint">
                             <button onClick={() => this.save()} >
                                 <i className="material-icons right">
                                     image
-                        	    </i>
+                                </i>
                                 Save Analysis
                             </button><br /> <br />
                             <button onClick={() => window.print()} >
                                 <i className="material-icons right">
                                     picture_as_pdf
-                        	    </i>
+                                </i>
                                 Print Analysis
                             </button>
-                        </div> 
+                        </div>
                     </div>
                 </div>
             </div>

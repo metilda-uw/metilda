@@ -37,7 +37,7 @@ describe("AuthorizeUser", () => {
       }
       subject.find(".CreateUserForm").simulate("submit", { preventDefault() { return "true"; } });
       setTimeout(function() {expect(subject.state()).to.be.deep.equal({email: "", role: null, isLoading: false});
-                             expect(confirmStub.calledOnce).to.equal(true);
+                             expect(confirmStub.calledOnce).to.equal(false);
                              confirmStub.restore();
                              done(); }, 10);
       });

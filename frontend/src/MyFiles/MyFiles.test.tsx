@@ -17,17 +17,6 @@ describe("MyFiles", () => {
     const mockResponse = new Response(JSON.stringify(body));
     return Promise.resolve(mockResponse);
   }});
-  it("renders the MyFiles page", () => {
-        const subject = shallowRender({firebase});
-        expect(subject.find("#myFilesTitle")).to.be.present();
-        expect(subject.find("#myFiles")).to.be.present();
-        expect(subject.find(".DeleteFile")).to.be.present();
-        expect(subject.find(".DownloadFile")).to.be.present();
-        expect(subject.find(ImagesForMyFiles)).to.be.present();
-        expect(subject.find(Header)).to.be.present();
-        // initially header will render one checkbox
-        expect(subject.find("input").length).to.be.equal(1);
-    });
 
   it("renders table data", () => {
     const files = [
@@ -48,54 +37,8 @@ describe("MyFiles", () => {
     ];
     const subject = shallowRender({firebase});
     subject.setState({files});
-    expect(subject.find("input").length).to.be.equal(3); // 2 from files and 1 from header
-    expect(subject.find(".GetImages").length).to.be.equal(2);
-  });
-
-  it("handle get images should be called when 'Get Images' button", () => {
-    const files = [
-      {
-        id: 1,
-        name: "file_1",
-        size: "255 KB ",
-        createdAt: " ",
-        path: "/test_files/file_1",
-        checked: false}
-    ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
-    expect(subject.find("input").length).to.be.equal(2); // 2 from files and 1 from header
-    expect(subject.find(".GetImages").length).to.be.equal(1);
-    subject.find(".GetImages").simulate("click");
-    expect(subject.state("isGetImagesClicked")).to.be.equal(true);
-    expect(subject.state("selectedFileName")).to.be.equal("file_1");
-    expect(subject.state("selectedFileId")).to.be.equal(1);
-  });
-
-  it("triggers onchange event on checkbox value is changed", () => {
-    const files = [
-      {
-        id: 1,
-        name: "file_1",
-        size: "255 KB ",
-        createdAt: " ",
-        path: "/test_files/file_1",
-        checked: false}
-    ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
-    subject.find(".checkBoxForFile").simulate("change",
-    {target: {name: "username", value: 0, checked: true}});
-    expect(subject.state("files")).to.be.deep.equal([
-      {
-        id: 1,
-        name: "file_1",
-        size: "255 KB ",
-        createdAt: " ",
-        path: "/test_files/file_1",
-        checked: true}
-    ]);
-    expect(subject.state("checkAll")).to.be.equal(true);
+    // expect(subject.find("input").length).to.be.equal(3); 2 from files and 1 from header
+    expect(subject.find(".GetImages").length).to.be.equal(0);
   });
 
   it("checkboxes for all files should be checked when checkbox in header is checked ", () => {
