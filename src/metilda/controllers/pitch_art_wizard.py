@@ -6,12 +6,18 @@ from flask import request, jsonify, send_file, flash
 from Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
-from metilda.services import audio_analysis, file_io
+from metilda.services import audio_analysis, file_io, praat, utils
 from werkzeug.utils import secure_filename
 import firebase_admin
 from firebase_admin import credentials, db, auth
 import wave
-
+import pympi
+import pathlib
+import matplotlib
+matplotlib.use('agg')
+from pylab import *
+import xml.etree.ElementTree as ET
+import lxml.etree as etree
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
@@ -164,6 +170,26 @@ def create_file():
             connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
+@app.route('/api/move-to-folder', methods=["POST"])
+def move_to_folder():
+    with Postgres() as connection:
+        postgres_update_query = """ UPDATE audio 
+            SET FILE_PATH = %s
+            WHERE AUDIO_ID = %s"""
+        record_to_update = (request.form['file_path'], request.form['file_id'])
+        last_row_id = connection.execute_update_query(postgres_update_query, record_to_update)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/create-folder', methods=["POST"])
+def create_folder():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO audio (AUDIO_ID, USER_ID, FILE_NAME, FILE_PATH, FILE_TYPE, FILE_SIZE,
+         CREATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING AUDIO_ID"""
+        record_to_insert = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'],
+        request.form['file_size'])
+        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
 @app.route('/api/delete-file', methods=["POST"])
 def delete_file():
     with Postgres() as connection:
@@ -171,6 +197,19 @@ def delete_file():
         results = connection.execute_update_query(postgres_select_query, (request.form['file_id'],))
     return jsonify({'result': results})
 
+@app.route('/api/delete-eaf-file', methods=["POST"])
+def delete_eaf_file():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM eaf WHERE EAF_ID = %s"""
+        results = connection.execute_update_query(postgres_select_query, (request.form['eaf_id'],))
+    return jsonify({'result': results})
+
+@app.route('/api/delete-folder', methods=["POST"])
+def delete_folder():
+    with Postgres() as connection:
+        postgres_delete_query = """ DELETE FROM audio WHERE AUDIO_ID = %s"""
+        results = connection.execute_update_query(postgres_delete_query, (request.form['file_id'],))
+    return jsonify({'result': results})
 
 @app.route('/api/delete-image', methods=["POST"])
 def delete_image():
@@ -196,6 +235,50 @@ def get_file(user_id):
         results = connection.execute_select_query(postgres_select_query, filter_values)
     return jsonify({'result': results})
 
+@app.route('/api/get-files-and-folders/<string:user_id>/<string:folder_name>', methods=["GET"])
+def get_files_and_folders(user_id, folder_name):
+    file_type1 = request.args.get('file-type1', type=None)
+    file_type2 = request.args.get('file-type2', type=None)
+    file_path = ""
+    filteredResults = []
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM audio WHERE USER_ID = %s AND (FILE_TYPE = %s OR FILE_TYPE = %s) AND FILE_PATH LIKE %s"""
+        if folder_name != 'Uploads':
+            file_path = user_id + "/Uploads/" + folder_name + "/%"
+        else: 
+            file_path = user_id + "/Uploads/%"
+        filter_values= (user_id, file_type1, file_type2, file_path)
+        results = connection.execute_select_query(postgres_select_query, filter_values)
+        if folder_name == 'Uploads':
+            for result in results:
+                forwardSlashCounter = result[2].count('/')
+                if forwardSlashCounter == 2:
+                    filteredResults.append(result)
+            return jsonify({'result': filteredResults})
+        else:
+            return jsonify({'result': results})
+
+@app.route('/api/get-eaf-files/<string:audio_id>', methods=["GET"])
+def get_eaf_file(audio_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT EAF_ID, EAF_FILE_NAME FROM eaf WHERE AUDIO_ID = %s"""
+        results = connection.execute_select_query(postgres_select_query, (audio_id,))
+    return jsonify({'result': results})
+
+@app.route('/api/get-eaf-file-path/<string:eaf_id>', methods=["GET"])
+def get_eaf_file_path(eaf_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT EAF_FILE_PATH FROM eaf WHERE EAF_ID = %s"""
+        results = connection.execute_select_query(postgres_select_query, (eaf_id,))
+    return jsonify({'result': results[0]})
+
+@app.route('/api/get-eafs-for-files/<string:audio_id>', methods=["GET"])
+def get_eafs_for_files(audio_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * FROM eaf WHERE AUDIO_ID = %s"""
+        results = connection.execute_select_query(postgres_select_query, (audio_id,))
+    return jsonify({'result': results})
+
 @app.route('/api/get-analysis-file-path/<string:analysis_id>', methods=["GET"])
 def get_analysis_file_path(analysis_id):
     with Postgres() as connection:
@@ -208,6 +291,14 @@ def create_analysis():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO analysis (ANALYSIS_ID, AUDIO_ID, ANALYSIS_FILE_NAME, ANALYSIS_FILE_PATH, GENERATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING ANALYSIS_ID"""
         record_to_insert = (request.form['file_id'], request.form['analysis_file_name'],request.form['analysis_file_path'])
+        last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
+    return jsonify({'result': last_row_id})
+
+@app.route('/api/create-eaf', methods=["POST"])
+def create_eaf():
+    with Postgres() as connection:
+        postgres_insert_query = """ INSERT INTO eaf (EAF_ID, AUDIO_ID, EAF_FILE_NAME, EAF_FILE_PATH, GENERATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING EAF_ID"""
+        record_to_insert = (request.form['file_id'], request.form['eaf_file_name'],request.form['eaf_file_path'])
         last_row_id=connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
@@ -402,5 +493,279 @@ def authorize_user():
         record_to_insert = (request.form['email'], request.form['user_role'])
         last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
-   
-   
+
+@app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
+def drawSound(upload_id):
+    sound_path = os.path.join(app.config["SOUNDS"], upload_id)
+
+    script = praat._scripts_dir + "getBounds"
+    output = praat.runScript(script, [upload_id, praat._sounds_dir])
+    res = output.split()  # Split output into an array
+
+    # Get last modified time of the sound file
+    # Should think about either changing the service name,
+    # or obtaining last modified time using a different service
+    lastModifiedTime = time.ctime(os.path.getctime(sound_path))
+
+    # Get URL parameters
+    showSpectrogram = '0' if request.args.get("spectrogram") is None else '1'
+    showPitch = '0' if request.args.get("pitch") is None else '1'
+    showIntensity = '0' if request.args.get("intensity") is None else '1'
+    showFormants = '0' if request.args.get("formants") is None else '1'
+    showPulses = '0' if request.args.get("pulses") is None else '1'
+
+    # Script file
+    script = praat._scripts_dir + "drawSpectrogram"
+
+    # Parameters to the script
+    params = [upload_id, str(float(res[0])), str(float(res[2])),
+             showSpectrogram, showPitch, showIntensity, showFormants, showPulses,
+              praat._sounds_dir, praat._images_dir]
+
+    # Image name will be a combination of relevant params joined by a period.
+    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+
+    # Add image name to params list
+    params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
+
+    # If image does not exist, run script
+    if not os.path.isfile(image):
+       praat.runScript(script, params)
+       utils.resizeImage(image)
+
+    # Image should be available now, generated or cached
+    resp = app.make_response(open(image).read())
+    resp.content_type = "image/png"
+    os.remove(image)
+    #os.remove(sound_path)
+    return resp
+
+@app.route('/draw-sound/<sound>/<startTime>/<endTime>')
+def drawSoundWithTime(sound, startTime, endTime):
+
+    # Get URL parameters
+    showSpectrogram = '0' if request.args.get("spectrogram") is None else '1'
+    showPitch = '0' if request.args.get("pitch") is None else '1'
+    showIntensity = '0' if request.args.get("intensity") is None else '1'
+    showFormants = '0' if request.args.get("formants") is None else '1'
+    showPulses = '0' if request.args.get("pulses") is None else '1'
+
+    # Script file
+    script = praat._scripts_dir + "drawSpectrogram";
+
+    # Parameters to the script
+    params = [sound, startTime, endTime,
+             showSpectrogram, showPitch, showIntensity, showFormants, showPulses, 
+             praat._sounds_dir, praat._images_dir];
+
+    # Image name will be a combination of relevant params joined by a period.
+    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+
+    # Add image name to params list
+    params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
+
+    # If image does not exist, run script
+    if not os.path.isfile(image):
+       praat.runScript(script, params)
+       utils.resizeImage(image)
+
+    # Image should be available now, generated or cached
+    resp = app.make_response(open(image).read())
+    resp.content_type = "image/png"
+    os.remove(image)
+    return resp
+
+@app.route('/get-bounds/<sound>')
+def getBounds(sound):
+    script = praat._scripts_dir + "getBounds"
+    output = praat.runScript(script, [sound, praat._sounds_dir])
+    res = output.split() # Split output into an array
+
+    # Create JSON object to return
+    bounds = {
+        "start": float(res[0]),
+        "end": float(res[2]),
+        "min": float(res[4]),
+        "max": float(res[6])
+    }
+    return jsonify(bounds)
+
+@app.route('/get-energy/<sound>', methods=["GET"])
+def getEnergy(sound):
+    script = praat._scripts_dir + "getEnergy"
+    return jsonify({"energy": praat.runScript(script, [sound, praat._sounds_dir])}) 
+
+@app.route('/pitch/count-voiced-frames/<sound>', methods=["GET"])
+def countVoicedFrames(sound):
+    script = praat._scripts_dir + "countVoicedFrames"
+    return jsonify({"voicedFrames": praat.runScript(script, [sound, praat._sounds_dir])})
+
+@app.route('/pitch/value-at-time/<sound>/<time>', methods=["GET"])
+def pitchValueAtTime(sound, time):
+    script = praat._scripts_dir + "pitchValueAtTime"
+    return jsonify({"pitchValueAtTime": praat.runScript(script, [sound, time, praat._sounds_dir])})
+
+@app.route('/pitch/value-in-frame/<sound>/<frame>', methods=["GET"])
+def pitchValueInFrame(sound, frame):
+    script = praat._scripts_dir + "pitchValueInFrame"
+    return jsonify({"pitchValueInFrame": praat.runScript(script, [sound, frame, praat._sounds_dir])}) 
+
+@app.route('/spectrum/get-bounds/<sound>', methods=["GET"])
+def spectrumFrequencyBounds(sound):
+    # Script file
+    script = praat._scripts_dir + "spectrumFreqBounds"
+
+    # Run script and get output
+    output = praat.runScript(script, [sound, praat._sounds_dir])
+
+    # Split output into an array
+    res = output.split()
+
+    # Create JSON object to return
+    bounds = {
+       "lowFrequency": float(res[0]),
+       "highFrequency": float(res[2])
+    }
+
+    return jsonify(bounds)
+
+@app.route('/intensity/get-bounds/<sound>', methods=["GET"])
+def intensityBounds(sound):
+    # Patht to script
+    script = praat._scripts_dir + "intensityBounds"
+
+    # Run script
+    output = praat.runScript(script, [sound, praat._sounds_dir])
+
+    # Split output into an array
+    res = output.split()
+
+    # Create JSON object to return
+    bounds = {
+       "minIntensity": float(res[0]),
+       "maxIntensity": float(res[2]),
+       "meanIntensity": float(res[4])
+    }
+
+    return jsonify(bounds)   
+
+@app.route('/formant/number-of-frames/<sound>', methods=["GET"])
+def formantFrameCount(sound):
+    script = praat._scripts_dir + "formantFrameCount"
+    return jsonify({"noOfFrames": praat.runScript(script, [sound, praat._sounds_dir])})
+
+@app.route('/formant/number-of-formants/<sound>/<frame>')
+def formantCountAtFrame(sound, frame):
+    script = praat._scripts_dir + "formantCount"
+    return jsonify({"noOfFormants": praat.runScript(script, [sound, frame, praat._sounds_dir])})
+
+@app.route('/formant/value-at-time/<sound>/<formantNumber>/<time>')
+def formantValueAtTime(sound, formantNumber, time):
+    script = praat._scripts_dir + "formantValueAtTime"
+    return jsonify({"formantValueAtTime": praat.runScript(script, [sound, formantNumber, time, praat._sounds_dir])})
+
+@app.route('/harmonicity/get-min/<sound>/<start>/<end>')
+def harmonicityGetMin(sound, start, end):
+    script = praat._scripts_dir + "harmonicityGetMin"
+    return jsonify({"minHarmonicity": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
+
+@app.route('/harmonicity/get-max/<sound>/<start>/<end>')
+def harmonicityGetMax(sound, start, end):
+    script = praat._scripts_dir + "harmonicityGetMax"
+    return jsonify({"maxHarmonicity": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
+
+@app.route('/harmonicity/value-at-time/<sound>/<time>')
+def harmonicityValueAtTime(sound, time):
+    script = praat._scripts_dir + "harmonicityGetValueAtTime"
+    return jsonify({"harmonicityValueAtTime": praat.runScript(script, [sound, time, praat._sounds_dir])})
+
+@app.route('/pointprocess/number-of-periods/<sound>/<start>/<end>')
+def pointProcessGetNumPeriods(sound, start, end):
+    script = praat._scripts_dir + "pointProcessGetNumPeriods"
+    return jsonify({"noOfPeriods": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
+
+@app.route('/pointprocess/number-of-points/<sound>')
+def pointProcessGetNumPoints(sound):
+    script = praat._scripts_dir + "pointProcessGetNumPoints"
+    return jsonify({"noOfPoints": praat.runScript(script, [sound, praat._sounds_dir])})
+
+@app.route('/pointprocess/get-jitter/<sound>/<start>/<end>')
+def pointProcessGetJitter(sound, start, end):
+    script = praat._scripts_dir + "pointProcessGetJitter"
+    return jsonify({"localJitter": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
+
+@app.route('/annotation/<eaffilename>/<sound>/<start>/<end>/<text0>/<text1>/<text2>/<text3>/<text4>/<text5>')
+def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2, text3, text4, text5):
+    x = sound.index('.')
+    nameoffile = eaffilename
+
+    if text0 == "EMPTY":
+        text0 = ""
+    if text1 == "EMPTY":
+        text1 = ""
+    if text2 == "EMPTY":
+        text2 = ""
+    if text3 == "EMPTY":
+        text3 = ""
+    if text4 == "EMPTY":
+        text4 = ""
+    if text5 == "EMPTY":
+        text5 = ""
+
+    #Create a new EAF file
+    filepath = praat._eaf_dir + nameoffile + ".eaf"
+    startTime = int(round(float(start)))
+    endTime = int(round(float(end)))
+
+    # Initialize the elan file
+    eafob = pympi.Elan.Eaf()
+
+    #Add linguistic type constraint - right now just one - Time_Subdivision
+    ltype = "TimeSubdivision-lt"
+    ltcon = "Time_Subdivision"
+
+    #prep variables for media descriptor
+    soundpath = praat._sounds_dir + sound
+    soundpath_url = pathlib.Path(soundpath)
+    relpath = "./" + sound
+    mimetype = "audio/" + sound[x+1:len(sound)]
+
+    #set media descriptor
+    if(soundpath != ""):
+        eafob.add_linked_file(soundpath_url, relpath, mimetype) 
+
+    defaulttier = "default"
+    tier1 = "Tier1"
+    tier2 = "Tier2" 
+    tier3 = "Tier3"
+    tier4 = "Tier4"
+    tier5 = "Tier5"
+
+    if (text0 != "undefined" and text0 != ""):
+        eafob.add_annotation(defaulttier, startTime, endTime, text0)
+        eafob.add_linguistic_type(ltype, ltcon)
+    if (text1 != "undefined" and text1 != ""):
+        eafob.add_tier(tier1, ltype)
+        eafob.add_annotation(tier1, startTime, endTime, text1)
+    if (text2 != "undefined" and text2 != ""):
+        eafob.add_tier(tier2, ltype)
+        eafob.add_annotation(tier2, startTime, endTime, text2)
+    if (text3 != "undefined" and text3 != ""):
+        eafob.add_tier(tier3, ltype)
+        eafob.add_annotation(tier3, startTime, endTime, text3)
+    if (text4 != "undefined" and text4 != ""):
+        eafob.add_tier(tier4, ltype)
+        eafob.add_annotation(tier4, startTime, endTime, text4)
+    if (text5 != "undefined" and text5 != ""):
+        eafob.add_tier(tier5, ltype)
+        eafob.add_annotation(tier5, startTime, endTime, text5)
+
+    #Write the object to a file
+    if(filepath != ""):
+        eafob.to_file(filepath)
+      
+    xmlObject = etree.parse(filepath)
+    eafstring = etree.tostring(xmlObject, pretty_print = True)
+    os.remove(filepath)
+
+    return eafstring

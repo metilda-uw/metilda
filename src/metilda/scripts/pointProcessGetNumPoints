@@ -1,0 +1,8 @@
+form Get Number of Points 
+   sentence name_of_sound sp1.wav
+   sentence sounds_dir "sounds/"
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+To PointProcess (periodic, cc): 75,600
+Get number of points

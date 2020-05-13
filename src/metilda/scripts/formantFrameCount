@@ -1,0 +1,9 @@
+form Get Number of Frames 
+   sentence name_of_sound sp1.wav
+   sentence sounds_dir "sounds/"
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+To Formant (burg): 0,5,5500,0.025,50
+Get number of frames
+

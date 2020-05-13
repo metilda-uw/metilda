@@ -85,8 +85,8 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
 
     render() {
         return (
-            <div className="SpeakerControl metilda-audio-analysis-controls-list-item col s12">
-                <div className="metilda-audio-analysis-controls-list-item-row-left-align">
+            <div className="SpeakerControl  col s12">
+                <div className="-row-left-align">
                     {this.maybeRenderRemoveSpeaker()}
                     {this.maybeRenderAddSpeaker()}
                 </div>

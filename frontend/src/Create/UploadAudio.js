@@ -48,7 +48,7 @@ class UploadAudio extends Component {
 
         if (this.props.initFileName) {
             let isOk = window.confirm(
-                "Selecting a new file will reload the " +
+                "Selecting a new file/folder will reload the " +
                 "page, do you want to continue?");
 
             if (!isOk) {
@@ -58,19 +58,27 @@ class UploadAudio extends Component {
         }
 
         const index = event.target.value;
-        this.props.setUploadId(this.props.userFiles[index][1], this.props.userFiles[index][2], this.props.userFiles[index][0]);
+        this.props.setUploadId(this.props.userFiles[index][1], this.props.userFiles[index][2], this.props.userFiles[index][0], this.props.userFiles[index][4]);
     }
 
     render() {
         const { userFiles } = this.props;
         const availableFilesList = userFiles.map((item, index) => {
-            return (
-                <option key={index} value={index}>{item[1]}</option>
-            )
+            if (item[4] === "Upload") {
+                return (
+                    <option key={index} value={index}>{item[1]}</option>
+                );
+            } else {
+                return (
+                    <option key={index} value={index} className="folderOption">
+                        &#xf07c; {item[1]}
+                    </option>
+                );
+            }
         });
         const selectedIndex = userFiles.findIndex(file => file[1] === this.props.initFileName);
         return (
-            <div className="metilda-audio-analysis-controls-list-item col s12"
+            <div className="metilda-audio-amenu-icon-top-rightnalysis-controls-list-item col s12"
                  key={this.state.updateCounter}>
                 <label className="group-label">Audio File</label>
                 <div className="metilda-audio-analysis-controls-list-item-row">

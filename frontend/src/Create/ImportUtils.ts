@@ -298,3 +298,111 @@ export function uploadImageAnalysisIds(
     });
         return promise;
 }
+
+export function uploadEaf(
+    fileName: any,
+    fileIndex: any,
+    fileContent: string,
+    firebase: any
+    ): Promise<number> {
+        const promise = new Promise<number>((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            const storageRef = firebase.uploadFile();
+            const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+            const filesRef = storageRef.child(`${uid}/Eafs/${timeStamp}_${fileName}`);
+            filesRef.put(new Blob([fileContent], {type: "application/xml"})).then((success: any) => {
+                const formData = new FormData();
+                formData.append("file_id", fileIndex.toString());
+                formData.append("eaf_file_name", fileName);
+                formData.append("uploaded_at", timeStamp);
+                formData.append("eaf_file_path", `${uid}/Eafs/${timeStamp}_${fileName}`);
+                fetch(`/api/create-eaf`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    resolve(data.result);
+                    NotificationManager.success("Uploaded " + fileName + " successfully!");
+                });
+            })
+            .catch((ex: any) => {
+                reject(ex);
+                NotificationManager.error("Error: EAF not uploaded");
+            });
+        });
+    return promise;
+}
+
+export function AddFolder(
+    folderName: any,
+    firebase: any 
+    ) {
+        const filePromise = new Promise((resolve, reject) => {
+            const uid = firebase.auth.currentUser.email;
+            const storageRef = firebase.uploadFile();
+            const filesRef = storageRef.child(`${uid}/Uploads/${folderName}/.ignore`);
+            
+            filesRef.getMetadata().then(function () {
+                NotificationManager.error(folderName + " already exists!");
+            }).catch(function () {
+                filesRef.put(new Blob())
+                .then((success: any) => {
+                    const formData = new FormData();
+                    formData.append("user_id", uid);
+                    formData.append("file_name", folderName);
+                    formData.append("file_path", `${uid}/Uploads/${folderName}`);
+                    formData.append("file_type", "Folder");
+                    formData.append("file_size", "0");
+                    formData.append("updated_by", uid);
+                    fetch(`/api/create-folder`, {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    }).then((response) => {
+                        NotificationManager.success("Created " + folderName + " successfully!");
+                        resolve(response);
+                    });
+                }).catch((ex: any) => {
+                    reject(ex);
+                    NotificationManager.success("Error: Subfolder not uploaded");
+                 });
+            });
+        });   
+        return filePromise; 
+}
+
+export function MoveToFolder(
+    fileId: any,
+    filePath: any,
+    fileData: any,
+    firebase: any,
+    ) {
+        const filePromise = new Promise((resolve, reject) => {
+            const storageRef = firebase.uploadFile();
+            const filesRef = storageRef.child(filePath);
+            filesRef.put(new Blob([fileData], {type: "audio/wav"}))
+                .then((success: any) => {
+                const formData = new FormData();
+                formData.append("file_id", fileId);
+                formData.append("file_path", filePath);
+                fetch(`/api/move-to-folder`, {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                }).then((response) => {
+                    resolve(response);
+                });
+            }).catch((ex: any) => {
+                reject(ex);
+            });
+        });
+        return filePromise;
+}

@@ -1,0 +1,11 @@
+form Get Value 
+   sentence name_of_sound sp1.wav
+   real formant_number 1
+   real time 0
+   sentence sounds_dir "sounds/"
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+To Formant (burg): 0,5,5500,0.025,50
+Get value at time: formant_number, time, "Hertz", "Linear"
+

@@ -1,0 +1,11 @@
+form Get Bounds 
+   sentence name_of_sound sp1.wav
+   real start_time 0
+   real end_time 0
+   sentence sounds_dir "sounds/"
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+To Intensity: 100,0,1
+Get mean: start_time,end_time,"energy"
+

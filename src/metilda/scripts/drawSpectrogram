@@ -1,0 +1,62 @@
+form Draw Spectrogram
+   sentence name_of_sound sp1.wav
+   real start_time 0
+   real end_time 0
+   boolean show_spectrogram 0
+   boolean show_pitch 0
+   boolean show_intensity 0
+   boolean show_formants 0
+   boolean show_pulses 0
+   sentence sounds_dir sounds/
+   sentence images_dir images/
+   sentence image_name
+endform
+
+sound = Read from file: "../"+sounds_dir$+name_of_sound$
+Select outer viewport: 0,6,0,3
+Colour: "Black"
+Draw: start_time, end_time, 0, 0, "yes"
+
+if show_pulses=1
+   select sound
+   To PointProcess (periodic, cc): 75,600
+   Colour: "Blue"
+   Draw: 0,0,"no"
+endif
+
+Select outer viewport: 0,6,2.6,5.6
+garnish = 1 
+
+if show_spectrogram=1
+   select sound
+   To Spectrogram: 0.005,5000.0,0.002,20.0,"Gaussian"
+   Paint: start_time,end_time,0,0,100,"yes",50,6,0,garnish
+   garnish = 0
+endif
+
+if show_intensity=1
+   select sound
+   To Intensity: 100,0,"yes"
+   Colour: "Green"
+   Draw: start_time,end_time,0,0,garnish
+   garnish = 0
+endif
+
+if show_pitch=1
+   select sound
+   To Pitch: 0,75,600
+   Colour: "Blue"
+   Draw: start_time,end_time,0,500,garnish
+   garnish = 0
+endif
+
+if show_formants=1
+   select sound
+   To Formant (burg): 0,5,5500,0.025,50
+   Colour: "Red"
+   Speckle: start_time,end_time,5500,30,garnish
+   garnish = 0
+endif
+
+Select outer viewport: 0,5.50,0.25,5.60
+Save as 300-dpi PNG file: "../"+image_name$
