@@ -17,7 +17,7 @@ mistune==0.8.4
 msgpack==0.6.1
 pandas==0.23.4
 persistent==4.4.3
-praat-parselmouth==0.3.2
+praat-parselmouth==0.3.2.post2
 pyAudioAnalysis==0.2.5
 pycparser==2.19
 pyrsistent==0.14.11
