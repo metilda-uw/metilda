@@ -32,9 +32,11 @@ export interface AudioAnalysisProps {
     resetLetters: (speakerIndex: number) => void;
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
+    parentCallBack: (selectedFolderName: string ) => void;
 }
 
 interface State {
+    selectedFolderName: string;
     showImgMenu: boolean;
     imgMenuX: number;
     imgMenuY: number;
@@ -140,6 +142,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         super(props);
 
         this.state = {
+            selectedFolderName: "Uploads",
             showImgMenu: false,
             imgMenuX: -1,
             imgMenuY: -1,
@@ -222,23 +225,30 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             });
     }
 
-    setUploadId = (uploadId: string, uploadPath: string, fileIndex: number) => {
-    const storageRef = this.props.firebase.uploadFile();
-    storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
-        // `url` is the download URL for file
-        const response = await fetch(url);
-        const responseBlob = await response.blob();
-        const formData = new FormData();
-        formData.append("file", responseBlob, uploadId);
-        const analysisResponse = await fetch(`/api/audio/download-file`, {
-            method: "POST",
-            body: formData,
-        });
-        this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
-        this.props.resetLetters(this.props.speakerIndex);
-      }).catch(function(error: any) {
-        // return;
-      });
+    setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
+        if (fileType !== "Folder") {
+            const storageRef = this.props.firebase.uploadFile();
+            storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
+                // `url` is the download URL for file
+                const response = await fetch(url);
+                const responseBlob = await response.blob();
+                const formData = new FormData();
+                formData.append("file", responseBlob, uploadId);
+                const analysisResponse = await fetch(`/api/audio/download-file`, {
+                    method: "POST",
+                    body: formData,
+                });
+                this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+                this.props.resetLetters(this.props.speakerIndex);
+            }).catch(function(error: any) {
+                // return;
+            });
+        } else {
+            await this.setState ({
+                selectedFolderName:  uploadId,
+            });
+            this.props.parentCallBack(this.state.selectedFolderName);
+        }
     }
 
     getAudioConfigForSelection(leftX?: number, rightX?: number) {

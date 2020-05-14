@@ -23,6 +23,7 @@ export interface CreatePitchArtProps {
 
 interface State {
     files: any[];
+    selectedFolderName: string;
     isLoading: boolean;
 }
 
@@ -32,6 +33,7 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
 
         this.state = {
             files: [],
+            selectedFolderName: "Uploads",
             isLoading: false,
         };
     }
@@ -43,7 +45,8 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
         return (
             this.props.speakers.map((item, index) =>
                 <AudioAnalysis speakerIndex={index} key={`audio-analysis-${index}-${item.uploadId}`}
-                firebase={this.props.firebase} files={this.state.files}/>
+                firebase={this.props.firebase} files={this.state.files}
+                parentCallBack={this.callBackSelectionInterval}/>
             )
         );
     }
@@ -61,8 +64,8 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
     getUserFiles = () => {
         // Get files of a user
         const currentUserId = this.props.firebase.auth.currentUser.email;
-        fetch(`api/get-files/${currentUserId}`
-        + "?file-type=Upload", {
+        fetch(`api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}`
+        + "?file-type1=Folder&file-type2=Upload", {
         method: "GET",
         headers: {
             "Accept": "application/json",
@@ -94,6 +97,22 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
         });
     }
 
+    folderBackButtonClicked = async () => {
+        await this.setState({
+          selectedFolderName: "Uploads",
+        });
+        this.getUserFiles();
+    }
+
+    callBackSelectionInterval = (childSelectedFolderName: string) => {
+        this.setState ({
+            selectedFolderName: childSelectedFolderName,
+        });
+        if (this.state.selectedFolderName !== "Uploads") {
+            this.getUserFiles();
+        }
+    }
+
     render() {
         const { isLoading } = this.state;
         const uploadId = this.props.speakers.map((item) => this.formatFileName(item.uploadId)).join("_");
@@ -111,7 +130,23 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
                     </button>
                     </ReactFileReader>
                 <div className="metilda-page-content">
-                    {this.renderSpeakers()}
+                    <div id="button-drop-down-image-side-by-side">
+                        <div id="metilda-drop-down-back-button">
+                            {this.state.selectedFolderName === "Uploads" &&
+                            <button className="audioBackButtonDisabled"  disabled={true}>
+                                <i className="material-icons">arrow_back</i>
+                            </button>
+                            }
+                            {this.state.selectedFolderName !== "Uploads" &&
+                            <button className="audioBackButton" onClick={() => this.folderBackButtonClicked()}>
+                                <i className="material-icons">arrow_back</i>
+                            </button>
+                            }
+                        </div>
+                        <div id="drop-down-and-image">
+                            {this.renderSpeakers()}
+                        </div>
+                    </div>
                     <div className="row">
                         <PitchArtContainer
                             firebase={this.props.firebase}

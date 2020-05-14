@@ -584,7 +584,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
     }
 
     save() {
-        window.open("http://localhost:5000/draw-sound/EarlOldPersonNaapi.mp3.png/image?min-pitch=75&max-pitch=500&spectrogram&pitch&intensity&formants&pulses&");
+        window.open(this.state.imageUrl);
     }
 
     getEafFiles = () => {

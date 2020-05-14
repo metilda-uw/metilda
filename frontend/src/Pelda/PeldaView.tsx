@@ -1208,7 +1208,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
                   </ReactFileReader>
       <div className="metilda-page-content">
       <div id="button-drop-down-image-side-by-side">
-        <div id="drop-down-back-button">
+        <div id="pelda-drop-down-back-button">
         {this.state.selectedFolderName === "Uploads" &&
         <button className="audioBackButtonDisabled"  disabled={true}>
           <i className="material-icons">arrow_back</i>

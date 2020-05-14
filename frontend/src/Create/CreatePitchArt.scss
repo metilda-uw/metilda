@@ -164,3 +164,41 @@
 .btn{
     text-transform: none
 }
+
+#metilda-drop-down-back-button .audioBackButton {
+    position: relative;
+    left: 15px;
+    top: 75px;
+    width: 40px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    height: 40px;
+    background-color: #26a69a;
+    border: none;
+    color: black;
+    border-radius: 5px;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    display: block; }
+  
+#metilda-drop-down-back-button .audioBackButtonDisabled {
+    position: relative;
+    left: 15px;
+    top: 75px;
+    width: 40px;
+    font-size: 14px;
+    text-align: center;
+    cursor: not-allowed;
+    height: 40px;
+    background-color: #c7c7c7;
+    border: none;
+    color: black;
+    border-radius: 5px;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    display: block; }
+  
+  #button-drop-down-image-side-by-side {
+    display: flex;
+    flex-direction: row; }
