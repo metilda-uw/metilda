@@ -117,10 +117,10 @@ callBackSelectionInterval = (childSoundLength: number, childMinAudioTime: number
   }
 
 callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2Enabled: boolean, tier2text: string,
-                             isTier3Enabled: boolean, tier3text: string,
-                             isTier4Enabled: boolean, tier4text: string,
-                             isTier5Enabled: boolean, tier5text: string,
-                             isTier6Enabled: boolean, tier6text: string) => {
+                             isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean, tier4text: string,
+                             isTier5Enabled: boolean, tier5text: string, isTier6Enabled: boolean, tier6text: string,
+                             startTime: any, endTime: any) => {
+  const timeInterval = document.getElementById("selection-interval");
   const element = document.getElementById("elan-annotation");
   const elementTier1 = document.getElementById("tier1label");
   const elementTier2 = document.getElementById("tier2label");
@@ -147,6 +147,16 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       tier5Value: tier5text,
       tier6Value: tier6text,
     });
+
+    if (timeInterval !== null) {
+        const startTimeElement = timeInterval.firstChild;
+        const endTimeElement = timeInterval.lastChild;
+        if (startTimeElement !== null && endTimeElement !== null) {
+            timeInterval.setAttribute("class", "unhidden");
+            startTimeElement.textContent = "EAF start time: " + startTime;
+            endTimeElement.textContent = "EAF end time: " + endTime;
+        }
+    }
 
     if (elementTier1 !== null) {
       const textbox1 = document.getElementById("textbox1");
@@ -219,6 +229,16 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     tier5Value: tier5text,
     tier6Value: tier6text,
     });
+
+    if (timeInterval !== null) {
+        const startTimeElement = timeInterval.firstChild;
+        const endTimeElement = timeInterval.lastChild;
+        if (startTimeElement !== null && endTimeElement !== null) {
+            timeInterval.setAttribute("class", "unhidden");
+            startTimeElement.textContent = "EAF start time: " + startTime;
+            endTimeElement.textContent = "EAF end time: " + endTime;
+        }
+    }
 
     if (elementTier1 !== null) {
     const textbox1 = document.getElementById("textbox1");
