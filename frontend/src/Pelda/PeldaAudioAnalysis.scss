@@ -6,4 +6,25 @@
   
   .PeldaAudioAnalysis-speaker {
     max-width: 360px; }
-  
+
+  .metilda-audio-analysis-controls-list-item-row .eafRefreshButton {
+    position: relative;
+    left: 5px;
+    top: 5px;
+    width: 40px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    height: 40px;
+    background-color: #26a69a;
+    border: none;
+    color: black;
+    border-radius: 5px;
+    z-index: 1;
+    letter-spacing: 0.5px;
+    display: block; }
+    
+  .metilda-audio-analysis-controls-list-item-row {
+    display: flex;
+    flex-direction: row; }
+    
