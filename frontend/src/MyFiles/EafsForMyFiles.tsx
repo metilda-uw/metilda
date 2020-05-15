@@ -136,7 +136,7 @@ State > {
          <td>{eaf.name}</td>
          <td>{eaf.createdAt}</td>
           <td>
-              <button className="GetImages waves-effect waves-light btn globalbtn" title="Get EAFs for the file"
+              <button className="GetImages waves-effect waves-light btn globalbtn" title="View the content of the file"
                onClick={() => this.viewEaf(eaf)}>
                   <i className="material-icons right">insert_drive_file</i>
                   View EAF

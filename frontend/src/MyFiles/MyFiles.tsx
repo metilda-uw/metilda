@@ -193,7 +193,7 @@ renderTableData() {
                 </button>
                 }
                 {file.type === "Folder" &&
-                <button className="OpenFolder waves-effect waves-light btn globalbtn" title="Open Folder"
+                <button className="OpenFolder waves-effect waves-light btn globalbtn"
                 onClick={() => (this.openFolder(file))}>
                    <i className="material-icons right">folder_open</i>
                    Open Folder
@@ -202,14 +202,14 @@ renderTableData() {
             </td>
             <td>
                 {file.type === "Upload" &&
-                <button className="GetImages waves-effect waves-light btn globalbtn" title="Move selected audio files to folder"
+                <button className="GetImages waves-effect waves-light btn globalbtn" title="Get EAFs for the file"
                  onClick={() => (this.handleGetEafs(file.id, file.name))}>
                      <i className="material-icons right">insert_drive_file</i>
                     Get EAFs
                 </button>
                 }
                 {file.type === "Folder" &&
-                <button className="MoveToFolder waves-effect waves-light btn globalbtn" title="Get images for the file"
+                <button className="MoveToFolder waves-effect waves-light btn globalbtn" title="Move selected audio files to folder"
                 onClick={() => (this.handleMoveFiles(file))}>
                    <i className="material-icons right">add_box</i>
                    Move to Folder
