@@ -192,7 +192,7 @@ State > {
     const {isLoading} = this.state;
     const {showImages} = this.props;
     const className = `${showImages
-      ? "transition"
+      ? "imageTransition"
       : ""} ImagesForMyFiles`;
     return (
       <div className={className}>

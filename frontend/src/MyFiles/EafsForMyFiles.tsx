@@ -239,7 +239,7 @@ State > {
     const {isLoading} = this.state;
     const {showEafs} = this.props;
     const className = `${showEafs
-      ? "transition"
+      ? "eafTransition"
       : ""} EafsForMyFiles`;
     return (
       <div className={className}>

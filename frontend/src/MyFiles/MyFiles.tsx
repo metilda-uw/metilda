@@ -172,7 +172,7 @@ renderTableData() {
            value={index}/><span/></label></td>
             }
             {file.type === "Folder" &&
-           <td><i className="material-icons center">folder</i></td>
+           <td><i className="material-icons left">folder</i></td>
             }
            <td>{file.name}</td>
            <td>

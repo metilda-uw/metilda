@@ -111,23 +111,27 @@ callBackSelectionInterval = (childSoundLength: number, childMinAudioTime: number
   selectEndTime: childSelectEndTime,
   selectedFolderName: childSelectedFolderName,
   });
+
   if (this.state.selectedFolderName !== "Uploads") {
     this.getUserFiles();
   }
+
+  const eafTimeInterval = document.getElementById("eaf-interval");
+  const eafStartTimeElement = document.getElementById("eaf-start-time");
+  const eafEndTimeElement = document.getElementById("eaf-end-time");
+
+  if (eafTimeInterval !== null && eafStartTimeElement !== null && eafEndTimeElement !== null) {
+    eafTimeInterval.setAttribute("class", "hidden");
+    eafStartTimeElement.setAttribute("class", "hidden");
+    eafEndTimeElement.setAttribute("class", "hidden");
   }
+}
 
 callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2Enabled: boolean, tier2text: string,
                              isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean, tier4text: string,
                              isTier5Enabled: boolean, tier5text: string, isTier6Enabled: boolean, tier6text: string,
-                             startTime: any, endTime: any) => {
-  const timeInterval = document.getElementById("selection-interval");
+                             startTime: number, endTime: number) => {
   const element = document.getElementById("elan-annotation");
-  const elementTier1 = document.getElementById("tier1label");
-  const elementTier2 = document.getElementById("tier2label");
-  const elementTier3 = document.getElementById("tier3label");
-  const elementTier4 = document.getElementById("tier4label");
-  const elementTier5 = document.getElementById("tier5label");
-  const elementTier6 = document.getElementById("tier6label");
 
   if (element !== null) {
     element.setAttribute("class", "unhidden");
@@ -148,16 +152,30 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       tier6Value: tier6text,
     });
 
-    if (timeInterval !== null) {
-        const startTimeElement = timeInterval.firstChild;
-        const endTimeElement = timeInterval.lastChild;
-        if (startTimeElement !== null && endTimeElement !== null) {
-            timeInterval.setAttribute("class", "unhidden");
-            startTimeElement.textContent = "EAF start time: " + startTime;
-            endTimeElement.textContent = "EAF end time: " + endTime;
+    const eafTimeInterval = document.getElementById("eaf-interval");
+    const eafStartTimeElement = document.getElementById("eaf-start-time");
+    const eafEndTimeElement = document.getElementById("eaf-end-time");
+
+    if (eafTimeInterval !== null && eafStartTimeElement !== null && eafEndTimeElement !== null) {
+        eafStartTimeElement.innerText = "EAF start time: " + startTime.toFixed(1);
+        eafEndTimeElement.innerText = "EAF end time: " + endTime.toFixed(1);
+
+        const timeInterval = document.getElementById("selection-interval");
+        const startTimeElement = document.getElementById("select-start-time");
+        const endTimeElement = document.getElementById("select-end-time");
+
+        if (timeInterval !== null && startTimeElement !== null && endTimeElement !== null) {
+            timeInterval.setAttribute("class", "hidden");
+            startTimeElement.setAttribute("class", "hidden");
+            endTimeElement.setAttribute("class", "hidden");
         }
+
+        eafTimeInterval.setAttribute("class", "unhidden");
+        eafStartTimeElement.setAttribute("class", "unhidden");
+        eafEndTimeElement.setAttribute("class", "unhidden");
     }
 
+    const elementTier1 = document.getElementById("tier1label");
     if (elementTier1 !== null) {
       const textbox1 = document.getElementById("textbox1");
       if (isTier1Enabled && textbox1 != null) {
@@ -168,6 +186,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
+    const elementTier2 = document.getElementById("tier2label");
     if (elementTier2 !== null) {
       const textbox2 = document.getElementById("textbox2");
       if (isTier2Enabled && textbox2 != null) {
@@ -178,6 +197,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
+    const elementTier3 = document.getElementById("tier3label");
     if (elementTier3 !== null) {
       const textbox3 = document.getElementById("textbox3");
       if (isTier3Enabled && textbox3 != null) {
@@ -188,6 +208,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
+    const elementTier4 = document.getElementById("tier4label");
     if (elementTier4 !== null) {
       const textbox4 = document.getElementById("textbox4");
       if (isTier4Enabled && textbox4 != null) {
@@ -198,6 +219,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
+    const elementTier5 = document.getElementById("tier5label");
     if (elementTier5 !== null) {
       const textbox5 = document.getElementById("textbox5");
       if (isTier5Enabled && textbox5 != null) {
@@ -208,6 +230,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
+    const elementTier6 = document.getElementById("tier6label");
     if (elementTier6 !== null) {
       const textbox6 = document.getElementById("textbox6");
       if (isTier6Enabled && textbox6 != null) {
@@ -230,16 +253,30 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     tier6Value: tier6text,
     });
 
-    if (timeInterval !== null) {
-        const startTimeElement = timeInterval.firstChild;
-        const endTimeElement = timeInterval.lastChild;
-        if (startTimeElement !== null && endTimeElement !== null) {
-            timeInterval.setAttribute("class", "unhidden");
-            startTimeElement.textContent = "EAF start time: " + startTime;
-            endTimeElement.textContent = "EAF end time: " + endTime;
+    const eafTimeInterval = document.getElementById("eaf-interval");
+    const eafStartTimeElement = document.getElementById("eaf-start-time");
+    const eafEndTimeElement = document.getElementById("eaf-end-time");
+
+    if (eafTimeInterval !== null && eafStartTimeElement !== null && eafEndTimeElement !== null) {
+        eafStartTimeElement.innerText = "EAF start time: " + startTime.toFixed(1);
+        eafEndTimeElement.innerText = "EAF end time: " + endTime.toFixed(1);
+
+        const timeInterval = document.getElementById("selection-interval");
+        const startTimeElement = document.getElementById("select-start-time");
+        const endTimeElement = document.getElementById("select-end-time");
+
+        if (timeInterval !== null && startTimeElement !== null && endTimeElement !== null) {
+            timeInterval.setAttribute("class", "hidden");
+            startTimeElement.setAttribute("class", "hidden");
+            endTimeElement.setAttribute("class", "hidden");
         }
+
+        eafTimeInterval.setAttribute("class", "unhidden");
+        eafStartTimeElement.setAttribute("class", "unhidden");
+        eafEndTimeElement.setAttribute("class", "unhidden");
     }
 
+    const elementTier1 = document.getElementById("tier1label");
     if (elementTier1 !== null) {
     const textbox1 = document.getElementById("textbox1");
     if (isTier1Enabled && textbox1 != null) {
@@ -250,6 +287,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     }
     }
 
+    const elementTier2 = document.getElementById("tier2label");
     if (elementTier2 !== null) {
     const textbox2 = document.getElementById("textbox2");
     if (isTier2Enabled && textbox2 != null) {
@@ -260,6 +298,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     }
     }
 
+    const elementTier3 = document.getElementById("tier3label");
     if (elementTier3 !== null) {
     const textbox3 = document.getElementById("textbox3");
     if (isTier3Enabled && textbox3 != null) {
@@ -270,6 +309,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     }
     }
 
+    const elementTier4 = document.getElementById("tier4label");
     if (elementTier4 !== null) {
     const textbox4 = document.getElementById("textbox4");
     if (isTier4Enabled && textbox4 != null) {
@@ -280,6 +320,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     }
     }
 
+    const elementTier5 = document.getElementById("tier5label");
     if (elementTier5 !== null) {
     const textbox5 = document.getElementById("textbox5");
     if (isTier5Enabled && textbox5 != null) {
@@ -290,6 +331,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     }
     }
 
+    const elementTier6 = document.getElementById("tier6label");
     if (elementTier6 !== null) {
     const textbox6 = document.getElementById("textbox6");
     if (isTier6Enabled && textbox6 != null) {
@@ -1328,12 +1370,22 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
 
       {this.state.selectStartTime >= 0 && this.state.selectEndTime >= 0 &&
       (this.state.selectEndTime - this.state.selectStartTime) > 0 &&
-      <div id="selection-interval">
-        <p id="select-start-time">
-            Start Time: {this.state.selectStartTime.toFixed(1)}
+      <div id="selection-interval" className="unhidden">
+        <p id="select-start-time" className="unhidden">
+          Start Time: {this.state.selectStartTime.toFixed(1)}
         </p>
-        <p id="select-end-time">End Time: {this.state.selectEndTime.toFixed(1)}</p>
-      </div>}
+        <p id="select-end-time" className="unhidden">
+          End Time: {this.state.selectEndTime.toFixed(1)}
+        </p>
+      </div>
+      }
+
+      <div id="eaf-interval" className="unhidden">
+        <p id="eaf-start-time" className="unhidden">
+        </p>
+        <p id="eaf-end-time" className="unhidden">
+        </p>
+      </div>
 
       <div id="elan-annotation" className="hidden">
         <div id="tier1label" className="hidden">

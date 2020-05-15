@@ -30,11 +30,11 @@
     bottom: 0px;
 }
   
-.transition {
+.eafTransition {
     width: 100%;
     left: 0;
+    height: inherit;
     overflow:auto;
-    height:90vh
 }
   
 .BackButton{

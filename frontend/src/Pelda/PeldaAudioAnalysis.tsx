@@ -30,7 +30,7 @@ export interface PeldaAudioAnalysisProps {
     eafTierDataCallBack: (isTier1Enabled: boolean, tier1text: string, isTier2Enabled: boolean,
                           tier2text: string, isTier3Enabled: boolean, tier3text: string, isTier4Enabled: boolean,
                           tier4text: string, isTier5Enabled: boolean, tier5text: string, isTier6Enabled: boolean,
-                          tier6text: string, startTime: any, endTime: any) => void;
+                          tier6text: string, startTime: number, endTime: number) => void;
 }
 
 interface State {
@@ -671,16 +671,16 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
             let tier4text: string = "";
             let tier5text: string = "";
             let tier6text: string = "";
-            let startTime: any;
-            let endTime: any;
+            let startTime: number = -1;
+            let endTime: number = -1;
 
             if (timeInterval.length > 1) {
                 const startTimeNode = timeInterval.item(0);
                 const endTimeNode = timeInterval.item(1);
 
                 if (startTimeNode !== null && endTimeNode !== null) {
-                    startTime = startTimeNode.getAttribute("TIME_VALUE");
-                    endTime = endTimeNode.getAttribute("TIME_VALUE");
+                    startTime = Number(startTimeNode.getAttribute("TIME_VALUE"));
+                    endTime = Number(endTimeNode.getAttribute("TIME_VALUE"));
                 }
             }
 
