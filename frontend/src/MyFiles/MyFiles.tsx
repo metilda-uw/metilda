@@ -177,10 +177,10 @@ renderTableData() {
            <td>{file.name}</td>
            <td>
                 {file.type === "Upload" &&
-                   <p> {(file.size / 1024).toFixed(2)} KB</p>
+                   <p id="sizeParagraph"> {(file.size / 1024).toFixed(2)} KB</p>
                 }
                 {file.type === "Folder" &&
-                <p>-</p>
+                <p id="sizeParagraph">-</p>
                 }
             </td>
            <td>{file.createdAt}</td>
@@ -438,8 +438,10 @@ render() {
                 <p>
                     <i>
                         <b>Note:</b>
-                        Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the
-                         bottom of the page to download or delete files.
+                        1) Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the
+                         bottom of the page to download or delete files. <br/>
+                        2) Select checkboxes for files and click on the corrosponding 'Move to Folder' button to move
+                         those selected files to that subfolder.
                     </i>
                 </p><br/>
                 <table id="myFiles">
