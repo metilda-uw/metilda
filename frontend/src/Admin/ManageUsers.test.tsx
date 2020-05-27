@@ -19,6 +19,7 @@ describe("MyFiles", () => {
     const mockResponse = new Response(JSON.stringify(body));
     return Promise.resolve(mockResponse);
   }});
+
   it("renders the MyFiles page", () => {
         const subject = shallowRender({firebase});
         expect(subject.find(".AddUser")).to.be.present();
@@ -54,6 +55,56 @@ describe("MyFiles", () => {
     subject.setState({users: initialUsers});
     expect(subject.find(".DeleteUser").length).to.be.equal(2);
     expect(subject.find(".EditUser").length).to.be.equal(2);
+  });
+
+  it("should not delete user details when user cancels user deletion", () => {
+    const confirmStub = sinon.stub(window, "confirm").returns(true);
+    const initialUsers = [{
+      id: "1",
+      name: "user_1",
+      createdAt: "",
+      lastLogin: "",
+      role: "test_role",
+      university: "test_university",
+      researchLanguage: "test_language"
+    }];
+    const subject = shallowRender({firebase});
+    subject.setState({users: initialUsers});
+    expect(subject.find(".DeleteUser").length).to.be.equal(1);
+    subject.find(".DeleteUser").simulate("click");
+    expect(subject.state("users")).to.be.deep.equal([
+      {
+        id: "1",
+        name: "user_1",
+        createdAt: "",
+        lastLogin: "",
+        role: "test_role",
+        university: "test_university",
+        researchLanguage: "test_language"
+      }
+    ]);
+    expect(confirmStub.calledOnce).to.equal(false);
+    confirmStub.restore();
+  });
+
+  it("should delete user details when user confirms user deletion", () => {
+    const confirmStub = sinon.stub(window, "confirm").returns(false);
+    const initialUsers = [{
+      id: "1",
+      name: "user_1",
+      createdAt: "",
+      lastLogin: "",
+      role: "test_role",
+      university: "test_university",
+      researchLanguage: "test_language"
+    }];
+    const subject = shallowRender({firebase});
+    subject.setState({users: initialUsers});
+    expect(subject.find(".DeleteUser").length).to.be.equal(1);
+    subject.find(".DeleteUser").simulate("click");
+    expect(subject.state("users")).to.be.deep.equal(initialUsers);
+    expect(confirmStub.calledOnce).to.equal(false);
+    confirmStub.restore();
   });
 
   it("clicking authorize user button should authorize an user", () => {

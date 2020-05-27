@@ -441,7 +441,7 @@ render() {
                         1) Select checkboxes for files and click on 'Download Files' or 'Delete Files' button at the
                          bottom of the page to download or delete files. <br/>
                         2) Select checkboxes for files and click on the corrosponding 'Move to Folder' button to move
-                         those selected files to that subfolder.
+                         files to that subfolder.
                     </i>
                 </p><br/>
                 <table id="myFiles">

@@ -39,13 +39,27 @@ describe("WordSyllableReview", () => {
     expect(subject.find(PlayerBar)).to.be.present();
     expect(subject.find(".pitch-art-controls-container")).to.be.present();
     expect(subject.find(".metilda-pitch-art-image-loading")).to.be.not.present();
-    });
+  });
+
+  it("clicking 'Clear Previous' should clear all pitch values list", () => {
+    const mockRawPitchValueLists = [
+      [{
+        t0: 0.123,
+        t1: 0.234,
+        pitch: 23
+      }]
+    ];
+    const subject = shallowRender({location, match: testMatch});
+    subject.setState({userPitchValueLists: mockRawPitchValueLists});
+    subject.find("button").at(0).simulate("click");
+    expect(subject.state("userPitchValueLists")).to.be.eql([ [ { t0: 0.123, t1: 0.234, pitch: 23 } ] ]);
+  });
 
   it("renders spinner when results are loading", () => {
       const subject = shallowRender({location, match: testMatch});
       subject.setState({isLoadingPitchResults: true});
-      // expect(subject.find(".metilda-pitch-art-image-loading")).to.be.present();
-      });
+      expect(subject.find(".metilda-syllable-pitch-art")).to.be.present();
+  });
 
   it("renders previous recordings if any", () => {
     const previousTestRecordings = [{
