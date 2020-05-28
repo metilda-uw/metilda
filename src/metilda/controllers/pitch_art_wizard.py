@@ -540,7 +540,7 @@ def drawSound(upload_id):
     #os.remove(sound_path)
     return resp
 
-@app.route('/draw-sound/<sound>/<startTime>/<endTime>')
+@app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
 def drawSoundWithTime(sound, startTime, endTime):
 
     # Get URL parameters
@@ -575,7 +575,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     os.remove(image)
     return resp
 
-@app.route('/get-bounds/<sound>')
+@app.route('/get-bounds/<sound>', methods=["GET"])
 def getBounds(sound):
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [sound, praat._sounds_dir])
@@ -654,47 +654,47 @@ def formantFrameCount(sound):
     script = praat._scripts_dir + "formantFrameCount"
     return jsonify({"noOfFrames": praat.runScript(script, [sound, praat._sounds_dir])})
 
-@app.route('/formant/number-of-formants/<sound>/<frame>')
+@app.route('/formant/number-of-formants/<sound>/<frame>', methods=["GET"])
 def formantCountAtFrame(sound, frame):
     script = praat._scripts_dir + "formantCount"
     return jsonify({"noOfFormants": praat.runScript(script, [sound, frame, praat._sounds_dir])})
 
-@app.route('/formant/value-at-time/<sound>/<formantNumber>/<time>')
+@app.route('/formant/value-at-time/<sound>/<formantNumber>/<time>', methods=["GET"])
 def formantValueAtTime(sound, formantNumber, time):
     script = praat._scripts_dir + "formantValueAtTime"
     return jsonify({"formantValueAtTime": praat.runScript(script, [sound, formantNumber, time, praat._sounds_dir])})
 
-@app.route('/harmonicity/get-min/<sound>/<start>/<end>')
+@app.route('/harmonicity/get-min/<sound>/<start>/<end>', methods=["GET"])
 def harmonicityGetMin(sound, start, end):
     script = praat._scripts_dir + "harmonicityGetMin"
     return jsonify({"minHarmonicity": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
 
-@app.route('/harmonicity/get-max/<sound>/<start>/<end>')
+@app.route('/harmonicity/get-max/<sound>/<start>/<end>', methods=["GET"])
 def harmonicityGetMax(sound, start, end):
     script = praat._scripts_dir + "harmonicityGetMax"
     return jsonify({"maxHarmonicity": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
 
-@app.route('/harmonicity/value-at-time/<sound>/<time>')
+@app.route('/harmonicity/value-at-time/<sound>/<time>', methods=["GET"])
 def harmonicityValueAtTime(sound, time):
     script = praat._scripts_dir + "harmonicityGetValueAtTime"
     return jsonify({"harmonicityValueAtTime": praat.runScript(script, [sound, time, praat._sounds_dir])})
 
-@app.route('/pointprocess/number-of-periods/<sound>/<start>/<end>')
+@app.route('/pointprocess/number-of-periods/<sound>/<start>/<end>', methods=["GET"])
 def pointProcessGetNumPeriods(sound, start, end):
     script = praat._scripts_dir + "pointProcessGetNumPeriods"
     return jsonify({"noOfPeriods": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
 
-@app.route('/pointprocess/number-of-points/<sound>')
+@app.route('/pointprocess/number-of-points/<sound>', methods=["GET"])
 def pointProcessGetNumPoints(sound):
     script = praat._scripts_dir + "pointProcessGetNumPoints"
     return jsonify({"noOfPoints": praat.runScript(script, [sound, praat._sounds_dir])})
 
-@app.route('/pointprocess/get-jitter/<sound>/<start>/<end>')
+@app.route('/pointprocess/get-jitter/<sound>/<start>/<end>', methods=["GET"])
 def pointProcessGetJitter(sound, start, end):
     script = praat._scripts_dir + "pointProcessGetJitter"
     return jsonify({"localJitter": praat.runScript(script, [sound, start, end, praat._sounds_dir])})
 
-@app.route('/annotation/<eaffilename>/<sound>/<start>/<end>/<text0>/<text1>/<text2>/<text3>/<text4>/<text5>')
+@app.route('/annotation/<eaffilename>/<sound>/<start>/<end>/<text0>/<text1>/<text2>/<text3>/<text4>/<text5>', methods=["GET"])
 def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2, text3, text4, text5):
     x = sound.index('.')
     nameoffile = eaffilename

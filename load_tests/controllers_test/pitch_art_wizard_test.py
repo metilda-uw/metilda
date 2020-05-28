@@ -10,6 +10,7 @@ from test_data import *
 
 class WebsiteTasks(TaskSet):
     email = "NOT_FOUND"
+    userid = "NOT_FOUND"
     username = "NOT_FOUND"
     university="NOT_FOUND"
     role="NOT_FOUND"
@@ -25,6 +26,9 @@ class WebsiteTasks(TaskSet):
     analysis_file_path="NOT_FOUND"
     analysis_id="NOT_FOUND"
     image_id="NOT_FOUND"
+    eaf_file_id="NOT_FOUND"
+    eaf_file_name="NOT_FOUND"
+    eaf_file_path="NOT_FOUND"
     def on_start(self):
         if len(USER_DETAILS) > 0:
             self.email, self.username,self.university, self.role, self.research_language, self.file_name,self.file_path,self.file_type,self.file_size,self.file_id,self.image_name, self.image_path = USER_DETAILS.pop()
@@ -40,7 +44,7 @@ class WebsiteTasks(TaskSet):
             "/api/audio/EOP-AF-saahkomaapiwa_mono.wav.png/image?min-pitch=75&max-pitch=500"
         )
 
-    @task
+    '''@task
     def audio(self):
         self.client.get("/api/audio/EOP-AF-saahkomaapiwa_mono.wav/file")
 
@@ -82,11 +86,67 @@ class WebsiteTasks(TaskSet):
         self.client.post(
             "/api/audio/download-file",
             files={'file': open(file_path, 'rb')}
-        )
+        )'''
 
+    @task
+    def draw_sound(self):
+        self.client.get("/draw-sound/EOP-AF-saahkomaapiwa_mono.wav.png/image?spectrogram&pitch&intensity&")
+
+    @task
+    def get_bounds(self):
+        self.client.get("/get-bounds/EOP-AF-saahkomaapiwa_mono.wav")
+
+    @task
+    def get_energy(self):
+        self.client.get("/get-energy/EOP-AF-saahkomaapiwa_mono.wav")
+
+    @task
+    def get_pitch_voiced_frames(self):
+        self.client.get("/pitch/count-voiced-frames/EOP-AF-saahkomaapiwa_mono.wav")
+    
+    @task
+    def get_frequency(self):
+        self.client.get("/spectrum/get-bounds/EOP-AF-saahkomaapiwa_mono.wav")
+    
+    @task
+    def get_intensity(self):
+        self.client.get("/intensity/get-bounds/EOP-AF-saahkomaapiwa_mono.wav")
+    
+    @task
+    def get_frames(self):
+        self.client.get("/formant/number-of-frames/EOP-AF-saahkomaapiwa_mono.wav")
+    
+    @task
+    def get_harmonicity(self):
+        self.client.get("/harmonicity/get-max/EOP-AF-saahkomaapiwa_mono.wav/1/3")
+
+    @task
+    def get_points(self):
+        self.client.get("/pointprocess/number-of-points/EOP-AF-saahkomaapiwa_mono.wav")
+
+    @task
+    def get_jitter(self):
+        self.client.get("/pointprocess/get-jitter/EOP-AF-saahkomaapiwa_mono.wav/1/3")
+    
+    @task
+    def save_annotation(self):
+        self.client.get("/annotation/EOP4.eaf/EOP-AF-saahkomaapiwa_mono.wav/0/2/text0/text1/text2/text3/text4/text5")
+    
+    @task
+    def get_eaf_file_path(self):
+        self.client.get("/api/get-eaf-file-path/49")
+    
+    @task
+    def get_eaf_files(self):
+        self.client.get("/api/get-eafs-for-files/712")
+    
+    @task
+    def get_files_and_folders(self):
+        self.client.get("/api/get-files-and-folders/jignasha@uw.edu/Uploads")
+    
 # Run the below task after commenting the above tasks because on_start function should only be called before executing this task.
 # If all the tasks are run at once, the on_start function runs before every task which pops the elements from test data which is not required.
-    @task
+    '''@task
     def create_db_user(self):
         self.client.post("/api/create-user", {
             'user_id': self.email, 'user_name': self.username,'university':self.university
@@ -151,9 +211,36 @@ class WebsiteTasks(TaskSet):
             "/api/delete-user",
             {
             'user_id': self.email
-        })
-        
+        })'''
 
+    '''@task
+    def db_post_operations(self):
+        self.client.post(
+            "/api/create-eaf",
+                {
+            'file_id': self.file_id, 'eaf_file_name': self.eaf_file_name, 'eaf_file_path': self.eaf_file_path
+        })
+        self.client.post(
+            "/api/delete-eaf-file",
+            {
+            'eaf_id': self.eaf_file_id
+        })
+        self.client.post(
+            "/api/move-to-folder",
+                {
+            'file_id': self.file_id, 'file_path': self.file_path
+        })
+        self.client.post(
+            "/api/create-file",
+            {
+            'user_id': self.email, 'file_name': self.file_name,'file_path':self.file_path,'file_type':self.file_type,
+            'file_size':self.file_size
+        })
+        self.client.post(
+            "/api/delete-folder",
+            {
+            'file_id': self.file_id
+        })'''
 
 class WebsiteUser(HttpLocust):
     task_set = WebsiteTasks
