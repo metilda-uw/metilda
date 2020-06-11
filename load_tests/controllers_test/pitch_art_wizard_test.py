@@ -29,6 +29,7 @@ class WebsiteTasks(TaskSet):
     eaf_file_id="NOT_FOUND"
     eaf_file_name="NOT_FOUND"
     eaf_file_path="NOT_FOUND"
+    
     def on_start(self):
         if len(USER_DETAILS) > 0:
             self.email, self.username,self.university, self.role, self.research_language, self.file_name,self.file_path,self.file_type,self.file_size,self.file_id,self.image_name, self.image_path = USER_DETAILS.pop()
@@ -38,13 +39,14 @@ class WebsiteTasks(TaskSet):
             self.analysis_id,self.image_id=IMAGE_ANALYSIS.pop()
         if len(UPDATE_ANALYSIS) > 0:
             self.analysis_id,self.analysis_file_path=UPDATE_ANALYSIS.pop()
+    
     @task
     def audio_analysis_image(self):
         self.client.get(
             "/api/audio/EOP-AF-saahkomaapiwa_mono.wav.png/image?min-pitch=75&max-pitch=500"
         )
 
-    '''@task
+    @task
     def audio(self):
         self.client.get("/api/audio/EOP-AF-saahkomaapiwa_mono.wav/file")
 
@@ -86,7 +88,7 @@ class WebsiteTasks(TaskSet):
         self.client.post(
             "/api/audio/download-file",
             files={'file': open(file_path, 'rb')}
-        )'''
+        )
 
     @task
     def draw_sound(self):
@@ -142,11 +144,12 @@ class WebsiteTasks(TaskSet):
     
     @task
     def get_files_and_folders(self):
-        self.client.get("/api/get-files-and-folders/jignasha@uw.edu/Uploads")
+        self.client.get("/api/get-files-and-folders/metilda.uw@gmail.edu/Uploads")
     
 # Run the below task after commenting the above tasks because on_start function should only be called before executing this task.
 # If all the tasks are run at once, the on_start function runs before every task which pops the elements from test data which is not required.
-    '''@task
+    
+    @task
     def create_db_user(self):
         self.client.post("/api/create-user", {
             'user_id': self.email, 'user_name': self.username,'university':self.university
@@ -211,9 +214,9 @@ class WebsiteTasks(TaskSet):
             "/api/delete-user",
             {
             'user_id': self.email
-        })'''
+        })
 
-    '''@task
+    @task
     def db_post_operations(self):
         self.client.post(
             "/api/create-eaf",
@@ -231,7 +234,7 @@ class WebsiteTasks(TaskSet):
             'file_id': self.file_id, 'file_path': self.file_path
         })
         self.client.post(
-            "/api/create-file",
+            "/api/create-folder",
             {
             'user_id': self.email, 'file_name': self.file_name,'file_path':self.file_path,'file_type':self.file_type,
             'file_size':self.file_size
@@ -240,7 +243,7 @@ class WebsiteTasks(TaskSet):
             "/api/delete-folder",
             {
             'file_id': self.file_id
-        })'''
+        })
 
 class WebsiteUser(HttpLocust):
     task_set = WebsiteTasks

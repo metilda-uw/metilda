@@ -1185,7 +1185,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
-    const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want proceed to save an eaf file?");
+    const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want to proceed to save an eaf file?");
 
     if ( isOk ) {
       const eafFileName = prompt("Enter name for EAF: ", "testeaf.eaf");
