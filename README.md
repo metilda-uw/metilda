@@ -7,6 +7,7 @@ Audio analysis web app.
 ## Links
 ### Web App
 - Dev site: https://metilda-dev.herokuapp.com
+- Prod site: https://metilda.herokuapp.com/
 ### DevOps
 - Repo: https://github.com/mitchl2/metilda 
 - Travis CI: https://travis-ci.com/mitchl2/metilda
