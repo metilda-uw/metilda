@@ -43,7 +43,7 @@ Flask-Cors==3.0.8
 itsdangerous==1.1.0
 Jinja2==2.10.3
 kiwisolver==1.1.0
-lxml==4.5.0
+lxml==4.6.2
 MarkupSafe==1.1.1
 matplotlib==2.2.4
 numpy==1.16.6
