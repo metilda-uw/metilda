@@ -18,7 +18,12 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
+
+  div {
+    font-size: 100%;
+  }
 }
+
 
 .login_Button:hover {
   background-color: #e0363c;
@@ -27,4 +32,18 @@
 h3 {
   color: rgb(185, 54, 54);
   font-size: 30pt;
+}
+
+@media (max-width: 1025px) {
+  .login_Button div {
+    width: 15%;
+    font-size: 80%;
+  }
+}
+
+@media (max-width: 769px) {
+  .login_Button div {
+    width: 20%;
+    font-size: 60%;
+  }
 }

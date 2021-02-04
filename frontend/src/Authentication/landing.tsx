@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
 import * as ROUTES from "../constants/routes";
+import { DemoVideo } from "./DemoVideo";
 import "./landing.scss";
 
 export interface Props {
@@ -28,9 +29,11 @@ export class Landing extends React.Component<Props> {
         </p>
         <button className="login_Button globalbtn" onClick={this.displayLoginPage}>
           {" "}
-          Login/Sign Up
+            <div>Login/Sign Up</div>
         </button>
         <p />
+        <p>This is a short demo of the system in it's current state!</p>
+        <DemoVideo />
       </div>
     );
   }
