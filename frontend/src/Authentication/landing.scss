@@ -19,9 +19,9 @@
   border-radius: 4px;
   cursor: pointer;
 
-  div {
-    font-size: 100%;
-  }
+  //div {
+  //  font-size: 100%;
+  //}
 }
 
 
@@ -35,15 +35,13 @@ h3 {
 }
 
 @media (max-width: 1025px) {
-  .login_Button div {
-    width: 15%;
-    font-size: 80%;
+  .login_Button {
+    width: 25%;
   }
 }
 
-@media (max-width: 769px) {
-  .login_Button div {
-    width: 20%;
-    font-size: 60%;
+@media (max-width: 1025px) {
+  .login_Button {
+    width: 40%;
   }
 }
