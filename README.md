@@ -31,10 +31,11 @@ Tested on Windows, but should work on Linux as well (the test suite is run on a 
 1) Install nodejs (the version is specified in `/frontend/package.json`, it is currently 8.12.0)
 2) Install <a href="https://heynode.com/tutorial/install-nodejs-locally-nvm">Node Version Manager</a>
 3) Run the following commands to switch to the correct version of node (Important for successfully running the frontend)
-   ```
-   nvm install 8.12.0
-   nvm use 8.12.0
-   ```
+```
+nvm install 8.12.0
+nvm use 8.12.0
+```
+
 5) Run these commands:
 ```
 cd frontend
