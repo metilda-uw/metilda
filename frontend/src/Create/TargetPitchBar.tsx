@@ -313,7 +313,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 </DialogTitle>
                 <DialogContent>
                 <input className="analysisName" name="currentAnalysisName" value={this.state.currentAnalysisName}
-                onChange={this.onChange} type="text" placeholder="Ex: Analysis1.json or Analysis1" required/>
+                onChange={this.onChange} type="text" placeholder={"Ex: \"Analysis1.json\" or \"Analysis1\""} required/>
                 </DialogContent>
                 <DialogActions>
                     <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
@@ -385,7 +385,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         const startsWithDot: boolean = name.startsWith(".");
         const isEmpty: boolean = name.length === 0;
         const tooManyDots: boolean = name.indexOf(".") !== name.lastIndexOf(".");
-        const invalidFileFormat = name.includes(".") && name.slice(name.indexOf(".")) !== ".json";
+        const invalidFileFormat: boolean = name.includes(".") && name.slice(name.indexOf(".")) !== ".json";
 
         return !(startsWithDot || isEmpty || tooManyDots || invalidFileFormat);
     }
@@ -406,6 +406,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             const data = await uploadAnalysis(metildaWord, fileIndex, updatedAnalysisName, this.props.firebase);
             this.props.setLatestAnalysisId(this.props.speakerIndex, data,
                 updatedAnalysisName, speaker.letters);
+        } else if (this.state.currentAnalysisName === "") {
+          NotificationManager.error("Analysis not uploaded. Analysis name is missing");
         } else { // File name format invalid
             NotificationManager.error("Analysis not uploaded. Invalid File Name");
         }

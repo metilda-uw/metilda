@@ -183,10 +183,13 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
             <Dialog fullWidth={true} maxWidth="xs" open={this.state.showNewImageModal}
             onClose={this.handleCloseImageModal}aria-labelledby="form-dialog-title">
                 <DialogTitle onClose={this.handleCloseImageModal} id="form-dialog-title">
-                    Enter image name</DialogTitle>
+                    Enter image name
+                    <br />
+                    (Supported Formats: png)
+                </DialogTitle>
                 <DialogContent>
                 <input className="imageName" name="currentImageName" value={this.state.currentImageName}
-                onChange={this.onChange} type="text" placeholder="Ex: Image1.png" required/>
+                onChange={this.onChange} type="text" placeholder={"Ex: \"Image1.png\" or \"Image1\""} required/>
                 </DialogContent>
                 <DialogActions>
                     <button className="SaveImage waves-effect waves-light btn globalbtn"
@@ -199,6 +202,15 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         );
     }
 
+    fileNameIsValid = (name: string): boolean =>  {
+        const startsWithDot: boolean = name.startsWith(".");
+        const isEmpty: boolean = name.length === 0;
+        const tooManyDots: boolean = name.indexOf(".") !== name.lastIndexOf(".");
+        const invalidFileFormat: boolean = name.includes(".") && name.slice(name.indexOf(".")) !== ".png";
+
+        return !(startsWithDot || isEmpty || tooManyDots || invalidFileFormat);
+    }
+
     uploadImage = async () => {
          // follows example from:
         // https://konvajs.github.io/docs/data_and_serialization/Stage_Data_URL.html
@@ -207,7 +219,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.setState( {
             showNewImageModal: false
         });
-        if (this.state.currentImageName !== "") {
+        if (this.fileNameIsValid(this.state.currentImageName)) {
             const updatedImageName = this.state.currentImageName.trim();
             const imageId = await uploadImage(`${updatedImageName}`, dataURL, this.props.firebase);
             if (typeof(imageId) === "number") {
@@ -215,8 +227,10 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                 const imageAnalysisId = await uploadImageAnalysisIds(imageId, id);
             }
             }
-        } else {
+        } else if (this.state.currentImageName === "") {
             NotificationManager.error("Image not uploaded. Image name is missing");
+        } else {
+            NotificationManager.error("Image not uploaded. Invalid File Name");
         }
         this.setState({
             currentImageName: ""

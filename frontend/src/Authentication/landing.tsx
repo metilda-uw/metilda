@@ -32,7 +32,7 @@ export class Landing extends React.Component<Props> {
             <div>Login/Sign Up</div>
         </button>
         <p />
-        <p>This is a short demo of the system in it's current state!</p>
+        <p>This is a short demo of the system in its current state!</p>
         <DemoVideo />
       </div>
     );
