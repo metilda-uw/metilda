@@ -21,7 +21,7 @@ praat-parselmouth==0.3.2.post2
 pyAudioAnalysis==0.2.5
 pycparser==2.19
 pyrsistent==0.14.11
-PyYAML==5.1
+PyYAML==5.4
 pyzmq==18.0.1
 psycopg2==2.8.4
 requests==2.21.0
