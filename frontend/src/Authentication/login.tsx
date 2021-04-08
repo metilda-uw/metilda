@@ -7,6 +7,8 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import { SignUpPage } from "./signup";
 import ReactGA from "react-ga";
+import {log} from "util";
+import {NotificationManager} from "react-notifications";
 
 export interface Props {
   firebase: any;
@@ -54,22 +56,37 @@ constructor(props: any) {
       action: "User pressed login button",
       transport: "beacon"
     });
-    const authUser =  await this.props.firebase.doSignInWithEmailAndPassword(email, password);
-    ReactGA.set({
+
+    interface LoginError {
+        code: string;
+        message: string;
+    }
+
+    let userIsAuthorized: boolean = true;
+    const authUser =  await this.props.firebase.doSignInWithEmailAndPassword(email, password)
+        .catch((error: LoginError) => {
+            userIsAuthorized = false;
+            this.setState({...INITIAL_STATE });
+            NotificationManager.error(error.message);
+        });
+
+    if (userIsAuthorized) {
+        ReactGA.set({
           userId: authUser.user.uid
         });
-    this.setState({ ...INITIAL_STATE });
-    const formData = new FormData();
-    formData.append("user_id", authUser.user.email);
-    fetch(`/api/update-user`, {
-          method: "POST",
-          headers: {
+        this.setState({ ...INITIAL_STATE });
+        const formData = new FormData();
+        formData.append("user_id", authUser.user.email);
+        fetch(`/api/update-user`, {
+            method: "POST",
+            headers: {
               Accept: "application/json"
-          },
+            },
           body: formData
-      })
-      .then((response) => response.json());
-    this.props.history.push(ROUTES.HOME);
+        })
+        .then((response) => response.json());
+        this.props.history.push(ROUTES.HOME);
+    }
   }
 
 onChange = (event: any) => {

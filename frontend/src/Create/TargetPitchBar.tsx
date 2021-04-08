@@ -307,10 +307,13 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             <Dialog fullWidth={true} maxWidth="xs" open={this.state.showNewAnalysisModal}
             onClose={this.handleCloseNewAnalysis}aria-labelledby="form-dialog-title">
                 <DialogTitle onClose={this.handleCloseNewAnalysis} id="form-dialog-title">
-                Enter analysis name</DialogTitle>
+                    Enter analysis name
+                    <br />
+                    (Supported Formats: json)
+                </DialogTitle>
                 <DialogContent>
                 <input className="analysisName" name="currentAnalysisName" value={this.state.currentAnalysisName}
-                onChange={this.onChange} type="text" placeholder="Ex: Analysis1.json" required/>
+                onChange={this.onChange} type="text" placeholder={"Ex: \"Analysis1.json\" or \"Analysis1\""} required/>
                 </DialogContent>
                 <DialogActions>
                     <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
@@ -378,6 +381,26 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         );
     }
 
+    evalFileName = (name: string): string =>  {
+        const startsWithDot: boolean = name.startsWith(".");
+        const isEmpty: boolean = name.length === 0;
+        const tooManyDots: boolean = name.indexOf(".") !== name.lastIndexOf(".");
+        const invalidFileFormat: boolean = name.includes(".") && name.slice(name.indexOf(".")) !== ".json";
+
+        const baseMessage: string = "Analysis not uploaded. ";
+        if (startsWithDot) {
+            return baseMessage + "File name cannot start with a '.'";
+        } else if (isEmpty) {
+            return baseMessage + "Analysis name is missing";
+        } else if (tooManyDots) {
+            return baseMessage + "Analysis name can only have one dot to specify file extension";
+        } else if (invalidFileFormat) {
+            return baseMessage + "Unsupported file format";
+        } else {
+            return "ok";
+        }
+    }
+
     uploadAnalysis = async () => {
         this.setState( {
             showNewAnalysisModal: false
@@ -388,15 +411,17 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             letters: speaker.letters
         } as Speaker;
         const matchingFile = this.props.files.filter((currentRow: any[]) => currentRow[1] === speaker.uploadId);
-        if (this.state.currentAnalysisName !== "") {
+        const fileStatus: string = this.evalFileName(this.state.currentAnalysisName);
+        if (fileStatus === "ok") {
             const updatedAnalysisName = this.state.currentAnalysisName.trim();
             const fileIndex = speaker.fileIndex !== undefined ? speaker.fileIndex : matchingFile[0][0];
             const data = await uploadAnalysis(metildaWord, fileIndex, updatedAnalysisName, this.props.firebase);
             this.props.setLatestAnalysisId(this.props.speakerIndex, data,
                 updatedAnalysisName, speaker.letters);
-               } else {
-            NotificationManager.error("Analysis not uploaded. Analysis name is missing");
+        } else {
+            NotificationManager.error(fileStatus);
         }
+
         this.setState( {
             currentAnalysisName: ""
         });
