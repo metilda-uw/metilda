@@ -18,17 +18,25 @@ Tested on Windows, but should work on Linux as well (the test suite is run on a 
 
 ## Build and Run
 ### Python
-1) Install a Python interpreter (the version is specified in runtime.txt)
-1) Create a virtualenv under the /venv folder
-1) Run these commands:
+1) Install a Python interpreter (the version is specified in runtime.txt, it is currently 2.7.15). 
+   <a href="https://help.dreamhost.com/hc/en-us/articles/115000218612-Installing-a-custom-version-of-Python-2"> Installation Instructions </a> 
+3) Create a virtualenv under the /venv folder
+4) Run these commands:
 ```
 ./venv/Scripts/python -r requirements.txt
 ./bin/runLocalServer.sh
 ```
 
 ### React
-1) Install nodejs (the version is specified in `/frontend/package.json`)
-1) Run these commands:
+1) Install nodejs (the version is specified in `/frontend/package.json`, it is currently 8.12.0)
+2) Install <a href="https://heynode.com/tutorial/install-nodejs-locally-nvm">Node Version Manager</a>
+3) Run the following commands to switch to the correct version of node (Important for successfully running the frontend)
+```
+nvm install 8.12.0
+nvm use 8.12.0
+```
+
+5) Run these commands:
 ```
 cd frontend
 npm install 
