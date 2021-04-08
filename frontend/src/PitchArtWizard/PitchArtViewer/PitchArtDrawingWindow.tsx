@@ -202,13 +202,24 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         );
     }
 
-    fileNameIsValid = (name: string): boolean =>  {
+    evalFileName = (name: string): string =>  {
         const startsWithDot: boolean = name.startsWith(".");
         const isEmpty: boolean = name.length === 0;
         const tooManyDots: boolean = name.indexOf(".") !== name.lastIndexOf(".");
         const invalidFileFormat: boolean = name.includes(".") && name.slice(name.indexOf(".")) !== ".png";
 
-        return !(startsWithDot || isEmpty || tooManyDots || invalidFileFormat);
+        const baseMessage: string = "Image not uploaded. ";
+        if (startsWithDot) {
+            return baseMessage + "File name cannot start with a '.'";
+        } else if (isEmpty) {
+            return baseMessage + "Image name is missing";
+        } else if (tooManyDots) {
+            return baseMessage + "Image name can only have one dot to specify file extension";
+        } else if (invalidFileFormat) {
+            return baseMessage + "Unsupported file format";
+        } else {
+            return "ok";
+        }
     }
 
     uploadImage = async () => {
@@ -219,7 +230,9 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.setState( {
             showNewImageModal: false
         });
-        if (this.fileNameIsValid(this.state.currentImageName)) {
+
+        const fileStatus: string = this.evalFileName(this.state.currentImageName);
+        if (fileStatus === "ok") {
             const updatedImageName = this.state.currentImageName.trim();
             const imageId = await uploadImage(`${updatedImageName}`, dataURL, this.props.firebase);
             if (typeof(imageId) === "number") {
@@ -227,10 +240,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                 const imageAnalysisId = await uploadImageAnalysisIds(imageId, id);
             }
             }
-        } else if (this.state.currentImageName === "") {
-            NotificationManager.error("Image not uploaded. Image name is missing");
         } else {
-            NotificationManager.error("Image not uploaded. Invalid File Name");
+            NotificationManager.error(fileStatus);
         }
         this.setState({
             currentImageName: ""
