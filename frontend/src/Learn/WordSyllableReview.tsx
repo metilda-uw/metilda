@@ -543,6 +543,9 @@ render() {
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
                                             {!this.state.isRecording ? "Start Record" : "Stop Record"}
+                                            <i className="material-icons right">
+                                                record_voice_over
+                                            </i>
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.playPitchArt}
