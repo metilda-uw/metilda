@@ -388,8 +388,8 @@ playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
     }
 
-saveImage = () => {
-        this.pitchArtRef.current!.saveImage();
+saveImageforLearn = () => {
+        this.pitchArtRef.current!.saveImageforLearn();
     }
 
 minPitchArtTime = () => {
@@ -556,7 +556,7 @@ render() {
                                             Play Tones
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
-                                                onClick={this.saveImage}
+                                                onClick={this.saveImageforLearn}
                                                 disabled={this.state.isRecording}>
                                             <i className="material-icons right">
                                                 cloud_upload
