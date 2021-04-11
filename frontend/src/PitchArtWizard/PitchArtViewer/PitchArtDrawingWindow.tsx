@@ -275,6 +275,29 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         }
     }
 
+    saveImageforLearn = async () => {
+        ReactGA.event({
+            category: "Save Image",
+            action: "User pressed Save Image button"
+          });
+        const speakerIndicesForUnsavedAnalysis: number[] = [];
+        const allAnalysisIds: number[] = [];
+        this.props.speakers.forEach((item, index) => {
+            if (item.letters.length > 0 && JSON.stringify(item.letters) !== JSON.stringify(item.lastUploadedLetters)) {
+                speakerIndicesForUnsavedAnalysis.push(index);
+            } else if (item.letters.length > 0 && JSON.stringify(item.letters) ===
+            JSON.stringify(item.lastUploadedLetters)) {
+                if (item.latestAnalysisId !== null && item.latestAnalysisId !== undefined) {
+                allAnalysisIds.push(item.latestAnalysisId);
+                }
+            }
+        });
+        this.setState({
+                    showNewImageModal: true,
+                    allAnalysisIds
+                });
+    }
+    
 playPitchArt() {
         if (this.props.speakers.length !== 1) {
             return;
