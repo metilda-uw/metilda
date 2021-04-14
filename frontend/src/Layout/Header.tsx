@@ -66,6 +66,9 @@ class Header extends Component<HeaderProps, State> {
         <nav className="nav">
           <ul className="nav__menu">
             <li className="nav__menu-item">
+                <Link to="/">About</Link>
+            </li>
+            <li className="nav__menu-item">
               <Link to="/home">Home</Link>
             </li>
             <li className="nav__menu-item">
@@ -83,7 +86,7 @@ class Header extends Component<HeaderProps, State> {
                   {
                     name: "PELDA",
                     link: "/peldaview",
-                  },
+                  }
                 ]}
               />
             </li>
