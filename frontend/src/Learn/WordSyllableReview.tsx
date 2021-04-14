@@ -27,6 +27,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
+import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -136,7 +137,9 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false,
             deleteRecordingItemRef: "",
             recordingResult: "",
-            currentRecordingName: ""
+            currentRecordingName: "",
+            minPitch: WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH
         };
     }
 
@@ -384,15 +387,15 @@ export class WordSyllableReview extends React.Component<Props, State> {
         }
     }
 
-playPitchArt = () => {
+    playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
     }
 
-saveImage = () => {
+    saveImage = () => {
         this.pitchArtRef.current!.saveImage();
     }
 
-minPitchArtTime = () => {
+    minPitchArtTime = () => {
         if (this.state.words.length === 0
             || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
@@ -403,7 +406,7 @@ minPitchArtTime = () => {
             0);
     }
 
-maxPitchArtTime = () => {
+    maxPitchArtTime = () => {
         if (this.state.words.length === 0
             || this.state.words[this.state.activeWordIndex].letters.length === 0) {
             return 0;
@@ -414,7 +417,7 @@ maxPitchArtTime = () => {
             + WordSyllableReview.AUDIO_BUFFER_TIME);
     }
 
-pageTitle = () => {
+    pageTitle = () => {
         const syllableStr = `${this.props.match.params.numSyllables} Syllables`;
 
         const values = queryString.parse(this.props.location.search);
@@ -433,11 +436,11 @@ pageTitle = () => {
         return syllableStr + ", " + accentStr;
     }
 
-clearPrevious = () => {
+    clearPrevious = () => {
         this.setState({userPitchValueLists: []});
     }
 
-handleInputChange = (event: ChangeEvent) => {
+    handleInputChange = (event: ChangeEvent) => {
         const target = event.target as HTMLInputElement;
 
         let value: boolean | File | string;
@@ -454,7 +457,11 @@ handleInputChange = (event: ChangeEvent) => {
         this.setState({[name]: value} as any);
     }
 
-render() {
+    applyPitchRange = (minPitch: number, maxPitch: number) => {
+        this.setState({minPitch, maxPitch});
+    }
+
+    render() {
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];
@@ -487,6 +494,11 @@ render() {
                                     }
                                 </ul>
                             </div>
+                            <div className="metilda-pitch-art-container-control-list">
+                                <PitchRange initMinPitch={this.state.minPitch}
+                                        initMaxPitch={this.state.maxPitch}
+                                        applyPitchRange={this.applyPitchRange}/>
+                            </div>
                             <h6 className="metilda-control-header">Previous Recordings</h6>
                             {this.renderPreviousRecordings()}
                             <h6 className="metilda-control-header">Pitch Art</h6>
@@ -507,8 +519,8 @@ render() {
                                         showDynamicContent={true}
                                         width={WordSyllableReview.AUDIO_IMG_WIDTH}
                                         height={600}
-                                        minPitch={WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH}
-                                        maxPitch={WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH}
+                                        minPitch={this.state.minPitch}
+                                        maxPitch={this.state.maxPitch}
                                         fileName={this.state.words[this.state.activeWordIndex].uploadId}
                                         setLetterPitch={(x, y, z) => (null)}
                                         showAccentPitch={true}
