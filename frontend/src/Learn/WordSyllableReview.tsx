@@ -148,6 +148,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
         }
+        if (prevProps.location.search !== this.props.location.search) { // when user clicks different pitch art image
+            this.setState({activeWordIndex: 0}); // update activeWordIndex to default 0
+            this.setState({words: new StaticWordSyallableData().getData( // update words data with newly selected ones
+                 parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+        }
     }
 
     getPreviousRecordings = async () => {
