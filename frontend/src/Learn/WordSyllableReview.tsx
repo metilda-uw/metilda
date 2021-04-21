@@ -463,12 +463,6 @@ render() {
                 {this.recordingConfirmationModal()}
                 {this.saveRecordingModal()}
                 {this.deleteRecordingModal()}
-                <Header/>
-                <div className="metilda-page-header">
-                    <h5>
-                        Blackfoot Words > {this.pageTitle()}
-                    </h5>
-                </div>
                 <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
