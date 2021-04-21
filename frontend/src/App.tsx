@@ -81,7 +81,7 @@ const App = () => (
     <Route path="/manage-users" component={ManageUsers} />
     <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
     <Route path="/peldaview" component={PeldaView} />
-    <Route exact={true} path="/learn/words/syllables" component={WordSyllableCategories} />
+    <Route path="/learn/words/syllables" component={WordSyllableCategories} />
     <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
   </div>
 </Router>);
