@@ -145,6 +145,14 @@ export class WordSyllableReview extends React.Component<Props, State> {
 
     componentDidMount() {
         this.getPreviousRecordings();
+        this.setState((prevState) =>
+            (
+                {
+                    minPitch: prevState.words[prevState.activeWordIndex].minPitch,
+                    maxPitch: prevState.words[prevState.activeWordIndex].maxPitch
+                }
+            )
+        );
     }
 
     componentDidUpdate(prevProps: Props, prevState: State) {
@@ -246,7 +254,15 @@ export class WordSyllableReview extends React.Component<Props, State> {
     }
 
     wordClicked = (index: number) => {
-        this.setState({activeWordIndex: index});
+        this.setState((prevState) =>
+            (
+                {
+                    activeWordIndex: index,
+                    minPitch: prevState.words[index].minPitch,
+                    maxPitch: prevState.words[index].maxPitch
+                }
+            )
+        );
     }
 
     handleCloseRecordingModal = () => {
@@ -458,7 +474,13 @@ export class WordSyllableReview extends React.Component<Props, State> {
     }
 
     applyPitchRange = (minPitch: number, maxPitch: number) => {
-        this.setState({minPitch, maxPitch});
+        this.setState
+        (
+            {
+                    minPitch,
+                    maxPitch
+                 }
+        );
     }
 
     render() {

@@ -49,6 +49,8 @@ const WORDS: WordLookup = {
     pitchArt21: [
         {
             uploadId: "PHEOP019 onni.wav",
+            minPitch: 30,
+            maxPitch: 38,
             letters: [
                 {
                     syllable: "ON",
@@ -70,6 +72,8 @@ const WORDS: WordLookup = {
         },
         {
             uploadId: "PHEOP011 isska.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "ISS",
@@ -93,6 +97,8 @@ const WORDS: WordLookup = {
     pitchArt22: [
         {
             uploadId: "PHEOP002 aakiiwa.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "AAK",
@@ -116,6 +122,8 @@ const WORDS: WordLookup = {
     pitchArt31: [
         {
             uploadId: "PHEOP151 awakaasiwa.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "A",
@@ -147,6 +155,8 @@ const WORDS: WordLookup = {
     pitchArt32: [
         {
             uploadId: "EOP-RS-NC-makoyi.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "MA",
@@ -178,6 +188,8 @@ const WORDS: WordLookup = {
     pitchArt33: [
         {
             uploadId: "PHEOP014 ponokawa.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "PO",
@@ -209,6 +221,8 @@ const WORDS: WordLookup = {
     pitchArt41: [
         {
             uploadId: "PHEOP163 nikso'kowaksi.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "NIK",
@@ -248,6 +262,8 @@ const WORDS: WordLookup = {
     pitchArt42: [
         {
             uploadId: "EOP-AF-saahkomaapiwa_mono.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "SAAH",
@@ -287,6 +303,8 @@ const WORDS: WordLookup = {
     pitchArt43: [
         {
             uploadId: "PHEOP066 nottoana.wav",
+            minPitch: 75,
+            maxPitch: 500,
             letters: [
                 {
                     syllable: "NOT",
