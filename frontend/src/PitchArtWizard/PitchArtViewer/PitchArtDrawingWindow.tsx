@@ -298,7 +298,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                 });
     }
     
-playPitchArt() {
+    playPitchArt() {
         if (this.props.speakers.length !== 1) {
             return;
         }
@@ -349,23 +349,23 @@ playPitchArt() {
         Tone.Transport.start();
     }
 
-playSound(pitch: number) {
+    playSound(pitch: number) {
         const synth = new Tone.Synth().toMaster();
         synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
     }
 
-imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {
+    imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {
         const yPos = this.stageRef.current!.getStage().getPointerPosition().y;
         const pitch = coordConverter.rectCoordsToVertValue(yPos);
         this.playSound(pitch);
     }
 
-setPointerEnabled(isEnabled: boolean) {
+    setPointerEnabled(isEnabled: boolean) {
         this.stageRef.current!.getStage().container().style.cursor
             = isEnabled ? "pointer" : "default";
     }
 
-maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
+    maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
         if (!this.props.rawPitchValueLists || this.props.rawPitchValueLists.length === 0) {
             return;
         }
@@ -404,7 +404,7 @@ maybeUserPitchView(windowConfig: PitchArtWindowConfig) {
         );
     }
 
-colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): ColorScheme => {
+    colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): ColorScheme => {
         if (!showArtDesign) {
             const color = PitchArtLegend.SPEAKER_COLOR(speakerIndex);
             return {
@@ -480,7 +480,7 @@ colorScheme = (showArtDesign: boolean, speaker: Speaker, speakerIndex: number): 
         };
     }
 
-maybeShowPitchScale = (windowConfig: PitchArtWindowConfig) => {
+    maybeShowPitchScale = (windowConfig: PitchArtWindowConfig) => {
         if (!this.props.showPitchScale) {
             return;
         }
