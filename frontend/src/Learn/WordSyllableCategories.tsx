@@ -92,13 +92,15 @@ class WordSyllableCategories extends React.Component<Props, State> {
         if (this.props.location.pathname === "/learn/words/syllables") { // WordSyllableCategories component
             if (nextProps.location.search.slice(0, -1) === "?accentIndex=") { // when user clicks picth art image
                 return false;  // when pitch art is selected, stop re-render WordSyllableCategories component
-            } else if (numSyllables !== numSyllablesNext) { // when user clicks different "Number of syllables" radio button
+            } else if (numSyllables !== numSyllablesNext) { 
+                // when user clicks different "Number of syllables" radio button
                 return true;   // re-render pitch art images
             }
         }
 
         if (this.props.location.search.slice(0, -1) === "?accentIndex=") {    // When user clicks pitch art image
-            if (nextProps.location.search.slice(0, -1) === "?accentIndex=") { // When user clicks pitch art image again
+            if (nextProps.location.search.slice(0, -1) === "?accentIndex=") { 
+                // When user clicks pitch art image again
                 return false;                                                 // stop re-rendering WordSyllableCategories
             }                                                                 // stay at the same "Number of syllables"
         }
