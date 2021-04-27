@@ -64,7 +64,11 @@ class WordSyllableCategories extends React.Component<Props, State> {
         const numSyllables = values.numSyllables as string;
 
         if (!numSyllables) {
-            return 2;
+            if (this.props.location.pathname === "/learn/words/syllables") {
+                return 2;
+            } else {
+                return parseFloat(this.props.location.pathname.slice(-1));
+            }
         }
 
         return parseFloat(numSyllables);
@@ -103,6 +107,10 @@ class WordSyllableCategories extends React.Component<Props, State> {
                 return false;                                                 
             }                                                                 
         }
+
+        if (numSyllables !== numSyllablesNext) { 
+            this.resetSize();                   
+        }
         return true;
     }
 
@@ -117,6 +125,17 @@ class WordSyllableCategories extends React.Component<Props, State> {
             viewStudentsClicked: false
         });
       }
+    
+    resetSize = () => {
+        for (let i = 0; i < this.imageSrcList().length; i++) {
+            document.getElementById("pitchArt" + this.getNumSyllables() + i)!.className = "pitch-art-img-list-item-smaller";
+        }
+    }
+
+    enlargeSize = (numSyllables: number, index: number, length: number) => {
+        this.resetSize();
+        document.getElementById("pitchArt" + numSyllables + index)!.className = "pitch-art-img-list-item";
+    }
 
     render() {
         const numSyllables = this.getNumSyllables();
@@ -185,7 +204,10 @@ class WordSyllableCategories extends React.Component<Props, State> {
                                     to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
-                                             className="pitch-art-img-list-item"/>
+                                             className="pitch-art-img-list-item"
+                                             id = {"pitchArt" + numSyllables + index}
+                                             onClick={() => this.enlargeSize(numSyllables, index, this.imageSrcList().length)}
+                                        />
                                     </Link>
                                 )}
                             </div>
