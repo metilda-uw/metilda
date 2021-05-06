@@ -39,7 +39,7 @@ zope.interface==4.6.0
 firebase_admin==3.2.1
 backports.functools-lru-cache==1.6.1
 Flask==1.1.1
-Flask-Cors==3.0.8
+Flask-Cors==3.0.9
 itsdangerous==1.1.0
 Jinja2==2.10.3
 kiwisolver==1.1.0
