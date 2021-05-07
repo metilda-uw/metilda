@@ -27,6 +27,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
+import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -147,12 +148,22 @@ export class WordSyllableReview extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
-        }
+            this.resetSamplePitch();
+            this.toggleChanged("showRedDot", false); // reset toggle
+        } 
         if (prevProps.location.search !== this.props.location.search) { // when user clicks different pitch art image
             this.setState({activeWordIndex: 0}); // update activeWordIndex to default 0
             this.setState({words: new StaticWordSyallableData().getData( // update words data with newly selected ones
                  parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+            this.resetSamplePitch();
+            this.toggleChanged("showRedDot", false); // reset toggle
         }
+    }
+    
+    resetSamplePitch = async () => {
+        this.setState({
+           userPitchValueLists: []
+        });
     }
 
     getPreviousRecordings = async () => {
@@ -389,6 +400,59 @@ export class WordSyllableReview extends React.Component<Props, State> {
         }
     }
 
+    toggleChanged = (inputName: string, isSelected: boolean) => {
+        if (inputName === "showRedDot") {
+            this.onRedDotClick(isSelected);
+        }
+        this.setState({[inputName]: isSelected} as any);
+    }
+    
+    onRedDotClick = (isRedDotted: boolean) => {
+        if (isRedDotted) {
+            this.showRedDot();
+        } else {
+            this.resetSamplePitch();
+        }
+    }
+
+    showRedDot = async () => {
+        // retrieve current letters array && convert them to RawPitchValue array
+        const controller = this;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        const notes: RawPitchValue[] = letter.map(
+                (item) => ({t0: item.t0, t1: item.t1, pitch: item.pitch}) as RawPitchValue
+            );
+        // t1 is irrelevant, t0 decides row, pitch decided column
+        const note: RawPitchValue[] = [{t0: notes[0].t0, t1: notes[0].t0, pitch: notes[0].pitch}];
+        let k: number = 0;
+        while (k !== notes.length - 1) {
+            let t0Start: number = notes[k].t0;
+            const t0End: number = notes[k + 1].t0;
+            const pitchStart: number = notes[k].pitch;
+            const pitchEnd: number = notes[k + 1].pitch;
+            const x = t0End - t0Start;
+            const y = pitchEnd - pitchStart;
+            const m = y / x;
+            const interval = x / 10;
+            // (t0End, pitchEnd) finding pitchPoint at given t0 value
+            // y = m(x -  t0End) + pitchEnd
+            let i: number = notes[k].t0;
+            while (i <= t0End) {
+                t0Start += interval;
+                note.push({
+                    t0: t0Start, t1: t0Start,
+                    pitch: m * (t0Start - t0End) + pitchEnd
+                });
+                i += interval;
+            }
+            k++;
+        }
+        controller.setState(
+            {
+                userPitchValueLists: controller.state.userPitchValueLists.concat([note])
+            });
+    }
+    
 playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
     }
@@ -493,6 +557,16 @@ render() {
                                 <PitchArtPrevPitchValueToggle
                                     handleInputChange={this.handleInputChange}
                                     showPrevPitchValueLists={this.state.showPrevPitchValueLists}/>
+                            </div>
+                            <div className="row metilda-pitch-art-container-control-toggle-list">
+                                <PitchArtToggle
+                                    label = "Show Sample Pitch Tracking"
+                                    inputName="showRedDot"
+                                    isSelected={this.state.showRedDot}
+                                    offText="Hide"
+                                    onText="Show"
+                                    onChange={this.toggleChanged}
+                                />
                             </div>
                         </div>
                         {this.state.isLoadingPitchResults && spinner()}
