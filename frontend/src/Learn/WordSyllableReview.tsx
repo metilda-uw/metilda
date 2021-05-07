@@ -149,14 +149,14 @@ export class WordSyllableReview extends React.Component<Props, State> {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
             this.resetSamplePitch();
-            this.toggleChanged("showRedDot", false); // reset toggle
+            this.toggleChanged("showRedDot", false);
         } 
-        if (prevProps.location.search !== this.props.location.search) { // when user clicks different pitch art image
-            this.setState({activeWordIndex: 0}); // update activeWordIndex to default 0
-            this.setState({words: new StaticWordSyallableData().getData( // update words data with newly selected ones
+        if (prevProps.location.search !== this.props.location.search) {
+            this.setState({activeWordIndex: 0});
+            this.setState({words: new StaticWordSyallableData().getData(
                  parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
             this.resetSamplePitch();
-            this.toggleChanged("showRedDot", false); // reset toggle
+            this.toggleChanged("showRedDot", false);
         }
     }
     
@@ -416,13 +416,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
     }
 
     showRedDot = async () => {
-        // retrieve current letters array && convert them to RawPitchValue array
         const controller = this;
         const letter = this.state.words[this.state.activeWordIndex].letters;
         const notes: RawPitchValue[] = letter.map(
                 (item) => ({t0: item.t0, t1: item.t1, pitch: item.pitch}) as RawPitchValue
             );
-        // t1 is irrelevant, t0 decides row, pitch decided column
         const note: RawPitchValue[] = [{t0: notes[0].t0, t1: notes[0].t0, pitch: notes[0].pitch}];
         let k: number = 0;
         while (k !== notes.length - 1) {
@@ -434,8 +432,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             const y = pitchEnd - pitchStart;
             const m = y / x;
             const interval = x / 10;
-            // (t0End, pitchEnd) finding pitchPoint at given t0 value
-            // y = m(x -  t0End) + pitchEnd
             let i: number = notes[k].t0;
             while (i <= t0End) {
                 t0Start += interval;
