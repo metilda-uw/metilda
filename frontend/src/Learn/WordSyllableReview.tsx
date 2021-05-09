@@ -421,7 +421,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
         const notes: RawPitchValue[] = letter.map(
                 (item) => ({t0: item.t0, t1: item.t1, pitch: item.pitch}) as RawPitchValue
             );
-        const note: RawPitchValue[] = [{t0: notes[0].t0, t1: notes[0].t0, pitch: notes[0].pitch}];
+        const note: RawPitchValue[] = [];
         let k: number = 0;
         while (k !== notes.length - 1) {
             let t0Start: number = notes[k].t0;
@@ -434,13 +434,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
             const interval = x / 10;
             let i: number = notes[k].t0;
             while (i <= t0End) {
-                t0Start += interval;
                 note.push({
                     t0: t0Start, t1: t0Start,
                     pitch: m * (t0Start - t0End) + pitchEnd
                 });
+                t0Start += interval;
                 i += interval;
             }
+            note.push({
+                t0: t0End, t1: t0End,
+                pitch: pitchEnd
+            });
             k++;
         }
         controller.setState(
