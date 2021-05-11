@@ -2,6 +2,8 @@ from __future__ import with_statement
 import os
 import shutil
 import tempfile
+import flask
+import uuid
 from flask import request, jsonify, send_file, flash
 from Postgres import Postgres
 from metilda import app
@@ -493,6 +495,83 @@ def authorize_user():
         record_to_insert = (request.form['email'], request.form['user_role'])
         last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
+
+@app.route('/api/words', methods=["GET", "POST"])
+def getOrCreateWords():
+    req_method = flask.request.method
+
+    if req_method == "GET":
+        return jsonify({'hello': 'GET'})
+    elif req_method == "POST":
+        body = request.json
+
+        # Check if first layer of schema has all mandatory fields
+        body_fields = ["uploadId", "minPitch", "maxPitch", "letters", "creator", "imagePath"]
+        for field in body_fields:
+            if field not in body:
+                return {"isSuccessful": False, "description": "1 or more required request body fields missing"}, 400
+
+        # Check if all letters contain all required schema fields
+        letter_fields = ["syllable", "t0", "t1", "pitch", "isManualPitch", "isWordSep"]
+        for letter in body["letters"]:
+            for field in letter_fields:
+                if field not in letter:
+                    return {"isSuccessful": False, "description": "1 or more required letters are missing 1 or more required fields"}, 400
+
+        num_syllables = len(body["letters"])
+        accent_index = 0
+
+
+        with Postgres() as connection:
+
+            # Calculate accent_index for this word to use based on max accent_index currently in the DB for words
+            # belonging to the same syllable count
+            current_greatest_index_for_syllable = """ SELECT MAX(accent_index) FROM word WHERE num_syllables = %s"""
+            query_result = connection.execute_select_query(current_greatest_index_for_syllable, (str(num_syllables),))
+
+            max_index = query_result[0][0]
+
+            if max_index != None:
+                accent_index = max_index + 1
+
+            # Create a new Word record for this word
+            word_insert_query = """
+                                    INSERT INTO word(
+                                                        id, user_id, num_syllables, accent_index, min_pitch, max_pitch, 
+                                                        image_path
+                                                    )
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                """
+
+            word_record_to_insert = (
+                                        body["uploadId"], body["creator"], num_syllables, accent_index,
+                                        body["minPitch"], body["maxPitch"], body["imagePath"]
+                                    )
+
+            connection.execute_insert_query(word_insert_query, word_record_to_insert, False)
+
+            word_id = body["uploadId"]
+            for order_index in range(len(body["letters"])):
+                letter = body["letters"][order_index]
+                letter_insert_query = """
+                                            INSERT INTO letter
+                                                        (
+                                                            id, syllable, word_id, t0, t1, pitch, is_manual_pitch, 
+                                                            is_word_sep, order_index
+                                                        )
+                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                      """
+
+                letter_id = str(uuid.uuid4().hex)
+                letter_record_to_insert = (
+                                            letter_id, letter["syllable"], word_id, letter["t0"], letter["t1"], letter["pitch"],
+                                            letter["isManualPitch"], letter["isWordSep"], order_index
+                                          )
+
+                connection.execute_insert_query(letter_insert_query, letter_record_to_insert, False)
+
+        return jsonify({"isSuccessful": True, 'word': word_id, 'creator': body["creator"], 'numSyllables': len(body["letters"])})
+
 
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):
