@@ -527,7 +527,7 @@ def getOrCreateWords():
             else:
                 query_results = connection.execute_select_query(word_retrieval_query)
 
-            response = {"isSuccess": True, "data": []}
+            response = {"isSuccessful": True, "data": []}
 
             for res in query_results:
                 letters_retrieval_query = """ SELECT * FROM letter WHERE word_id = %s ORDER BY order_index"""

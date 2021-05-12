@@ -12,7 +12,7 @@ class CustomJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, decimal.Decimal):
             # Convert decimal objects into strings
-            return str(obj)
+            return float(obj)
 
         return super(CustomJSONEncoder, self).default(obj)
 
