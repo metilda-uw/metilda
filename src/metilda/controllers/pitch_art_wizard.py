@@ -21,6 +21,7 @@ from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
 
+
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
     return '.' in filename and \
@@ -501,12 +502,70 @@ def getOrCreateWords():
     req_method = flask.request.method
 
     if req_method == "GET":
-        return jsonify({'hello': 'GET'})
+        upload_id = request.args.get('uploadId')
+        num_syllables = request.args.get('numSyllables')
+        accent_index = request.args.get('accentIndex')
+
+
+        syllable_filter = " WHERE num_syllables = %s"
+        index_filter = " AND accent_index = %s"
+
+        with Postgres() as connection:
+
+            word_retrieval_query = """ SELECT * FROM word"""
+
+            query_results = None
+            if upload_id:
+                word_retrieval_query += " WHERE id = %s"
+                query_results = connection.execute_select_query(word_retrieval_query, (str(upload_id),))
+            elif num_syllables and accent_index:
+                word_retrieval_query += syllable_filter + index_filter
+                query_results = connection.execute_select_query(word_retrieval_query, (str(num_syllables), (str(accent_index))))
+            elif num_syllables:
+                word_retrieval_query += syllable_filter + " ORDER BY accent_index"
+                query_results = connection.execute_select_query(word_retrieval_query, (str(num_syllables),))
+            else:
+                query_results = connection.execute_select_query(word_retrieval_query)
+
+            response = {"isSuccess": True, "data": []}
+
+            for res in query_results:
+                letters_retrieval_query = """ SELECT * FROM letter WHERE word_id = %s ORDER BY order_index"""
+                letters = []
+                letters_query_results = connection.execute_select_query(letters_retrieval_query, (str(res[0]),))
+
+                for row in letters_query_results:
+                    letters.append(
+                        {
+                            "syllable": row[1],
+                            "t0": row[3],
+                            "t1": row[4],
+                            "pitch": row[5],
+                            "isManualPitch": row[6],
+                            "isWordSep": row[7]
+                        }
+                    )
+
+                response["data"].append(
+                    {
+                        "uploadId": res[0],
+                        "creator": res[1],
+                        "numSyllables": res[2],
+                        "accentIndex": res[3],
+                        "minPitch": res[4],
+                        "maxPitch": res[5],
+                        "imagePath": res[6],
+                        "letters": letters
+                    }
+                )
+
+        return jsonify(response)
+
     elif req_method == "POST":
         body = request.json
 
         # Check if first layer of schema has all mandatory fields
-        body_fields = ["uploadId", "minPitch", "maxPitch", "letters", "creator", "imagePath"]
+        body_fields = ["uploadId", "minPitch", "maxPitch", "letters", "creator", "imagePath", "accentIndex"]
         for field in body_fields:
             if field not in body:
                 return {"isSuccessful": False, "description": "1 or more required request body fields missing"}, 400
@@ -519,20 +578,9 @@ def getOrCreateWords():
                     return {"isSuccessful": False, "description": "1 or more required letters are missing 1 or more required fields"}, 400
 
         num_syllables = len(body["letters"])
-        accent_index = 0
 
 
         with Postgres() as connection:
-
-            # Calculate accent_index for this word to use based on max accent_index currently in the DB for words
-            # belonging to the same syllable count
-            current_greatest_index_for_syllable = """ SELECT MAX(accent_index) FROM word WHERE num_syllables = %s"""
-            query_result = connection.execute_select_query(current_greatest_index_for_syllable, (str(num_syllables),))
-
-            max_index = query_result[0][0]
-
-            if max_index != None:
-                accent_index = max_index + 1
 
             # Create a new Word record for this word
             word_insert_query = """
@@ -544,7 +592,7 @@ def getOrCreateWords():
                                 """
 
             word_record_to_insert = (
-                                        body["uploadId"], body["creator"], num_syllables, accent_index,
+                                        body["uploadId"], body["creator"], num_syllables, body["accentIndex"],
                                         body["minPitch"], body["maxPitch"], body["imagePath"]
                                     )
 

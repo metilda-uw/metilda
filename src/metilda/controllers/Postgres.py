@@ -56,9 +56,12 @@ class Postgres(object):
                 print(last_row_id)
                 return last_row_id
     
-    def execute_select_query(self, query, record):
+    def execute_select_query(self, query, record = None):
         try:
-            self.cursor.execute(query, record)
+            if record:
+                self.cursor.execute(query, record)
+            else:
+                self.cursor.execute(query)
         except Exception as error:
             print('error execting query "{}", error: {}'.format(query, error))
             return None
