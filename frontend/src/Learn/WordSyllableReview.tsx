@@ -28,6 +28,9 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
 import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
+import { Slider } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/styles";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -59,6 +62,9 @@ interface State {
     currentRecordingName: string;
     recordingResult: any;
     [key: string]: any;
+    showRedDot: boolean;
+    prevPitchSliderValue: number;
+    prevSpeedSliderValue: number;
 }
 
 const styles = (theme: Theme) =>
@@ -137,7 +143,10 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false,
             deleteRecordingItemRef: "",
             recordingResult: "",
-            currentRecordingName: ""
+            currentRecordingName: "",
+            showRedDot: false,
+            prevPitchSliderValue: 0,
+            prevSpeedSliderValue: 0
         };
     }
 
@@ -155,6 +164,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
             this.setState({activeWordIndex: 0});
             this.setState({words: new StaticWordSyallableData().getData(
                  parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+            this.getPreviousRecordings();
             this.resetSamplePitch();
             this.toggleChanged("showRedDot", false);
         }
@@ -452,6 +462,35 @@ export class WordSyllableReview extends React.Component<Props, State> {
                 userPitchValueLists: controller.state.userPitchValueLists.concat([note])
             });
     }
+
+    onSliderChangePitch = (pitch: number) => {
+        if (pitch === this.state.prevPitchSliderValue) {
+            return;
+        }
+        const prevPitchChange = this.state.prevPitchSliderValue;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].pitch += pitch;
+            letter[i].pitch -= prevPitchChange;
+        }
+        this.setState({prevPitchSliderValue: pitch});
+    }
+
+    onSliderChangeSpeed = (speed: number) => {
+        const prevSpeedChange = this.state.prevSpeedSliderValue;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            if (prevSpeedChange !== 0) {
+                letter[i].t0 *= prevSpeedChange;
+                letter[i].t1 *= prevSpeedChange;
+            }
+            letter[i].t0 /= speed;
+            letter[i].t1 /= speed;
+        }
+        this.setState({prevSpeedSliderValue: speed});
+    }    
     
 playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
@@ -527,6 +566,25 @@ render() {
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];
+        const muiTheme = createMuiTheme({
+            overrides: {
+                MuiSlider: {
+                    thumb: {
+                    color: "#2bbbad",
+                    height: 15,
+                    width: 15,
+                    },
+                    track: {
+                    color: "#2bbbad",
+                    height: 8,
+                    },
+                    rail: {
+                    color: "#bef6f1",
+                    height: 8,
+                    }
+                }
+            }
+        });
         return (
             <div>
                 {this.recordingConfirmationModal()}
@@ -567,6 +625,44 @@ render() {
                                     onText="Show"
                                     onChange={this.toggleChanged}
                                 />
+                            </div>
+                            <div className="col metilda-pitch-art-container-control-toggle-list">
+                                 <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Pitch Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={0}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={10}
+                                    marks={true}
+                                    min={-50}
+                                    max={50}
+                                    onChange={(event, value) => this.onSliderChangePitch(value as number)}
+                                    />
+                                </ThemeProvider>
+                                <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Speed Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={1}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={0.5}
+                                    marks={true}
+                                    min={0.5}
+                                    max={2}
+                                    onChange={(event, value) => this.onSliderChangeSpeed(value as number)}
+                                    />
+                                </ThemeProvider>
                             </div>
                         </div>
                         {this.state.isLoadingPitchResults && spinner()}
