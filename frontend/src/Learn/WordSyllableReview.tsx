@@ -27,6 +27,10 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
+import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
+import { Slider } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/styles";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -58,6 +62,9 @@ interface State {
     currentRecordingName: string;
     recordingResult: any;
     [key: string]: any;
+    showRedDot: boolean;
+    prevPitchSliderValue: number;
+    prevSpeedSliderValue: number;
 }
 
 const styles = (theme: Theme) =>
@@ -136,7 +143,10 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false,
             deleteRecordingItemRef: "",
             recordingResult: "",
-            currentRecordingName: ""
+            currentRecordingName: "",
+            showRedDot: false,
+            prevPitchSliderValue: 0,
+            prevSpeedSliderValue: 0
         };
     }
 
@@ -147,7 +157,23 @@ export class WordSyllableReview extends React.Component<Props, State> {
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
+            this.resetSamplePitch();
+            this.toggleChanged("showRedDot", false);
+        } 
+        if (prevProps.location.search !== this.props.location.search) {
+            this.setState({activeWordIndex: 0});
+            this.setState({words: new StaticWordSyallableData().getData(
+                 parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+            this.getPreviousRecordings();
+            this.resetSamplePitch();
+            this.toggleChanged("showRedDot", false);
         }
+    }
+    
+    resetSamplePitch = async () => {
+        this.setState({
+           userPitchValueLists: []
+        });
     }
 
     getPreviousRecordings = async () => {
@@ -384,12 +410,94 @@ export class WordSyllableReview extends React.Component<Props, State> {
         }
     }
 
+    toggleChanged = (inputName: string, isSelected: boolean) => {
+        if (inputName === "showRedDot") {
+            this.onRedDotClick(isSelected);
+        }
+        this.setState({[inputName]: isSelected} as any);
+    }
+    
+    onRedDotClick = (isRedDotted: boolean) => {
+        if (isRedDotted) {
+            this.showRedDot();
+        } else {
+            this.resetSamplePitch();
+        }
+    }
+
+    showRedDot = async () => {
+        const controller = this;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        const notes: RawPitchValue[] = letter.map(
+                (item) => ({t0: item.t0, t1: item.t1, pitch: item.pitch}) as RawPitchValue
+            );
+        const note: RawPitchValue[] = [];
+        let k: number = 0;
+        while (k !== notes.length - 1) {
+            let t0Start: number = notes[k].t0;
+            const t0End: number = notes[k + 1].t0;
+            const pitchStart: number = notes[k].pitch;
+            const pitchEnd: number = notes[k + 1].pitch;
+            const x = t0End - t0Start;
+            const y = pitchEnd - pitchStart;
+            const m = y / x;
+            const interval = x / 10;
+            let i: number = notes[k].t0;
+            while (i <= t0End) {
+                note.push({
+                    t0: t0Start, t1: t0Start,
+                    pitch: m * (t0Start - t0End) + pitchEnd
+                });
+                t0Start += interval;
+                i += interval;
+            }
+            note.push({
+                t0: t0End, t1: t0End,
+                pitch: pitchEnd
+            });
+            k++;
+        }
+        controller.setState(
+            {
+                userPitchValueLists: controller.state.userPitchValueLists.concat([note])
+            });
+    }
+
+    onSliderChangePitch = (pitch: number) => {
+        if (pitch === this.state.prevPitchSliderValue) {
+            return;
+        }
+        const prevPitchChange = this.state.prevPitchSliderValue;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].pitch += pitch;
+            letter[i].pitch -= prevPitchChange;
+        }
+        this.setState({prevPitchSliderValue: pitch});
+    }
+
+    onSliderChangeSpeed = (speed: number) => {
+        const prevSpeedChange = this.state.prevSpeedSliderValue;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            if (prevSpeedChange !== 0) {
+                letter[i].t0 *= prevSpeedChange;
+                letter[i].t1 *= prevSpeedChange;
+            }
+            letter[i].t0 /= speed;
+            letter[i].t1 /= speed;
+        }
+        this.setState({prevSpeedSliderValue: speed});
+    }    
+    
 playPitchArt = () => {
         this.pitchArtRef.current!.playPitchArt();
     }
 
-saveImage = () => {
-        this.pitchArtRef.current!.saveImage();
+saveImageforLearn = () => {
+        this.pitchArtRef.current!.saveImageforLearn();
     }
 
 minPitchArtTime = () => {
@@ -458,17 +566,30 @@ render() {
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];
+        const muiTheme = createMuiTheme({
+            overrides: {
+                MuiSlider: {
+                    thumb: {
+                    color: "#2bbbad",
+                    height: 15,
+                    width: 15,
+                    },
+                    track: {
+                    color: "#2bbbad",
+                    height: 8,
+                    },
+                    rail: {
+                    color: "#bef6f1",
+                    height: 8,
+                    }
+                }
+            }
+        });
         return (
             <div>
                 {this.recordingConfirmationModal()}
                 {this.saveRecordingModal()}
                 {this.deleteRecordingModal()}
-                <Header/>
-                <div className="metilda-page-header">
-                    <h5>
-                        Blackfoot Words > {this.pageTitle()}
-                    </h5>
-                </div>
                 <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
@@ -494,6 +615,54 @@ render() {
                                 <PitchArtPrevPitchValueToggle
                                     handleInputChange={this.handleInputChange}
                                     showPrevPitchValueLists={this.state.showPrevPitchValueLists}/>
+                            </div>
+                            <div className="row metilda-pitch-art-container-control-toggle-list">
+                                <PitchArtToggle
+                                    label = "Show Sample Pitch Tracking"
+                                    inputName="showRedDot"
+                                    isSelected={this.state.showRedDot}
+                                    offText="Hide"
+                                    onText="Show"
+                                    onChange={this.toggleChanged}
+                                />
+                            </div>
+                            <div className="col metilda-pitch-art-container-control-toggle-list">
+                                 <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Pitch Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={0}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={10}
+                                    marks={true}
+                                    min={-50}
+                                    max={50}
+                                    onChange={(event, value) => this.onSliderChangePitch(value as number)}
+                                    />
+                                </ThemeProvider>
+                                <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Speed Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={1}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={0.5}
+                                    marks={true}
+                                    min={0.5}
+                                    max={2}
+                                    onChange={(event, value) => this.onSliderChangeSpeed(value as number)}
+                                    />
+                                </ThemeProvider>
                             </div>
                         </div>
                         {this.state.isLoadingPitchResults && spinner()}
@@ -543,6 +712,9 @@ render() {
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
                                             {!this.state.isRecording ? "Start Record" : "Stop Record"}
+                                            <i className="material-icons right">
+                                                record_voice_over
+                                            </i>
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.playPitchArt}
@@ -553,7 +725,7 @@ render() {
                                             Play Tones
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
-                                                onClick={this.saveImage}
+                                                onClick={this.saveImageforLearn}
                                                 disabled={this.state.isRecording}>
                                             <i className="material-icons right">
                                                 cloud_upload

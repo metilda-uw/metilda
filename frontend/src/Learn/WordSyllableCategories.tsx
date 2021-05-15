@@ -64,7 +64,11 @@ class WordSyllableCategories extends React.Component<Props, State> {
         const numSyllables = values.numSyllables as string;
 
         if (!numSyllables) {
-            return 2;
+            if (this.props.location.pathname === "/learn/words/syllables") {
+                return 2;
+            } else {
+                return parseFloat(this.props.location.pathname.slice(-1));
+            }
         }
 
         return parseFloat(numSyllables);
@@ -83,6 +87,30 @@ class WordSyllableCategories extends React.Component<Props, State> {
         }
     }
 
+    shouldComponentUpdate(nextProps: Readonly<Props>, nextState: Readonly<State>, nextContext: any): boolean {
+
+        const numSyllables = this.getNumSyllables();
+        const valuesNext = queryString.parse(nextProps.location.search);
+        const numSyllablesNext = parseFloat(valuesNext.numSyllables as string);
+
+        if (this.props.location.pathname === "/learn/words/syllables") { // WordSyllableCategories component
+            if (nextProps.location.search.slice(0, -1) === "?accentIndex=") { // when user clicks picth art image
+                return false;  // when pitch art is selected, stop re-render WordSyllableCategories component
+            } else if (numSyllables !== numSyllablesNext) { 
+                // when user clicks different "Number of syllables" radio button
+                return true;   // re-render pitch art images
+            }
+        }
+       
+        if (this.props.location.search.slice(0, -1) === "?accentIndex=") {    
+            if (nextProps.location.search.slice(0, -1) === "?accentIndex=") { 
+                return false;                                                 
+            }                                                                 
+        }
+        this.resetSize();                   
+        return true;
+    }
+
     displayStudents = async () => {
         this.setState({
             viewStudentsClicked: true
@@ -94,6 +122,17 @@ class WordSyllableCategories extends React.Component<Props, State> {
             viewStudentsClicked: false
         });
       }
+    
+    resetSize = () => {
+        for (let i = 0; i < this.imageSrcList().length; i++) {
+            document.getElementById("pitchArt" + this.getNumSyllables() + i)!.className = "pitch-art-img-list-item-smaller";
+        }
+    }
+
+    enlargeSize = (numSyllables: number, index: number, length: number) => {
+        this.resetSize();
+        document.getElementById("pitchArt" + numSyllables + index)!.className = "pitch-art-img-list-item";
+    }
 
     render() {
         const numSyllables = this.getNumSyllables();
@@ -162,7 +201,11 @@ class WordSyllableCategories extends React.Component<Props, State> {
                                     to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
-                                             className="pitch-art-img-list-item"/>
+                                             className="pitch-art-img-list-item"
+                                             id = {"pitchArt" + numSyllables + index}
+                                             onClick={() => this.enlargeSize
+                                             (numSyllables, index, this.imageSrcList().length)}
+                                        />
                                     </Link>
                                 )}
                             </div>
