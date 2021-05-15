@@ -201,7 +201,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
                                     to={"/learn/words/syllables/" + numSyllables + "?accentIndex=" + index}>
                                         <img src={item}
                                              key={"pitch-art-img-list-item-" + index}
-                                             className="pitch-art-img-list-item"
+                                             className="pitch-art-img-list-item-smaller"
                                              id = {"pitchArt" + numSyllables + index}
                                              onClick={() => this.enlargeSize
                                              (numSyllables, index, this.imageSrcList().length)}
