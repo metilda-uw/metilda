@@ -107,10 +107,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
                 return false;                                                 
             }                                                                 
         }
-
-        if (numSyllables !== numSyllablesNext) { 
-            this.resetSize();                   
-        }
+        this.resetSize();                   
         return true;
     }
 
