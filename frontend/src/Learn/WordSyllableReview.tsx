@@ -166,8 +166,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
             this.resetSamplePitch();
             this.resetSlider(prevState.activeWordIndex);
             this.toggleChanged("showRedDot", false);
-        } 
-        else if (prevProps.location.search !== this.props.location.search) {
+        } else if (prevProps.location.search !== this.props.location.search) {
             this.setState({activeWordIndex: 0});
             this.setState({words: new StaticWordSyallableData().getData(
                  parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
