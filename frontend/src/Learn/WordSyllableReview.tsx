@@ -65,8 +65,10 @@ interface State {
     showRedDot: boolean;
     prevPitchSliderValue: number;
     prevSpeedSliderValue: number;
+    pitchValue: number;
+    speedValue: number;
+    resetDone: boolean;
 }
-
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -80,7 +82,6 @@ const styles = (theme: Theme) =>
       color: theme.palette.grey[500],
     },
   });
-
 export interface DialogTitleProps extends WithStyles<typeof styles> {
     id: string;
     children: React.ReactNode;
@@ -146,36 +147,68 @@ export class WordSyllableReview extends React.Component<Props, State> {
             currentRecordingName: "",
             showRedDot: false,
             prevPitchSliderValue: 0,
-            prevSpeedSliderValue: 0
+            prevSpeedSliderValue: 1,
+            pitchValue: 0,
+            speedValue: 1,
+            resetDone: false
         };
     }
-
     componentDidMount() {
         this.getPreviousRecordings();
     }
-
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
             this.resetSamplePitch();
+            this.resetSlider(prevState.activeWordIndex);
             this.toggleChanged("showRedDot", false);
-        } 
-        if (prevProps.location.search !== this.props.location.search) {
+        } else if (prevProps.location.search !== this.props.location.search) {
             this.setState({activeWordIndex: 0});
             this.setState({words: new StaticWordSyallableData().getData(
                  parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
             this.getPreviousRecordings();
             this.resetSamplePitch();
+            this.resetSlider(this.state.activeWordIndex);
             this.toggleChanged("showRedDot", false);
         }
     }
+    componentWillUnmount() {
+        this.resetSlider(this.state.activeWordIndex);
+    }
     
+    resetSlider = async (wordIndex: number) => {
+        if (this.state.resetDone === false) {
+            this.resetPitchSlider(wordIndex);
+            this.resetSpeedSlider(wordIndex);
+            this.setState({
+                resetDone: true,
+                pitchValue: 0,
+                speedValue: 1,
+                prevPitchSliderValue: 0,
+                prevSpeedSliderValue: 1,
+            });
+        }
+    }
+    resetPitchSlider = async (wordIndex: number) => {
+        const letter = this.state.words[wordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].pitch -= this.state.prevPitchSliderValue;
+        }
+    }
+    resetSpeedSlider = async (wordIndex: number) => {     
+        const letter = this.state.words[wordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].t0 *= this.state.speedValue;
+            letter[i].t1 *= this.state.speedValue;
+        }
+    }
     resetSamplePitch = async () => {
         this.setState({
            userPitchValueLists: []
         });
     }
-
     getPreviousRecordings = async () => {
         this.setState({
             previousRecordings: []
@@ -193,13 +226,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
              });
           });
     }
-
     handleCloseDeleteRecordingModal = () => {
         this.setState({
             deleteRecordingModal: false,
         });
     }
-
     handleOkDeleteRecordingModal = async () => {
         const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
         const updatedRecordings = this.state.previousRecordings.filter((recording) =>
@@ -209,7 +240,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false
         });
     }
-
     deleteRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="sm" open={this.state.deleteRecordingModal}
@@ -231,14 +261,12 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Dialog>
         );
     }
-
     handleClickDeleteRecordings = (itemRef: any) => {
         this.setState({
             deleteRecordingModal: true,
             deleteRecordingItemRef: itemRef
         });
     }
-
     renderPreviousRecordings = () => {
         return this.state.previousRecordings.map((recording, index) => {
             const recordingName = recording.itemRef.location.path.split("_");
@@ -267,11 +295,9 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Media>);
         });
     }
-
     wordClicked = (index: number) => {
         this.setState({activeWordIndex: index});
     }
-
     handleCloseRecordingModal = () => {
         this.setState({
             currentRecordingName: "",
@@ -281,7 +307,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
     onChange = (event: any) => {
         this.setState({ [event.target.name]: event.target.value });
       }
-
     saveRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="xs" open={this.state.showRecordingModal}
@@ -332,20 +357,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
             currentRecordingName: ""
         });
    }
-
    handleCloseRecordingConfirmationModal = () => {
     this.setState({
         showRecordingConfirmationModal: false
     });
   }
-
     handleOkRecordingConfirmationModal = () => {
         this.setState({
             showRecordingModal: true,
             showRecordingConfirmationModal: false
         });
     }
-
     recordingConfirmationModal = () => {
         return(
         <Dialog fullWidth={true} maxWidth="sm" open={this.state.showRecordingConfirmationModal}
@@ -467,29 +489,29 @@ export class WordSyllableReview extends React.Component<Props, State> {
         if (pitch === this.state.prevPitchSliderValue) {
             return;
         }
-        const prevPitchChange = this.state.prevPitchSliderValue;
+        this.setState({pitchValue: pitch});
         const letter = this.state.words[this.state.activeWordIndex].letters;
+        this.resetPitchSlider(this.state.activeWordIndex);        
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < letter.length; i++) {
             letter[i].pitch += pitch;
-            letter[i].pitch -= prevPitchChange;
         }
-        this.setState({prevPitchSliderValue: pitch});
+        this.setState({prevPitchSliderValue: pitch, resetDone: false});
     }
 
     onSliderChangeSpeed = (speed: number) => {
-        const prevSpeedChange = this.state.prevSpeedSliderValue;
+        if (speed === this.state.prevSpeedSliderValue) {
+            return;
+        }
+        this.setState({speedValue: speed});
         const letter = this.state.words[this.state.activeWordIndex].letters;
+        this.resetSpeedSlider(this.state.activeWordIndex);
         // tslint:disable-next-line:prefer-for-of
         for (let i = 0; i < letter.length; i++) {
-            if (prevSpeedChange !== 0) {
-                letter[i].t0 *= prevSpeedChange;
-                letter[i].t1 *= prevSpeedChange;
-            }
             letter[i].t0 /= speed;
             letter[i].t1 /= speed;
         }
-        this.setState({prevSpeedSliderValue: speed});
+        this.setState({prevSpeedSliderValue: speed, resetDone: false});
     }    
     
 playPitchArt = () => {
@@ -643,6 +665,7 @@ render() {
                                     min={-50}
                                     max={50}
                                     onChange={(event, value) => this.onSliderChangePitch(value as number)}
+                                    value={this.state.pitchValue}
                                     />
                                 </ThemeProvider>
                                 <Typography
@@ -661,6 +684,7 @@ render() {
                                     min={0.5}
                                     max={2}
                                     onChange={(event, value) => this.onSliderChangeSpeed(value as number)}
+                                    value={this.state.speedValue}    
                                     />
                                 </ThemeProvider>
                             </div>
