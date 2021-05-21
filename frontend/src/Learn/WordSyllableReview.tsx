@@ -69,7 +69,6 @@ interface State {
     speedValue: number;
     resetDone: boolean;
 }
-
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -83,7 +82,6 @@ const styles = (theme: Theme) =>
       color: theme.palette.grey[500],
     },
   });
-
 export interface DialogTitleProps extends WithStyles<typeof styles> {
     id: string;
     children: React.ReactNode;
@@ -155,11 +153,9 @@ export class WordSyllableReview extends React.Component<Props, State> {
             resetDone: false
         };
     }
-
     componentDidMount() {
         this.getPreviousRecordings();
     }
-
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
@@ -213,7 +209,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
            userPitchValueLists: []
         });
     }
-
     getPreviousRecordings = async () => {
         this.setState({
             previousRecordings: []
@@ -231,13 +226,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
              });
           });
     }
-
     handleCloseDeleteRecordingModal = () => {
         this.setState({
             deleteRecordingModal: false,
         });
     }
-
     handleOkDeleteRecordingModal = async () => {
         const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
         const updatedRecordings = this.state.previousRecordings.filter((recording) =>
@@ -247,7 +240,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false
         });
     }
-
     deleteRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="sm" open={this.state.deleteRecordingModal}
@@ -269,14 +261,12 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Dialog>
         );
     }
-
     handleClickDeleteRecordings = (itemRef: any) => {
         this.setState({
             deleteRecordingModal: true,
             deleteRecordingItemRef: itemRef
         });
     }
-
     renderPreviousRecordings = () => {
         return this.state.previousRecordings.map((recording, index) => {
             const recordingName = recording.itemRef.location.path.split("_");
@@ -305,11 +295,9 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Media>);
         });
     }
-
     wordClicked = (index: number) => {
         this.setState({activeWordIndex: index});
     }
-
     handleCloseRecordingModal = () => {
         this.setState({
             currentRecordingName: "",
@@ -319,7 +307,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
     onChange = (event: any) => {
         this.setState({ [event.target.name]: event.target.value });
       }
-
     saveRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="xs" open={this.state.showRecordingModal}
@@ -370,20 +357,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
             currentRecordingName: ""
         });
    }
-
    handleCloseRecordingConfirmationModal = () => {
     this.setState({
         showRecordingConfirmationModal: false
     });
   }
-
     handleOkRecordingConfirmationModal = () => {
         this.setState({
             showRecordingModal: true,
             showRecordingConfirmationModal: false
         });
     }
-
     recordingConfirmationModal = () => {
         return(
         <Dialog fullWidth={true} maxWidth="sm" open={this.state.showRecordingConfirmationModal}
