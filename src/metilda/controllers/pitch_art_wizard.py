@@ -2,6 +2,8 @@ from __future__ import with_statement
 import os
 import shutil
 import tempfile
+import flask
+import uuid
 from flask import request, jsonify, send_file, flash
 from Postgres import Postgres
 from metilda import app
@@ -18,6 +20,7 @@ matplotlib.use('agg')
 from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
+
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
@@ -493,6 +496,130 @@ def authorize_user():
         record_to_insert = (request.form['email'], request.form['user_role'])
         last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
+
+@app.route('/api/words', methods=["GET", "POST"])
+def getOrCreateWords():
+    req_method = flask.request.method
+
+    if req_method == "GET":
+        upload_id = request.args.get('uploadId')
+        num_syllables = request.args.get('numSyllables')
+        accent_index = request.args.get('accentIndex')
+
+
+        syllable_filter = " WHERE num_syllables = %s"
+        index_filter = " AND accent_index = %s"
+
+        with Postgres() as connection:
+
+            word_retrieval_query = """ SELECT * FROM word"""
+
+            query_results = None
+            if upload_id:
+                word_retrieval_query += " WHERE id = %s"
+                query_results = connection.execute_select_query(word_retrieval_query, (str(upload_id),))
+            elif num_syllables and accent_index:
+                word_retrieval_query += syllable_filter + index_filter
+                query_results = connection.execute_select_query(word_retrieval_query, (str(num_syllables), (str(accent_index))))
+            elif num_syllables:
+                word_retrieval_query += syllable_filter + " ORDER BY accent_index"
+                query_results = connection.execute_select_query(word_retrieval_query, (str(num_syllables),))
+            else:
+                query_results = connection.execute_select_query(word_retrieval_query)
+
+            response = {"isSuccessful": True, "data": []}
+
+            for res in query_results:
+                letters_retrieval_query = """ SELECT * FROM letter WHERE word_id = %s ORDER BY order_index"""
+                letters = []
+                letters_query_results = connection.execute_select_query(letters_retrieval_query, (str(res[0]),))
+
+                for row in letters_query_results:
+                    letters.append(
+                        {
+                            "syllable": row[1],
+                            "t0": row[3],
+                            "t1": row[4],
+                            "pitch": row[5],
+                            "isManualPitch": row[6],
+                            "isWordSep": row[7]
+                        }
+                    )
+
+                response["data"].append(
+                    {
+                        "uploadId": res[0],
+                        "creator": res[1],
+                        "numSyllables": res[2],
+                        "accentIndex": res[3],
+                        "minPitch": res[4],
+                        "maxPitch": res[5],
+                        "imagePath": res[6],
+                        "letters": letters
+                    }
+                )
+
+        return jsonify(response)
+
+    elif req_method == "POST":
+        body = request.json
+
+        # Check if first layer of schema has all mandatory fields
+        body_fields = ["uploadId", "minPitch", "maxPitch", "letters", "creator", "imagePath", "accentIndex"]
+        for field in body_fields:
+            if field not in body:
+                return {"isSuccessful": False, "description": "1 or more required request body fields missing"}, 400
+
+        # Check if all letters contain all required schema fields
+        letter_fields = ["syllable", "t0", "t1", "pitch", "isManualPitch", "isWordSep"]
+        for letter in body["letters"]:
+            for field in letter_fields:
+                if field not in letter:
+                    return {"isSuccessful": False, "description": "1 or more required letters are missing 1 or more required fields"}, 400
+
+        num_syllables = len(body["letters"])
+
+
+        with Postgres() as connection:
+
+            # Create a new Word record for this word
+            word_insert_query = """
+                                    INSERT INTO word(
+                                                        id, user_id, num_syllables, accent_index, min_pitch, max_pitch, 
+                                                        image_path
+                                                    )
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s)
+                                """
+
+            word_record_to_insert = (
+                                        body["uploadId"], body["creator"], num_syllables, body["accentIndex"],
+                                        body["minPitch"], body["maxPitch"], body["imagePath"]
+                                    )
+
+            connection.execute_insert_query(word_insert_query, word_record_to_insert, False)
+
+            word_id = body["uploadId"]
+            for order_index in range(len(body["letters"])):
+                letter = body["letters"][order_index]
+                letter_insert_query = """
+                                            INSERT INTO letter
+                                                        (
+                                                            id, syllable, word_id, t0, t1, pitch, is_manual_pitch, 
+                                                            is_word_sep, order_index
+                                                        )
+                                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                      """
+
+                letter_id = str(uuid.uuid4().hex)
+                letter_record_to_insert = (
+                                            letter_id, letter["syllable"], word_id, letter["t0"], letter["t1"], letter["pitch"],
+                                            letter["isManualPitch"], letter["isWordSep"], order_index
+                                          )
+
+                connection.execute_insert_query(letter_insert_query, letter_record_to_insert, False)
+
+        return jsonify({"isSuccessful": True, 'word': word_id, 'creator': body["creator"], 'numSyllables': len(body["letters"])})
+
 
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):

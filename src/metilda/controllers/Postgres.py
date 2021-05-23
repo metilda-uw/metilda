@@ -11,7 +11,7 @@ class Postgres(object):
         print(DATABASE_URL)
         try:
             print('connecting to PostgreSQL database...')
-            self.connection =  psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
             self.cursor = self.connection.cursor()
 
         except Exception as error:
@@ -41,21 +41,27 @@ class Postgres(object):
         else:
             return self.cursor.rowcount
     
-    def execute_insert_query(self, query, record):
+    def execute_insert_query(self, query, record, need_last_row_id=True):
         try:
             self.cursor.execute(query, record)
         except Exception as error:
             print('error execting query "{}", error: {}'.format(query, error))
             return None
         else:
-            print('last row id is: ')
-            last_row_id=self.cursor.fetchone()[0]
-            print(last_row_id)
-            return last_row_id
+            if need_last_row_id:
+                print('last row id is: ')
+
+                last_row_id = self.cursor.fetchone()[0]
+
+                print(last_row_id)
+                return last_row_id
     
-    def execute_select_query(self, query, record):
+    def execute_select_query(self, query, record = None):
         try:
-            self.cursor.execute(query, record)
+            if record:
+                self.cursor.execute(query, record)
+            else:
+                self.cursor.execute(query)
         except Exception as error:
             print('error execting query "{}", error: {}'.format(query, error))
             return None

@@ -4,8 +4,18 @@ import os
 import matplotlib
 matplotlib.use('Agg')
 
+import decimal
+from flask import Flask, render_template, json
 
-from flask import Flask, render_template
+class CustomJSONEncoder(json.JSONEncoder):
+
+    def default(self, obj):
+        if isinstance(obj, decimal.Decimal):
+            # Convert decimal objects into strings
+            return float(obj)
+
+        return super(CustomJSONEncoder, self).default(obj)
+
 
 app = Flask(__name__,
             static_folder="../../frontend/build/static",
@@ -14,8 +24,9 @@ app.config["SOUNDS"] = os.path.join(os.path.dirname(__file__), "sounds")
 app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
 app.config["CERTIFICATES"] = os.path.join(os.path.dirname(__file__), "certificates")
 
-import metilda.controllers.pitch_art_wizard
+app.json_encoder = CustomJSONEncoder
 
+import metilda.controllers.pitch_art_wizard
 
 @app.route('/')
 @app.route('/<path:path>')
