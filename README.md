@@ -94,3 +94,57 @@ deployment:
 To initiate deployment: 
 1) Run `./bin/push.sh` to deploy to Heroku
 1) Wait for tests to pass in Travis CI and then check the appropriate web app environment in Heroku. 
+
+
+## Build and Run on Ubuntu 20.04
+### Install Python 2.7.15 & PIP on Ubuntu 20.04
+$ sudo apt-get update
+
+$ sudo apt-get install build-essential checkinstall
+
+$ sudo wget https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tgz
+
+$ sudo tar –xvzf  Python-2.7.15.tgz
+
+$ cd Python-2.7.15
+
+$ sudo ./configure  –enable-optimizations --with-ensurepip=install
+
+$ sudo make install
+
+### Make sure to check if they're installed correctly
+$ python -V
+
+$ pip -V
+
+### Create a virtual environment via PyCharm && Follow above PyCharm IDE Configuration steps
+https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html
+
+### Install requirements.txt
+$ pip install -r requirements.txt
+
+### Go to matilda-master folder & Activate virtual environment
+$ source venv/scripts/activate
+
+$ sudo apt update
+
+$ sudo apt-get install postgresql postgresql-contrib
+
+$ sudo apt-get install libpq-dev
+
+$ sudo apt-get install python-pip
+
+### Run backend(After virtual environment activation)
+$ cd src
+
+$ python2 -m metilda.local_server
+
+### Run frontend(On another Ubuntu) 
+$ cd frontend
+
+$ npm install
+
+$ npm install -g npm-check-updates
+
+$ npm start
+

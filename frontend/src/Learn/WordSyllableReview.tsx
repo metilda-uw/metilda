@@ -28,6 +28,10 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
+import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
+import { Slider } from "@material-ui/core";
+import { createMuiTheme } from "@material-ui/core/styles";
+import { ThemeProvider } from "@material-ui/styles";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -59,8 +63,13 @@ interface State {
     currentRecordingName: string;
     recordingResult: any;
     [key: string]: any;
+    showRedDot: boolean;
+    prevPitchSliderValue: number;
+    prevSpeedSliderValue: number;
+    pitchValue: number;
+    speedValue: number;
+    resetDone: boolean;
 }
-
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -74,7 +83,6 @@ const styles = (theme: Theme) =>
       color: theme.palette.grey[500],
     },
   });
-
 export interface DialogTitleProps extends WithStyles<typeof styles> {
     id: string;
     children: React.ReactNode;
@@ -140,9 +148,14 @@ export class WordSyllableReview extends React.Component<Props, State> {
             currentRecordingName: "",
             minPitch: WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH,
             maxPitch: WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH
+            showRedDot: false,
+            prevPitchSliderValue: 0,
+            prevSpeedSliderValue: 1,
+            pitchValue: 0,
+            speedValue: 1,
+            resetDone: false
         };
     }
-
     componentDidMount() {
         this.getPreviousRecordings();
         this.setState((prevState) =>
@@ -154,13 +167,59 @@ export class WordSyllableReview extends React.Component<Props, State> {
             )
         );
     }
-
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
             this.getPreviousRecordings();
+            this.resetSamplePitch();
+            this.resetSlider(prevState.activeWordIndex);
+            this.toggleChanged("showRedDot", false);
+        } else if (prevProps.location.search !== this.props.location.search) {
+            this.setState({activeWordIndex: 0});
+            this.setState({words: new StaticWordSyallableData().getData(
+                 parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+            this.getPreviousRecordings();
+            this.resetSamplePitch();
+            this.resetSlider(this.state.activeWordIndex);
+            this.toggleChanged("showRedDot", false);
         }
     }
-
+    componentWillUnmount() {
+        this.resetSlider(this.state.activeWordIndex);
+    }
+    
+    resetSlider = async (wordIndex: number) => {
+        if (this.state.resetDone === false) {
+            this.resetPitchSlider(wordIndex);
+            this.resetSpeedSlider(wordIndex);
+            this.setState({
+                resetDone: true,
+                pitchValue: 0,
+                speedValue: 1,
+                prevPitchSliderValue: 0,
+                prevSpeedSliderValue: 1,
+            });
+        }
+    }
+    resetPitchSlider = async (wordIndex: number) => {
+        const letter = this.state.words[wordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].pitch -= this.state.prevPitchSliderValue;
+        }
+    }
+    resetSpeedSlider = async (wordIndex: number) => {     
+        const letter = this.state.words[wordIndex].letters;
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].t0 *= this.state.speedValue;
+            letter[i].t1 *= this.state.speedValue;
+        }
+    }
+    resetSamplePitch = async () => {
+        this.setState({
+           userPitchValueLists: []
+        });
+    }
     getPreviousRecordings = async () => {
         this.setState({
             previousRecordings: []
@@ -178,13 +237,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
              });
           });
     }
-
     handleCloseDeleteRecordingModal = () => {
         this.setState({
             deleteRecordingModal: false,
         });
     }
-
     handleOkDeleteRecordingModal = async () => {
         const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
         const updatedRecordings = this.state.previousRecordings.filter((recording) =>
@@ -194,7 +251,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             deleteRecordingModal: false
         });
     }
-
     deleteRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="sm" open={this.state.deleteRecordingModal}
@@ -216,14 +272,12 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Dialog>
         );
     }
-
     handleClickDeleteRecordings = (itemRef: any) => {
         this.setState({
             deleteRecordingModal: true,
             deleteRecordingItemRef: itemRef
         });
     }
-
     renderPreviousRecordings = () => {
         return this.state.previousRecordings.map((recording, index) => {
             const recordingName = recording.itemRef.location.path.split("_");
@@ -252,7 +306,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             </Media>);
         });
     }
-
     wordClicked = (index: number) => {
         this.setState((prevState) =>
             (
@@ -264,7 +317,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
             )
         );
     }
-
     handleCloseRecordingModal = () => {
         this.setState({
             currentRecordingName: "",
@@ -274,7 +326,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
     onChange = (event: any) => {
         this.setState({ [event.target.name]: event.target.value });
       }
-
     saveRecordingModal = () => {
         return(
             <Dialog fullWidth={true} maxWidth="xs" open={this.state.showRecordingModal}
@@ -325,20 +376,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
             currentRecordingName: ""
         });
    }
-
    handleCloseRecordingConfirmationModal = () => {
     this.setState({
         showRecordingConfirmationModal: false
     });
   }
-
     handleOkRecordingConfirmationModal = () => {
         this.setState({
             showRecordingModal: true,
             showRecordingConfirmationModal: false
         });
     }
-
     recordingConfirmationModal = () => {
         return(
         <Dialog fullWidth={true} maxWidth="sm" open={this.state.showRecordingConfirmationModal}
@@ -403,12 +451,98 @@ export class WordSyllableReview extends React.Component<Props, State> {
         }
     }
 
-    playPitchArt = () => {
-        this.pitchArtRef.current!.playPitchArt();
-    }
-
     saveImage = () => {
         this.pitchArtRef.current!.saveImage();
+    }
+
+    toggleChanged = (inputName: string, isSelected: boolean) => {
+        if (inputName === "showRedDot") {
+            this.onRedDotClick(isSelected);
+        }
+        this.setState({[inputName]: isSelected} as any);
+    }
+    
+    onRedDotClick = (isRedDotted: boolean) => {
+        if (isRedDotted) {
+            this.showRedDot();
+        } else {
+            this.resetSamplePitch();
+        }
+    }
+
+    showRedDot = async () => {
+        const controller = this;
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        const notes: RawPitchValue[] = letter.map(
+                (item) => ({t0: item.t0, t1: item.t1, pitch: item.pitch}) as RawPitchValue
+            );
+        const note: RawPitchValue[] = [];
+        let k: number = 0;
+        while (k !== notes.length - 1) {
+            let t0Start: number = notes[k].t0;
+            const t0End: number = notes[k + 1].t0;
+            const pitchStart: number = notes[k].pitch;
+            const pitchEnd: number = notes[k + 1].pitch;
+            const x = t0End - t0Start;
+            const y = pitchEnd - pitchStart;
+            const m = y / x;
+            const interval = x / 10;
+            let i: number = notes[k].t0;
+            while (i <= t0End) {
+                note.push({
+                    t0: t0Start, t1: t0Start,
+                    pitch: m * (t0Start - t0End) + pitchEnd
+                });
+                t0Start += interval;
+                i += interval;
+            }
+            note.push({
+                t0: t0End, t1: t0End,
+                pitch: pitchEnd
+            });
+            k++;
+        }
+        controller.setState(
+            {
+                userPitchValueLists: controller.state.userPitchValueLists.concat([note])
+            });
+    }
+
+    onSliderChangePitch = (pitch: number) => {
+        if (pitch === this.state.prevPitchSliderValue) {
+            return;
+        }
+        this.setState({pitchValue: pitch});
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        this.resetPitchSlider(this.state.activeWordIndex);        
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].pitch += pitch;
+        }
+        this.setState({prevPitchSliderValue: pitch, resetDone: false});
+    }
+
+    onSliderChangeSpeed = (speed: number) => {
+        if (speed === this.state.prevSpeedSliderValue) {
+            return;
+        }
+        this.setState({speedValue: speed});
+        const letter = this.state.words[this.state.activeWordIndex].letters;
+        this.resetSpeedSlider(this.state.activeWordIndex);
+        // tslint:disable-next-line:prefer-for-of
+        for (let i = 0; i < letter.length; i++) {
+            letter[i].t0 /= speed;
+            letter[i].t1 /= speed;
+        }
+        this.setState({prevSpeedSliderValue: speed, resetDone: false});
+    }    
+    
+    playPitchArt = () => {
+      this.pitchArtRef.current!.playPitchArt();
+    }
+
+    saveImageforLearn = () => {
+        this.pitchArtRef.current!.saveImageforLearn();
     }
 
     minPitchArtTime = () => {
@@ -487,17 +621,30 @@ export class WordSyllableReview extends React.Component<Props, State> {
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];
+        const muiTheme = createMuiTheme({
+            overrides: {
+                MuiSlider: {
+                    thumb: {
+                    color: "#2bbbad",
+                    height: 15,
+                    width: 15,
+                    },
+                    track: {
+                    color: "#2bbbad",
+                    height: 8,
+                    },
+                    rail: {
+                    color: "#bef6f1",
+                    height: 8,
+                    }
+                }
+            }
+        });
         return (
             <div>
                 {this.recordingConfirmationModal()}
                 {this.saveRecordingModal()}
                 {this.deleteRecordingModal()}
-                <Header/>
-                <div className="metilda-page-header">
-                    <h5>
-                        Blackfoot Words > {this.pageTitle()}
-                    </h5>
-                </div>
                 <div className="metilda-page-content">
                     <div className="row">
                         <div className="col s4">
@@ -528,6 +675,56 @@ export class WordSyllableReview extends React.Component<Props, State> {
                                 <PitchArtPrevPitchValueToggle
                                     handleInputChange={this.handleInputChange}
                                     showPrevPitchValueLists={this.state.showPrevPitchValueLists}/>
+                            </div>
+                            <div className="row metilda-pitch-art-container-control-toggle-list">
+                                <PitchArtToggle
+                                    label = "Show Sample Pitch Tracking"
+                                    inputName="showRedDot"
+                                    isSelected={this.state.showRedDot}
+                                    offText="Hide"
+                                    onText="Show"
+                                    onChange={this.toggleChanged}
+                                />
+                            </div>
+                            <div className="col metilda-pitch-art-container-control-toggle-list">
+                                 <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Pitch Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={0}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={10}
+                                    marks={true}
+                                    min={-50}
+                                    max={50}
+                                    onChange={(event, value) => this.onSliderChangePitch(value as number)}
+                                    value={this.state.pitchValue}
+                                    />
+                                </ThemeProvider>
+                                <Typography
+                                    align="left"
+                                    color={"textPrimary"}
+                                    id="discrete-slider-small-steps" gutterBottom>
+                                    Speed Level
+                                </Typography>
+                                <ThemeProvider theme={muiTheme}>
+                                    <Slider
+                                    defaultValue={1}
+                                    aria-labelledby="discrete-slider-small-steps"
+                                    valueLabelDisplay="auto"
+                                    step={0.5}
+                                    marks={true}
+                                    min={0.5}
+                                    max={2}
+                                    onChange={(event, value) => this.onSliderChangeSpeed(value as number)}
+                                    value={this.state.speedValue}    
+                                    />
+                                </ThemeProvider>
                             </div>
                         </div>
                         {this.state.isLoadingPitchResults && spinner()}
@@ -577,6 +774,9 @@ export class WordSyllableReview extends React.Component<Props, State> {
                                                 onClick={this.toggleRecord}
                                                 disabled={this.state.isLoadingPitchResults}>
                                             {!this.state.isRecording ? "Start Record" : "Stop Record"}
+                                            <i className="material-icons right">
+                                                record_voice_over
+                                            </i>
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
                                                 onClick={this.playPitchArt}
@@ -587,7 +787,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
                                             Play Tones
                                         </button>
                                         <button className="waves-effect waves-light btn metilda-btn globalbtn"
-                                                onClick={this.saveImage}
+                                                onClick={this.saveImageforLearn}
                                                 disabled={this.state.isRecording}>
                                             <i className="material-icons right">
                                                 cloud_upload
