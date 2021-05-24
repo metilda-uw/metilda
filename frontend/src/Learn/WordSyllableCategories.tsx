@@ -14,6 +14,7 @@ import "./WordSyllableCategories.css";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 import StudentsInfo from "./StudentsInfo";
+import wordSyllableService from "./services/WordSyllables";
 
 interface State {
     viewStudentsClicked: boolean;
@@ -75,6 +76,13 @@ class WordSyllableCategories extends React.Component<Props, State> {
     }
 
     imageSrcList = () => {
+        const numSyllables: number = this.getNumSyllables();
+
+        wordSyllableService.getWordsBySyllableCount(numSyllables)
+            .then(res => console.log(res.data));
+
+        const bruh = "./images/Pitch Art - 21-01.jpg";
+
         switch (this.getNumSyllables()) {
             case 2:
                 return [pitchArt21, pitchArt22];

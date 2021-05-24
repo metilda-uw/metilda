@@ -147,7 +147,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
             recordingResult: "",
             currentRecordingName: "",
             minPitch: WordSyllableReview.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH
+            maxPitch: WordSyllableReview.DEFAULT_MAX_ANALYSIS_PITCH,
             showRedDot: false,
             prevPitchSliderValue: 0,
             prevSpeedSliderValue: 1,
