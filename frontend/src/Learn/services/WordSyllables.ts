@@ -16,7 +16,7 @@ const getWordsBySyllableCount = async (numSyllables?: number) => {
         getUrl += "?numSyllables=" + numSyllables;
     }
 
-    let response = await axios.get(getUrl);
+    const response = await axios.get(getUrl);
 
     return response.data;
 };
