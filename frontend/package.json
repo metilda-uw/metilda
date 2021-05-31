@@ -34,6 +34,7 @@
     "@types/sizzle": "^2.3.2",
     "@types/styled-components": "^4.1.13",
     "@types/tone": "git://github.com/Tonejs/TypeScript.git",
+    "axios": "^0.21.1",
     "chai": "^4.2.0",
     "coveralls": "^3.0.3",
     "d3-scale": "^3.0.0",
