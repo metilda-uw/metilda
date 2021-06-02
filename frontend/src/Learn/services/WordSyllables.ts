@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {AxiosResponse} from "axios";
 const baseUrl: string = "/api/words";
 
 const getInitializer: RequestInit = {
@@ -9,14 +9,18 @@ const getInitializer: RequestInit = {
     }
 };
 
-const getWordsBySyllableCount = async (numSyllables?: number) => {
+const getWordsBySyllableCount = async (numSyllables?: number, accentIndex?: number) => {
     let getUrl: string = baseUrl;
 
     if (typeof numSyllables !== "undefined") {
         getUrl += "?numSyllables=" + numSyllables;
     }
 
-    const response = await axios.get(getUrl);
+    if (typeof accentIndex !== "undefined") {
+        getUrl += "&accentIndex=" + accentIndex;
+    }
+
+    const response: AxiosResponse<any> = await axios.get(getUrl);
 
     return response.data;
 };
