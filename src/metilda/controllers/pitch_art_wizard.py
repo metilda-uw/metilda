@@ -561,7 +561,7 @@ def modifyPitchOrImageDetails(upload_id):
 
                 connection.execute_update_query(postgres_delete_query, (upload_id,))
 
-                return jsonify({'isSuccessful': True, 'description': "Word with id of " + upload_id + "successfully deleted!"})
+                return jsonify({'isSuccessful': True, 'wordDeleted': upload_id})
 
 
 
