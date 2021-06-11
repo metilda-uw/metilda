@@ -174,15 +174,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
                 this.setState({loading: false});
             });
 
-        // this.getPreviousRecordings();
-        // this.setState((prevState) =>
-        //     (
-        //         {
-        //             minPitch: prevState.words[prevState.activeWordIndex].minPitch,
-        //             maxPitch: prevState.words[prevState.activeWordIndex].maxPitch
-        //         }
-        //     )
-        // );
     }
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
@@ -210,13 +201,6 @@ export class WordSyllableReview extends React.Component<Props, State> {
                                   this.setState({loading: false});
                                });
 
-            // this.setState({activeWordIndex: 0});
-            // this.setState({words: new StaticWordSyallableData().getData(
-            //      parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
-            // this.getPreviousRecordings();
-            // this.resetSamplePitch();
-            // this.resetSlider(this.state.activeWordIndex);
-            // this.toggleChanged("showRedDot", false);
         }
     }
     componentWillUnmount() {

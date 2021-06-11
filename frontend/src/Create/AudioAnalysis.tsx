@@ -358,7 +358,13 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Content-Type": "application/json",
+                "Content-Type": "application/json"            // this.setState({activeWordIndex: 0});
+            // this.setState({words: new StaticWordSyallableData().getData(
+            //      parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
+            // this.getPreviousRecordings();
+            // this.resetSamplePitch();
+            // this.resetSlider(this.state.activeWordIndex);
+            // this.toggleChanged("showRedDot", false);",
             },
         })
             .then((response) => response.json())
