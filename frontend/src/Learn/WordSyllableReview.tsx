@@ -32,6 +32,7 @@ import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
 import { Slider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
+import wordSyllableService from "./services/WordSyllables";
 
 const {PlayPause, SeekBar} = controls;
 
@@ -130,12 +131,10 @@ export class WordSyllableReview extends React.Component<Props, State> {
         const accentIndex = values.accentIndex;
 
         this.state = {
+            loading: true,
             activeWordIndex: 0,
             userPitchValueLists: [],
-            words: new StaticWordSyallableData().getData(
-                parseFloat(this.props.match.params.numSyllables),
-                parseFloat(accentIndex as string)
-            ),
+            words: [],
             isRecording: false,
             isLoadingPitchResults: false,
             showPrevPitchValueLists: false,
@@ -157,15 +156,24 @@ export class WordSyllableReview extends React.Component<Props, State> {
         };
     }
     componentDidMount() {
-        this.getPreviousRecordings();
-        this.setState((prevState) =>
-            (
-                {
-                    minPitch: prevState.words[prevState.activeWordIndex].minPitch,
-                    maxPitch: prevState.words[prevState.activeWordIndex].maxPitch
-                }
-            )
-        );
+        this.setState({loading: true});
+        const values: queryString.ParsedQuery<string> = queryString.parse(this.props.location.search);
+        const numSyllables: number = parseFloat(this.props.match.params.numSyllables);
+        const accentIndex: number = parseFloat(values.accentIndex as string) + 1;
+
+        wordSyllableService.getWordsBySyllableCount(numSyllables, accentIndex)
+            .then((res) => {
+                console.log(res.data);
+                this.setState({
+                    words: res.data,
+                    minPitch: res.data[0].minPitch,
+                    maxPitch: res.data[0].maxPitch
+                });
+
+                this.getPreviousRecordings();
+                this.setState({loading: false});
+            });
+
     }
     componentDidUpdate(prevProps: Props, prevState: State) {
         if (this.state.activeWordIndex !== prevState.activeWordIndex) {
@@ -174,13 +182,25 @@ export class WordSyllableReview extends React.Component<Props, State> {
             this.resetSlider(prevState.activeWordIndex);
             this.toggleChanged("showRedDot", false);
         } else if (prevProps.location.search !== this.props.location.search) {
-            this.setState({activeWordIndex: 0});
-            this.setState({words: new StaticWordSyallableData().getData(
-                 parseFloat(this.props.match.params.numSyllables), parseFloat(this.props.location.search.slice(-1)))});
-            this.getPreviousRecordings();
-            this.resetSamplePitch();
-            this.resetSlider(this.state.activeWordIndex);
-            this.toggleChanged("showRedDot", false);
+            this.setState({loading: true});
+            const numSyllables: number = parseFloat(this.props.match.params.numSyllables);
+            const accentIndex: number = parseFloat(this.props.location.search.slice(-1)) + 1;
+
+            wordSyllableService.getWordsBySyllableCount(numSyllables, accentIndex)
+                               .then((res) => {
+                                  this.setState({
+                                     activeWordIndex: 0,
+                                     words: res.data,
+                                     minPitch: res.data[0].minPitch,
+                                     maxPitch: res.data[0].maxPitch
+                                  });
+                                  this.getPreviousRecordings();
+                                  this.resetSamplePitch();
+                                  this.resetSlider(0);
+                                  this.toggleChanged("showRedDot", false);
+                                  this.setState({loading: false});
+                               });
+
         }
     }
     componentWillUnmount() {
@@ -618,6 +638,15 @@ export class WordSyllableReview extends React.Component<Props, State> {
     }
 
     render() {
+
+        if (this.state.loading) {
+            return (
+                <div className="metilda-page-content">
+                    Loading...
+                </div>
+            );
+        }
+
         const speakers: Speaker[] = [
             {uploadId: "", letters: this.state.words[this.state.activeWordIndex].letters}
         ];

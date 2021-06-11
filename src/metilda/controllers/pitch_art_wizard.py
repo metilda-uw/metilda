@@ -497,6 +497,76 @@ def authorize_user():
         last_row_id=connection.execute_update_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
 
+
+@app.route('/api/words/<string:upload_id>', methods=["PATCH", "DELETE"])
+def modifyPitchOrImageDetails(upload_id):
+    req_method = flask.request.method
+
+    if req_method == "PATCH":
+        with Postgres() as connection:
+            postgres_select_query = """ SELECT id FROM word WHERE id = %s"""
+            select_results = connection.execute_select_query(postgres_select_query, (upload_id,))
+
+            if not select_results:
+                return jsonify({'isSuccessful': False, 'description': "Word does not exist"}), 404
+            else:
+
+                body = request.json
+                no_valid_fields_provided = ("minPitch" not in body) and ("maxPitch" not in body) and (
+                            "imagePath" not in body)
+
+                if not body or no_valid_fields_provided:
+                    return jsonify({'isSuccessful': False, 'description': "Valid body not provided"}), 400
+
+                postgres_update_query = """ UPDATE word"""
+
+                valid_fields = {"minPitch": "min_pitch", "maxPitch": "max_pitch", "imagePath": "image_path"}
+                record_to_update = []
+
+                set_appended = False
+                for field in valid_fields:
+                    if field in body:
+                        if not set_appended:
+                            postgres_update_query += """ SET """ + valid_fields[field] + """ = %s"""
+                            set_appended = True
+                        else:
+                            postgres_update_query += ", " + valid_fields[field] + """ = %s"""
+
+                        record_to_update.append(str(body[field]))
+
+                postgres_update_query += """ WHERE id = %s """
+                record_to_update.append(upload_id)
+
+                record_to_update = tuple(record_to_update)
+
+                connection.execute_update_query(postgres_update_query, record_to_update)
+
+                response = {'isSuccessful': True, 'word': upload_id}
+                for field in valid_fields:
+                    if field in body:
+                        response[field] = body[field]
+
+                return jsonify(response)
+
+    elif req_method == "DELETE":
+        with Postgres() as connection:
+            postgres_select_query = """ SELECT id FROM word WHERE id = %s"""
+            select_results = connection.execute_select_query(postgres_select_query, (upload_id,))
+
+            if not select_results:
+                return jsonify({'isSuccessful': False, 'description': "Word does not exist for purposes of deletion"}), 404
+            else:
+                postgres_delete_query = """ DELETE FROM word WHERE id = %s"""
+                word_to_delete = (str(upload_id))
+
+                connection.execute_update_query(postgres_delete_query, (upload_id,))
+
+                return jsonify({'isSuccessful': True, 'wordDeleted': upload_id})
+
+
+
+
+
 @app.route('/api/words', methods=["GET", "POST"])
 def getOrCreateWords():
     req_method = flask.request.method
