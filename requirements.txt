@@ -48,7 +48,7 @@ MarkupSafe==1.1.1
 matplotlib==2.2.4
 numpy==1.16.6
 pathlib==1.0.1
-Pillow==6.2.2
+Pillow==8.3.2
 pydub==0.23.1
 pympi-ling==1.69
 pyparsing==2.4.6
