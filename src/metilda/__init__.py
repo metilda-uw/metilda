@@ -33,6 +33,10 @@ import metilda.controllers.pitch_art_wizard
 def react_app(path=None):
     return render_template("index.html")
 
+@app.route('/api')
+def return_api():
+    return "Hello!"
+
 
 def get_app():
     return app
