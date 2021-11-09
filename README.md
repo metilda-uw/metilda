@@ -99,37 +99,50 @@ To initiate deployment:
 
 
 ## Build and Run on Ubuntu 20.04
-### Install Python 2.7 & PIP on Ubuntu 20.04
-$ sudo apt-get update
+### Install Prerequisite Packages including Python 2.7 & PIP
 
+```
+$ sudo apt-get update
 $ sudo apt-get install build-essential checkinstall python2-minimal virtualenv postgresql postgresql-contrib libpq-dev python-dev
+```
 
 ### Clone the Metilda Repository
 
+```
 $ git clone https://github.com/metilda-uw/metilda.git 
+```
 
 ### Create and activate a virtual environment
 
+```
 $ virtualenv metilda -python=2.7
-
 $ cd metilda
 $ source bin/activate
+```
 
-### Alternative Option: Create a virtual environment via PyCharm && Follow above PyCharm IDE Configuration steps
+### Alternative Option: Create a virtual environment via PyCharm & Follow PyCharm IDE Configuration steps
 https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html
 
 ### Verify that Python and Pip are installed correctly
+
+```
 $ python -V
 $ pip -V
+```
 
 ### Install requirements.txt
+
+```
 $ pip install -r requirements.txt
+```
 
 ### Install Node and NVM 
 
-1) Install nodejs (the version is specified in `/frontend/package.json`, it is currently 8.12.0).  Install current version then use nvm to manage the version used in the project.
+1) Install nodejs (the version is specified in `/frontend/package.json`, it is currently 8.12.0).  You can install the current version of Node then use nvm to manage the version used in the project.
 
+```
 $ apt install nodejs
+```
 
 2) Install <a href="https://heynode.com/tutorial/install-nodejs-locally-nvm">Node Version Manager</a>
 3) Run the following commands to install and switch to the correct version of node (Important for successfully running the frontend)
@@ -140,12 +153,16 @@ $ nvm use 8.12.0
 ```
 
 ### Run backend (After activating the virtual environment)
+
+```
 $ cd src
 $ python2 -m metilda.local_server
+```
 
 ### Run frontend(In an additional terminal Window) 
+
+```
 $ cd frontend
-
 $ npm install -g npm-check-updates
-
 $ npm start
+```
