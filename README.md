@@ -106,6 +106,14 @@ $ sudo apt-get update
 $ sudo apt-get install build-essential checkinstall python2-minimal virtualenv postgresql postgresql-contrib libpq-dev python-dev
 ```
 
+### Install Praat - In order for the PELDA page to work the following steps need to be completed.  https://www.fon.hum.uva.nl/praat/download_linux.html
+
+```
+$ wget https://www.fon.hum.uva.nl/praat/praat6156_linux64nogui.tar.gz
+$ tar xzf praat6156_linux64nogui.tar.gz
+$ cp praat_nogui /usr/bin/
+```
+
 ### Clone the Metilda Repository
 
 ```
