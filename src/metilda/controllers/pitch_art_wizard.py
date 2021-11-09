@@ -27,6 +27,10 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/api', methods=["GET"])
+def api():
+    return jsonify({'name': "MetildaAPI", 'version': "1.0"})
+
 @app.route('/api/audio/<string:upload_id>.png/image', methods=["GET"])
 def audio_analysis_image(upload_id):
     image_path = os.path.join(app.config["SOUNDS"], upload_id)
@@ -720,7 +724,8 @@ def drawSound(upload_id):
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    #image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
@@ -734,7 +739,6 @@ def drawSound(upload_id):
     resp = app.make_response(open(image).read())
     resp.content_type = "image/png"
     os.remove(image)
-    #os.remove(sound_path)
     return resp
 
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
@@ -756,7 +760,8 @@ def drawSoundWithTime(sound, startTime, endTime):
              praat._sounds_dir, praat._images_dir];
 
     # Image name will be a combination of relevant params joined by a period.
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    #image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
@@ -769,7 +774,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     # Image should be available now, generated or cached
     resp = app.make_response(open(image).read())
     resp.content_type = "image/png"
-    os.remove(image)
+    #os.remove(image)
     return resp
 
 @app.route('/get-bounds/<sound>', methods=["GET"])

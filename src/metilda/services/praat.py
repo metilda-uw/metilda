@@ -4,18 +4,18 @@ from flask_cors import CORS
 
 # Locations of required files
 _images_dir = "images/"
-_scripts_dir = "src/metilda/scripts/"
+_scripts_dir = "metilda/scripts/"
 _sounds_dir = "sounds/"
-_eaf_dir = "src/metilda/eaf/"
+_eaf_dir = "metilda/eaf/"
 _linkElanPraat_dir = "combined/"
 
 # Run script 'scriptName' with the provided parameters
 def runScript(scriptName, args):
    praatExec = ["praat_nogui", "--run", "--no-pref-files", scriptName];
    praatExec.extend(args)
-   print "script is: " + str(praatExec)
+   #print "script is: " + str(praatExec)
    output = subprocess.check_output(praatExec);
-   print "output from praat.py is: " + str(output)
+   #print "output from praat.py is: " + str(output)
    return output
 
 # Create flask app
