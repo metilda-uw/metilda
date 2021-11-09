@@ -58,7 +58,9 @@ This feature enables tslint highlighting, it is only available in the Profession
 ## Tests
 
 ### Unit Tests
-After configuring your build environment, run tests locally using `./bin/runTests.sh`. 
+After configuring your build environment, run tests locally using `./bin/runTests.sh`.  For example:
+
+/metilda$ ./bin/runTests.sh --python
 
 Note, tests are also run prior to a push in `./bin/push.sh`. Upon being pushed, the test suite is also
 run on Travis CI.
@@ -97,54 +99,53 @@ To initiate deployment:
 
 
 ## Build and Run on Ubuntu 20.04
-### Install Python 2.7.15 & PIP on Ubuntu 20.04
+### Install Python 2.7 & PIP on Ubuntu 20.04
 $ sudo apt-get update
 
-$ sudo apt-get install build-essential checkinstall
+$ sudo apt-get install build-essential checkinstall python2-minimal virtualenv postgresql postgresql-contrib libpq-dev python-dev
 
-$ sudo wget https://www.python.org/ftp/python/2.7.15/Python-2.7.15.tgz
+### Clone the Metilda Repository
 
-$ sudo tar –xvzf  Python-2.7.15.tgz
+$ git clone https://github.com/metilda-uw/metilda.git 
 
-$ cd Python-2.7.15
+### Create and activate a virtual environment
 
-$ sudo ./configure  –enable-optimizations --with-ensurepip=install
+$ virtualenv metilda -python=2.7
 
-$ sudo make install
+$ cd metilda
+$ source bin/activate
 
-### Make sure to check if they're installed correctly
-$ python -V
-
-$ pip -V
-
-### Create a virtual environment via PyCharm && Follow above PyCharm IDE Configuration steps
+### Alternative Option: Create a virtual environment via PyCharm && Follow above PyCharm IDE Configuration steps
 https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html
+
+### Verify that Python and Pip are installed correctly
+$ python -V
+$ pip -V
 
 ### Install requirements.txt
 $ pip install -r requirements.txt
 
-### Go to matilda-master folder & Activate virtual environment
-$ source venv/scripts/activate
+### Install Node and NVM 
 
-$ sudo apt update
+1) Install nodejs (the version is specified in `/frontend/package.json`, it is currently 8.12.0).  Install current version then use nvm to manage the version used in the project.
 
-$ sudo apt-get install postgresql postgresql-contrib
+$ apt install nodejs
 
-$ sudo apt-get install libpq-dev
+2) Install <a href="https://heynode.com/tutorial/install-nodejs-locally-nvm">Node Version Manager</a>
+3) Run the following commands to install and switch to the correct version of node (Important for successfully running the frontend)
 
-$ sudo apt-get install python-pip
+```
+$ nvm install 8.12.0
+$ nvm use 8.12.0
+```
 
-### Run backend(After virtual environment activation)
+### Run backend (After activating the virtual environment)
 $ cd src
-
 $ python2 -m metilda.local_server
 
-### Run frontend(On another Ubuntu) 
+### Run frontend(In an additional terminal Window) 
 $ cd frontend
-
-$ npm install
 
 $ npm install -g npm-check-updates
 
 $ npm start
-
