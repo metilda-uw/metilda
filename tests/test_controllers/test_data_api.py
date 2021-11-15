@@ -132,12 +132,12 @@ def test_data_api_get_user_roles(client):
     rv = client.get("/api/get-user-roles/student@uw.edu")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': [['student']]}
+    result = {'result': [['Student']]}
     assert result == json.loads(rv.data)
     rv = client.get("/api/get-user-roles/teacher@uw.edu")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': [['teacher']]}
+    result = {'result': [['Teacher']]}
     assert result == json.loads(rv.data)
     rv = client.get("/api/get-user-roles/NOT_FOUND@uw.edu")
     assert rv.status_code == 200
@@ -186,13 +186,9 @@ def test_data_api_update_user_from_admin(client):
 def test_data_api_authorize_user(client):    
     rv = client.post(
         '/api/authorize-user', data = {
-        'user_id': "student@uw.edu", 'user_role': "Student"
+        'email': "teacher@uw.edu", 'user_role': "Teacher"
     })
-    
-    # rv = client.post(
-    # '/api/authorize-user', data = {
-    # 'user_id': email, 'user_role': role
-    # })
+
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
     result = {'result': 1}
@@ -211,7 +207,7 @@ def test_data_api_delete_previous_user_roles(client):
 def test_data_api_delete_previous_user_research_language(client):
     rv = client.post(
         '/api/delete-previous-user-research-language', data = {
-        'user_id': email, 'user_language': research_language
+        'user_id': "student@uw.edu", 'language': research_language
         })
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
@@ -318,18 +314,18 @@ def test_data_api_get_files_and_folders(client):
 
 def test_data_api_get_eaf_file(client):
     rv = client.get(
-        "/api/get-eaf-files/1")
+        "/api/get-eaf-files/260")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': [] }
+    result = {'result': [[841, 'testeaf_test.eaf']]}
     assert result == json.loads(rv.data)
 
 def test_data_api_get_eaf_file_path(client):
     rv = client.get(
-        "/api/get-eaf-file-path/49")
+        "/api/get-eaf-file-path/841")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': "results[0]" }
+    result = {'result': ['student@uw.edu/Eafs/06-01-2020_08_57_31_testeaf_test.eaf'] }
     assert result == json.loads(rv.data)
 
 def test_data_api_get_eafs_for_files(client):
@@ -340,9 +336,13 @@ def test_data_api_get_eafs_for_files(client):
     result = {'result': [] }
     assert result == json.loads(rv.data)
 
-@pytest.mark.skip
 def test_data_api_get_analysis_file_path(client):
-    assert False
+    rv = client.get(
+        "/api/get-analysis-file-path/101")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': ['student@uw.edu/Analyses/02-21-2020_09_12_36_EOP_pannii.json']}
+    assert result == json.loads(rv.data)
 
 @pytest.mark.skip
 def test_data_api_create_analysis(client):
