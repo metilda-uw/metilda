@@ -1,3 +1,4 @@
 #!/bin/bash
 PATH=$PATH:../venv/Scripts
-(cd ../src && python -m unittest discover ../tests)
+# add -v, -vv or -s for verbose output
+(cd ../src && python -m pytest ../tests)

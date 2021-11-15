@@ -15,16 +15,16 @@ username = "test_student"
 university = "University of Washington"
 role = "Student"
 research_language = "Blackfoot"
-file_name = "NOT_FOUND"
-file_path = "NOT_FOUND"
+file_name = "test_file"
+file_path = "test_file_path"
 file_type = "NOT_FOUND"
 file_size = 1024
-file_id = 1
+file_id = 260
 image_name = "NOT_FOUND"
 image_path = "NOT_FOUND"
-analysis_file_name = "NOT_FOUND"
-analysis_file_path = "NOT_FOUND"
-analysis_id = "NOT_FOUND"
+analysis_file_name = "test_analysis_file_name"
+analysis_file_path = "test_analysis_file_path"
+analysis_id = 100
 image_id = 1
 eaf_file_id = 1
 eaf_file_name = "NOT_FOUND"
@@ -78,55 +78,28 @@ def client():
     with app.test_client() as client:
         yield client
 
+# Test all GET methods
+
 def test_data_api_get_users(client):
     rv = client.get(
         '/api/get-users'
     )
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': [['student@uw.edu', 'University of Washington', 'Mon, 28 Dec 2020 01:40:35 GMT', 'Mon, 28 Dec 2020 01:41:12 GMT', 'student'],
-                ['teacher@uw.edu', 'University of Washington', 'Mon, 28 Dec 2020 01:40:35 GMT', 'Mon, 28 Dec 2020 01:41:12 GMT', 'teacher'] ]}
+    result = {'result': 
+                [['student@uw.edu', 'University of Washington', 'Mon, 28 Dec 2020 01:40:35 GMT', 'Mon, 28 Dec 2020 01:41:12 GMT', 'student'],
+                ['teacher@uw.edu', 'University of Washington', 'Mon, 28 Dec 2020 01:40:35 GMT', 'Mon, 28 Dec 2020 01:41:12 GMT', 'teacher'],
+                ['admin@uw.edu', 'University of Washington', 'Mon, 28 Dec 2020 01:40:35 GMT', 'Mon, 28 Dec 2020 01:41:12 GMT', 'admin']
+                ]}
     assert result == json.loads(rv.data)
 
-def test_data_api_create_db_user(client):
-    rv = client.post("/api/create-user", data= {
-            'user_id': email, 'user_name': username, 'university': university
-        })
+def test_data_api_get_student_recordings(client):
+    rv = client.get(
+        "/api/get-all-students")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': "test_student@uw.edu"}
+    result = {'result': [['student', 'student@uw.edu', 'Mon, 28 Dec 2020 01:41:12 GMT']]}
     assert result == json.loads(rv.data)
-
-def test_data_api_create_user_research_language(client):
-    rv = client.post(
-        "/api/create-user-research-language", data = {
-        'user_id': email, 'language': research_language
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': "test_student@uw.edu"}
-    assert result == json.loads(rv.data)
-
-def test_data_api_create_user_research_role(client):
-    rv = client.post(
-            "/api/create-user-role", data = {
-            'user_id': email, 'user_role': role
-        })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 'test_student@uw.edu'}
-    assert result == json.loads(rv.data)
-
-def test_data_api_update_db_user(client):
-    rv = client.post(
-        "/api/update-user", data = {
-            "user_id": email
-        })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': "success"}
-    assert result == json.loads(rv.data)
-    #TODO: get users and confirm user updated?
 
 def test_data_api_get_user_roles(client):
     rv = client.get("/api/get-user-roles/student@uw.edu")
@@ -139,12 +112,6 @@ def test_data_api_get_user_roles(client):
     assert rv.content_type == "application/json"
     result = {'result': [['Teacher']]}
     assert result == json.loads(rv.data)
-    rv = client.get("/api/get-user-roles/NOT_FOUND@uw.edu")
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': []}
-    assert result == json.loads(rv.data)
-    #TODO: more roles?
 
 def test_data_api_get_user_research_language(client):
     rv = client.get("/api/get-user-research-language/student@uw.edu")
@@ -156,144 +123,6 @@ def test_data_api_get_user_research_language(client):
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
     result = {'result': [['Blackfoot']]}
-    assert result == json.loads(rv.data)
-    rv = client.get("/api/get-user-research-language/NOT_FOUND@uw.edu")
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': []}
-    assert result == json.loads(rv.data)
-
-@pytest.mark.skip("Firebase integration")
-def test_data_api_delete_user(client):
-    rv = client.post(
-            "/api/delete-user",
-            {
-            'user_id': email
-        })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': "success"}
-    assert result == json.loads(rv.data)
-
-@pytest.mark.skip("Firebase integration")
-def test_data_api_add_new_user_from_admin(client):
-    assert False
-
-@pytest.mark.skip("Firebase integration")
-def test_data_api_update_user_from_admin(client):
-    assert False
-
-def test_data_api_authorize_user(client):    
-    rv = client.post(
-        '/api/authorize-user', data = {
-        'email': "teacher@uw.edu", 'user_role': "Teacher"
-    })
-
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1}
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_previous_user_roles(client):
-    rv = client.post(
-        '/api/delete-previous-user-roles', data = {
-        'user_id': email, 'user_role': role
-        })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1}
-    assert result == json.loads(rv.data)
-    
-def test_data_api_delete_previous_user_research_language(client):
-    rv = client.post(
-        '/api/delete-previous-user-research-language', data = {
-        'user_id': "student@uw.edu", 'language': research_language
-        })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1}
-    assert result == json.loads(rv.data)
-
-def test_data_api_create_file(client):
-    rv = client.post(
-        "/api/create-file", data ={
-        'user_id': email, 'file_name': file_name,'file_path': file_path,'file_type': file_type,
-        'file_size': file_size
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1}
-    assert result == json.loads(rv.data)
-
-def test_data_api_move_to_folder(client):
-    rv = client.post(
-        "/api/move-to-folder", data = {
-            'file_id': file_id, 'file_path': file_path
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_create_folder(client):
-    rv = client.post(
-        "/api/create-folder", data = {
-        'user_id': email, 'file_name': file_name,'file_path':file_path,'file_type':file_type,
-        'file_size':file_size
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 2 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_file(client):
-    rv = client.post(
-        "/api/delete-folder", data = {
-        'file_id': file_id
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_eaf_file(client):
-    rv = client.post(
-        "/api/delete-eaf-file", data = {
-        'eaf_id': eaf_file_id
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 0 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_folder(client):
-    rv = client.post(
-        "/api/delete-folder", data = {
-        'file_id': file_id
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 0 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_image(client):
-    rv = client.post(
-        "/api/delete-image", data = {
-        'image_id': image_id
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 0 }
-    assert result == json.loads(rv.data)
-
-def test_data_api_delete_recording(client):
-    rv = client.post(
-        "/api/delete-recording", data = {
-        'user_id': email,'file_path': file_path,'file_type': file_type
-    })
-    assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    result = {'result': 1 }
     assert result == json.loads(rv.data)
 
 def test_data_api_get_file(client):
@@ -338,58 +167,309 @@ def test_data_api_get_eafs_for_files(client):
 
 def test_data_api_get_analysis_file_path(client):
     rv = client.get(
-        "/api/get-analysis-file-path/101")
+        "/api/get-analysis-file-path/100")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': ['student@uw.edu/Analyses/02-21-2020_09_12_36_EOP_pannii.json']}
+    result = {'result': ['student@uw.edu/Analyses/02-21-2020_09_12_36_test.json']}
+    assert result == json.loads(rv.data)
+
+def test_data_api_get_image_for_analysis(client):
+    rv = client.get(
+        "/api/get-image-for-analysis/100")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': [[100, 'test.png', 'student@uw.edu/Images/02-21-2020_09_35_56_test.png', None, 'Fri, 21 Feb 2020 16:35:57 GMT', 'student@uw.edu']]}
+    assert result == json.loads(rv.data)
+
+def test_data_api_get_all_images(client):
+    rv = client.get(
+        "/api/get-all-images-for-user/student@uw.edu")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': [[100, 'test.png', 'student@uw.edu/Images/02-21-2020_09_35_56_test.png', None, 'Fri, 21 Feb 2020 16:35:57 GMT', 'student@uw.edu']]}
+    assert result == json.loads(rv.data)
+
+def test_data_api_get_analyses_for_image(client):
+    rv = client.get(
+        "/api/get-analyses-for-image/100")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': [[100, 'test.json', 'student@uw.edu/Analyses/02-21-2020_09_12_36_test.json', 260, 'Fri, 21 Feb 2020 16:12:36 GMT', 'Fri, 21 Feb 20 16:12:36 GMT']]}
+    assert result == json.loads(rv.data)
+
+def test_data_api_get_admin(client):
+    rv = client.get(
+        "/api/get-user-with-verified-role/admin@uw.edu?user-role=Admin")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': [['admin@uw.edu', 'Admin', True]]}
+    assert result == json.loads(rv.data)
+
+def test_data_api_getOrCreateWords_get(client):
+    rv = client.get(
+        "/api/words?numSyllables=2")
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {u'data': [{u'accentIndex': 1,
+                u'creator': u'student@uw.edu',
+                u'imagePath': u'/images/Pitch Art - 21-01.jpg',
+                u'letters': [],
+                u'maxPitch': 38,
+                u'minPitch': 30,
+                u'numSyllables': 2,
+                u'uploadId': u'PHEOP019 onni.wav'},
+                {u'accentIndex': 2,
+                u'creator': u'student@uw.edu',
+                u'imagePath': u'/images/Pitch Art - 22-01.jpg',
+                u'letters': [],
+                u'maxPitch': 500,
+                u'minPitch': 75,
+                u'numSyllables': 2,
+                u'uploadId': u'PHEOP002 aakiiwa.wav'}],
+                u'isSuccessful': True}
     assert result == json.loads(rv.data)
 
 @pytest.mark.skip
+def test_data_api_modify_pitch_or_image_details(client):
+    assert False
+
+# Test all POST methods    
+
+@pytest.mark.skip
+def test_data_api_getOrCreateWords_post(client):
+    assert False
+
+def test_data_api_create_db_user(client):
+    rv = client.post("/api/create-user", data= {
+            'user_id': email, 'user_name': username, 'university': university
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "test_student@uw.edu"}
+    assert result == json.loads(rv.data)
+
+def test_data_api_create_user_research_language(client):
+    rv = client.post(
+        "/api/create-user-research-language", data = {
+        'user_id': email, 'language': research_language
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "test_student@uw.edu"}
+    assert result == json.loads(rv.data)
+
+def test_data_api_create_user_research_role(client):
+    rv = client.post(
+            "/api/create-user-role", data = {
+            'user_id': email, 'user_role': role
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 'test_student@uw.edu'}
+    assert result == json.loads(rv.data)
+
+def test_data_api_update_db_user(client):
+    rv = client.post(
+        "/api/update-user", data = {
+            "user_id": email
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "success"}
+    assert result == json.loads(rv.data)
+    #TODO: get users and confirm user updated?
+
+@pytest.mark.skip("Firebase integration")
+def test_data_api_add_new_user_from_admin(client):
+    assert False
+
+@pytest.mark.skip("Firebase integration")
+def test_data_api_update_user_from_admin(client):
+    assert False
+
+def test_data_api_authorize_user(client):    
+    rv = client.post(
+        '/api/authorize-user', data = {
+        'email': "teacher@uw.edu", 'user_role': "Teacher"
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1}
+    assert result == json.loads(rv.data)
+
+def test_data_api_create_file(client):
+    rv = client.post(
+        "/api/create-file", data ={
+        'user_id': email, 'file_name': file_name,'file_path': file_path,'file_type': file_type,
+        'file_size': file_size
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1}
+    assert result == json.loads(rv.data)
+
+def test_data_api_move_to_folder(client):
+    rv = client.post(
+        "/api/move-to-folder", data = {
+            'file_id': file_id, 'file_path': file_path
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
+
+def test_data_api_create_folder(client):
+    rv = client.post(
+        "/api/create-folder", data = {
+        'user_id': email, 'file_name': file_name,'file_path':file_path,'file_type':file_type,
+        'file_size':file_size
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 2 }
+    assert result == json.loads(rv.data)
+
+
+
 def test_data_api_create_analysis(client):
-    assert False
+    rv = client.post(
+        "/api/create-analysis", data ={
+        'file_id': file_id, 'analysis_file_name': analysis_file_name,'analysis_file_path': analysis_file_path
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
 def test_data_api_create_eaf(client):
-    assert False
+    rv = client.post(
+        "/api/create-eaf", data = {
+            'file_id': file_id, 'eaf_file_name': eaf_file_name, 'eaf_file_path': eaf_file_path
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
 def test_data_api_update_analysis(client):
-    assert False
+    rv = client.post(
+        "/api/update-analysis", data ={
+            'analysis_file_path': analysis_file_path, 'analysis_id': analysis_id
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
 def test_data_api_create_image(client):
-    assert False
+    rv = client.post(
+        "/api/create-image", data = {
+            'user_id': email, 'image_name': image_name,'image_path': image_path
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
 def test_data_api_insert_image_analysis_ids(client):
-    assert False
+    rv = client.post(
+        "/api/create-image-analysis", data ={
+            'image_id': image_id, 'analysis_id': analysis_id
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 100 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_analyses_for_file(client):
-    assert False
+def test_data_api_delete_file(client):
+    rv = client.post(
+        "/api/delete-folder", data = {
+        'file_id': file_id
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_image_for_analysis(client):
-    assert False
+def test_data_api_delete_recording(client):
+    rv = client.post(
+        "/api/delete-recording", data = {
+        'user_id': email,'file_path': file_path,'file_type': file_type
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 2 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_all_images(client):
-    assert False
+def test_data_api_delete_file(client):
+    rv = client.post(
+        "/api/delete-folder", data = {
+        'file_id': file_id
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_analyses_for_image(client):
-    assert False
+def test_data_api_delete_eaf_file(client):
+    rv = client.post(
+        "/api/delete-eaf-file", data = {
+        'eaf_id': eaf_file_id
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 0 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_student_recordings(client):
-    assert False
+def test_data_api_delete_folder(client):
+    rv = client.post(
+        "/api/delete-folder", data = {
+        'file_id': file_id
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 0 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_get_admin(client):
-    assert False
+def test_data_api_delete_image(client):
+    rv = client.post(
+        "/api/delete-image", data = {
+        'image_id': image_id
+    })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1 }
+    assert result == json.loads(rv.data)
 
-@pytest.mark.skip
-def test_data_api_getOrCreateWords(client):
-    assert False
+def test_data_api_delete_previous_user_roles(client):
+    rv = client.post(
+        '/api/delete-previous-user-roles', data = {
+        'user_id': email, 'user_role': role
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1}
+    assert result == json.loads(rv.data)
+    
+def test_data_api_delete_previous_user_research_language(client):
+    rv = client.post(
+        '/api/delete-previous-user-research-language', data = {
+        'user_id': "student@uw.edu", 'language': research_language
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 1}
+    assert result == json.loads(rv.data)
 
+@pytest.mark.skip("Firebase integration")
+def test_data_api_delete_user(client):
+    rv = client.post(
+            "/api/delete-user",
+            {
+            'user_id': email
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "success"}
+    assert result == json.loads(rv.data)
 
