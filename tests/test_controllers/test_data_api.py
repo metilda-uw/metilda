@@ -194,7 +194,7 @@ def test_data_api_get_analyses_for_image(client):
         "/api/get-analyses-for-image/100")
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
-    result = {'result': [[100, 'test.json', 'student@uw.edu/Analyses/02-21-2020_09_12_36_test.json', 260, 'Fri, 21 Feb 2020 16:12:36 GMT', 'Fri, 21 Feb 20 16:12:36 GMT']]}
+    result = {'result': [[100, 'test.json', 'student@uw.edu/Analyses/02-21-2020_09_12_36_test.json', 260, 'Fri, 21 Feb 2020 16:12:36 GMT', 'Fri, 21 Feb 0020 16:12:36 GMT']]}
     assert result == json.loads(rv.data)
 
 def test_data_api_get_admin(client):

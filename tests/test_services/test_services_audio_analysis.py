@@ -4,17 +4,14 @@ import json
 import sys
 import os
 from pydub import AudioSegment
-from pydub.utils import mediainfo
+#from pydub.utils import mediainfo
 import pytest
 import parselmouth
 
 from tests.testing_utilities import assert_images_equal
 
-import metilda
-#from metilda import MIN_PITCH_HZ, MAX_PITCH_HZ
-#import metilda.services.audio_analysis as AA
-
-
+from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
+import metilda.services.audio_analysis as AA
 
 PITCH_SAMPLES = [(0.2843424036281179, 127.95736457135402), (0.2943424036281179, 127.08856224311243), (0.30434240362811793, 126.45033816064401), (0.3143424036281179, 127.44297906956773), (0.3243424036281179, 129.2763013628734), (0.3343424036281179, 130.96148788901297), (0.3443424036281179, 132.82131461292263), (0.3543424036281179, 134.99014414306697), (0.36434240362811793, 137.98019955276308), (0.37434240362811794, 142.1758080632193), (0.3843424036281179, 145.43306429813987), (0.3943424036281179, 148.35803584378925), (0.4043424036281179, 151.21010427627053), (0.4143424036281179, 153.4994389101892), (0.4243424036281179, 155.87847060109803), (0.43434240362811793, 156.65837394869223), (0.4443424036281179, 154.41039349600493), (0.4543424036281179, 158.17125940775696), (0.4643424036281179, 156.26568404689118), (0.4743424036281179, 154.35356174912368), (0.4843424036281179, 151.98210557808437), (0.49434240362811793, 148.88090258236042), (0.5043424036281179, 145.87584713228048), (0.5143424036281179, 143.01614095438254), (0.5243424036281179, 141.63223412373645), (0.5343424036281179, 140.17378860497985), (0.5443424036281179, 134.5307018839533), (0.5543424036281179, 130.77719134550597), (0.5643424036281179, 127.67983524027878), (0.574342403628118, 123.74106114254175), (0.584342403628118, 120.38731995982253), (0.594342403628118, 116.81817145888921), (0.6043424036281179, 112.3495525375976), (0.6143424036281179, 105.88861292944428), (0.6243424036281179, 107.14332700175117), (1.034342403628118, 115.38432386351262), (1.044342403628118, 114.67740398848444), (1.054342403628118, 112.70600324503464), (1.064342403628118, 110.36934190428823), (1.074342403628118, 108.64575148057386), (1.084342403628118, 107.23811690299539), (1.094342403628118, 106.31014617966069), (1.104342403628118, 105.16535083582035), (1.114342403628118, 104.11301475738809), (1.124342403628118, 102.50226292491696), (1.134342403628118, 100.96363325446175), (1.144342403628118, 100.18756857031505), (1.154342403628118, 99.46289874325504), (1.164342403628118, 98.91109106606957), (1.174342403628118, 98.5359312069565), (1.1843424036281178, 97.95376910792757), (1.1943424036281178, 97.00224496852351), (1.2043424036281178, 94.99064193916722), (1.2143424036281179, 93.00999592015249), (1.2243424036281179, 89.08883512211546), (1.2343424036281179, 88.91891635064414), (1.2443424036281179, 89.50897802501936), (1.2543424036281179, 88.84094214178428), (1.264342403628118, 88.60025464689761), (1.274342403628118, 88.41726432327481), (1.284342403628118, 88.14664443293734), (1.294342403628118, 88.28507348851446), (1.304342403628118, 87.93911468137502), (1.314342403628118, 86.81767689074233), (1.324342403628118, 85.44950767732819), (1.334342403628118, 85.58728751895372), (1.344342403628118, 87.17894651102065), (1.354342403628118, 85.26060883525562), (1.364342403628118, 85.54439480600163), (1.374342403628118, 86.40702879115862), (1.384342403628118, 86.15598706267649), (1.394342403628118, 84.83053616901111), (1.404342403628118, 83.33755899764037), (1.414342403628118, 82.28484921101294), (1.424342403628118, 90.42914235177568), (1.4343424036281178, 85.32710511218554)]
 
@@ -27,34 +24,29 @@ PITCH_SAMPLES = [(0.2843424036281179, 127.95736457135402), (0.2943424036281179, 
     #assert False
 
 def test_audio_analysis_image():
-    assert_images_equal("metilda/images-baseline/rs_kaanaisskiinaa-create.png", metilda.services.audio_analysis_image("metilda/sounds/RS_kaanaisskiinaa.wav"))
+    assert_images_equal("metilda/images-baseline/rs_kaanaisskiinaa-create.png", AA.audio_analysis_image("metilda/sounds/RS_kaanaisskiinaa.wav"))
 
 def test_get_pitches_in_range():
     snd = parselmouth.Sound("metilda/sounds/RS_kaanaisskiinaa.wav")
-    snd_pitch = snd.to_pitch(pitch_floor= metilda.MIN_PITCH_HZ, pitch_ceiling=metilda.MAX_PITCH_HZ)
+    snd_pitch = snd.to_pitch(pitch_floor= MIN_PITCH_HZ, pitch_ceiling=MAX_PITCH_HZ)
     t0, t1 = -1, 5
-    assert PITCH_SAMPLES == metilda.services.audio_analysis.get_pitches_in_range(t0, t1, snd_pitch)
+    assert PITCH_SAMPLES == AA.get_pitches_in_range(t0, t1, snd_pitch)
     
 def test_get_all_pitches():
-    assert PITCH_SAMPLES == metilda.services.audio_analysis.get_all_pitches((-1, 5), "metilda/sounds/RS_kaanaisskiinaa.wav")
+    assert PITCH_SAMPLES == AA.get_all_pitches((-1, 5), "metilda/sounds/RS_kaanaisskiinaa.wav")
 
 def test_get_avg_pitch():
-    assert 114.24665556222276 == metilda.services.audio_analysis.get_avg_pitch((0, 1.8586848072562359), "metilda/sounds/RS_kaanaisskiinaa.wav")
+    assert 114.24665556222276 == AA.get_avg_pitch((0, 1.8586848072562359), "metilda/sounds/RS_kaanaisskiinaa.wav")
 
 def test_get_sound_length():
-    assert 1.8586848072562359 == metilda.services.audio_analysis.get_sound_length("metilda/sounds/RS_kaanaisskiinaa.wav")
+    assert 1.8586848072562359 == AA.get_sound_length("metilda/sounds/RS_kaanaisskiinaa.wav")
 
 def test_get_audio():
-    #temp_dir = tempfile.mkdtemp()
-    #snd = parselmouth.Sound(get_audio("metilda/sounds/rs_kaanaisskiinaa.wav",0,1.8))
-    #Gets the section of the recording from tmin to tmax.
-    #If tmin and tmax are not included it gets the whole recording.
-
     temp_dir = tempfile.mkdtemp()
     temp_file = os.path.join(temp_dir, "audio.wav")
 
-    temp_sound = metilda.services.audio_analysis.get_audio("metilda/sounds/RS_kaanaisskiinaa.wav",0, 1.8589342403628117)
+    temp_sound = AA.get_audio("metilda/sounds/RS_kaanaisskiinaa.wav",0, 1.8589342403628117)
     assert AudioSegment.from_raw(temp_sound, sample_width=2, frame_rate=44100, channels=2).export(temp_file, format='wav')
     
-    temp_sound = metilda.services.audio_analysis.get_audio("metilda/sounds/RS_kaanaisskiinaa.wav",.25, 1)
+    temp_sound = AA.get_audio("metilda/sounds/RS_kaanaisskiinaa.wav",.25, 1)
     assert AudioSegment.from_raw(temp_sound, sample_width=2, frame_rate=44100, channels=2).export(temp_file, format='wav')
