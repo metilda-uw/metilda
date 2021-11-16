@@ -164,7 +164,7 @@ $ nvm use 8.12.0
 
 ```
 $ cd src
-$ python2 -m metilda.local_server
+$ python -m metilda.local_server
 ```
 
 ### Run frontend(In an additional terminal Window) 
