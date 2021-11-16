@@ -100,11 +100,11 @@ To initiate deployment:
 
 ## Build and Run on Ubuntu 20.04
 ### Install Prerequisite Packages
- 
+
 ```
 $ sudo apt-get update
 $ sudo apt-get install build-essential checkinstall virtualenv python-dev-is-python3 postgresql postgresql-contrib libpq-dev libfreetype6-dev libxft-dev ffmpeg
-
+```
 
 ### Install Praat - In order for the PELDA page to work the following steps need to be completed.  https://www.fon.hum.uva.nl/praat/download_linux.html
 
