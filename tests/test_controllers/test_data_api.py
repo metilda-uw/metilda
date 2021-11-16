@@ -1,6 +1,6 @@
 #https://github.com/walkermatt/python-postgres-testing-demo/tree/master/test
 
-from metilda import get_app
+import metilda
 from flask import jsonify
 import pytest
 import testing.postgresql
@@ -72,7 +72,7 @@ def slurp(path):
 
 @pytest.fixture
 def client():
-    app = get_app()
+    app = metilda.get_app()
     app.config['TESTING'] = True
 
     with app.test_client() as client:

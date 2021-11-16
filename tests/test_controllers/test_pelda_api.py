@@ -1,4 +1,4 @@
-from metilda import get_app
+import metilda
 from flask import jsonify
 from ..testing_utilities import assert_images_equal
 
@@ -11,12 +11,13 @@ import io
 #
 @pytest.fixture
 def client():
-    app = get_app()
+    app = metilda.get_app()
     app.config['TESTING'] = True
 
     with app.test_client() as client:
         yield client
 
+@pytest.mark.pelda
 def test_pelda_api_draw_sound(client):
     rv = client.get('/draw-sound/RS_kaanaisskiinaa.wav.png/image')
     image = io.BytesIO(rv.data)
@@ -24,6 +25,7 @@ def test_pelda_api_draw_sound(client):
     assert rv.content_type == "image/png"
     assert_images_equal("metilda/images-baseline/RS_kaanaisskiinaa.wav.0.0.1.85868480726.0.0.0.0.0-original.png", image)
 
+@pytest.mark.pelda
 def test_pelda_api_draw_sound_with_time(client):
     rv = client.get('/draw-sound/RS_kaanaisskiinaa.wav/0/1')
     image = io.BytesIO(rv.data)

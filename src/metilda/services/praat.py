@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 import subprocess
 from flask import Flask
 from flask_cors import CORS
@@ -16,7 +17,8 @@ def runScript(scriptName, args):
    #print "script is: " + str(praatExec)
    output = subprocess.check_output(praatExec);
    #print "output from praat.py is: " + str(output)
-   return output
+   #return output
+   return output.decode("utf-8")
 
 # Create flask app
 app = Flask(__name__, static_url_path="")

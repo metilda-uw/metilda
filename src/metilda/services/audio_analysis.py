@@ -4,6 +4,7 @@ based on examples from the parselmouth-praat library:
 https://github.com/YannickJadoul/Parselmouth
 """
 
+from __future__ import absolute_import
 import io
 import os
 import shutil
@@ -105,7 +106,7 @@ def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX
     if len(pitch_samples) == 0:
         return -1
     else:
-        pitches = zip(*pitch_samples)[1]
+        pitches = list(zip(*pitch_samples))[1]
         return sum(pitches) / len(pitches)
 
 

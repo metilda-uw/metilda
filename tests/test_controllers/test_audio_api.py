@@ -1,5 +1,6 @@
-from metilda import get_app
-from tests.testing_utilities import assert_images_equal
+#rom metilda import get_app
+import metilda
+import tests
 
 import tempfile 
 import os
@@ -11,20 +12,21 @@ import pytest
 # Test utility function in pitch_art_wizard
 # TODO: Move to audio_utilities module?
 #
-from metilda.controllers.pitch_art_wizard import allowed_file
+
+#from metilda.controllers.pitch_art_wizard import allowed_file
 
 def test_allowed_files_extensions():
-    assert allowed_file("test.wav") == True
-    assert allowed_file("test.mp3") == True
-    assert allowed_file("test.mpeg") == True
-    assert allowed_file("test.doc") == False
+    assert metilda.controllers.pitch_art_wizard.allowed_file("test.wav") == True
+    assert metilda.controllers.pitch_art_wizard.allowed_file("test.mp3") == True
+    assert metilda.controllers.pitch_art_wizard.allowed_file("test.mpeg") == True
+    assert metilda.controllers.pitch_art_wizard.allowed_file("test.doc") == False
 
 #
 # Test Audio API calls in pitch_art_wizard
 #
 @pytest.fixture
 def client():
-    app = get_app()
+    app = metilda.get_app()
     app.config['TESTING'] = True
 
     with app.test_client() as client:
@@ -41,7 +43,7 @@ def test_audio_analysis_image(client):
     image = io.BytesIO(rv.data)
     assert rv.status_code == 200
     assert rv.content_type == "image/png"
-    assert_images_equal("metilda/images-baseline/rs_kaanaisskiinaa-create.png", image)
+    tests.testing_utilities.assert_images_equal("metilda/images-baseline/rs_kaanaisskiinaa-create.png", image)
 
 def test_audio_upload(client):
     file_path = os.path.join(os.path.dirname(__file__),

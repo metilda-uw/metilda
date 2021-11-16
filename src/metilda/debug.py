@@ -10,6 +10,7 @@
 ################
 
 # Launcher for local, debug runs
+from __future__ import absolute_import
 from metilda import get_app
 
 

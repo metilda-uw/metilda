@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+from __future__ import print_function
 import psycopg2
 import os
 class Postgres(object):
@@ -11,11 +13,13 @@ class Postgres(object):
         print(DATABASE_URL)
         try:
             print('connecting to PostgreSQL database...')
-            self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
+            #TODO: Figure out how to dynamicall turn off SSL for testing
+            #self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
+            self.connection = psycopg2.connect(DATABASE_URL)
             self.cursor = self.connection.cursor()
 
         except Exception as error:
-            print('Error: connection not established {}'.format(error))
+            print(('Error: connection not established {}'.format(error)))
             self.connection = None
             self.cursor =  None
 
@@ -36,7 +40,7 @@ class Postgres(object):
         try:
             self.cursor.execute(query, record)
         except Exception as error:
-            print('error execting query "{}", error: {}'.format(query, error))
+            print(('error execting query "{}", error: {}'.format(query, error)))
             return None
         else:
             return self.cursor.rowcount
@@ -45,7 +49,7 @@ class Postgres(object):
         try:
             self.cursor.execute(query, record)
         except Exception as error:
-            print('error execting query "{}", error: {}'.format(query, error))
+            print(('error execting query "{}", error: {}'.format(query, error)))
             return None
         else:
             if need_last_row_id:
@@ -63,7 +67,7 @@ class Postgres(object):
             else:
                 self.cursor.execute(query)
         except Exception as error:
-            print('error execting query "{}", error: {}'.format(query, error))
+            print(('error execting query "{}", error: {}'.format(query, error)))
             return None
         else:
             return self.cursor.fetchall()
