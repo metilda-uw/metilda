@@ -1,7 +1,9 @@
 from __future__ import absolute_import
 from __future__ import print_function
+import metilda
 import psycopg2
 import os
+
 class Postgres(object):
     def __init__(self):
         self.connection = None
@@ -11,11 +13,16 @@ class Postgres(object):
       
         DATABASE_URL = os.environ['DATABASE_URL']
         print(DATABASE_URL)
+        
         try:
             print('connecting to PostgreSQL database...')
-            #TODO: Figure out how to dynamicall turn off SSL for testing
-            #self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
-            self.connection = psycopg2.connect(DATABASE_URL)
+
+            app = metilda.get_app()
+            if (app.config['TESTING']) == True:
+                self.connection = psycopg2.connect(DATABASE_URL)    
+            else:
+                self.connection = psycopg2.connect(DATABASE_URL, sslmode='require')
+
             self.cursor = self.connection.cursor()
 
         except Exception as error:
