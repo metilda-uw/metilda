@@ -5,9 +5,9 @@ from flask_cors import CORS
 
 # Locations of required files
 _images_dir = "images/"
-_scripts_dir = "metilda/scripts/"
+_scripts_dir = "src/metilda/scripts/"
 _sounds_dir = "sounds/"
-_eaf_dir = "metilda/eaf/"
+_eaf_dir = "src/metilda/eaf/"
 _linkElanPraat_dir = "combined/"
 
 # Run script 'scriptName' with the provided parameters
