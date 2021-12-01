@@ -3,10 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": "8.12.0"
+    "node": "12.22.7"
   },
   "dependencies": {
-    "@angular/core": "^2.4.3",
     "@babel/plugin-proposal-optional-chaining": "^7.9.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.17",
     "@fortawesome/free-solid-svg-icons": "^5.8.1",
@@ -63,16 +62,14 @@
     "react-ga": "^2.7.0",
     "react-html-parser": "^2.0.2",
     "react-https-redirect": "^1.1.0",
-    "react-input-checkbox": "^0.1.6",
     "react-konva": "^16.5.2",
     "react-media-player": "^0.7.5",
     "react-notifications": "^1.5.0-beta.0",
     "react-pie-menu": "^0.2.4",
     "react-redux": "^6.0.0",
     "react-router-dom": "^5.0.1",
-    "react-scripts": "^2.1.8",
+    "react-scripts": "^4.0.3",
     "react-select": "^3.0.8",
-    "react-test-renderer": "^16.8.5",
     "recompose": "^0.30.0",
     "recorder-js": "^1.0.7",
     "redux": "^4.0.1",
