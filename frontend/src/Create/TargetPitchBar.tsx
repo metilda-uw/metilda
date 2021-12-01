@@ -433,7 +433,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
             return;
         }
-        const isOk: boolean = confirm(
+        const isOk: boolean = window.confirm(
             "The current speaker will be reset.\n\n" +
             "Do you want to continue?"
         );

@@ -140,7 +140,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
   if ((this.state.tier1Value !== "") || (this.state.tier2Value !== "") ||
     (this.state.tier3Value !== "") || (this.state.tier4Value !== "") ||
     (this.state.tier5Value !== "") || (this.state.tier6Value !== "")) {
-    const isOk: boolean = confirm("The existing content of tiers will be lost. Are you sure you want to view eaf file data?");
+    const isOk: boolean = window.confirm("The existing content of tiers will be lost. Are you sure you want to view eaf file data?");
 
     if ( isOk ) {
     await this.setState({
@@ -886,7 +886,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     if ((this.state.tier1Value !== "") || (this.state.tier2Value !== "") ||
     (this.state.tier3Value !== "") || (this.state.tier4Value !== "") ||
     (this.state.tier5Value !== "") || (this.state.tier6Value !== "")) {
-    const isOk: boolean = confirm("The content of tiers will be lost. Are you sure you want to remove all tiers?");
+    const isOk: boolean = window.confirm("The content of tiers will be lost. Are you sure you want to remove all tiers?");
 
     if ( isOk ) {
       if (element !== null) {
@@ -922,7 +922,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
     } else {
-    const isOk: boolean = confirm("Are you sure you want to remove all tiers?");
+    const isOk: boolean = window.confirm("Are you sure you want to remove all tiers?");
 
     if ( isOk ) {
       if (element !== null) {
@@ -961,7 +961,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 1 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 1?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 1?");
 
     if ( isOk ) {
     const element = document.getElementById("tier1label");
@@ -981,7 +981,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 2 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 2?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 2?");
 
     if ( isOk ) {
     const element = document.getElementById("tier2label");
@@ -1001,7 +1001,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 3 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 3?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 3?");
 
     if ( isOk ) {
     const element = document.getElementById("tier3label");
@@ -1021,7 +1021,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 4 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 4?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 4?");
 
     if ( isOk ) {
     const element = document.getElementById("tier4label");
@@ -1041,7 +1041,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 5 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 5?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 5?");
 
     if ( isOk ) {
     const element = document.getElementById("tier5label");
@@ -1061,7 +1061,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     isTextboxEmpty = "Tier 6 content will be lost. ";
     }
 
-    const isOk: boolean = confirm(isTextboxEmpty + "Are you sure you want to remove Tier 6?");
+    const isOk: boolean = window.confirm(isTextboxEmpty + "Are you sure you want to remove Tier 6?");
 
     if ( isOk ) {
     const element = document.getElementById("tier6label");
@@ -1185,7 +1185,7 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
       }
     }
 
-    const isOk: boolean = confirm("The following are the annotation details: " + tiersValue + "\nDo you want to proceed to save an eaf file?");
+    const isOk: boolean = window.confirm("The following are the annotation details: " + tiersValue + "\nDo you want to proceed to save an eaf file?");
 
     if ( isOk ) {
       const eafFileName = prompt("Enter name for EAF: ", "testeaf.eaf");

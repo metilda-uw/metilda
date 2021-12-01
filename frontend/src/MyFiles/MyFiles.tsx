@@ -359,7 +359,7 @@ addSubfolder = async () => {
 }
 
 deleteFolder = async () => {
-    const isOk: boolean = confirm("The content of the folder will be deleted. Are you sure you want to delete folder?");
+    const isOk: boolean = window.confirm("The content of the folder will be deleted. Are you sure you want to delete folder?");
 
     if ( isOk ) {
         try {
