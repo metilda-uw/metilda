@@ -728,8 +728,10 @@ def drawSound(upload_id):
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-    #image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
-    image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
+    #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
