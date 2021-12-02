@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 # Locations of required files
 #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
-_images_dir = "images/"
+_images_dir = "src/metilda/images/"
 _scripts_dir = "src/metilda/scripts/"
 _sounds_dir = "sounds/"
 _eaf_dir = "src/metilda/eaf/"

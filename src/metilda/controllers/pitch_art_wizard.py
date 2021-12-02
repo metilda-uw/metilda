@@ -701,11 +701,11 @@ def getOrCreateWords():
 #PELDA 
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):
-    print("Current Working Directoy: " + os.getcwd())
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
 
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
+    print("getBounds run: " + output)
     res = output.split()  # Split output into an array
 
     # Get last modified time of the sound file
@@ -733,14 +733,16 @@ def drawSound(upload_id):
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
-    print("Draw Sound without time:" + image)
+    print("Draw Sound without time:" + os.getcwd() + "***" + image)
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
     # If image does not exist, run script
     if not os.path.isfile(image):
+        print("Draw Spectrogram: " + image)
         praat.runScript(script, params)
+        print("Resize Image: " + image)
         utils.resizeImage(image)
 
     # Image should be available now, generated or cached
@@ -752,7 +754,6 @@ def drawSound(upload_id):
 
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
 def drawSoundWithTime(sound, startTime, endTime):
-    print("Current Working Directoy: " + os.getcwd())
     # Get URL parameters
     showSpectrogram = '0' if request.args.get("spectrogram") is None else '1'
     showPitch = '0' if request.args.get("pitch") is None else '1'
