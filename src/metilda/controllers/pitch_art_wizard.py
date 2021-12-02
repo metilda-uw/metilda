@@ -732,7 +732,7 @@ def drawSound(upload_id):
     #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = praat._images_dir + ".".join(params[:-2]) + ".png"
     print("Draw Sound without time:" + image)
 
     # Add image name to params list
@@ -771,7 +771,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     # Image name will be a combination of relevant params joined by a period.
     #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = praat._images_dir + ".".join(params[:-2]) + ".png"
     print("Draw sound with time: " + image)
 
     # Add image name to params list
