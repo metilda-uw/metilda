@@ -730,6 +730,7 @@ def drawSound(upload_id):
     # Image name will be a combination of relevant params joined by a period.
     #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    print("Current Working Directoy: " + os.getcwd())
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
     
 
@@ -770,6 +771,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
     #image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    print("Current Working Directoy: " + os.getcwd())
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
 
 
