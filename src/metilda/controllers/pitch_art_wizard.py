@@ -788,7 +788,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     #resp.content_type = "image/png"
     #os.remove(image)
     #return resp
-    return send_file("../" + image, mimetype='image/png')
+    return send_file(image, mimetype='image/png')
 
 @app.route('/get-bounds/<sound>', methods=["GET"])
 def getBounds(sound):
