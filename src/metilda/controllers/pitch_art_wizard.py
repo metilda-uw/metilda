@@ -733,11 +733,7 @@ def drawSound(upload_id):
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
     image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
-<<<<<<< HEAD
     print("Draw Sound without time:" + image)
-=======
-    print("Draw Sound without time:" image)
->>>>>>> daefa97dec077c8161108a69b7e5bb472071b9ae
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")

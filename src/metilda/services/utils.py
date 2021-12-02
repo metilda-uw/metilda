@@ -18,11 +18,7 @@ def isSound(fileName):
 def resizeImage(image):
    """ Down-scaling the image to 500x500 pixels """
    print("Current Working Directoy: " + os.getcwd())
-<<<<<<< HEAD
    print("Draw Sound without time:" + image)
-=======
-   print("Draw Sound without time:" image)
->>>>>>> daefa97dec077c8161108a69b7e5bb472071b9ae
    img = Image.open(image)
    img.thumbnail((500,500), Image.ANTIALIAS)
    img.save(image, "PNG", quality=88)
