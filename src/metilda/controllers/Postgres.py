@@ -10,14 +10,13 @@ class Postgres(object):
         self.cursor = None
     
     def __enter__(self):
-      
+        app = metilda.get_app()
         DATABASE_URL = os.environ['DATABASE_URL']
-        print(DATABASE_URL)
-        
+        print("Testing: " + str(app.config['TESTING']) + "\n Database URL: " + DATABASE_URL)
+
         try:
             print('connecting to PostgreSQL database...')
 
-            app = metilda.get_app()
             if (app.config['TESTING']) == True:
                 self.connection = psycopg2.connect(DATABASE_URL)    
             else:
