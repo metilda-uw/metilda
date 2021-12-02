@@ -705,7 +705,6 @@ def drawSound(upload_id):
 
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
-    print("getBounds run: " + output)
     res = output.split()  # Split output into an array
 
     # Get last modified time of the sound file
@@ -729,29 +728,21 @@ def drawSound(upload_id):
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-    #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
-    #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
 
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
-    print("Draw Sound without time:" + os.getcwd() + "***" + image)
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
     # If image does not exist, run script
     if not os.path.isfile(image):
-        print("Draw Spectrogram: " + image)
         praat.runScript(script, params)
-        print("Resize Image: " + image)
         utils.resizeImage(image)
 
     # Image should be available now, generated or cached
-    #resp = app.make_response(open(image).read())
-    #resp.content_type = "image/png"
-    #os.remove(image)
-    #return resp
+    #os.remove(image) // Should these images be removed at some point or left in Cache?
     #return send_file("../" + image, mimetype='image/png')
-    return send_file(image, mimetype='image/png')
+    return send_file("../../" + image, mimetype='image/png')
     
 
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
@@ -775,7 +766,6 @@ def drawSoundWithTime(sound, startTime, endTime):
     #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
     #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
-    print("Draw sound with time: " + image)
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
