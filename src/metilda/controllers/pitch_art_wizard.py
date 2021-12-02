@@ -750,7 +750,9 @@ def drawSound(upload_id):
     #resp.content_type = "image/png"
     #os.remove(image)
     #return resp
-    return send_file("../" + image, mimetype='image/png')
+    #return send_file("../" + image, mimetype='image/png')
+    return send_file(image, mimetype='image/png')
+    
 
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
 def drawSoundWithTime(sound, startTime, endTime):
