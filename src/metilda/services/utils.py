@@ -17,7 +17,6 @@ def isSound(fileName):
 
 def resizeImage(image):
    """ Down-scaling the image to 500x500 pixels """
-   print("Resize Image: " + os.getcwd() + "*" + image)
    img = Image.open(image)
    img.thumbnail((500,500), Image.ANTIALIAS)
    img.save(image, "PNG", quality=88)
