@@ -735,9 +735,9 @@ def drawSound(upload_id):
 
     # If image does not exist, run script
     app.logger.info("Draw Image without time: " + image)
-    if not os.path.isfile("metilda/" + image):
+    if not os.path.isfile("src/metilda/" + image):
         praat.runScript(script, params)
-        utils.resizeImage("metilda/" + image)
+        utils.resizeImage("src/metilda/" + image)
 
     # Image should be available now, generated or cached
     #os.remove(image) // Should these images be removed at some point or left in Cache?
@@ -761,8 +761,6 @@ def drawSoundWithTime(sound, startTime, endTime):
              praat._sounds_dir, praat._images_dir];
 
     # Image name will be a combination of relevant params joined by a period.
-    #TODO: This path needs to change based on whether you are working locally or deploying to Heroku
-    #Local: image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
 
     # Add image name to params list
@@ -770,9 +768,9 @@ def drawSoundWithTime(sound, startTime, endTime):
 
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image)
-    if not os.path.isfile("metilda/" + image):
+    if not os.path.isfile("src/metilda/" + image):
         praat.runScript(script, params)
-        utils.resizeImage("metilda/" + image)
+        utils.resizeImage("src/metilda/" + image)
 
     # Image should be available now, generated or cached
     #os.remove(image)
