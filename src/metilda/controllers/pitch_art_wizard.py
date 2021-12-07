@@ -1,7 +1,5 @@
-from __future__ import with_statement
-from __future__ import absolute_import
-from __future__ import print_function
 import os
+from os import environ
 import shutil
 import tempfile
 import flask
@@ -733,11 +731,16 @@ def drawSound(upload_id):
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
+    if environ.get('FLASK_ENV') == "development":
+        image_path = ("metilda/" + image)
+    else:
+        image_path = ("src/metilda/" + image)
+
     # If image does not exist, run script
-    app.logger.info("Draw Image without time: " + image)
-    if not os.path.isfile("src/metilda/" + image):
+    app.logger.info("Draw Image with time: " + image_path)
+    if not os.path.isfile(image_path):
         praat.runScript(script, params)
-        utils.resizeImage("src/metilda/" + image)
+        utils.resizeImage(image_path)
 
     # Image should be available now, generated or cached
     #os.remove(image) // Should these images be removed at some point or left in Cache?
@@ -766,11 +769,16 @@ def drawSoundWithTime(sound, startTime, endTime):
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
+    if environ.get('FLASK_ENV') == "development":
+        image_path = ("metilda/" + image)
+    else:
+        image_path = ("src/metilda/" + image)
+        
     # If image does not exist, run script
-    app.logger.info("Draw Image with time: " + image)
-    if not os.path.isfile("src/metilda/" + image):
+    app.logger.info("Draw Image with time: " + image_path)
+    if not os.path.isfile(image_path):
         praat.runScript(script, params)
-        utils.resizeImage("src/metilda/" + image)
+        utils.resizeImage(image_path)
 
     # Image should be available now, generated or cached
     #os.remove(image)
