@@ -702,7 +702,7 @@ def getOrCreateWords():
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-
+    
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
     res = output.split()  # Split output into an array
@@ -728,23 +728,21 @@ def drawSound(upload_id):
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-
     image = praat._images_dir + ".".join(params[:-2]) + ".png"
-
+    
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
     # If image does not exist, run script
-    if not os.path.isfile(image):
+    app.logger.info("Draw Image without time: " + image)
+    if not os.path.isfile("metilda/" + image):
         praat.runScript(script, params)
-        utils.resizeImage(image)
+        utils.resizeImage("metilda/" + image)
 
     # Image should be available now, generated or cached
     #os.remove(image) // Should these images be removed at some point or left in Cache?
-    #return send_file("../" + image, mimetype='image/png')
-    return send_file("../../" + image, mimetype='image/png')
+    return send_file(image, mimetype='image/png')
     
-
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
 def drawSoundWithTime(sound, startTime, endTime):
     # Get URL parameters
@@ -771,15 +769,13 @@ def drawSoundWithTime(sound, startTime, endTime):
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
     # If image does not exist, run script
-    if not os.path.isfile(image):
-       praat.runScript(script, params)
-       utils.resizeImage(image)
+    app.logger.info("Draw Image with time: " + image)
+    if not os.path.isfile("metilda/" + image):
+        praat.runScript(script, params)
+        utils.resizeImage("metilda/" + image)
 
     # Image should be available now, generated or cached
-    #resp = app.make_response(open(image).read())
-    #resp.content_type = "image/png"
     #os.remove(image)
-    #return resp
     return send_file(image, mimetype='image/png')
 
 @app.route('/get-bounds/<sound>', methods=["GET"])
