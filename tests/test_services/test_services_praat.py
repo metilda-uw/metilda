@@ -1,3 +1,4 @@
+from metilda import app
 import pytest
 import numpy as np
 from PIL import Image
@@ -33,14 +34,14 @@ def test_praat_run_script_draw_spectogram():
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-    image = 'metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = praat._images_dir + ".".join(params[:-2]) + ".png"
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
     praat.runScript(script, params)
 
-    assert_images_equal("metilda/images-baseline/RS_kaanaisskiinaa.wav.0.0.1.85868480726.1.1.1.1.1-original.png", image)
+    assert_images_equal("metilda/images-baseline/RS_kaanaisskiinaa.wav.0.0.1.85868480726.1.1.1.1.1-original.png", "metilda/" + image)
 
 def test_praat_run_script_get_energy():
     script = praat._scripts_dir + "getEnergy"
