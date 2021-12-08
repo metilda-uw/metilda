@@ -3,6 +3,7 @@
     "node": "12.22.7"
   },
   "scripts": {
-    "heroku-prebuild": "cd frontend && npm ci && npm run build --verbose"
+    "heroku-prebuild": "cd frontend && npm ci && npm run build --verbose",
+    "heroku-postbuild": "webpack --config webpack.config.prod.js"
   }
 }
