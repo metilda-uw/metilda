@@ -4,6 +4,6 @@
   },
   "scripts": {
     "heroku-prebuild": "cd frontend && npm ci && npm run build --verbose",
-    "heroku-postbuild": "./node_modules/webpack/bin/webpack.js --config webpack.config.prod.js"
+    "heroku-postbuild": "webpack -p --config ./webpack.config.prod.js --progress"
   }
 }
