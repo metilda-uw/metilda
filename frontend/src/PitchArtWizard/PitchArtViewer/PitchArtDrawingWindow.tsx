@@ -344,6 +344,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
             if (note.index !== -1) {
                 synth.triggerAttackRelease(note.pitch, note.duration, time);
             }
+        // @ts-ignore
         }, notes).start();
 
         Tone.Transport.start();
