@@ -80,7 +80,7 @@
     "tone": "^13.4.9",
     "tslint": "^5.14.0",
     "typescript": "^3.3.4000",
-    "xlsx": "^0.15.4"
+    "xlsx": "^0.17.4"
   },
   "scripts": {
     "build-css": "node-sass --include-path ./src --include-path ./node_modules src/ -o src/",
