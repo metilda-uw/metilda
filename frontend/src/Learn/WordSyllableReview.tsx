@@ -300,7 +300,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
     }
     renderPreviousRecordings = () => {
         return this.state.previousRecordings.map((recording, index) => {
-            const recordingName = recording.itemRef.location.path.split("_");
+            const recordingName = recording.itemRef.fullPath.split("_");
             return(
                 <Media key={index}>
                 <div className="media">
