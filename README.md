@@ -14,7 +14,7 @@ Audio analysis web app.
 ## Supported Platforms
 Ubuntu Linux 20.04
 
-## Build and Run
+## Quickstart - Build and Run
 ### Python
 1) Install a Python interpreter (the version is specified in runtime.txt, it is currently 3.8.10). 
    <a href="https://help.dreamhost.com/hc/en-us/articles/115000218612-Installing-a-custom-version-of-Python-2"> Installation Instructions </a> 
@@ -91,11 +91,11 @@ deployment:
 
 To initiate deployment: 
 1) Run `./bin/push.sh` to deploy to Heroku
-1) Wait for tests to pass in Travis CI and then check the appropriate web app environment in Heroku. 
-
 
 ## Development Environment
-### Build and Run on Ubuntu 20.04
+```
+Build and Run on Ubuntu 20.04
+```
 ### Install Prerequisite Packages
 
 ```
@@ -125,7 +125,7 @@ $ cd metilda
 $ source bin/activate
 ```
 
-### Alternative Option: Create a virtual environment via PyCharm & Follow PyCharm IDE Configuration steps
+#### *An alternative Option: Create a virtual environment via PyCharm & Follow PyCharm IDE Configuration steps
 https://www.jetbrains.com/help/pycharm/creating-virtual-environment.html
 
 ### Verify that Python and Pip are installed correctly
@@ -135,7 +135,7 @@ $ python -V
 $ pip -V
 ```
 
-### Install requirements.txt
+### Install Python packages using requirements.txt
 
 ```
 $ pip install -r requirements.txt
@@ -157,21 +157,22 @@ $ nvm install 14.18.2
 $ nvm use 14.18.2
 ```
 
-### Run backend (After activating the virtual environment)
-
-```
-$ cd src
-$ python -m metilda.local_server
-```
-
-### Install NPM Packages 
+### Install NPM packages (run this one time at setup)
 
 ```
 $ cd frontend
 $ npm install
 ```
 
-### Run frontend(In an additional terminal Window) 
+## In two separate terminals run backend and frontend
+### Run backend (after activating virtual environment)
+
+```
+$ cd src
+$ python -m metilda.local_server
+```
+
+### Run frontend (In a second terminal window) 
 
 ```
 $ cd frontend
