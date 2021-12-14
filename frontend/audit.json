@@ -1,0 +1,2549 @@
+{
+  "actions": [
+    {
+      "isMajor": true,
+      "action": "install",
+      "resolves": [
+        {
+          "id": 1004946,
+          "path": "@types/jest>jest-diff>pretty-format>ansi-regex",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "@types/jest",
+      "target": "27.0.3"
+    },
+    {
+      "isMajor": true,
+      "action": "install",
+      "resolves": [
+        {
+          "id": 1005040,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005043,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005046,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005077,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005081,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005182,
+          "path": "firebase>@firebase/util",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005182,
+          "path": "firebase>@firebase/app>@firebase/util",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005182,
+          "path": "firebase>@firebase/performance>@firebase/installations>@firebase/util",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005560,
+          "path": "firebase>@firebase/functions>isomorphic-fetch>node-fetch",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "firebase",
+      "target": "9.5.0"
+    },
+    {
+      "isMajor": true,
+      "action": "install",
+      "resolves": [
+        {
+          "id": 1005040,
+          "path": "node-sass>node-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005043,
+          "path": "node-sass>node-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005046,
+          "path": "node-sass>node-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005078,
+          "path": "node-sass>node-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005082,
+          "path": "node-sass>node-gyp>tar",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005151,
+          "path": "node-sass>meow>trim-newlines",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "node-sass",
+      "target": "6.0.1"
+    },
+    {
+      "isMajor": false,
+      "action": "install",
+      "resolves": [
+        {
+          "id": 1005101,
+          "path": "xlsx",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005102,
+          "path": "xlsx",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005103,
+          "path": "xlsx",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "xlsx",
+      "target": "0.17.4"
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1004967,
+          "path": "enzyme>cheerio>css-select>nth-check",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "cheerio",
+      "target": "1.0.0-rc.10",
+      "depth": 2
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005018,
+          "path": "axios",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "axios",
+      "target": "0.21.4",
+      "depth": 1
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005072,
+          "path": "tslint>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>@babel/core>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "node-sass>meow>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>@svgr/webpack>@svgr/plugin-jsx>@babel/core>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "node-sass>meow>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "node-sass>sass-graph>yargs>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest-circus>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest>jest-cli>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005072,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "path-parse",
+      "target": "1.0.7",
+      "depth": 14
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005092,
+          "path": "node-sass>sass-graph>yargs>yargs-parser",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "yargs-parser",
+      "target": "5.0.1",
+      "depth": 4
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005210,
+          "path": "node-sass>meow>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "node-sass>meow>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "node-sass>sass-graph>yargs>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest-circus>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest>jest-cli>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005210,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "hosted-git-info",
+      "target": "2.8.9",
+      "depth": 13
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005265,
+          "path": "recompose>fbjs>ua-parser-js",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005406,
+          "path": "recompose>fbjs>ua-parser-js",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "ua-parser-js",
+      "target": "0.7.31",
+      "depth": 3
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005365,
+          "path": "node-sass>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "enzyme>cheerio>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "node-sass>gaze>globule>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "styled-components>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>@svgr/webpack>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>workbox-webpack-plugin>workbox-build>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/helper-function-name>@babel/helper-get-function-arity>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005365,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>babel-preset-jest>babel-plugin-jest-hoist>@types/babel__core>@types/babel__generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "node-sass>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "enzyme>cheerio>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "node-sass>gaze>globule>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "styled-components>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>@svgr/webpack>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>workbox-webpack-plugin>workbox-build>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/helper-function-name>@babel/helper-get-function-arity>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006094,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>babel-preset-jest>babel-plugin-jest-hoist>@types/babel__core>@types/babel__generator>@babel/types>lodash",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "lodash",
+      "target": "4.17.21",
+      "depth": 14
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005432,
+          "path": "node-sass>sass-graph>yargs>y18n",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005432,
+          "path": "firebase>@firebase/firestore>grpc>protobufjs>yargs>y18n",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "y18n",
+      "target": "3.2.2",
+      "depth": 6
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005523,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>rc>ini",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "ini",
+      "target": "1.3.8",
+      "depth": 6
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1005671,
+          "path": "node-sass",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "node-sass",
+      "target": "4.14.1",
+      "depth": 1
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1006147,
+          "path": "firebase>@firebase/database>faye-websocket>websocket-driver>websocket-extensions",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006147,
+          "path": "react-scripts>webpack-dev-server>sockjs>faye-websocket>websocket-driver>websocket-extensions",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "websocket-extensions",
+      "target": "0.1.4",
+      "depth": 6
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1006168,
+          "path": "jquery",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006169,
+          "path": "jquery",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "jquery",
+      "target": "3.6.0",
+      "depth": 1
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1006179,
+          "path": "coveralls>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "node-sass>meow>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>eslint-plugin-import>tsconfig-paths>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>babel-loader>loader-utils>json5>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>@jest/core>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>@jest/core>@jest/reporters>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>@jest/core>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006179,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>rc>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "minimist",
+      "target": "1.2.5",
+      "depth": 13
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1006180,
+          "path": "firebase>@firebase/firestore>grpc>node-pre-gyp>tar>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "node-sass>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "node-sass>node-gyp>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "node-sass>node-gyp>fstream>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "node-sass>node-gyp>tar>fstream>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "react-scripts>webpack>terser-webpack-plugin>cacache>move-concurrently>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "mkdirp",
+      "target": "0.5.5",
+      "depth": 6
+    },
+    {
+      "action": "update",
+      "resolves": [
+        {
+          "id": 1006724,
+          "path": "coveralls>request>http-signature>jsprim>json-schema",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006724,
+          "path": "node-sass>node-gyp>request>http-signature>jsprim>json-schema",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ],
+      "module": "jsprim",
+      "target": "1.4.2",
+      "depth": 5
+    },
+    {
+      "action": "review",
+      "module": "ansi-regex",
+      "resolves": [
+        {
+          "id": 1004946,
+          "path": "react-scripts>webpack-dev-server>yargs>string-width>strip-ansi>ansi-regex",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1004946,
+          "path": "react-scripts>webpack-dev-server>yargs>cliui>string-width>strip-ansi>ansi-regex",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1004946,
+          "path": "react-scripts>webpack-dev-server>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "nth-check",
+      "resolves": [
+        {
+          "id": 1004967,
+          "path": "react-scripts>@svgr/webpack>@svgr/plugin-svgo>svgo>css-select>nth-check",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1004967,
+          "path": "react-scripts>optimize-css-assets-webpack-plugin>cssnano>cssnano-preset-default>postcss-svgo>svgo>css-select>nth-check",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "materialize-css",
+      "resolves": [
+        {
+          "id": 1004974,
+          "path": "materialize-css",
+          "dev": false,
+          "bundled": false,
+          "optional": false
+        },
+        {
+          "id": 1005685,
+          "path": "materialize-css",
+          "dev": false,
+          "bundled": false,
+          "optional": false
+        },
+        {
+          "id": 1005686,
+          "path": "materialize-css",
+          "dev": false,
+          "bundled": false,
+          "optional": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "immer",
+      "resolves": [
+        {
+          "id": 1005024,
+          "path": "react-scripts>react-dev-utils>immer",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1005029,
+          "path": "react-scripts>react-dev-utils>immer",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "ansi-html",
+      "resolves": [
+        {
+          "id": 1005059,
+          "path": "react-scripts>@pmmmwh/react-refresh-webpack-plugin>ansi-html",
+          "dev": false,
+          "bundled": false,
+          "optional": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "jszip",
+      "resolves": [
+        {
+          "id": 1005083,
+          "path": "react-data-export>tempa-xlsx>jszip",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "glob-parent",
+      "resolves": [
+        {
+          "id": 1005154,
+          "path": "react-scripts>webpack>watchpack>watchpack-chokidar2>chokidar>glob-parent",
+          "dev": false,
+          "optional": true,
+          "bundled": false
+        },
+        {
+          "id": 1005154,
+          "path": "react-scripts>webpack-dev-server>chokidar>glob-parent",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "browserslist",
+      "resolves": [
+        {
+          "id": 1005174,
+          "path": "react-scripts>react-dev-utils>browserslist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "grpc",
+      "resolves": [
+        {
+          "id": 1005305,
+          "path": "firebase>@firebase/firestore>grpc",
+          "dev": false,
+          "bundled": false,
+          "optional": false
+        }
+      ]
+    },
+    {
+      "action": "review",
+      "module": "minimist",
+      "resolves": [
+        {
+          "id": 1006179,
+          "path": "react-scripts>babel-jest>@jest/transform>jest-haste-map>sane>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        },
+        {
+          "id": 1006180,
+          "path": "react-scripts>optimize-css-assets-webpack-plugin>cssnano>cssnano-preset-default>postcss-svgo>svgo>mkdirp>minimist",
+          "dev": false,
+          "optional": false,
+          "bundled": false
+        }
+      ]
+    }
+  ],
+  "advisories": {
+    "1004946": {
+      "findings": [
+        {
+          "version": "4.1.0",
+          "paths": [
+            "@types/jest>jest-diff>pretty-format>ansi-regex",
+            "react-scripts>webpack-dev-server>yargs>string-width>strip-ansi>ansi-regex",
+            "react-scripts>webpack-dev-server>yargs>cliui>string-width>strip-ansi>ansi-regex",
+            "react-scripts>webpack-dev-server>yargs>cliui>wrap-ansi>string-width>strip-ansi>ansi-regex"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">2.1.1 <5.0.1",
+      "module_name": "ansi-regex",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-93q8-gq69-wqmw",
+      "cves": [
+        "CVE-2021-3807"
+      ],
+      "access": "public",
+      "patched_versions": ">=5.0.1",
+      "updated": "2021-09-23T15:45:50.000Z",
+      "recommendation": "Upgrade to version 5.0.1 or later",
+      "cwe": "CWE-918",
+      "found_by": null,
+      "deleted": null,
+      "id": 1004946,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-3807\n- https://github.com/chalk/ansi-regex/commit/8d1d7cdb586269882c4bdc1b7325d0c58c8f76f9\n- https://huntr.dev/bounties/5b3cf33b-ede0-4398-9974-800876dfd994\n- https://github.com/chalk/ansi-regex/issues/38#issuecomment-924086311\n- https://app.snyk.io/vuln/SNYK-JS-ANSIREGEX-1583908\n- https://github.com/chalk/ansi-regex/issues/38#issuecomment-925924774\n- https://github.com/advisories/GHSA-93q8-gq69-wqmw",
+      "created": "2021-11-18T16:00:48.472Z",
+      "reported_by": null,
+      "title": " Inefficient Regular Expression Complexity in chalk/ansi-regex",
+      "npm_advisory_id": null,
+      "overview": "ansi-regex is vulnerable to Inefficient Regular Expression Complexity",
+      "url": "https://github.com/advisories/GHSA-93q8-gq69-wqmw"
+    },
+    "1004967": {
+      "findings": [
+        {
+          "version": "1.0.2",
+          "paths": [
+            "enzyme>cheerio>css-select>nth-check",
+            "react-scripts>@svgr/webpack>@svgr/plugin-svgo>svgo>css-select>nth-check",
+            "react-scripts>optimize-css-assets-webpack-plugin>cssnano>cssnano-preset-default>postcss-svgo>svgo>css-select>nth-check"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<2.0.1",
+      "module_name": "nth-check",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-rp65-9cf3-cjxr",
+      "cves": [
+        "CVE-2021-3803"
+      ],
+      "access": "public",
+      "patched_versions": ">=2.0.1",
+      "updated": "2021-09-20T20:15:09.000Z",
+      "recommendation": "Upgrade to version 2.0.1 or later",
+      "cwe": "CWE-1333",
+      "found_by": null,
+      "deleted": null,
+      "id": 1004967,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-3803\n- https://github.com/fb55/nth-check/commit/9894c1d2010870c351f66c6f6efcf656e26bb726\n- https://huntr.dev/bounties/8cf8cc06-d2cf-4b4e-b42c-99fafb0b04d0\n- https://github.com/advisories/GHSA-rp65-9cf3-cjxr",
+      "created": "2021-11-18T16:00:48.476Z",
+      "reported_by": null,
+      "title": "Inefficient Regular Expression Complexity in nth-check",
+      "npm_advisory_id": null,
+      "overview": "nth-check is vulnerable to Inefficient Regular Expression Complexity",
+      "url": "https://github.com/advisories/GHSA-rp65-9cf3-cjxr"
+    },
+    "1004974": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "materialize-css"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=1.0.0",
+      "module_name": "materialize-css",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-rg3q-jxmp-pvjj",
+      "cves": [
+        "CVE-2019-11004"
+      ],
+      "access": "public",
+      "patched_versions": "<0.0.0",
+      "updated": "2021-09-17T17:47:07.000Z",
+      "recommendation": "None",
+      "cwe": "CWE-79",
+      "found_by": null,
+      "deleted": null,
+      "id": 1004974,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2019-11004\n- https://github.com/Dogfalo/materialize/issues/6286\n- https://github.com/advisories/GHSA-rg3q-jxmp-pvjj",
+      "created": "2021-11-18T16:00:48.480Z",
+      "reported_by": null,
+      "title": "Low severity vulnerability that affects materialize-css",
+      "npm_advisory_id": null,
+      "overview": "In Materialize through 1.0.0, XSS is possible via the Toast feature.",
+      "url": "https://github.com/advisories/GHSA-rg3q-jxmp-pvjj"
+    },
+    "1005018": {
+      "findings": [
+        {
+          "version": "0.21.1",
+          "paths": [
+            "axios"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=0.21.1",
+      "module_name": "axios",
+      "severity": "high",
+      "github_advisory_id": "GHSA-cph5-m8f7-6c5x",
+      "cves": [
+        "CVE-2021-3749"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.21.2",
+      "updated": "2021-09-08T16:46:47.000Z",
+      "recommendation": "Upgrade to version 0.21.2 or later",
+      "cwe": "CWE-697",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005018,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-3749\n- https://github.com/axios/axios/commit/5b457116e31db0e88fede6c428e969e87f290929\n- https://huntr.dev/bounties/1e8f07fc-c384-4ff9-8498-0690de2e8c31\n- https://www.npmjs.com/package/axios\n- https://lists.apache.org/thread.html/r075d464dce95cd13c03ff9384658edcccd5ab2983b82bfc72b62bb10@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/r216f0fd0a3833856d6a6a1fada488cadba45f447d87010024328ccf2@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/r3ae6d2654f92c5851bdb73b35e96b0e4e3da39f28ac7a1b15ae3aab8@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/r4bf1b32983f50be00f9752214c1b53738b621be1c2b0dbd68c7f2391@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/r7324ecc35b8027a51cb6ed629490fcd3b2d7cf01c424746ed5744bf1@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/r74d0b359408fff31f87445261f0ee13bdfcac7d66f6b8e846face321@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/ra15d63c54dc6474b29f72ae4324bcb03038758545b3ab800845de7a1@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/rc263bfc5b53afcb7e849605478d73f5556eb0c00d1f912084e407289@%3Ccommits.druid.apache.org%3E\n- https://lists.apache.org/thread.html/rfa094029c959da0f7c8cd7dc9c4e59d21b03457bf0cedf6c93e1bb0a@%3Cdev.druid.apache.org%3E\n- https://lists.apache.org/thread.html/rfc5c478053ff808671aef170f3d9fc9d05cc1fab8fb64431edc66103@%3Ccommits.druid.apache.org%3E\n- https://github.com/advisories/GHSA-cph5-m8f7-6c5x",
+      "created": "2021-11-18T16:00:48.489Z",
+      "reported_by": null,
+      "title": "Incorrect Comparison in axios",
+      "npm_advisory_id": null,
+      "overview": "axios is vulnerable to Inefficient Regular Expression Complexity",
+      "url": "https://github.com/advisories/GHSA-cph5-m8f7-6c5x"
+    },
+    "1005024": {
+      "findings": [
+        {
+          "version": "8.0.1",
+          "paths": [
+            "react-scripts>react-dev-utils>immer"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<9.0.6",
+      "module_name": "immer",
+      "severity": "high",
+      "github_advisory_id": "GHSA-c36v-fmgq-m8hx",
+      "cves": [
+        "CVE-2021-3757"
+      ],
+      "access": "public",
+      "patched_versions": ">=9.0.6",
+      "updated": "2021-09-03T20:17:22.000Z",
+      "recommendation": "Upgrade to version 9.0.6 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005024,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-3757\n- https://github.com/immerjs/immer/commit/fa671e55ee9bd42ae08cc239102b665a23958237\n- https://huntr.dev/bounties/23d38099-71cd-42ed-a77a-71e68094adfa\n- https://github.com/advisories/GHSA-c36v-fmgq-m8hx",
+      "created": "2021-11-18T16:00:48.490Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in immer",
+      "npm_advisory_id": null,
+      "overview": "immer is vulnerable to Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')",
+      "url": "https://github.com/advisories/GHSA-c36v-fmgq-m8hx"
+    },
+    "1005029": {
+      "findings": [
+        {
+          "version": "8.0.1",
+          "paths": [
+            "react-scripts>react-dev-utils>immer"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<9.0.6",
+      "module_name": "immer",
+      "severity": "critical",
+      "github_advisory_id": "GHSA-33f9-j839-rf8h",
+      "cves": [
+        "CVE-2021-23436"
+      ],
+      "access": "public",
+      "patched_versions": ">=9.0.6",
+      "updated": "2021-09-02T16:57:32.000Z",
+      "recommendation": "Upgrade to version 9.0.6 or later",
+      "cwe": "CWE-843",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005029,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23436\n- https://github.com/immerjs/immer/commit/fa671e55ee9bd42ae08cc239102b665a23958237\n- https://snyk.io/vuln/SNYK-JS-IMMER-1540542\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1579266\n- https://github.com/advisories/GHSA-33f9-j839-rf8h",
+      "created": "2021-11-18T16:00:48.491Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in immer",
+      "npm_advisory_id": null,
+      "overview": "This affects the package immer before 9.0.6. A type confusion vulnerability can lead to a bypass of CVE-2020-28477 when the user-provided keys used in the path parameter are arrays. In particular, this bypass is possible because the condition (p === \"__proto__\" || p === \"constructor\") in applyPatches_ returns false if p is ['__proto__'] (or ['constructor']). The === operator (strict equality operator) returns false if the operands have different type.",
+      "url": "https://github.com/advisories/GHSA-33f9-j839-rf8h"
+    },
+    "1005040": {
+      "findings": [
+        {
+          "version": "4.4.10",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar"
+          ]
+        },
+        {
+          "version": "2.2.2",
+          "paths": [
+            "node-sass>node-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<4.4.18",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-5955-9wpr-37jh",
+      "cves": [
+        "CVE-2021-37713"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.4.18",
+      "updated": "2021-08-31T16:02:33.000Z",
+      "recommendation": "Upgrade to version 4.4.18 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005040,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-5955-9wpr-37jh\n- https://www.npmjs.com/package/tar\n- https://nvd.nist.gov/vuln/detail/CVE-2021-37713\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-5955-9wpr-37jh",
+      "created": "2021-11-18T16:00:48.492Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite on Windows via insufficient relative path sanitization",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\nnode-tar aims to guarantee that any file whose location would be outside of the extraction target directory is not extracted. This is, in part, accomplished by sanitizing absolute paths of entries within the archive, skipping archive entries that contain `..` path portions, and resolving the sanitized paths against the extraction target directory.\n\nThis logic was insufficient on Windows systems when extracting tar files that contained a path that was not an absolute path, but specified a drive letter different from the extraction target, such as `C:some\\path`.  If the drive letter does not match the extraction target, for example `D:\\extraction\\dir`, then the result of `path.resolve(extractionDirectory, entryPath)` would resolve against the current working directory on the `C:` drive, rather than the extraction target directory.\n\nAdditionally, a `..` portion of the path could occur immediately after the drive letter, such as `C:../foo`, and was not properly sanitized by the logic that checked for `..` within the normalized and split portions of the path.\n\nThis only affects users of `node-tar` on Windows systems.\n\n### Patches\n\n4.4.18 || 5.0.10 || 6.1.9\n\n### Workarounds\n\nThere is no reasonable way to work around this issue without performing the same path normalization procedures that node-tar now does.\n\nUsers are encouraged to upgrade to the latest patched versions of node-tar, rather than attempt to sanitize paths themselves.\n\n### Fix\n\nThe fixed versions strip path roots from all paths prior to being resolved against the extraction target folder, even if such paths are not \"absolute\".\n\nAdditionally, a path starting with a drive letter and then two dots, like `c:../`, would bypass the check for `..` path portions.  This is checked properly in the patched versions.\n\nFinally, a defense in depth check is added, such that if the `entry.absolute` is outside of the extraction taret, and we are not in preservePaths:true mode, a warning is raised on that entry, and it is skipped.  Currently, it is believed that this check is redundant, but it did catch some oversights in development.\n",
+      "url": "https://github.com/advisories/GHSA-5955-9wpr-37jh"
+    },
+    "1005043": {
+      "findings": [
+        {
+          "version": "4.4.10",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar"
+          ]
+        },
+        {
+          "version": "2.2.2",
+          "paths": [
+            "node-sass>node-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<4.4.18",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-qq89-hq3f-393p",
+      "cves": [
+        "CVE-2021-37712"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.4.18",
+      "updated": "2021-08-31T16:02:05.000Z",
+      "recommendation": "Upgrade to version 4.4.18 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005043,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-qq89-hq3f-393p\n- https://www.npmjs.com/package/tar\n- https://nvd.nist.gov/vuln/detail/CVE-2021-37712\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://www.debian.org/security/2021/dsa-5008\n- https://github.com/advisories/GHSA-qq89-hq3f-393p",
+      "created": "2021-11-18T16:00:48.493Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning using symbolic links",
+      "npm_advisory_id": null,
+      "overview": "### Impact\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\nnode-tar aims to guarantee that any file whose location would be modified by a symbolic link is not extracted. This is, in part, achieved by ensuring that extracted directories are not symlinks. Additionally, in order to prevent unnecessary stat calls to determine whether a given path is a directory, paths are cached when directories are created.\n\nThis logic was insufficient when extracting tar files that contained two directories and a symlink with names containing unicode values that normalized to the same value. Additionally, on Windows systems, long path portions would resolve to the same file system entities as their 8.3 \"short path\" counterparts. A specially crafted tar archive could thus include directories with two forms of the path that resolve to the same file system entity, followed by a symbolic link with a name in the first form, lastly followed by a file using the second form. It led to bypassing node-tar symlink checks on directories, essentially allowing an untrusted tar file to symlink into an arbitrary location and subsequently extracting arbitrary files into that location, thus allowing arbitrary file creation and overwrite.\n\nThe v3 branch of `node-tar` has been deprecated and did not receive patches for these issues. If you are still using a v3 release we recommend you update to a more recent version of `node-tar`. If this is not possible, a workaround is available below.\n\n### Patches\n\n6.1.9 || 5.0.10 || 4.4.18\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom filter method which prevents the extraction of symbolic links.\n\n```js\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  filter: (file, entry) => {\n    if (entry.type === 'SymbolicLink') {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patched versions, rather than attempt to sanitize tar input themselves.\n\n#### Fix\n\nThe problem is addressed in the following ways, when comparing paths in the directory cache and path reservation systems:\n\n1. The `String.normalize('NFKD')` method is used to first normalize all unicode to its maximally compatible and multi-code-point form.\n2. All slashes are normalized to `/` on Windows systems (on posix systems, `\\` is a valid filename character, and thus left intact).\n3. When a symbolic link is encountered on Windows systems, the entire directory cache is cleared.  Collisions related to use of 8.3 short names to replace directories with other (non-symlink) types of entries may make archives fail to extract properly, but will not result in arbitrary file writes.\n",
+      "url": "https://github.com/advisories/GHSA-qq89-hq3f-393p"
+    },
+    "1005046": {
+      "findings": [
+        {
+          "version": "4.4.10",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar"
+          ]
+        },
+        {
+          "version": "2.2.2",
+          "paths": [
+            "node-sass>node-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<4.4.16",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-9r2w-394v-53qc",
+      "cves": [
+        "CVE-2021-37701"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.4.16",
+      "updated": "2021-08-31T16:01:51.000Z",
+      "recommendation": "Upgrade to version 4.4.16 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005046,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-9r2w-394v-53qc\n- https://www.npmjs.com/package/tar\n- https://nvd.nist.gov/vuln/detail/CVE-2021-37701\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://www.debian.org/security/2021/dsa-5008\n- https://github.com/advisories/GHSA-9r2w-394v-53qc",
+      "created": "2021-11-18T16:00:48.493Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning using symbolic links",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\n`node-tar` aims to guarantee that any file whose location would be modified by a symbolic link is not extracted. This is, in part, achieved by ensuring that extracted directories are not symlinks. Additionally, in order to prevent unnecessary stat calls to determine whether a given path is a directory, paths are cached when directories are created.\n\nThis logic was insufficient when extracting tar files that contained both a directory and a symlink with the same name as the directory, where the symlink and directory names in the archive entry used backslashes as a path separator on posix systems. The cache checking logic used both `\\` and `/` characters as path separators, however `\\` is a valid filename character on posix systems.\n\nBy first creating a directory, and then replacing that directory with a symlink, it was thus possible to bypass node-tar symlink checks on directories, essentially allowing an untrusted tar file to symlink into an arbitrary location and subsequently extracting arbitrary files into that location, thus allowing arbitrary file creation and overwrite.\n\nAdditionally, a similar confusion could arise on case-insensitive filesystems.  If a tar archive contained a directory at `FOO`, followed by a symbolic link named `foo`, then on case-insensitive file systems, the creation of the symbolic link would remove the directory from the filesystem, but _not_ from the internal directory cache, as it would not be treated as a cache hit.  A subsequent file entry within the `FOO` directory would then be placed in the target of the symbolic link, thinking that the directory had already been created. \n\nThese issues were addressed in releases 4.4.16, 5.0.8 and 6.1.7.\n\nThe v3 branch of `node-tar` has been deprecated and did not receive patches for these issues. If you are still using a v3 release we recommend you update to a more recent version of `node-tar`. If this is not possible, a workaround is available below.\n\n### Patches\n\n4.4.16 || 5.0.8 || 6.1.7\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom filter method which prevents the extraction of symbolic links.\n\n```js\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  filter: (file, entry) => {\n    if (entry.type === 'SymbolicLink') {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patched versions, rather than attempt to sanitize tar input themselves.\n\n### Fix\n\nThe problem is addressed in the following ways:\n\n1. All paths are normalized to use `/` as a path separator, replacing `\\` with `/` on Windows systems, and leaving `\\` intact in the path on posix systems.  This is performed in depth, at every level of the program where paths are consumed.\n2. Directory cache pruning is performed case-insensitively.  This _may_ result in undue cache misses on case-sensitive file systems, but the performance impact is negligible.\n\n#### Caveat\n\nNote that this means that the `entry` objects exposed in various parts of tar's API will now always use `/` as a path separator, even on Windows systems.  This is not expected to cause problems, as `/` is a valid path separator on Windows systems, but _may_ result in issues if `entry.path` is compared against a path string coming from some other API such as `fs.realpath()` or `path.resolve()`.\n\nUsers are encouraged to always normalize paths using a well-tested method such as `path.resolve()` before comparing paths to one another.",
+      "url": "https://github.com/advisories/GHSA-9r2w-394v-53qc"
+    },
+    "1005059": {
+      "findings": [
+        {
+          "version": "0.0.7",
+          "paths": [
+            "react-scripts>@pmmmwh/react-refresh-webpack-plugin>ansi-html"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=0.0.7",
+      "module_name": "ansi-html",
+      "severity": "high",
+      "github_advisory_id": "GHSA-whgm-jr23-g3j9",
+      "cves": [
+        "CVE-2021-23424"
+      ],
+      "access": "public",
+      "patched_versions": "<0.0.0",
+      "updated": "2021-08-26T14:50:46.000Z",
+      "recommendation": "None",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005059,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23424\n- https://github.com/Tjatse/ansi-html/issues/19\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1567198\n- https://snyk.io/vuln/SNYK-JS-ANSIHTML-1296849\n- https://github.com/ioet/time-tracker-ui/security/advisories/GHSA-4fjc-8q3h-8r69\n- https://github.com/advisories/GHSA-whgm-jr23-g3j9",
+      "created": "2021-11-18T16:00:48.495Z",
+      "reported_by": null,
+      "title": "Uncontrolled Resource Consumption in ansi-html",
+      "npm_advisory_id": null,
+      "overview": "This affects all versions of package ansi-html. If an attacker provides a malicious string, it will get stuck processing the input for an extremely long time.",
+      "url": "https://github.com/advisories/GHSA-whgm-jr23-g3j9"
+    },
+    "1005072": {
+      "findings": [
+        {
+          "version": "1.0.6",
+          "paths": [
+            "tslint>resolve>path-parse",
+            "react-scripts>@babel/core>resolve>path-parse",
+            "node-sass>meow>normalize-package-data>resolve>path-parse",
+            "react-scripts>@svgr/webpack>@svgr/plugin-jsx>@babel/core>resolve>path-parse",
+            "node-sass>meow>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "node-sass>sass-graph>yargs>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest-circus>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest>jest-cli>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest>jest-cli>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>resolve>path-parse"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.0.7",
+      "module_name": "path-parse",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-hj48-42vr-x3v9",
+      "cves": [
+        "CVE-2021-23343"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.0.7",
+      "updated": "2021-08-10T15:33:31.000Z",
+      "recommendation": "Upgrade to version 1.0.7 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005072,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23343\n- https://github.com/jbgutierrez/path-parse/issues/8\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1279028\n- https://snyk.io/vuln/SNYK-JS-PATHPARSE-1077067\n- https://lists.apache.org/thread.html/r6a32cb3eda3b19096ad48ef1e7aa8f26e005f2f63765abb69ce08b85@%3Cdev.myfaces.apache.org%3E\n- https://github.com/jbgutierrez/path-parse/pull/10\n- https://github.com/jbgutierrez/path-parse/commit/eca63a7b9a473bf6978a2f5b7b3343662d1506f7\n- https://github.com/advisories/GHSA-hj48-42vr-x3v9",
+      "created": "2021-11-18T16:00:48.496Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in path-parse",
+      "npm_advisory_id": null,
+      "overview": "Affected versions of npm package `path-parse` are vulnerable to Regular Expression Denial of Service (ReDoS) via splitDeviceRe, splitTailRe, and splitPathRe regular expressions. ReDoS exhibits polynomial worst-case time complexity.",
+      "url": "https://github.com/advisories/GHSA-hj48-42vr-x3v9"
+    },
+    "1005077": {
+      "findings": [
+        {
+          "version": "4.4.10",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=4.0.0 <4.4.14",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-3jfq-g458-7qm9",
+      "cves": [
+        "CVE-2021-32804"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.4.14",
+      "updated": "2021-08-03T19:06:16.000Z",
+      "recommendation": "Upgrade to version 4.4.14 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005077,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-3jfq-g458-7qm9\n- https://github.com/npm/node-tar/commit/1f036ca23f64a547bdd6c79c1a44bc62e8115da4\n- https://www.npmjs.com/advisories/1770\n- https://www.npmjs.com/package/tar\n- https://nvd.nist.gov/vuln/detail/CVE-2021-32804\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-3jfq-g458-7qm9",
+      "created": "2021-11-18T16:00:48.497Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite due to insufficient absolute path sanitization",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\n`node-tar` aims to prevent extraction of absolute file paths by turning absolute paths into relative paths when the `preservePaths` flag is not set to `true`. This is achieved by stripping the absolute path root from any absolute file paths contained in a tar file. For example `/home/user/.bashrc` would turn into `home/user/.bashrc`. \n\nThis logic was insufficient when file paths contained repeated path roots such as `////home/user/.bashrc`. `node-tar` would only strip a single path root from such paths. When given an absolute file path with repeating path roots, the resulting path (e.g. `///home/user/.bashrc`) would still resolve to an absolute path, thus allowing arbitrary file creation and overwrite. \n\n### Patches\n\n3.2.2 || 4.4.14 || 5.0.6 || 6.1.1\n\nNOTE: an adjacent issue [CVE-2021-32803](https://github.com/npm/node-tar/security/advisories/GHSA-r628-mhmh-qjhw) affects this release level. Please ensure you update to the latest patch levels that address CVE-2021-32803 as well if this adjacent issue affects your `node-tar` use case.\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom `onentry` method which sanitizes the `entry.path` or a `filter` method which removes entries with absolute paths.\n\n```js\nconst path = require('path')\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  // either add this function...\n  onentry: (entry) => {\n    if (path.isAbsolute(entry.path)) {\n      entry.path = sanitizeAbsolutePathSomehow(entry.path)\n      entry.absolute = path.resolve(entry.path)\n    }\n  },\n\n  // or this one\n  filter: (file, entry) => {\n    if (path.isAbsolute(entry.path)) {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patch versions, rather than attempt to sanitize tar input themselves.",
+      "url": "https://github.com/advisories/GHSA-3jfq-g458-7qm9"
+    },
+    "1005078": {
+      "findings": [
+        {
+          "version": "2.2.2",
+          "paths": [
+            "node-sass>node-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<3.2.2",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-3jfq-g458-7qm9",
+      "cves": [
+        "CVE-2021-32804"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.2.2",
+      "updated": "2021-08-03T19:06:16.000Z",
+      "recommendation": "Upgrade to version 3.2.2 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005078,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-3jfq-g458-7qm9\n- https://github.com/npm/node-tar/commit/1f036ca23f64a547bdd6c79c1a44bc62e8115da4\n- https://www.npmjs.com/advisories/1770\n- https://www.npmjs.com/package/tar\n- https://nvd.nist.gov/vuln/detail/CVE-2021-32804\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-3jfq-g458-7qm9",
+      "created": "2021-11-18T16:00:48.497Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite due to insufficient absolute path sanitization",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\n`node-tar` aims to prevent extraction of absolute file paths by turning absolute paths into relative paths when the `preservePaths` flag is not set to `true`. This is achieved by stripping the absolute path root from any absolute file paths contained in a tar file. For example `/home/user/.bashrc` would turn into `home/user/.bashrc`. \n\nThis logic was insufficient when file paths contained repeated path roots such as `////home/user/.bashrc`. `node-tar` would only strip a single path root from such paths. When given an absolute file path with repeating path roots, the resulting path (e.g. `///home/user/.bashrc`) would still resolve to an absolute path, thus allowing arbitrary file creation and overwrite. \n\n### Patches\n\n3.2.2 || 4.4.14 || 5.0.6 || 6.1.1\n\nNOTE: an adjacent issue [CVE-2021-32803](https://github.com/npm/node-tar/security/advisories/GHSA-r628-mhmh-qjhw) affects this release level. Please ensure you update to the latest patch levels that address CVE-2021-32803 as well if this adjacent issue affects your `node-tar` use case.\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom `onentry` method which sanitizes the `entry.path` or a `filter` method which removes entries with absolute paths.\n\n```js\nconst path = require('path')\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  // either add this function...\n  onentry: (entry) => {\n    if (path.isAbsolute(entry.path)) {\n      entry.path = sanitizeAbsolutePathSomehow(entry.path)\n      entry.absolute = path.resolve(entry.path)\n    }\n  },\n\n  // or this one\n  filter: (file, entry) => {\n    if (path.isAbsolute(entry.path)) {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patch versions, rather than attempt to sanitize tar input themselves.",
+      "url": "https://github.com/advisories/GHSA-3jfq-g458-7qm9"
+    },
+    "1005081": {
+      "findings": [
+        {
+          "version": "4.4.10",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=4.0.0 <4.4.15",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-r628-mhmh-qjhw",
+      "cves": [
+        "CVE-2021-32803"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.4.15",
+      "updated": "2021-08-03T18:59:59.000Z",
+      "recommendation": "Upgrade to version 4.4.15 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005081,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-r628-mhmh-qjhw\n- https://github.com/npm/node-tar/commit/9dbdeb6df8e9dbd96fa9e84341b9d74734be6c20\n- https://www.npmjs.com/advisories/1771\n- https://nvd.nist.gov/vuln/detail/CVE-2021-32803\n- https://www.npmjs.com/package/tar\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-r628-mhmh-qjhw",
+      "created": "2021-11-18T16:00:48.498Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\n`node-tar` aims to guarantee that any file whose location would be modified by a symbolic link is not extracted. This is, in part, achieved by ensuring that extracted directories are not symlinks.  Additionally, in order to prevent unnecessary `stat` calls to determine whether a given path is a directory, paths are cached when directories are created.\n\nThis logic was insufficient when extracting tar files that contained both a directory and a symlink with the same name as the directory. This order of operations resulted in the directory being created and added to the `node-tar` directory cache. When a directory is present in the directory cache, subsequent calls to mkdir for that directory are skipped. However, this is also where `node-tar` checks for symlinks occur.\n\nBy first creating a directory, and then replacing that directory with a symlink, it was thus possible to bypass `node-tar` symlink checks on directories, essentially allowing an untrusted tar file to symlink into an arbitrary location and subsequently extracting arbitrary files into that location, thus allowing arbitrary file creation and overwrite.\n\nThis issue was addressed in releases 3.2.3, 4.4.15, 5.0.7 and 6.1.2.\n\n### Patches\n\n3.2.3 || 4.4.15 || 5.0.7 || 6.1.2\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom `filter` method which prevents the extraction of symbolic links.\n\n```js\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  filter: (file, entry) => {\n    if (entry.type === 'SymbolicLink') {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patch versions, rather than attempt to sanitize tar input themselves.",
+      "url": "https://github.com/advisories/GHSA-r628-mhmh-qjhw"
+    },
+    "1005082": {
+      "findings": [
+        {
+          "version": "2.2.2",
+          "paths": [
+            "node-sass>node-gyp>tar"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<3.2.3",
+      "module_name": "tar",
+      "severity": "high",
+      "github_advisory_id": "GHSA-r628-mhmh-qjhw",
+      "cves": [
+        "CVE-2021-32803"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.2.3",
+      "updated": "2021-08-03T18:59:59.000Z",
+      "recommendation": "Upgrade to version 3.2.3 or later",
+      "cwe": "CWE-22",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005082,
+      "references": "- https://github.com/npm/node-tar/security/advisories/GHSA-r628-mhmh-qjhw\n- https://github.com/npm/node-tar/commit/9dbdeb6df8e9dbd96fa9e84341b9d74734be6c20\n- https://www.npmjs.com/advisories/1771\n- https://nvd.nist.gov/vuln/detail/CVE-2021-32803\n- https://www.npmjs.com/package/tar\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-r628-mhmh-qjhw",
+      "created": "2021-11-18T16:00:48.498Z",
+      "reported_by": null,
+      "title": "Arbitrary File Creation/Overwrite via insufficient symlink protection due to directory cache poisoning",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nArbitrary File Creation, Arbitrary File Overwrite, Arbitrary Code Execution\n\n`node-tar` aims to guarantee that any file whose location would be modified by a symbolic link is not extracted. This is, in part, achieved by ensuring that extracted directories are not symlinks.  Additionally, in order to prevent unnecessary `stat` calls to determine whether a given path is a directory, paths are cached when directories are created.\n\nThis logic was insufficient when extracting tar files that contained both a directory and a symlink with the same name as the directory. This order of operations resulted in the directory being created and added to the `node-tar` directory cache. When a directory is present in the directory cache, subsequent calls to mkdir for that directory are skipped. However, this is also where `node-tar` checks for symlinks occur.\n\nBy first creating a directory, and then replacing that directory with a symlink, it was thus possible to bypass `node-tar` symlink checks on directories, essentially allowing an untrusted tar file to symlink into an arbitrary location and subsequently extracting arbitrary files into that location, thus allowing arbitrary file creation and overwrite.\n\nThis issue was addressed in releases 3.2.3, 4.4.15, 5.0.7 and 6.1.2.\n\n### Patches\n\n3.2.3 || 4.4.15 || 5.0.7 || 6.1.2\n\n### Workarounds\n\nUsers may work around this vulnerability without upgrading by creating a custom `filter` method which prevents the extraction of symbolic links.\n\n```js\nconst tar = require('tar')\n\ntar.x({\n  file: 'archive.tgz',\n  filter: (file, entry) => {\n    if (entry.type === 'SymbolicLink') {\n      return false\n    } else {\n      return true\n    }\n  }\n})\n```\n\nUsers are encouraged to upgrade to the latest patch versions, rather than attempt to sanitize tar input themselves.",
+      "url": "https://github.com/advisories/GHSA-r628-mhmh-qjhw"
+    },
+    "1005083": {
+      "findings": [
+        {
+          "version": "2.4.0",
+          "paths": [
+            "react-data-export>tempa-xlsx>jszip"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<3.7.0",
+      "module_name": "jszip",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-jg8v-48h5-wgxg",
+      "cves": [
+        "CVE-2021-23413"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.7.0",
+      "updated": "2021-08-02T22:15:50.000Z",
+      "recommendation": "Upgrade to version 3.7.0 or later",
+      "cwe": "CWE-1321",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005083,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23413\n- https://github.com/Stuk/jszip/pull/766\n- https://github.com/Stuk/jszip/commit/22357494f424178cb416cdb7d93b26dd4f824b36\n- https://github.com/Stuk/jszip/blob/master/lib/object.js%23L88\n- https://snyk.io/vuln/SNYK-JS-JSZIP-1251497\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARS-1251499\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1251498\n- https://github.com/advisories/GHSA-jg8v-48h5-wgxg",
+      "created": "2021-11-18T16:00:48.498Z",
+      "reported_by": null,
+      "title": "Prototype Pollution",
+      "npm_advisory_id": null,
+      "overview": "This affects the package jszip before 3.7.0. Crafting a new zip file with filenames set to Object prototype values (e.g __proto__, toString, etc) results in a returned object with a modified prototype instance.",
+      "url": "https://github.com/advisories/GHSA-jg8v-48h5-wgxg"
+    },
+    "1005092": {
+      "findings": [
+        {
+          "version": "5.0.0",
+          "paths": [
+            "node-sass>sass-graph>yargs>yargs-parser"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=5.0.0",
+      "module_name": "yargs-parser",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-p9pc-299p-vxgp",
+      "cves": [
+        "CVE-2020-7608"
+      ],
+      "access": "public",
+      "patched_versions": ">=5.0.1",
+      "updated": "2021-07-28T21:26:25.000Z",
+      "recommendation": "Upgrade to version 5.0.1 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005092,
+      "references": "- https://snyk.io/vuln/SNYK-JS-YARGSPARSER-560381\n- https://www.npmjs.com/advisories/1500\n- https://github.com/yargs/yargs-parser/commit/63810ca1ae1a24b08293a4d971e70e058c7a41e2\n- https://nvd.nist.gov/vuln/detail/CVE-2020-7608\n- https://github.com/advisories/GHSA-p9pc-299p-vxgp",
+      "created": "2021-11-18T16:00:48.499Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in yargs-parser",
+      "npm_advisory_id": null,
+      "overview": "Affected versions of `yargs-parser` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--foo.__proto__.bar baz'` adds a `bar` property with value `baz` to all objects. This is only exploitable if attackers have control over the arguments being passed to `yargs-parser`.\n\n\n\n## Recommendation\n\nUpgrade to versions 13.1.2, 15.0.1, 18.1.1 or later.",
+      "url": "https://github.com/advisories/GHSA-p9pc-299p-vxgp"
+    },
+    "1005101": {
+      "findings": [
+        {
+          "version": "0.15.4",
+          "paths": [
+            "xlsx"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.17.0",
+      "module_name": "xlsx",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-g973-978j-2c3p",
+      "cves": [
+        "CVE-2021-32014"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.17.0",
+      "updated": "2021-07-19T21:44:43.000Z",
+      "recommendation": "Upgrade to version 0.17.0 or later",
+      "cwe": "CWE-345",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005101,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-32014\n- https://floqast.com/engineering-blog/post/fuzzing-and-parsing-securely/\n- https://sheetjs.com/pro\n- https://www.npmjs.com/package/xlsx/v/0.17.0\n- https://github.com/advisories/GHSA-g973-978j-2c3p",
+      "created": "2021-11-18T16:00:48.500Z",
+      "reported_by": null,
+      "title": "Denial of Service in SheetJS Pro",
+      "npm_advisory_id": null,
+      "overview": "SheetJS Pro through 0.16.9 allows attackers to cause a denial of service (CPU consumption) via a crafted .xlsx document that is mishandled when read by xlsx.js.",
+      "url": "https://github.com/advisories/GHSA-g973-978j-2c3p"
+    },
+    "1005102": {
+      "findings": [
+        {
+          "version": "0.15.4",
+          "paths": [
+            "xlsx"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.17.0",
+      "module_name": "xlsx",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-3x9f-74h4-2fqr",
+      "cves": [
+        "CVE-2021-32012"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.17.0",
+      "updated": "2021-07-19T21:44:39.000Z",
+      "recommendation": "Upgrade to version 0.17.0 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005102,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-32012\n- https://floqast.com/engineering-blog/post/fuzzing-and-parsing-securely/\n- https://sheetjs.com/pro\n- https://www.npmjs.com/package/xlsx/v/0.17.0\n- https://github.com/advisories/GHSA-3x9f-74h4-2fqr",
+      "created": "2021-11-18T16:00:48.500Z",
+      "reported_by": null,
+      "title": "Denial of Service in SheetJS Pro",
+      "npm_advisory_id": null,
+      "overview": "SheetJS Pro through 0.16.9 allows attackers to cause a denial of service (memory consumption) via a crafted .xlsx document that is mishandled when read by xlsx.js (issue 1 of 2).",
+      "url": "https://github.com/advisories/GHSA-3x9f-74h4-2fqr"
+    },
+    "1005103": {
+      "findings": [
+        {
+          "version": "0.15.4",
+          "paths": [
+            "xlsx"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.17.0",
+      "module_name": "xlsx",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-8vcr-vxm8-293m",
+      "cves": [
+        "CVE-2021-32013"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.17.0",
+      "updated": "2021-07-19T21:41:18.000Z",
+      "recommendation": "Upgrade to version 0.17.0 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005103,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-32013\n- https://floqast.com/engineering-blog/post/fuzzing-and-parsing-securely/\n- https://sheetjs.com/pro\n- https://www.npmjs.com/package/xlsx/v/0.17.0\n- https://github.com/advisories/GHSA-8vcr-vxm8-293m",
+      "created": "2021-11-18T16:00:48.500Z",
+      "reported_by": null,
+      "title": "Denial of Service in SheetsJS Pro",
+      "npm_advisory_id": null,
+      "overview": "SheetJS Pro through 0.16.9 allows attackers to cause a denial of service (memory consumption) via a crafted .xlsx document that is mishandled when read by xlsx.js (issue 2 of 2).",
+      "url": "https://github.com/advisories/GHSA-8vcr-vxm8-293m"
+    },
+    "1005151": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "node-sass>meow>trim-newlines"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<3.0.1",
+      "module_name": "trim-newlines",
+      "severity": "high",
+      "github_advisory_id": "GHSA-7p7h-4mm5-852v",
+      "cves": [
+        "CVE-2021-33623"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.0.1",
+      "updated": "2021-06-07T22:18:20.000Z",
+      "recommendation": "Upgrade to version 3.0.1 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005151,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-33623\n- https://github.com/sindresorhus/trim-newlines/commit/25246c6ce5eea1c82d448998733a6302a4350d91\n- https://github.com/sindresorhus/trim-newlines/releases/tag/v4.0.1\n- https://www.npmjs.com/package/trim-newlines\n- https://github.com/advisories/GHSA-7p7h-4mm5-852v",
+      "created": "2021-11-18T16:00:48.516Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in trim-newlines",
+      "npm_advisory_id": null,
+      "overview": "The trim-newlines package before 3.0.1 and 4.x before 4.0.1 for Node.js has an issue related to regular expression denial-of-service (ReDoS) for the .end() method.",
+      "url": "https://github.com/advisories/GHSA-7p7h-4mm5-852v"
+    },
+    "1005154": {
+      "findings": [
+        {
+          "version": "3.1.0",
+          "paths": [
+            "react-scripts>webpack>watchpack>watchpack-chokidar2>chokidar>glob-parent"
+          ]
+        },
+        {
+          "version": "3.1.0",
+          "paths": [
+            "react-scripts>webpack-dev-server>chokidar>glob-parent"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<5.1.2",
+      "module_name": "glob-parent",
+      "severity": "high",
+      "github_advisory_id": "GHSA-ww39-953v-wcq6",
+      "cves": [
+        "CVE-2020-28469"
+      ],
+      "access": "public",
+      "patched_versions": ">=5.1.2",
+      "updated": "2021-06-04T18:30:46.000Z",
+      "recommendation": "Upgrade to version 5.1.2 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005154,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-28469\n- https://github.com/gulpjs/glob-parent/pull/36\n- https://github.com/gulpjs/glob-parent/blob/6ce8d11f2f1ed8e80a9526b1dc8cf3aa71f43474/index.js%23L9\n- https://github.com/gulpjs/glob-parent/releases/tag/v5.1.2\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBES128-1059093\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1059092\n- https://snyk.io/vuln/SNYK-JS-GLOBPARENT-1016905\n- https://github.com/advisories/GHSA-ww39-953v-wcq6",
+      "created": "2021-11-18T16:00:48.517Z",
+      "reported_by": null,
+      "title": "Regular expression denial of service",
+      "npm_advisory_id": null,
+      "overview": "This affects the package glob-parent before 5.1.2. The enclosure regex used to check for strings ending in enclosure containing path separator.",
+      "url": "https://github.com/advisories/GHSA-ww39-953v-wcq6"
+    },
+    "1005174": {
+      "findings": [
+        {
+          "version": "4.14.2",
+          "paths": [
+            "react-scripts>react-dev-utils>browserslist"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=4.0.0 <4.16.5",
+      "module_name": "browserslist",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-w8qv-6jwh-64r5",
+      "cves": [
+        "CVE-2021-23364"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.16.5",
+      "updated": "2021-05-20T22:03:37.000Z",
+      "recommendation": "Upgrade to version 4.16.5 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005174,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23364\n- https://github.com/browserslist/browserslist/pull/593\n- https://github.com/browserslist/browserslist/commit/c091916910dfe0b5fd61caad96083c6709b02d98\n- https://github.com/browserslist/browserslist/blob/e82f32d1d4100d6bc79ea0b6b6a2d281a561e33c/index.js%23L472-L474\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1277182\n- https://snyk.io/vuln/SNYK-JS-BROWSERSLIST-1090194\n- https://github.com/advisories/GHSA-w8qv-6jwh-64r5",
+      "created": "2021-11-18T16:00:48.519Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in browserslist",
+      "npm_advisory_id": null,
+      "overview": "The package browserslist from 4.0.0 and before 4.16.5 are vulnerable to Regular Expression Denial of Service (ReDoS) during parsing of queries.",
+      "url": "https://github.com/advisories/GHSA-w8qv-6jwh-64r5"
+    },
+    "1005182": {
+      "findings": [
+        {
+          "version": "0.2.28",
+          "paths": [
+            "firebase>@firebase/util",
+            "firebase>@firebase/app>@firebase/util",
+            "firebase>@firebase/performance>@firebase/installations>@firebase/util"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.3.4",
+      "module_name": "@firebase/util",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-fpm5-vv97-jfwg",
+      "cves": [
+        "CVE-2020-7765"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.3.4",
+      "updated": "2021-05-18T01:56:43.000Z",
+      "recommendation": "Upgrade to version 0.3.4 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005182,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7765\n- https://github.com/firebase/firebase-js-sdk/pull/4001\n- https://github.com/firebase/firebase-js-sdk/commit/9cf727fcc3d049551b16ae0698ac33dc2fe45ada\n- https://snyk.io/vuln/SNYK-JS-FIREBASEUTIL-1038324\n- https://github.com/advisories/GHSA-fpm5-vv97-jfwg",
+      "created": "2021-11-18T16:00:48.519Z",
+      "reported_by": null,
+      "title": "Uncontrolled Resource Consumption in firebase",
+      "npm_advisory_id": null,
+      "overview": "This affects the package @firebase/util before 0.3.4. This vulnerability relates to the deepExtend function within the DeepCopy.ts file. Depending on if user input is provided, an attacker can overwrite and pollute the object prototype of a program.",
+      "url": "https://github.com/advisories/GHSA-fpm5-vv97-jfwg"
+    },
+    "1005210": {
+      "findings": [
+        {
+          "version": "2.8.5",
+          "paths": [
+            "node-sass>meow>normalize-package-data>hosted-git-info",
+            "node-sass>meow>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "node-sass>sass-graph>yargs>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest-circus>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest>jest-cli>@jest/core>@jest/reporters>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest>jest-cli>@jest/core>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>@jest/test-sequencer>jest-runner>jest-resolve>read-pkg-up>read-pkg>normalize-package-data>hosted-git-info"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<2.8.9",
+      "module_name": "hosted-git-info",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-43f8-2h32-f4cj",
+      "cves": [
+        "CVE-2021-23362"
+      ],
+      "access": "public",
+      "patched_versions": ">=2.8.9",
+      "updated": "2021-05-07T17:39:04.000Z",
+      "recommendation": "Upgrade to version 2.8.9 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005210,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23362\n- https://github.com/npm/hosted-git-info/commit/bede0dc38e1785e732bf0a48ba6f81a4a908eba3\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1088356\n- https://snyk.io/vuln/SNYK-JS-HOSTEDGITINFO-1088355\n- https://github.com/npm/hosted-git-info/pull/76\n- https://github.com/npm/hosted-git-info/commit/29adfe5ef789784c861b2cdeb15051ec2ba651a7\n- https://github.com/npm/hosted-git-info/commit/8d4b3697d79bcd89cdb36d1db165e3696c783a01\n- https://github.com/npm/hosted-git-info/commits/v2\n- https://github.com/advisories/GHSA-43f8-2h32-f4cj",
+      "created": "2021-11-18T16:00:48.522Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in hosted-git-info",
+      "npm_advisory_id": null,
+      "overview": "The npm package `hosted-git-info` before 3.0.8 are vulnerable to Regular Expression Denial of Service (ReDoS) via regular expression shortcutMatch in the fromUrl function in index.js. The affected regular expression exhibits polynomial worst-case time complexity",
+      "url": "https://github.com/advisories/GHSA-43f8-2h32-f4cj"
+    },
+    "1005265": {
+      "findings": [
+        {
+          "version": "0.7.20",
+          "paths": [
+            "recompose>fbjs>ua-parser-js"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.7.22",
+      "module_name": "ua-parser-js",
+      "severity": "high",
+      "github_advisory_id": "GHSA-662x-fhqg-9p8v",
+      "cves": [
+        "CVE-2020-7733"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.7.22",
+      "updated": "2021-05-03T19:19:26.000Z",
+      "recommendation": "Upgrade to version 0.7.22 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005265,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7733\n- https://github.com/faisalman/ua-parser-js/commit/233d3bae22a795153a7e6638887ce159c63e557d\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBFAISALMAN-674666\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-674665\n- https://snyk.io/vuln/SNYK-JS-UAPARSERJS-610226\n- https://github.com/advisories/GHSA-662x-fhqg-9p8v",
+      "created": "2021-11-18T16:00:48.527Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in ua-parser-js",
+      "npm_advisory_id": null,
+      "overview": "The package ua-parser-js before 0.7.22 are vulnerable to Regular Expression Denial of Service (ReDoS) via the regex for Redmi Phones and Mi Pad Tablets UA.",
+      "url": "https://github.com/advisories/GHSA-662x-fhqg-9p8v"
+    },
+    "1005305": {
+      "findings": [
+        {
+          "version": "1.23.3",
+          "paths": [
+            "firebase>@firebase/firestore>grpc"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.24.4",
+      "module_name": "grpc",
+      "severity": "high",
+      "github_advisory_id": "GHSA-pp75-xfpw-37g9",
+      "cves": [
+        "CVE-2020-7768"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.24.4",
+      "updated": "2021-04-19T22:57:06.000Z",
+      "recommendation": "Upgrade to version 1.24.4 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005305,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7768\n- https://github.com/grpc/grpc-node/pull/1605\n- https://github.com/grpc/grpc-node/pull/1606\n- https://github.com/grpc/grpc-node/releases/tag/grpc%401.24.4\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1038819\n- https://snyk.io/vuln/SNYK-JS-GRPC-598671\n- https://snyk.io/vuln/SNYK-JS-GRPCGRPCJS-1038818\n- https://www.npmjs.com/package/@grpc/grpc-js\n- https://www.npmjs.com/package/grpc\n- https://github.com/advisories/GHSA-pp75-xfpw-37g9",
+      "created": "2021-11-18T16:00:48.531Z",
+      "reported_by": null,
+      "title": "Prototype pollution in grpc and @grpc/grpc-js",
+      "npm_advisory_id": null,
+      "overview": "\"The package grpc before 1.24.4 and the package @grpc/grpc-js before 1.1.8 are vulnerable to Prototype Pollution via loadPackageDefinition.\"",
+      "url": "https://github.com/advisories/GHSA-pp75-xfpw-37g9"
+    },
+    "1005365": {
+      "findings": [
+        {
+          "version": "4.17.15",
+          "paths": [
+            "node-sass>lodash",
+            "enzyme>cheerio>lodash",
+            "node-sass>gaze>globule>lodash",
+            "styled-components>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>@svgr/webpack>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+            "react-scripts>workbox-webpack-plugin>workbox-build>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+            "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/types>lodash",
+            "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/helper-function-name>@babel/helper-get-function-arity>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>babel-preset-jest>babel-plugin-jest-hoist>@types/babel__core>@types/babel__generator>@babel/types>lodash"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<4.17.21",
+      "module_name": "lodash",
+      "severity": "high",
+      "github_advisory_id": "GHSA-35jh-r3h4-6jhm",
+      "cves": [
+        "CVE-2021-23337"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.17.21",
+      "updated": "2021-03-31T23:59:26.000Z",
+      "recommendation": "Upgrade to version 4.17.21 or later",
+      "cwe": "CWE-77",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005365,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-23337\n- https://github.com/lodash/lodash/commit/3469357cff396a26c363f8c1b5a91dde28ba4b1c\n- https://security.netapp.com/advisory/ntap-20210312-0006/\n- https://snyk.io/vuln/SNYK-JS-LODASH-1040724\n- https://github.com/lodash/lodash/blob/ddfd9b11a0126db2302cb70ec9973b66baec0975/lodash.js#L14851\n- https://github.com/lodash/lodash/blob/ddfd9b11a0126db2302cb70ec9973b66baec0975/lodash.js%23L14851\n- https://snyk.io/vuln/SNYK-JAVA-ORGFUJIONWEBJARS-1074932\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARS-1074930\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWER-1074928\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSBOWERGITHUBLODASH-1074931\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1074929\n- https://www.oracle.com//security-alerts/cpujul2021.html\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-35jh-r3h4-6jhm",
+      "created": "2021-11-18T16:00:48.535Z",
+      "reported_by": null,
+      "title": "Command Injection in lodash",
+      "npm_advisory_id": null,
+      "overview": "`lodash` versions prior to 4.17.21 are vulnerable to Command Injection via the template function.",
+      "url": "https://github.com/advisories/GHSA-35jh-r3h4-6jhm"
+    },
+    "1005406": {
+      "findings": [
+        {
+          "version": "0.7.20",
+          "paths": [
+            "recompose>fbjs>ua-parser-js"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=0.7.14 <0.7.24",
+      "module_name": "ua-parser-js",
+      "severity": "high",
+      "github_advisory_id": "GHSA-78cj-fxph-m83p",
+      "cves": [
+        "CVE-2021-27292"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.7.24",
+      "updated": "2021-03-22T20:23:58.000Z",
+      "recommendation": "Upgrade to version 0.7.24 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005406,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-27292\n- https://github.com/faisalman/ua-parser-js/commit/809439e20e273ce0d25c1d04e111dcf6011eb566\n- https://gist.github.com/b-c-ds/6941d80d6b4e694df4bc269493b7be76\n- https://github.com/pygments/pygments/commit/2e7e8c4a7b318f4032493773732754e418279a14\n- https://github.com/advisories/GHSA-78cj-fxph-m83p",
+      "created": "2021-11-18T16:00:48.538Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service (ReDoS) in ua-parser-js",
+      "npm_advisory_id": null,
+      "overview": "ua-parser-js >= 0.7.14, fixed in 0.7.24, uses a regular expression which is vulnerable to denial of service. If an attacker sends a malicious User-Agent header, ua-parser-js will get stuck processing it for an extended period of time.",
+      "url": "https://github.com/advisories/GHSA-78cj-fxph-m83p"
+    },
+    "1005432": {
+      "findings": [
+        {
+          "version": "3.2.1",
+          "paths": [
+            "node-sass>sass-graph>yargs>y18n",
+            "firebase>@firebase/firestore>grpc>protobufjs>yargs>y18n"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<3.2.2",
+      "module_name": "y18n",
+      "severity": "high",
+      "github_advisory_id": "GHSA-c4w7-xm78-47vh",
+      "cves": [
+        "CVE-2020-7774"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.2.2",
+      "updated": "2021-03-12T21:23:12.000Z",
+      "recommendation": "Upgrade to version 3.2.2 or later",
+      "cwe": "CWE-20",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005432,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7774\n- https://github.com/yargs/y18n/issues/96\n- https://github.com/yargs/y18n/pull/108\n- https://snyk.io/vuln/SNYK-JAVA-ORGWEBJARSNPM-1038306\n- https://snyk.io/vuln/SNYK-JS-Y18N-1021887\n- https://github.com/yargs/y18n/commit/a9ac604abf756dec9687be3843e2c93bfe581f25\n- https://www.oracle.com/security-alerts/cpuApr2021.html\n- https://github.com/advisories/GHSA-c4w7-xm78-47vh",
+      "created": "2021-11-18T16:00:48.540Z",
+      "reported_by": null,
+      "title": "Prototype Pollution",
+      "npm_advisory_id": null,
+      "overview": "### Overview\n\nThe npm package `y18n` before versions 3.2.2, 4.0.1, and 5.0.5 is vulnerable to Prototype Pollution. \n\n### POC\n\n```\nconst y18n = require('y18n')();\n\ny18n.setLocale('__proto__');\ny18n.updateLocale({polluted: true});\n\nconsole.log(polluted); // true\n```\n\n### Recommendation\n\nUpgrade to version 3.2.2, 4.0.1, 5.0.5 or later.",
+      "url": "https://github.com/advisories/GHSA-c4w7-xm78-47vh"
+    },
+    "1005523": {
+      "findings": [
+        {
+          "version": "1.3.5",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>rc>ini"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<1.3.6",
+      "module_name": "ini",
+      "severity": "high",
+      "github_advisory_id": "GHSA-qqgx-2p2h-9c37",
+      "cves": [
+        "CVE-2020-7788"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.3.6",
+      "updated": "2020-12-10T16:51:40.000Z",
+      "recommendation": "Upgrade to version 1.3.6 or later",
+      "cwe": "CWE-1321",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005523,
+      "references": "- https://github.com/npm/ini/commit/56d2805e07ccd94e2ba0984ac9240ff02d44b6f1\n- https://www.npmjs.com/advisories/1589\n- https://snyk.io/vuln/SNYK-JS-INI-1048974\n- https://nvd.nist.gov/vuln/detail/CVE-2020-7788\n- https://lists.debian.org/debian-lts-announce/2020/12/msg00032.html\n- https://github.com/advisories/GHSA-qqgx-2p2h-9c37",
+      "created": "2021-11-18T16:00:48.547Z",
+      "reported_by": null,
+      "title": "Prototype Pollution",
+      "npm_advisory_id": null,
+      "overview": "### Overview\nThe `ini` npm package before version 1.3.6 has a Prototype Pollution vulnerability.\n\nIf an attacker submits a malicious INI file to an application that parses it with `ini.parse`, they will pollute the prototype on the application. This can be exploited further depending on the context.\n\n### Patches\n\nThis has been patched in 1.3.6\n\n### Steps to reproduce\n\npayload.ini\n```\n[__proto__]\npolluted = \"polluted\"\n```\n\npoc.js:\n```\nvar fs = require('fs')\nvar ini = require('ini')\n\nvar parsed = ini.parse(fs.readFileSync('./payload.ini', 'utf-8'))\nconsole.log(parsed)\nconsole.log(parsed.__proto__)\nconsole.log(polluted)\n```\n\n```\n> node poc.js\n{}\n{ polluted: 'polluted' }\n{ polluted: 'polluted' }\npolluted\n```",
+      "url": "https://github.com/advisories/GHSA-qqgx-2p2h-9c37"
+    },
+    "1005560": {
+      "findings": [
+        {
+          "version": "1.7.3",
+          "paths": [
+            "firebase>@firebase/functions>isomorphic-fetch>node-fetch"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<2.6.1",
+      "module_name": "node-fetch",
+      "severity": "low",
+      "github_advisory_id": "GHSA-w7rc-rwvf-8q5r",
+      "cves": [
+        "CVE-2020-15168"
+      ],
+      "access": "public",
+      "patched_versions": ">=2.6.1",
+      "updated": "2020-09-10T17:44:10.000Z",
+      "recommendation": "Upgrade to version 2.6.1 or later",
+      "cwe": "CWE-20",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005560,
+      "references": "- https://github.com/node-fetch/node-fetch/security/advisories/GHSA-w7rc-rwvf-8q5r\n- https://www.npmjs.com/package/node-fetch\n- https://nvd.nist.gov/vuln/detail/CVE-2020-15168\n- https://github.com/advisories/GHSA-w7rc-rwvf-8q5r",
+      "created": "2021-11-18T16:00:48.550Z",
+      "reported_by": null,
+      "title": "The `size` option isn't honored after following a redirect in node-fetch",
+      "npm_advisory_id": null,
+      "overview": "### Impact\nNode Fetch did not honor the `size` option after following a redirect, which means that when a content size was over the limit, a `FetchError` would never get thrown and the process would end without failure.\n\nFor most people, this fix will have a little or no impact. However, if you are relying on node-fetch to gate files above a size, the impact could be significant, for example: If you don't double-check the size of the data after `fetch()` has completed, your JS thread could get tied up doing work on a large file (DoS) and/or cost you money in computing.\n\n### Patches\nWe released patched versions for both stable and beta channels:\n\n- For `v2`: 2.6.1\n- For `v3`: 3.0.0-beta.9\n\n### Workarounds\nNone, it is strongly recommended to update as soon as possible.\n\n### For more information\nIf you have any questions or comments about this advisory:\n* Open an issue in [node-fetch](https://github.com/node-fetch/node-fetch/issues/new?assignees=&labels=question&template=support-or-usage.md&title=Question%3A+)\n* Contact one of the core maintainers.",
+      "url": "https://github.com/advisories/GHSA-w7rc-rwvf-8q5r"
+    },
+    "1005671": {
+      "findings": [
+        {
+          "version": "4.13.0",
+          "paths": [
+            "node-sass"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=3.3.0 <4.13.1",
+      "module_name": "node-sass",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-9v62-24cr-58cx",
+      "cves": [],
+      "access": "public",
+      "patched_versions": ">=4.13.1",
+      "updated": "2020-08-31T18:42:10.000Z",
+      "recommendation": "Upgrade to version 4.13.1 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005671,
+      "references": "- https://www.npmjs.com/advisories/961\n- https://github.com/sass/node-sass/commit/338fd7a14d3b8bd374a382336df16f9c6792b884\n- https://github.com/advisories/GHSA-9v62-24cr-58cx",
+      "created": "2021-11-18T16:00:48.560Z",
+      "reported_by": null,
+      "title": "Denial of Service in node-sass",
+      "npm_advisory_id": null,
+      "overview": "Affected versions of `node-sass` are vulnerable to Denial of Service (DoS). Crafted objects passed to the `renderSync` function may trigger C++ assertions in `CustomImporterBridge::get_importer_entry` and `CustomImporterBridge::post_process_return_value` that crash the Node process. This may allow attackers to crash the system's running Node process and lead to Denial of Service.\n\n\n## Recommendation\n\nUpgrade to version 4.13.1 or later",
+      "url": "https://github.com/advisories/GHSA-9v62-24cr-58cx"
+    },
+    "1005685": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "materialize-css"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=1.0.0",
+      "module_name": "materialize-css",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-98f7-p5rc-jx67",
+      "cves": [
+        "CVE-2019-11002"
+      ],
+      "access": "public",
+      "patched_versions": "<0.0.0",
+      "updated": "2020-08-31T18:36:56.000Z",
+      "recommendation": "None",
+      "cwe": "CWE-79",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005685,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2019-11002\n- https://github.com/Dogfalo/materialize/issues/6286\n- https://github.com/advisories/GHSA-98f7-p5rc-jx67\n- https://snyk.io/vuln/SNYK-JS-MATERIALIZECSS-174148\n- https://www.npmjs.com/advisories/818",
+      "created": "2021-11-18T16:00:48.561Z",
+      "reported_by": null,
+      "title": "Cross-Site Scripting in materialize-css",
+      "npm_advisory_id": null,
+      "overview": "All versions of `materialize-css` are vulnerable to Cross-Site Scripting. The `tooltip` component does not sufficiently sanitize user input, allowing an attacker to execute arbitrary JavaScript code if the malicious input is rendered by a user.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "url": "https://github.com/advisories/GHSA-98f7-p5rc-jx67"
+    },
+    "1005686": {
+      "findings": [
+        {
+          "version": "1.0.0",
+          "paths": [
+            "materialize-css"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<=1.0.0",
+      "module_name": "materialize-css",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-7752-f4gf-94gc",
+      "cves": [
+        "CVE-2019-11003"
+      ],
+      "access": "public",
+      "patched_versions": "<0.0.0",
+      "updated": "2020-08-31T18:36:54.000Z",
+      "recommendation": "None",
+      "cwe": "CWE-79",
+      "found_by": null,
+      "deleted": null,
+      "id": 1005686,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2019-11003\n- https://github.com/Dogfalo/materialize/issues/6286\n- https://github.com/advisories/GHSA-7752-f4gf-94gc\n- https://snyk.io/vuln/SNYK-JS-MATERIALIZECSS-174144\n- https://www.npmjs.com/advisories/817",
+      "created": "2021-11-18T16:00:48.561Z",
+      "reported_by": null,
+      "title": "Cross-Site Scripting in materialize-css",
+      "npm_advisory_id": null,
+      "overview": "All versions of `materialize-css` are vulnerable to Cross-Site Scripting. The `autocomplete` component does not sufficiently sanitize user input, allowing an attacker to execute arbitrary JavaScript code if the malicious input is rendered by a user.\n\n\n## Recommendation\n\nNo fix is currently available. Consider using an alternative module until a fix is made available.",
+      "url": "https://github.com/advisories/GHSA-7752-f4gf-94gc"
+    },
+    "1006094": {
+      "findings": [
+        {
+          "version": "4.17.15",
+          "paths": [
+            "node-sass>lodash",
+            "enzyme>cheerio>lodash",
+            "node-sass>gaze>globule>lodash",
+            "styled-components>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>@svgr/webpack>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+            "react-scripts>workbox-webpack-plugin>workbox-build>@babel/preset-env>@babel/preset-modules>@babel/types>lodash",
+            "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/types>lodash",
+            "react-scripts>jest>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/generator>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>jest-jasmine2>@babel/traverse>@babel/helper-function-name>@babel/helper-get-function-arity>@babel/types>lodash",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>babel-preset-jest>babel-plugin-jest-hoist>@types/babel__core>@types/babel__generator>@babel/types>lodash"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<4.17.19",
+      "module_name": "lodash",
+      "severity": "high",
+      "github_advisory_id": "GHSA-p6mc-m468-83gw",
+      "cves": [
+        "CVE-2020-8203"
+      ],
+      "access": "public",
+      "patched_versions": ">=4.17.19",
+      "updated": "2020-07-15T19:15:01.000Z",
+      "recommendation": "Upgrade to version 4.17.19 or later",
+      "cwe": "CWE-770",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006094,
+      "references": "- https://github.com/lodash/lodash/issues/4744\n- https://github.com/lodash/lodash/commit/c84fe82760fb2d3e03a63379b297a1cc1a2fce12\n- https://www.npmjs.com/advisories/1523\n- https://nvd.nist.gov/vuln/detail/CVE-2020-8203\n- https://hackerone.com/reports/712065\n- https://security.netapp.com/advisory/ntap-20200724-0006/\n- https://github.com/lodash/lodash/issues/4874\n- https://www.oracle.com/security-alerts/cpuApr2021.html\n- https://www.oracle.com//security-alerts/cpujul2021.html\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://github.com/advisories/GHSA-p6mc-m468-83gw",
+      "created": "2021-11-18T16:00:48.598Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in lodash",
+      "npm_advisory_id": null,
+      "overview": "Versions of lodash prior to 4.17.19 are vulnerable to Prototype Pollution. The function zipObjectDeep allows a malicious user to modify the prototype of Object if the property identifiers are user-supplied. Being affected by this issue requires zipping objects based on user-provided property arrays.\n\nThis vulnerability causes the addition or modification of an existing property that will exist on all objects and may lead to Denial of Service or Code Execution under specific circumstances.",
+      "url": "https://github.com/advisories/GHSA-p6mc-m468-83gw"
+    },
+    "1006147": {
+      "findings": [
+        {
+          "version": "0.1.3",
+          "paths": [
+            "firebase>@firebase/database>faye-websocket>websocket-driver>websocket-extensions",
+            "react-scripts>webpack-dev-server>sockjs>faye-websocket>websocket-driver>websocket-extensions"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.1.4",
+      "module_name": "websocket-extensions",
+      "severity": "high",
+      "github_advisory_id": "GHSA-g78m-2chm-r7qv",
+      "cves": [
+        "CVE-2020-7662"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.1.4",
+      "updated": "2020-06-03T23:10:29.000Z",
+      "recommendation": "Upgrade to version 0.1.4 or later",
+      "cwe": "CWE-400",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006147,
+      "references": "- https://github.com/faye/websocket-extensions-node/security/advisories/GHSA-g78m-2chm-r7qv\n- https://nvd.nist.gov/vuln/detail/CVE-2020-7662\n- https://github.com/faye/websocket-extensions-node/commit/29496f6838bfadfe5a2f85dff33ed0ba33873237\n- https://blog.jcoglan.com/2020/06/02/redos-vulnerability-in-websocket-extensions\n- https://snyk.io/vuln/SNYK-JS-WEBSOCKETEXTENSIONS-570623\n- https://github.com/advisories/GHSA-g78m-2chm-r7qv",
+      "created": "2021-11-18T16:00:48.602Z",
+      "reported_by": null,
+      "title": "Regular Expression Denial of Service in websocket-extensions (NPM package)",
+      "npm_advisory_id": null,
+      "overview": "### Impact\n\nThe ReDoS flaw allows an attacker to exhaust the server's capacity to process\nincoming requests by sending a WebSocket handshake request containing a header\nof the following form:\n\n    Sec-WebSocket-Extensions: a; b=\"\\c\\c\\c\\c\\c\\c\\c\\c\\c\\c ...\n\nThat is, a header containing an unclosed string parameter value whose content is\na repeating two-byte sequence of a backslash and some other character. The\nparser takes exponential time to reject this header as invalid, and this will\nblock the processing of any other work on the same thread. Thus if you are\nrunning a single-threaded server, such a request can render your service\ncompletely unavailable.\n\n### Patches\n\nUsers should upgrade to version 0.1.4.\n\n### Workarounds\n\nThere are no known work-arounds other than disabling any public-facing\nWebSocket functionality you are operating.\n\n### References\n\n- https://blog.jcoglan.com/2020/06/02/redos-vulnerability-in-websocket-extensions/",
+      "url": "https://github.com/advisories/GHSA-g78m-2chm-r7qv"
+    },
+    "1006168": {
+      "findings": [
+        {
+          "version": "3.4.1",
+          "paths": [
+            "jquery"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=1.2 <3.5.0",
+      "module_name": "jquery",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-gxr4-xjj5-5px2",
+      "cves": [
+        "CVE-2020-11022"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.5.0",
+      "updated": "2020-04-29T22:18:38.000Z",
+      "recommendation": "Upgrade to version 3.5.0 or later",
+      "cwe": "CWE-79",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006168,
+      "references": "- https://github.com/jquery/jquery/security/advisories/GHSA-gxr4-xjj5-5px2\n- https://github.com/jquery/jquery/commit/1d61fd9407e6fbe82fe55cb0b938307aa0791f77\n- https://blog.jquery.com/2020/04/10/jquery-3-5-0-released/\n- https://jquery.com/upgrade-guide/3.5/\n- https://nvd.nist.gov/vuln/detail/CVE-2020-11022\n- https://security.netapp.com/advisory/ntap-20200511-0006/\n- https://www.drupal.org/sa-core-2020-002\n- https://www.debian.org/security/2020/dsa-4693\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/VOE7P7APPRQKD4FGNHBKJPDY6FFCOH3W/\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/QPN2L2XVQGUA2V5HNQJWHK3APSK3VN7K/\n- https://www.oracle.com/security-alerts/cpujul2020.html\n- http://lists.opensuse.org/opensuse-security-announce/2020-07/msg00067.html\n- https://security.gentoo.org/glsa/202007-03\n- http://lists.opensuse.org/opensuse-security-announce/2020-07/msg00085.html\n- https://lists.apache.org/thread.html/rdf44341677cf7eec7e9aa96dcf3f37ed709544863d619cca8c36f133@%3Ccommits.airflow.apache.org%3E\n- https://github.com/advisories/GHSA-gxr4-xjj5-5px2\n- https://www.npmjs.com/advisories/1518\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AVKYXLWCLZBV2N7M46KYK4LVA5OXWPBY/\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SFP4UK4EGP4AFH2MWYJ5A5Z4I7XVFQ6B/\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SAPQVX3XDNPGFT26QAQ6AJIXZZBZ4CD4/\n- https://www.oracle.com/security-alerts/cpuoct2020.html\n- https://lists.apache.org/thread.html/r706cfbc098420f7113968cc377247ec3d1439bce42e679c11c609e2d@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/rbb448222ba62c430e21e13f940be4cb5cfc373cd3bce56b48c0ffa67@%3Cdev.flink.apache.org%3E\n- http://lists.opensuse.org/opensuse-security-announce/2020-11/msg00039.html\n- https://lists.apache.org/thread.html/r49ce4243b4738dd763caeb27fa8ad6afb426ae3e8c011ff00b8b1f48@%3Cissues.flink.apache.org%3E\n- https://www.tenable.com/security/tns-2020-10\n- https://www.tenable.com/security/tns-2020-11\n- https://www.oracle.com/security-alerts/cpujan2021.html\n- https://lists.apache.org/thread.html/r564585d97bc069137e64f521e68ba490c7c9c5b342df5d73c49a0760@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/r8f70b0f65d6bedf316ecd899371fd89e65333bc988f6326d2956735c@%3Cissues.flink.apache.org%3E\n- https://www.tenable.com/security/tns-2021-02\n- https://lists.debian.org/debian-lts-announce/2021/03/msg00033.html\n- http://packetstormsecurity.com/files/162159/jQuery-1.2-Cross-Site-Scripting.html\n- https://lists.apache.org/thread.html/rede9cfaa756e050a3d83045008f84a62802fc68c17f2b4eabeaae5e4@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/ree3bd8ddb23df5fa4e372d11c226830ea3650056b1059f3965b3fce2@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/r54565a8f025c7c4f305355fdfd75b68eca442eebdb5f31c2e7d977ae@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/re4ae96fa5c1a2fe71ccbb7b7ac1538bd0cb677be270a2bf6e2f8d108@%3Cissues.flink.apache.org%3E\n- https://www.tenable.com/security/tns-2021-10\n- https://www.oracle.com/security-alerts/cpuApr2021.html\n- https://www.oracle.com//security-alerts/cpujul2021.html\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://lists.apache.org/thread.html/r0483ba0072783c2e1bfea613984bfb3c86e73ba8879d780dc1cc7d36@%3Cissues.flink.apache.org%3E\n- https://github.com/jquery/jquery/releases/tag/3.5.0",
+      "created": "2021-11-18T16:00:48.603Z",
+      "reported_by": null,
+      "title": "Potential XSS vulnerability in jQuery",
+      "npm_advisory_id": null,
+      "overview": "### Impact\nPassing HTML from untrusted sources - even after sanitizing it - to one of jQuery's DOM manipulation methods (i.e. `.html()`, `.append()`, and others) may execute untrusted code.\n\n### Patches\nThis problem is patched in jQuery 3.5.0.\n\n### Workarounds\nTo workaround the issue without upgrading, adding the following to your code:\n\n```js\njQuery.htmlPrefilter = function( html ) {\n\treturn html;\n};\n```\n\nYou need to use at least jQuery 1.12/2.2 or newer to be able to apply this workaround.\n\n### References\nhttps://blog.jquery.com/2020/04/10/jquery-3-5-0-released/\nhttps://jquery.com/upgrade-guide/3.5/\n\n### For more information\nIf you have any questions or comments about this advisory, search for a relevant issue in [the jQuery repo](https://github.com/jquery/jquery/issues). If you don't find an answer, open a new issue.",
+      "url": "https://github.com/advisories/GHSA-gxr4-xjj5-5px2"
+    },
+    "1006169": {
+      "findings": [
+        {
+          "version": "3.4.1",
+          "paths": [
+            "jquery"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=1.0.3 <3.5.0",
+      "module_name": "jquery",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-jpcq-cgw6-v4j6",
+      "cves": [
+        "CVE-2020-11023"
+      ],
+      "access": "public",
+      "patched_versions": ">=3.5.0",
+      "updated": "2020-04-29T22:15:52.000Z",
+      "recommendation": "Upgrade to version 3.5.0 or later",
+      "cwe": "CWE-79",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006169,
+      "references": "- https://github.com/jquery/jquery/security/advisories/GHSA-jpcq-cgw6-v4j6\n- https://jquery.com/upgrade-guide/3.5/\n- https://blog.jquery.com/2020/04/10/jquery-3-5-0-released\n- https://nvd.nist.gov/vuln/detail/CVE-2020-11023\n- https://security.netapp.com/advisory/ntap-20200511-0006/\n- https://www.drupal.org/sa-core-2020-002\n- https://www.debian.org/security/2020/dsa-4693\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/QPN2L2XVQGUA2V5HNQJWHK3APSK3VN7K/\n- https://www.oracle.com/security-alerts/cpujul2020.html\n- http://lists.opensuse.org/opensuse-security-announce/2020-07/msg00067.html\n- https://security.gentoo.org/glsa/202007-03\n- http://lists.opensuse.org/opensuse-security-announce/2020-07/msg00085.html\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/AVKYXLWCLZBV2N7M46KYK4LVA5OXWPBY/\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SFP4UK4EGP4AFH2MWYJ5A5Z4I7XVFQ6B/\n- https://lists.apache.org/thread.html/r0593393ca1e97b1e7e098fe69d414d6bd0a467148e9138d07e86ebbb@%3Cissues.hive.apache.org%3E\n- https://lists.fedoraproject.org/archives/list/package-announce@lists.fedoraproject.org/message/SAPQVX3XDNPGFT26QAQ6AJIXZZBZ4CD4/\n- https://lists.apache.org/thread.html/r094f435595582f6b5b24b66fedf80543aa8b1d57a3688fbcc21f06ec@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/r1fed19c860a0d470f2a3eded12795772c8651ff583ef951ddac4918c@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/r4aadb98086ca72ed75391f54167522d91489a0d0ae25b12baa8fc7c5@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/r6c4df3b33e625a44471009a172dabe6865faec8d8f21cac2303463b1@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/r6e97b37963926f6059ecc1e417721608723a807a76af41d4e9dbed49@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/r9c5fda81e4bca8daee305b4c03283dddb383ab8428a151d4cb0b3b15@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/ra32c7103ded9041c7c1cb8c12c8d125a6b2f3f3270e2937ef8417fac@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/ra374bb0299b4aa3e04edde01ebc03ed6f90cf614dad40dd428ce8f72@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/ra3c9219fcb0b289e18e9ec5a5ebeaa5c17d6b79a201667675af6721c@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/ra406b3adfcffcb5ce8707013bdb7c35e3ffc2776a8a99022f15274c6@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rab82dd040f302018c85bd07d33f5604113573514895ada523c3401d9@%3Ccommits.hive.apache.org%3E\n- https://lists.apache.org/thread.html/radcb2aa874a79647789f3563fcbbceaf1045a029ee8806b59812a8ea@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rb25c3bc7418ae75cba07988dafe1b6912f76a9dd7d94757878320d61@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rb69b7d8217c1a6a2100247a5d06ce610836b31e3f5d73fc113ded8e7@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rd38b4185a797b324c8dd940d9213cf99fcdc2dbf1fc5a63ba7dee8c9@%3Cissues.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rda99599896c3667f2cc9e9d34c7b6ef5d2bbed1f4801e1d75a2b0679@%3Ccommits.nifi.apache.org%3E\n- https://lists.apache.org/thread.html/rf1ba79e564fe7efc56aef7c986106f1cf67a3427d08e997e088e7a93@%3Cgitbox.hive.apache.org%3E\n- https://lists.apache.org/thread.html/rf661a90a15da8da5922ba6127b3f5f8194d4ebec8855d60a0dd13248@%3Cdev.hive.apache.org%3E\n- https://www.oracle.com/security-alerts/cpuoct2020.html\n- https://lists.apache.org/thread.html/r706cfbc098420f7113968cc377247ec3d1439bce42e679c11c609e2d@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/rbb448222ba62c430e21e13f940be4cb5cfc373cd3bce56b48c0ffa67@%3Cdev.flink.apache.org%3E\n- http://lists.opensuse.org/opensuse-security-announce/2020-11/msg00039.html\n- https://lists.apache.org/thread.html/r49ce4243b4738dd763caeb27fa8ad6afb426ae3e8c011ff00b8b1f48@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/r07ab379471fb15644bf7a92e4a98cbc7df3cf4e736abae0cc7625fe6@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r2c85121a47442036c7f8353a3724aa04f8ecdfda1819d311ba4f5330@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r3702ede0ff83a29ba3eb418f6f11c473d6e3736baba981a8dbd9c9ef@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r4dba67be3239b34861f1b9cfdf9dfb3a90272585dcce374112ed6e16@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r55f5e066cc7301e3630ce90bbbf8d28c82212ae1f2d4871012141494@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r9006ad2abf81d02a0ef2126bab5177987e59095b7194a487c4ea247c@%3Ccommits.felix.apache.org%3E\n- https://lists.apache.org/thread.html/r9e0bd31b7da9e7403478d22652b8760c946861f8ebd7bd750844898e@%3Cdev.felix.apache.org%3E\n- https://lists.apache.org/thread.html/rf0f8939596081d84be1ae6a91d6248b96a02d8388898c372ac807817@%3Cdev.felix.apache.org%3E\n- https://www.oracle.com/security-alerts/cpujan2021.html\n- https://lists.apache.org/thread.html/r564585d97bc069137e64f521e68ba490c7c9c5b342df5d73c49a0760@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/r8f70b0f65d6bedf316ecd899371fd89e65333bc988f6326d2956735c@%3Cissues.flink.apache.org%3E\n- https://www.tenable.com/security/tns-2021-02\n- https://lists.debian.org/debian-lts-announce/2021/03/msg00033.html\n- http://packetstormsecurity.com/files/162160/jQuery-1.0.3-Cross-Site-Scripting.html\n- https://lists.apache.org/thread.html/rede9cfaa756e050a3d83045008f84a62802fc68c17f2b4eabeaae5e4@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/ree3bd8ddb23df5fa4e372d11c226830ea3650056b1059f3965b3fce2@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/r54565a8f025c7c4f305355fdfd75b68eca442eebdb5f31c2e7d977ae@%3Cissues.flink.apache.org%3E\n- https://lists.apache.org/thread.html/re4ae96fa5c1a2fe71ccbb7b7ac1538bd0cb677be270a2bf6e2f8d108@%3Cissues.flink.apache.org%3E\n- https://www.tenable.com/security/tns-2021-10\n- https://www.oracle.com/security-alerts/cpuApr2021.html\n- https://www.oracle.com//security-alerts/cpujul2021.html\n- https://www.oracle.com/security-alerts/cpuoct2021.html\n- https://lists.apache.org/thread.html/r0483ba0072783c2e1bfea613984bfb3c86e73ba8879d780dc1cc7d36@%3Cissues.flink.apache.org%3E\n- https://github.com/jquery/jquery/releases/tag/3.5.0\n- https://github.com/advisories/GHSA-jpcq-cgw6-v4j6",
+      "created": "2021-11-18T16:00:48.603Z",
+      "reported_by": null,
+      "title": "Potential XSS vulnerability in jQuery",
+      "npm_advisory_id": null,
+      "overview": "### Impact\nPassing HTML containing `<option>` elements from untrusted sources - even after sanitizing them - to one of jQuery's DOM manipulation methods (i.e. `.html()`, `.append()`, and others) may execute untrusted code.\n\n### Patches\nThis problem is patched in jQuery 3.5.0.\n\n### Workarounds\nTo workaround this issue without upgrading, use [DOMPurify](https://github.com/cure53/DOMPurify) with its `SAFE_FOR_JQUERY` option to sanitize the HTML string before passing it to a jQuery method.\n\n### References\nhttps://blog.jquery.com/2020/04/10/jquery-3-5-0-released/\n\n### For more information\nIf you have any questions or comments about this advisory, search for a relevant issue in [the jQuery repo](https://github.com/jquery/jquery/issues). If you don't find an answer, open a new issue.",
+      "url": "https://github.com/advisories/GHSA-jpcq-cgw6-v4j6"
+    },
+    "1006179": {
+      "findings": [
+        {
+          "version": "1.2.0",
+          "paths": [
+            "coveralls>minimist",
+            "node-sass>meow>minimist",
+            "react-scripts>eslint-plugin-import>tsconfig-paths>minimist",
+            "react-scripts>babel-loader>loader-utils>json5>minimist",
+            "react-scripts>babel-jest>@jest/transform>jest-haste-map>sane>minimist",
+            "react-scripts>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>@jest/core>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>@jest/core>@jest/reporters>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>@jest/core>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>jest-cli>@jest/core>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist",
+            "react-scripts>jest>jest-cli>@jest/core>jest-runner>jest-runtime>jest-config>babel-jest>@jest/transform>jest-haste-map>sane>@cnakazawa/watch>minimist"
+          ]
+        },
+        {
+          "version": "1.2.0",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>rc>minimist"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": ">=1.0.0 <1.2.3",
+      "module_name": "minimist",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-vh95-rmgr-6w4m",
+      "cves": [
+        "CVE-2020-7598"
+      ],
+      "access": "public",
+      "patched_versions": ">=1.2.3",
+      "updated": "2020-04-03T21:42:10.000Z",
+      "recommendation": "Upgrade to version 1.2.3 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006179,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7598\n- https://github.com/substack/minimist/commit/38a4d1caead72ef99e824bb420a2528eec03d9ab\n- https://github.com/substack/minimist/commit/63e7ed05aa4b1889ec2f3b196426db4500cbda94\n- https://snyk.io/vuln/SNYK-JS-MINIMIST-559764\n- http://lists.opensuse.org/opensuse-security-announce/2020-06/msg00024.html\n- https://github.com/substack/minimist/commit/4cf1354839cb972e38496d35e12f806eea92c11f#diff-a1e0ee62c91705696ddb71aa30ad4f95\n- https://www.npmjs.com/advisories/1179\n- https://github.com/advisories/GHSA-vh95-rmgr-6w4m",
+      "created": "2021-11-18T16:00:48.604Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in minimist",
+      "npm_advisory_id": null,
+      "overview": "Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n\n\n\n## Recommendation\n\nUpgrade to versions 0.2.1, 1.2.3 or later.",
+      "url": "https://github.com/advisories/GHSA-vh95-rmgr-6w4m"
+    },
+    "1006180": {
+      "findings": [
+        {
+          "version": "0.0.8",
+          "paths": [
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>mkdirp>minimist",
+            "firebase>@firebase/firestore>grpc>node-pre-gyp>tar>mkdirp>minimist"
+          ]
+        },
+        {
+          "version": "0.0.8",
+          "paths": [
+            "node-sass>mkdirp>minimist",
+            "node-sass>node-gyp>mkdirp>minimist",
+            "node-sass>node-gyp>fstream>mkdirp>minimist",
+            "node-sass>node-gyp>tar>fstream>mkdirp>minimist",
+            "react-scripts>webpack>terser-webpack-plugin>cacache>move-concurrently>mkdirp>minimist",
+            "react-scripts>optimize-css-assets-webpack-plugin>cssnano>cssnano-preset-default>postcss-svgo>svgo>mkdirp>minimist"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.2.1",
+      "module_name": "minimist",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-vh95-rmgr-6w4m",
+      "cves": [
+        "CVE-2020-7598"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.2.1",
+      "updated": "2020-04-03T21:42:10.000Z",
+      "recommendation": "Upgrade to version 0.2.1 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006180,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2020-7598\n- https://github.com/substack/minimist/commit/38a4d1caead72ef99e824bb420a2528eec03d9ab\n- https://github.com/substack/minimist/commit/63e7ed05aa4b1889ec2f3b196426db4500cbda94\n- https://snyk.io/vuln/SNYK-JS-MINIMIST-559764\n- http://lists.opensuse.org/opensuse-security-announce/2020-06/msg00024.html\n- https://github.com/substack/minimist/commit/4cf1354839cb972e38496d35e12f806eea92c11f#diff-a1e0ee62c91705696ddb71aa30ad4f95\n- https://www.npmjs.com/advisories/1179\n- https://github.com/advisories/GHSA-vh95-rmgr-6w4m",
+      "created": "2021-11-18T16:00:48.604Z",
+      "reported_by": null,
+      "title": "Prototype Pollution in minimist",
+      "npm_advisory_id": null,
+      "overview": "Affected versions of `minimist` are vulnerable to prototype pollution. Arguments are not properly sanitized, allowing an attacker to modify the prototype of `Object`, causing the addition or modification of an existing property that will exist on all objects.  \nParsing the argument `--__proto__.y=Polluted` adds a `y` property with value `Polluted` to all objects. The argument `--__proto__=Polluted` raises and uncaught error and crashes the application.  \nThis is exploitable if attackers have control over the arguments being passed to `minimist`.\n\n\n\n## Recommendation\n\nUpgrade to versions 0.2.1, 1.2.3 or later.",
+      "url": "https://github.com/advisories/GHSA-vh95-rmgr-6w4m"
+    },
+    "1006724": {
+      "findings": [
+        {
+          "version": "0.2.3",
+          "paths": [
+            "coveralls>request>http-signature>jsprim>json-schema",
+            "node-sass>node-gyp>request>http-signature>jsprim>json-schema"
+          ]
+        }
+      ],
+      "metadata": null,
+      "vulnerable_versions": "<0.4.0",
+      "module_name": "json-schema",
+      "severity": "moderate",
+      "github_advisory_id": "GHSA-896r-f27r-55mw",
+      "cves": [
+        "CVE-2021-3918"
+      ],
+      "access": "public",
+      "patched_versions": ">=0.4.0",
+      "updated": "2021-11-15T22:44:28.000Z",
+      "recommendation": "Upgrade to version 0.4.0 or later",
+      "cwe": "CWE-915",
+      "found_by": null,
+      "deleted": null,
+      "id": 1006724,
+      "references": "- https://nvd.nist.gov/vuln/detail/CVE-2021-3918\n- https://github.com/kriszyp/json-schema/commit/22f146111f541d9737e832823699ad3528ca7741\n- https://huntr.dev/bounties/bb6ccd63-f505-4e3a-b55f-cd2662c261a9\n- https://github.com/kriszyp/json-schema/commit/b62f1da1ff5442f23443d6be6a92d00e65cba93a\n- https://github.com/kriszyp/json-schema/commit/f6f6a3b02d667aa4ba2d5d50cc19208c4462abfa\n- https://github.com/advisories/GHSA-896r-f27r-55mw",
+      "created": "2021-11-19T21:00:41.916Z",
+      "reported_by": null,
+      "title": "json-schema is vulnerable to Prototype Pollution",
+      "npm_advisory_id": null,
+      "overview": "json-schema is vulnerable to Improperly Controlled Modification of Object Prototype Attributes ('Prototype Pollution')",
+      "url": "https://github.com/advisories/GHSA-896r-f27r-55mw"
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 1,
+      "moderate": 66,
+      "high": 50,
+      "critical": 1
+    },
+    "dependencies": 2944,
+    "devDependencies": 3,
+    "optionalDependencies": 41,
+    "totalDependencies": 2988
+  },
+  "runId": "6a9dc616-5791-4cce-91da-46e8c3e0bb20"
+}

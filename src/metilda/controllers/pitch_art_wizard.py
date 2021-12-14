@@ -1,11 +1,11 @@
-from __future__ import with_statement
 import os
+from os import environ
 import shutil
 import tempfile
 import flask
 import uuid
 from flask import request, jsonify, send_file, flash
-from Postgres import Postgres
+from .Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io, praat, utils
@@ -16,16 +16,22 @@ import wave
 import pympi
 import pathlib
 import matplotlib
+from six.moves import range
 matplotlib.use('agg')
 from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
+from PIL import Image
 
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/api', methods=["GET"])
+def api():
+    return jsonify({'name': "MetildaAPI", 'version': "1.0"})
 
 @app.route('/api/audio/<string:upload_id>.png/image', methods=["GET"])
 def audio_analysis_image(upload_id):
@@ -432,7 +438,7 @@ def add_new_user_from_admin():
         user = auth.create_user(
         email=request.form['email'],
         password=request.form['password'])
-        print('Sucessfully created new user: {0}'.format(user.uid))
+        print(('Sucessfully created new user: {0}'.format(user.uid)))
         # Insert user into DB
         with Postgres() as connection:
             postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
@@ -441,7 +447,7 @@ def add_new_user_from_admin():
             last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
         return jsonify({'result': str(last_row_id)})
     except Exception as e:
-        print(str(e))
+        print((str(e)))
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/update-user-from-admin', methods=["POST"])
@@ -462,7 +468,7 @@ def update_user_from_admin():
         uid,
         email=email,
         password=password)
-        print('Sucessfully updated new user: {0}'.format(user.uid))
+        print(('Sucessfully updated new user: {0}'.format(user.uid)))
         # Update user in DB
         with Postgres() as connection:
             postgres_insert_query = """ UPDATE users SET USER_ID=%s,USER_NAME=%s, UNIVERSITY=%s WHERE USER_ID = %s"""
@@ -470,7 +476,7 @@ def update_user_from_admin():
             last_row_id = connection.execute_update_query(postgres_insert_query, record_to_insert)
         return jsonify({'result': str(last_row_id)})
     except Exception as e:
-        print(str(e))
+        print((str(e)))
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/delete-previous-user-roles', methods=["POST"])
@@ -690,11 +696,11 @@ def getOrCreateWords():
 
         return jsonify({"isSuccessful": True, 'word': word_id, 'creator': body["creator"], 'numSyllables': len(body["letters"])})
 
-
+#PELDA 
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
-
+    
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
     res = output.split()  # Split output into an array
@@ -720,26 +726,28 @@ def drawSound(upload_id):
               praat._sounds_dir, praat._images_dir]
 
     # Image name will be a combination of relevant params joined by a period.
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
-
+    image = praat._images_dir + ".".join(params[:-2]) + ".png"
+    
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
+    if environ.get('FLASK_ENV') == "development":
+        image_path = ("metilda/" + image)
+    else:
+        image_path = ("src/metilda/" + image)
+
     # If image does not exist, run script
-    if not os.path.isfile(image):
-       praat.runScript(script, params)
-       utils.resizeImage(image)
+    app.logger.info("Draw Image with time: " + image_path)
+    if not os.path.isfile(image_path):
+        praat.runScript(script, params)
+        utils.resizeImage(image_path)
 
     # Image should be available now, generated or cached
-    resp = app.make_response(open(image).read())
-    resp.content_type = "image/png"
-    os.remove(image)
-    #os.remove(sound_path)
-    return resp
-
+    #os.remove(image) // Should these images be removed at some point or left in Cache?
+    return send_file(image, mimetype='image/png')
+    
 @app.route('/draw-sound/<sound>/<startTime>/<endTime>', methods=["GET"])
 def drawSoundWithTime(sound, startTime, endTime):
-
     # Get URL parameters
     showSpectrogram = '0' if request.args.get("spectrogram") is None else '1'
     showPitch = '0' if request.args.get("pitch") is None else '1'
@@ -756,21 +764,25 @@ def drawSoundWithTime(sound, startTime, endTime):
              praat._sounds_dir, praat._images_dir];
 
     # Image name will be a combination of relevant params joined by a period.
-    image = 'src/metilda/' + praat._images_dir + ".".join(params[:-2]) + ".png"
+    image = praat._images_dir + ".".join(params[:-2]) + ".png"
 
     # Add image name to params list
     params.append(praat._images_dir + ".".join(params[:-2]) + ".png")
 
+    if environ.get('FLASK_ENV') == "development":
+        image_path = ("metilda/" + image)
+    else:
+        image_path = ("src/metilda/" + image)
+        
     # If image does not exist, run script
-    if not os.path.isfile(image):
-       praat.runScript(script, params)
-       utils.resizeImage(image)
+    app.logger.info("Draw Image with time: " + image_path)
+    if not os.path.isfile(image_path):
+        praat.runScript(script, params)
+        utils.resizeImage(image_path)
 
     # Image should be available now, generated or cached
-    resp = app.make_response(open(image).read())
-    resp.content_type = "image/png"
-    os.remove(image)
-    return resp
+    #os.remove(image)
+    return send_file(image, mimetype='image/png')
 
 @app.route('/get-bounds/<sound>', methods=["GET"])
 def getBounds(sound):
@@ -844,7 +856,7 @@ def intensityBounds(sound):
        "meanIntensity": float(res[4])
     }
 
-    return jsonify(bounds)   
+    return jsonify(bounds) 
 
 @app.route('/formant/number-of-frames/<sound>', methods=["GET"])
 def formantFrameCount(sound):

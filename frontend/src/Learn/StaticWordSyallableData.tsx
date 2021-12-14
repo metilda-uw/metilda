@@ -1,6 +1,7 @@
 import {MetildaWord} from "./types";
 
 export default class StaticWordSyallableData {
+    // @ts-ignore
     getData = (numSyllables: number, accentIndex: number): MetildaWord[] => {
         switch (numSyllables) {
             case 2:
@@ -10,6 +11,7 @@ export default class StaticWordSyallableData {
                     case 1:
                         return WORDS.pitchArt22;
                 }
+                break;
             case 3:
                 switch (accentIndex) {
                     case 0:
@@ -19,6 +21,7 @@ export default class StaticWordSyallableData {
                     case 2:
                         return WORDS.pitchArt33;
                 }
+                break;
             case 4:
                 switch (accentIndex) {
                     case 0:
@@ -28,6 +31,7 @@ export default class StaticWordSyallableData {
                     case 2:
                         return WORDS.pitchArt43;
                 }
+                break;
             default:
                 return WORDS.pitchArt21;
         }

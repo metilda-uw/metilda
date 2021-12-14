@@ -55,7 +55,7 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
             return;
         }
 
-        const isOk: boolean = confirm(
+        const isOk: boolean = window.confirm(
             "The current speaker will be removed.\n\n" +
             "Do you want to continue?"
         );
@@ -72,7 +72,7 @@ export class SpeakerControl extends React.Component<SpeakerControlProps> {
             return;
         }
 
-        const isOk: boolean = confirm(
+        const isOk: boolean = window.confirm(
             "The current speaker will be reset.\n\n" +
             "Do you want to continue?"
         );
