@@ -9,9 +9,6 @@ export interface Props {
 }
 
 export class Landing extends React.Component<Props> {
-  constructor(props: any) {
-    super(props);
-  }
 
   displayLoginPage = () => {
     this.props.history.push(ROUTES.SIGN_IN);
@@ -21,7 +18,7 @@ export class Landing extends React.Component<Props> {
     return (
       <div className="landing_Page">
         <h3>MeTILDA</h3>
-        <h5> Melodic Transciption in Language Documentation and Application</h5>
+        <h5> Melodic Transcription in Language Documentation and Application</h5>
         <p>
           {" "}
           Learning and Analysis Platform for Linguistic Researchers and
