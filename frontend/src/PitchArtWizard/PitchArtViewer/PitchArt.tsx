@@ -3,6 +3,7 @@ import {createRef} from "react";
 import {Letter, Speaker} from "../../types/types";
 import "./PitchArt.css";
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
+import BeatPoint from "./BeatPoints/BeatPoint";
 
 interface Props {
     width: number;
@@ -87,12 +88,22 @@ class PitchArt extends React.Component<Props> {
         const hiddenPitchArt = this.createPitchArt(false);
 
         return (
-            <div>
+            <div>  
                 <div>
                     {visiblePitchArt}
                 </div>
                 <div className="hide">
                     {hiddenPitchArt}
+                </div>
+                <div>
+                    <BeatPoint
+                        speakers={this.props.speakers}
+                        width={this.props.width}
+                        height={this.props.height/4}
+                        minPitch={this.props.minPitch}
+                        maxPitch={this.props.maxPitch}
+                        showPitchArtImageColor={this.props.showPitchArtImageColor}
+                    />  
                 </div>
                 <div id="metilda-pitch-art-btn-container">
                     <button className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
