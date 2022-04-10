@@ -10,6 +10,7 @@ import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
+import PitchArtMetildaWatermark from "./PitchArtMetildaWatermark";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
 import {uploadAnalysis, uploadImage, uploadImageAnalysisIds} from "../../Create/ImportUtils";
@@ -48,6 +49,7 @@ export interface PitchArtDrawingWindowProps {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showPrevPitchValueLists: boolean;
+    showMetildaWatermark: boolean;
     rawPitchValueLists?: RawPitchValue[][];
     firebase: any;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
@@ -498,6 +500,21 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
             />
         );
     }
+    
+    maybeShowMetildaWatermark = (windowConfig: PitchArtWindowConfig) => {
+        if (!this.props.showMetildaWatermark) {
+            return;
+        }
+
+        return (
+            <PitchArtMetildaWatermark
+                fontSize={this.fontSize}
+                windowConfig={windowConfig}
+                xOrigin={windowConfig.x0 * 0.77}
+                xMax={windowConfig.x0 + windowConfig.innerWidth + (windowConfig.x0 / 2)}
+            />
+        );
+    }
 
 render() {
         const windowConfig = {
@@ -542,6 +559,7 @@ render() {
                               onMouseLeave={() => this.setPointerEnabled(false)}/>
                     </Layer>
                     {this.maybeShowPitchScale(windowConfig)}
+                    {this.maybeShowMetildaWatermark(windowConfig)}
                     <PitchArtGeometry speakers={this.props.speakers}
                                       windowConfig={windowConfig}
                                       setLetterPitch={this.props.setLetterPitch}

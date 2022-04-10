@@ -780,6 +780,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
                                         showPerceptualScale={true}
                                         showLargeCircles={true}
                                         showPitchArtImageColor={true}
+                                        showMetildaWatermark={false}
                                         showPrevPitchValueLists={this.state.showPrevPitchValueLists}
                                         speakers={speakers}
                                         rawPitchValueLists={this.state.userPitchValueLists}
