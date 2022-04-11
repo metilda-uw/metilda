@@ -510,8 +510,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
             <PitchArtMetildaWatermark
                 fontSize={this.fontSize}
                 windowConfig={windowConfig}
-                xOrigin={windowConfig.x0 * 0.77}
-                xMax={windowConfig.x0 + windowConfig.innerWidth + (windowConfig.x0 / 2)}
+                xOrigin={windowConfig.x0}
+                xMax={windowConfig.x0 + windowConfig.innerWidth}
             />
         );
     }
