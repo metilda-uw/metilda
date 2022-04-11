@@ -39,12 +39,13 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
 
             <Layer>
                 <Text 
-                    x={this.props.xMax * .25}
-                    y={this.props.windowConfig.dMax * .75}
-                    fontSize={this.props.fontSize * 2}
-                    fontFamily={"Helvetica"}
+                    x={this.props.windowConfig.x0}
+                    y={(this.props.windowConfig.y0 + this.props.windowConfig.innerHeight) / 2.0}
+                    fontSize={this.props.fontSize * 3}
+                    fontFamily={"Trebuchet MS"}
                     text="Created with MeTilda"
-                    opacity={.5}/>
+                    rotation={0}
+                    opacity={.25}/>
             </Layer>
         );
     }
