@@ -30,7 +30,6 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
             false
         );
 
-
         const yMin = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMin);
         const yMax = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMax);
 
