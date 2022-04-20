@@ -53,7 +53,7 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
                     x+=5;
                 }
                 text.push(
-                    <Text key={x+ y + "_wm"}
+                    <Text key={x.toString() + y.toString() + "_wm"}
                         x={x}
                         y={y}
                         fontFamily={"Trebuchet MS"}
