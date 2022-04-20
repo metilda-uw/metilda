@@ -1,9 +1,9 @@
 import * as React from "react";
-import {Group, Layer, Line, Text} from "react-konva";
-import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import {Stage, Group, Layer, Line, Text} from "react-konva";
 import {PitchArtWindowConfig} from "./types";
 
 interface Props {
+    type: string;
     fontSize: number;
     windowConfig: PitchArtWindowConfig;
     xOrigin: number;
@@ -11,41 +11,82 @@ interface Props {
 }
 
 export default class PitchArtMetildaWatermark extends React.Component<Props> {
-    static TEXT_BOX_HEIGHT(): number {
-        return 20;
+
+    renderWatermarkOption1 = (width, height) => {
+        let text = [];
+        let currX = width * .25;
+        let currY = height * .20;
+
+        for (let i = 1; i < 3; i++){
+            for (let j = 1; j < 4; j++){
+                text.push(
+                    <Text key={i.toString() + j.toString() + "_wm"}
+                        x={currX}
+                        y={currY}
+                        fontFamily={"Trebuchet MS"}
+                        fontSize={this.props.fontSize * 2}
+                        text="MeTilda"
+                        rotation={45}
+                        opacity={.25}
+                    />
+                );
+            currX += width * .25;
+            }
+            currX = width * .25;
+            currY += height * .40;
+        }
+        return (
+            <Layer>
+                {text}
+            </Layer>
+        );
+
     }
 
-    static TEXT_BOX_WIDTH(): number {
-        return 30;
+    renderWatermarkOption2 = (width, height) => {
+        let text = [];
+
+        for (let y = 10; y < height; y+=22){
+            
+            for (let x = 10; x < height; y+=65){
+                text.push(
+                    <Text key={x+ y + "_wm"}
+                        x={x}
+                        y={y}
+                        fontFamily={"Trebuchet MS"}
+                        fontSize={this.props.fontSize}
+                        text="MeTilda"
+                        opacity={.50}
+                    />
+                );
+            }
+
+        }
+        return (
+            <Layer 
+                offsetX={-5}
+                offsetY={-5}
+                width={100}
+                height={100}
+            > 
+                {text}
+            </Layer>
+        );
+
     }
 
     render() {
-        console.log("Rendering Watermark");
-        const coordConverter = new PitchArtCoordConverter(
-            this.props.windowConfig,
-            [{pitch: this.props.windowConfig.dMin, t0: 0, t1: 0},
-                        {pitch: this.props.windowConfig.dMax, t0: 1, t1: 1}],
-            false,
-            false,
-            false
-        );
 
-        const yMin = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMin);
-        const yMax = coordConverter.vertValueToRectCoords(this.props.windowConfig.dMax);
+        const width = this.props.windowConfig.x0 + this.props.windowConfig.innerWidth;
+        const height = this.props.windowConfig.y0 + this.props.windowConfig.innerHeight;
 
-        console.log(this.props.windowConfig.dMax);
-        return (
+        if (this.props.type == "wm1") {         
+            return this.renderWatermarkOption1(width, height);
+        }
 
-            <Layer>
-                <Text 
-                    x={this.props.windowConfig.x0}
-                    y={(this.props.windowConfig.y0 + this.props.windowConfig.innerHeight) / 2.0}
-                    fontSize={this.props.fontSize * 3}
-                    fontFamily={"Trebuchet MS"}
-                    text="Created with MeTilda"
-                    rotation={0}
-                    opacity={.25}/>
-            </Layer>
-        );
+        // Option 2 is the Metilda text repeating
+        // Create the text objects and add them to an array 
+
+        return this.renderWatermarkOption2(width, height);
     }
 }

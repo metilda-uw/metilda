@@ -503,17 +503,26 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
     
     maybeShowMetildaWatermark = (windowConfig: PitchArtWindowConfig) => {
         if (!this.props.showMetildaWatermark) {
-            return;
+            return (
+                <PitchArtMetildaWatermark
+                    type= "wm1"
+                    fontSize={this.fontSize}
+                    windowConfig={windowConfig}
+                    xOrigin={windowConfig.x0}
+                    xMax={windowConfig.x0 + windowConfig.innerWidth}
+                />
+            );
         }
 
         return (
             <PitchArtMetildaWatermark
+                type= "wm2"
                 fontSize={this.fontSize}
                 windowConfig={windowConfig}
                 xOrigin={windowConfig.x0}
                 xMax={windowConfig.x0 + windowConfig.innerWidth}
             />
-        );
+         );
     }
 
 render() {

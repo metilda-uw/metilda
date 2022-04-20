@@ -180,11 +180,11 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 onChange={this.toggleChanged}
                             />
                             <PitchArtToggle
-                                label={"Show Metilda Watermark"}
+                                label={"Metilda Watermark"}
                                 inputName={"showMetildaWatermark"}
                                 isSelected={this.state.showMetildaWatermark}
-                                offText="No"
-                                onText="Yes"
+                                offText="Option 1"
+                                onText="Option 2"
                                 onChange={this.toggleChanged}
                             />
                         </div>
