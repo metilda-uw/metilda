@@ -1,5 +1,5 @@
 import * as React from "react";
-import {Stage, Group, Layer, Line, Text} from "react-konva";
+import {Layer, Text} from "react-konva";
 import {PitchArtWindowConfig} from "./types";
 
 interface Props {
@@ -45,10 +45,13 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
 
     renderWatermarkOption2 = (width, height) => {
         let text = [];
-
+        let offset = 0;
         for (let y = 10; y < height; y+=22){
             
-            for (let x = 10; x < height; y+=65){
+            for (let x = 5; x < width + 60; x+=60){
+                if (offset == 1) { 
+                    x+=5;
+                }
                 text.push(
                     <Text key={x+ y + "_wm"}
                         x={x}
@@ -59,15 +62,18 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
                         opacity={.50}
                     />
                 );
+                
             }
-
+            if (offset == 0) {
+                offset = 1;
+            } else if (offset == 1) {
+                offset = 0;
+            }
         }
         return (
             <Layer 
                 offsetX={-5}
                 offsetY={-5}
-                width={100}
-                height={100}
             > 
                 {text}
             </Layer>
@@ -84,9 +90,8 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
             return this.renderWatermarkOption1(width, height);
         }
 
-        // Option 2 is the Metilda text repeating
-        // Create the text objects and add them to an array 
-
-        return this.renderWatermarkOption2(width, height);
+        if (this.props.type == "wm2") {         
+            return this.renderWatermarkOption2(width, height);
+        }
     }
 }

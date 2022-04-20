@@ -886,8 +886,8 @@ callBackEafTierData = async (isTier1Enabled: boolean, tier1text: string, isTier2
     if ((this.state.tier1Value !== "") || (this.state.tier2Value !== "") ||
     (this.state.tier3Value !== "") || (this.state.tier4Value !== "") ||
     (this.state.tier5Value !== "") || (this.state.tier6Value !== "")) {
-    const isOk: boolean = window.confirm("The content of tiers will be lost." + 
-                                "Are you sure you want to remove all tiers?");
+    const isOk: boolean = window.confirm("The content of tiers will be lost."
+                                          + " Are you sure you want to remove all tiers?");
 
     if ( isOk ) {
       if (element !== null) {
