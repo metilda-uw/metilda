@@ -30,6 +30,7 @@ interface State {
     showPitchScale: boolean;
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
+    showMetildaWatermark: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -54,7 +55,8 @@ class PitchArtContainer extends React.Component<Props, State> {
             showTimeNormalization: false,
             showPitchScale: false,
             showPerceptualScale: true,
-            showPitchArtImageColor: true
+            showPitchArtImageColor: true,
+            showMetildaWatermark: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -177,6 +179,14 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 onText="Pitch Art"
                                 onChange={this.toggleChanged}
                             />
+                            <PitchArtToggle
+                                label={"Metilda Watermark"}
+                                inputName={"showMetildaWatermark"}
+                                isSelected={this.state.showMetildaWatermark}
+                                offText="Option 1"
+                                onText="Option 2"
+                                onChange={this.toggleChanged}
+                            />
                         </div>
                         {
                             this.props.speakers.length > 1
@@ -200,6 +210,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showPitchScale={this.state.showPitchScale}
                               showPerceptualScale={this.state.showPerceptualScale}
                               showPitchArtImageColor={this.state.showPitchArtImageColor}
+                              showMetildaWatermark={this.state.showMetildaWatermark}
                               speakers={this.props.speakers}
                               firebase={this.props.firebase}/>
                 </div>
