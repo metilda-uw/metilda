@@ -40,7 +40,9 @@ class PitchArtCoordConverter {
             const timeIndex = this.pitchValues.map((item) => item.t0).indexOf(time);
             timePerc = timeIndex / (this.pitchValues.length - 1);
         } else {
-            const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
+            // const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
+            // Update totalDuration to be the time set in the windowConfig
+            const totalDuration = this.config.tMax - this.config.tMin;
             timePerc = (time - this.pitchValues[0].t0) / totalDuration;
         }
 
@@ -62,6 +64,22 @@ class PitchArtCoordConverter {
         } else {
             return this.linearRectCoordsToVertValue(rectCoord);
         }
+    }
+
+    // returns location for tick marks for drawing time axis 
+    horzValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {       
+        let numTickMarks: number;
+        const dStep = maxValue - minValue;
+
+        if (!numSteps) {
+            numTickMarks = (maxValue * 4);
+        } else {
+            numTickMarks  = dStep / numSteps;
+        }
+        console.log("Number of Tick Marks: " + numTickMarks);
+        const scale = scaleLinear().domain([this.config.tMin, this.config.tMax])
+                                   .range([this.config.innerWidth + this.config.x0, this.config.x0]).nice();
+        return scale.ticks(numTickMarks);
     }
 
     vertValueRange(minValue: number, maxValue: number, numSteps?: number): number[] {
