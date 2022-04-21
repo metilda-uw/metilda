@@ -76,7 +76,6 @@ class PitchArtCoordConverter {
         } else {
             numTickMarks  = dStep / numSteps;
         }
-        console.log("Number of Tick Marks: " + numTickMarks);
         const scale = scaleLinear().domain([this.config.tMin, this.config.tMax])
                                    .range([this.config.innerWidth + this.config.x0, this.config.x0]).nice();
         return scale.ticks(numTickMarks);
