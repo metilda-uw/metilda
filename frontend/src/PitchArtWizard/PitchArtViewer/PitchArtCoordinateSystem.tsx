@@ -22,6 +22,14 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
         return 30;
     }
 
+    static X_AXIS_TEXT_BOX_HEIGHT(): number {
+        return 12;
+    }
+
+    static X_AXIS_TEXT_BOX_WIDTH(): number {
+        return 20;
+    }
+
     render() {
         const coordConverter = new PitchArtCoordConverter(
             this.props.windowConfig,
@@ -37,7 +45,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
 
         // Intelligently choose the number of steps to avoid picking values
         // that are too close together
-        const axisTickMarks = coordConverter.vertValueRange(
+        const vertAxisTickMarks = coordConverter.vertValueRange(
             this.props.windowConfig.dMin,
             this.props.windowConfig.dMax
         );
@@ -46,10 +54,22 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
 
         const yAxisTitle = this.props.showPerceptualScale ? "MeTILDA Perceptual Scale (Hz)" : "Linear Scale (Hz)";
 
+        //Get the time min and time max.
+        const xMin = coordConverter.horzIndexToRectCoords(this.props.windowConfig.tMin);
+        const xMax = coordConverter.horzIndexToRectCoords(this.props.windowConfig.tMax);
+        
+        // get horizontal tick marks
+        const horzAxisTickMarks = coordConverter.horzValueRange(
+            this.props.windowConfig.tMin,   
+            this.props.windowConfig.tMax
+        );
+
+        const xAxisTitle = "Time (seconds)";
+
         return (
             <Layer>
                 {
-                    axisTickMarks.map((value, index) => {
+                    vertAxisTickMarks.map((value, index) => {
                         const currVertValue = coordConverter.vertValueToRectCoords(value);
                         return (
                             <Group key={index}>
@@ -72,6 +92,27 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                         );
                     })
                 }
+                {
+                    horzAxisTickMarks.map((value, index) => {
+                        const currHorzValue = coordConverter.horzIndexToRectCoords(value);
+
+                        return (
+                            <Group key={index}>
+                                <Line points={[currHorzValue, yMin,
+                                               currHorzValue, yMin + tickWidth]}
+                                      strokeWidth={1}
+                                      stroke="black"
+                                />
+                                <Text x= {currHorzValue - (PitchArtCoordinateSystem.X_AXIS_TEXT_BOX_WIDTH() / 2.0) }
+                                    y={yMin + PitchArtCoordinateSystem.X_AXIS_TEXT_BOX_HEIGHT()}  
+                                    fontSize={this.props.fontSize}
+                                    height={PitchArtCoordinateSystem.X_AXIS_TEXT_BOX_HEIGHT()}
+                                    text={`${(Math.round(value * 100) / 100).toFixed(2)}`}    
+                                />
+                            </Group>
+                        );
+                    })
+                }
                 <Text x={this.props.xOrigin * 0.17}
                       y={yMin}
                       width={Math.abs(yMax - yMin)}
@@ -79,6 +120,13 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                       fontSize={this.props.fontSize * 1.4}
                       text={yAxisTitle}
                       rotation={-90}/>
+                <Text x={xMin}
+                      y={yMin * 1.06} 
+                      width={Math.abs(xMax - xMin)}
+                      align={"center"}
+                      fontSize={this.props.fontSize * 1.4}
+                      text={xAxisTitle}
+                      />
                 <Line points={[this.props.xOrigin, yMin, this.props.xMax, yMin]}
                       strokeWidth={1}
                       stroke="black"
