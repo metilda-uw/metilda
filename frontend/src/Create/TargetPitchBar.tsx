@@ -198,6 +198,10 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.props.targetPitchSelected(-1);
     }
 
+    setLetterTimeEvent() {
+        console.log("Setting Time on Syllable")
+    }
+
     downloadAnalysis = () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
@@ -481,6 +485,13 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterSyllableEvent}>
                         Set Syllable
+                    </button>
+                    <button className="TargetPitchBar-set-time btn globalbtn waves-effect waves-light m-r-16"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.selectedIndex === -1}
+                            onClick={this.setLetterTimeEvent}>
+                        Set Time
                     </button>
                     <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light m-r-16"
                             type="submit"
