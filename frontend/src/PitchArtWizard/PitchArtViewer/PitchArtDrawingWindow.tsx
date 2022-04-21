@@ -35,6 +35,8 @@ export interface PitchArtDrawingWindowProps {
     height: number;
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     fileName: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showDynamicContent: boolean;
@@ -145,7 +147,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
-        this.innerHeight = this.props.height * 0.90;
+        this.innerHeight = this.props.height * 0.80;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
         this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
 
@@ -487,7 +489,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         if (!this.props.showPitchScale) {
             return;
         }
-
+        
         return (
             <PitchArtCoordinateSystem
                 fontSize={this.fontSize * 0.75}
@@ -532,7 +534,9 @@ render() {
             y0: this.pointDy0,
             x0: this.pointDx0,
             dMin: this.props.minPitch,
-            dMax: this.props.maxPitch
+            dMax: this.props.maxPitch,
+            tMin: this.props.minTime,
+            tMax: this.props.maxTime
         };
 
         const colorSchemes = this.props.speakers.map((item, index) =>

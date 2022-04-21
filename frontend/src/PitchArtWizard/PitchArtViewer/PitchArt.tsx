@@ -9,6 +9,8 @@ interface Props {
     height: number;
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     uploadId: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showAccentPitch: boolean;
@@ -67,6 +69,8 @@ class PitchArt extends React.Component<Props> {
                         height={this.props.height}
                         minPitch={this.props.minPitch}
                         maxPitch={this.props.maxPitch}
+                        minTime={this.props.minTime}
+                        maxTime={this.props.maxTime}
                         fileName={this.props.uploadId}
                         setLetterPitch={this.props.setLetterPitch}
                         showAccentPitch={this.props.showAccentPitch}

@@ -14,6 +14,8 @@ interface Props {
     height: number;
     minPitch?: number;
     maxPitch?: number;
+    minTime?: number;
+    maxTime?: number;
     uploadId: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
@@ -21,6 +23,8 @@ interface Props {
 interface State {
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showVerticallyCentered: boolean;
@@ -42,11 +46,21 @@ class PitchArtContainer extends React.Component<Props, State> {
         return 500.0;
     }
 
+    static get DEFAULT_MIN_ANALYSIS_TIME(): number {
+        return 0.0;
+    }
+
+    static get DEFAULT_MAX_ANALYSIS_TIME(): number {
+        return 1.0;
+    }
+
     constructor(props: Props) {
         super(props);
         this.state = {
             minPitch: this.props.minPitch || PitchArtContainer.DEFAULT_MIN_ANALYSIS_PITCH,
             maxPitch: this.props.maxPitch || PitchArtContainer.DEFAULT_MAX_ANALYSIS_PITCH,
+            minTime: this.props.minPitch || PitchArtContainer.DEFAULT_MIN_ANALYSIS_TIME,
+            maxTime: this.props.maxPitch || PitchArtContainer.DEFAULT_MAX_ANALYSIS_TIME,
             showAccentPitch: false,
             showSyllableText: false,
             showVerticallyCentered: false,
@@ -199,6 +213,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                               height={this.props.height}
                               minPitch={this.state.minPitch}
                               maxPitch={this.state.maxPitch}
+                              minTime={this.state.minTime}
+                              maxTime={this.state.maxTime}
                               uploadId={this.props.uploadId}
                               setLetterPitch={this.props.setLetterPitch}
                               showAccentPitch={this.state.showAccentPitch}
