@@ -11,11 +11,11 @@ jobs:
 
     steps:
       - name: Development Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Use Node.js 14.8.2
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: 14.8.2
+          node-version: '14'
       - run: npm install
       - run: npm run build --if-present
       - name: Deploy to Heroku
