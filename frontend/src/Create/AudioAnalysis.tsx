@@ -87,6 +87,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return 653;
     }
 
+        static get AUDIO_IMG_HEIGHT(): number {
+        return 500;
+    }
+
     static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
         return 75.0;
     }
