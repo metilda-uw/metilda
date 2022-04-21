@@ -117,14 +117,14 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
                       y={yMin}
                       width={Math.abs(yMax - yMin)}
                       align={"center"}
-                      fontSize={this.props.fontSize * 1.4}
+                      fontSize={this.props.fontSize * 1.2}
                       text={yAxisTitle}
                       rotation={-90}/>
                 <Text x={xMin}
                       y={yMin * 1.06} 
                       width={Math.abs(xMax - xMin)}
                       align={"center"}
-                      fontSize={this.props.fontSize * 1.4}
+                      fontSize={this.props.fontSize * 1.2}
                       text={xAxisTitle}
                       />
                 <Line points={[this.props.xOrigin, yMin, this.props.xMax, yMin]}

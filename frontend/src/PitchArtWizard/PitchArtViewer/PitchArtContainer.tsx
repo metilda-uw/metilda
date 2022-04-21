@@ -169,7 +169,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 onChange={this.toggleChanged}
                             />
                             <PitchArtToggle
-                                label={"Pitch Scale"}
+                                label={"Pitch & Time Axis"}
                                 inputName={"showPitchScale"}
                                 isSelected={this.state.showPitchScale}
                                 offText="No"
