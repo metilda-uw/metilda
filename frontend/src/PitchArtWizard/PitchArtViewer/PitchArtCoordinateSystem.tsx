@@ -54,7 +54,7 @@ export default class PitchArtCoordinateSystem extends React.Component<Props> {
 
         const yAxisTitle = this.props.showPerceptualScale ? "MeTILDA Perceptual Scale (Hz)" : "Linear Scale (Hz)";
 
-        //Get the time min and time max.
+        // Get the time min and time max.
         const xMin = coordConverter.horzIndexToRectCoords(this.props.windowConfig.tMin);
         const xMax = coordConverter.horzIndexToRectCoords(this.props.windowConfig.tMax);
         

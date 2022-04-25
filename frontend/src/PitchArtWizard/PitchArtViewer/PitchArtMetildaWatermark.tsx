@@ -13,12 +13,12 @@ interface Props {
 export default class PitchArtMetildaWatermark extends React.Component<Props> {
 
     renderWatermarkOption1 = (width, height) => {
-        let text = [];
+        const text = [];
         let currX = width * .25;
         let currY = height * .20;
 
-        for (let i = 1; i < 3; i++){
-            for (let j = 1; j < 4; j++){
+        for (let i = 1; i < 3; i++) {
+            for (let j = 1; j < 4; j++) {
                 text.push(
                     <Text key={i.toString() + j.toString() + "_wm"}
                         x={currX}
@@ -30,7 +30,7 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
                         opacity={.25}
                     />
                 );
-            currX += width * .25;
+                currX += width * .25;
             }
             currX = width * .25;
             currY += height * .40;
@@ -44,13 +44,12 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
     }
 
     renderWatermarkOption2 = (width, height) => {
-        let text = [];
+        const text = [];
         let offset = 0;
-        for (let y = 10; y < height; y+=22){
-            
-            for (let x = 5; x < width + 60; x+=60){
-                if (offset == 1) { 
-                    x+=5;
+        for (let y = 10; y < height; y += 22) {
+            for (let x = 5; x < width + 60; x += 60) {
+                if (offset === 1) { 
+                    x += 5;
                 }
                 text.push(
                     <Text key={x.toString() + y.toString() + "_wm"}
@@ -64,9 +63,9 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
                 );
                 
             }
-            if (offset == 0) {
+            if (offset === 0) {
                 offset = 1;
-            } else if (offset == 1) {
+            } else if (offset === 1) {
                 offset = 0;
             }
         }
@@ -86,11 +85,11 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
         const width = this.props.windowConfig.x0 + this.props.windowConfig.innerWidth;
         const height = this.props.windowConfig.y0 + this.props.windowConfig.innerHeight;
 
-        if (this.props.type == "wm1") {         
+        if (this.props.type === "wm1") {         
             return this.renderWatermarkOption1(width, height);
         }
 
-        if (this.props.type == "wm2") {         
+        if (this.props.type === "wm2") {         
             return this.renderWatermarkOption2(width, height);
         }
     }
