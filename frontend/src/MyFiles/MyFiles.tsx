@@ -96,6 +96,7 @@ private downloadRef = createRef<HTMLAnchorElement>();
                     type: item[4],
                 }
             );
+            return null;
           });
       this.setState({
               files: updatedFiles,

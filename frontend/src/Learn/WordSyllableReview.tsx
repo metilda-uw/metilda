@@ -10,12 +10,9 @@ import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDraw
 import {PitchRangeDTO, RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Speaker} from "../types/types";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
-import StaticWordSyallableData from "./StaticWordSyallableData";
 import {MetildaWord} from "./types";
 import "./WordSyllableReview.css";
 import { withAuthorization } from "../Session";
-import Header from "../Layout/Header";
-import {uploadRecording, deleteRecording} from "../Create/ImportUtils";
 import {controls, Media, Player} from "react-media-player";
 import {spinner} from "../Utils/LoadingSpinner";
 import Dialog from "@material-ui/core/Dialog";
@@ -127,8 +124,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
 
     constructor(props: Props) {
         super(props);
-        const values = queryString.parse(this.props.location.search);
-        const accentIndex = values.accentIndex;
+        // const values = queryString.parse(this.props.location.search);
 
         this.state = {
             loading: true,
@@ -263,7 +259,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
         });
     }
     handleOkDeleteRecordingModal = async () => {
-        const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
+        // const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
         const updatedRecordings = this.state.previousRecordings.filter((recording) =>
              recording.itemRef !== this.state.deleteRecordingItemRef);
         this.setState({
@@ -371,17 +367,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
        this.setState({
             showRecordingModal: false
        });
-       const numberOfSyllables = this.props.match.params.numSyllables;
-       const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+       // const numberOfSyllables = this.props.match.params.numSyllables;
+       // const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
        const controller = this;
        if (this.state.currentRecordingName !== "") {
-           const updatedRecordingName = this.state.currentRecordingName;
+           // const updatedRecordingName = this.state.currentRecordingName;
            try {
                 controller.setState({
                         isLoadingPitchResults: true
                     });
-                const uploadResponse = await uploadRecording(this.state.recordingResult, updatedRecordingName,
-                    numberOfSyllables, recordingWordName, this.props.firebase);
+                // const uploadResponse = await uploadRecording(this.state.recordingResult, updatedRecordingName,
+                //     numberOfSyllables, recordingWordName, this.props.firebase);
                 this.getPreviousRecordings();
                     } catch (ex) {
                         console.log(ex);
@@ -462,8 +458,8 @@ export class WordSyllableReview extends React.Component<Props, State> {
                     isRecording: false,
             });
             const url = URL.createObjectURL(result.blob);
-            const audio = new Audio(url);
-            const recording = await audio.play();
+            // const audio = new Audio(url);
+            //const recording = await audio.play();
             this.setState({
                 showRecordingConfirmationModal: true,
                 recordingResult: result
