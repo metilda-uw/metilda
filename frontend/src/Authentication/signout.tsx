@@ -8,9 +8,6 @@ interface Props {
 }
 
 class SignOut extends Component<Props> {
-  constructor(props: any) {
-    super(props);
-  }
 
   displayLoginPage = () => {
     this.props.history.push(ROUTES.SIGN_IN);

@@ -7,7 +7,6 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import { SignUpPage } from "./signup";
 import ReactGA from "react-ga";
-import {log} from "util";
 import {NotificationManager} from "react-notifications";
 
 export interface Props {
