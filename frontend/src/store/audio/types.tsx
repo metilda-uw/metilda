@@ -41,6 +41,11 @@ export interface SetLetterSyllable extends Action {
     speakers: Speaker[];
 }
 
+export interface SetLetterTime extends Action {
+    type: constants.SET_LETTER_TIME;
+    speakers: Speaker[];
+}
+
 export interface SetActiveLetter extends Action {
     type: constants.SET_ACTIVE_LETTER;
     speakers: Speaker[];
@@ -53,4 +58,5 @@ export interface ManualPitchAdjust extends Action {
 
 export type AudioAction = (
     AddSpeaker | RemoveSpeaker | AddLetter | RemoveLetter |
-    ResetLetters | SetSpeaker | SetLetterSyllable | SetActiveLetter | ManualPitchAdjust);
+    ResetLetters | SetSpeaker | SetLetterSyllable |SetLetterTime | 
+    SetActiveLetter | ManualPitchAdjust);
