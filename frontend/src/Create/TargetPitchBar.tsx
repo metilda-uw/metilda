@@ -3,7 +3,8 @@ import {connect} from "react-redux";
 import moment from "moment";
 import {ThunkDispatch} from "redux-thunk";
 import {AppState} from "../store";
-import {removeLetter, resetLetters, setLetterSyllable, setLatestAnalysisId, setSpeaker, setUploadId} from "../store/audio/actions";
+import {removeLetter, resetLetters, setLetterSyllable, setLetterTime, setLatestAnalysisId, 
+    setSpeaker, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import AudioLetter from "./AudioLetter";
@@ -37,9 +38,11 @@ export interface TargetPitchBarProps {
     resetLetters: (speakerIndex: number) => void;
     setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
+    setLetterTime: (speakerIndex: number, index: number, time: number) => void;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number,
                           latestAnalysisName: string, lastUploadedLetters: Letter[]) => void;
     setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
+    
 }
 
 interface State {
@@ -103,6 +106,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.removeLetterEvent = this.removeLetterEvent.bind(this);
         this.resetAllLettersEvent = this.resetAllLettersEvent.bind(this);
         this.setLetterSyllableEvent = this.setLetterSyllableEvent.bind(this);
+        this.setLetterTimeEvent = this.setLetterTimeEvent.bind(this);
     }
 
     resetAllLettersEvent() {
@@ -199,7 +203,30 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     }
 
     setLetterTimeEvent() {
-        console.log("Setting Time on Syllable")
+
+        let isValidInput = false;
+        let time = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0;
+        let newTime = 0;
+        console.log("Setting Time on Syllable: " + this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0);
+        while (!isValidInput) {
+            const response = prompt("Enter time ", time.toString());
+
+            if (response == null) {
+                // user canceled input
+                return;
+            }
+
+            newTime = parseFloat(response);
+            if (newTime === 0) {
+                NotificationManager.error("Please enter a number greater than 0.");
+            } else {
+                isValidInput = true;
+            }
+        }
+        console.log(this.props.speakerIndex + " " + this.state.selectedIndex + " " + newTime);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, newTime);
+        this.setState({selectedIndex: -1});
+        this.props.targetPitchSelected(-1);
     }
 
     downloadAnalysis = () => {
@@ -430,9 +457,11 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             currentAnalysisName: ""
         });
     }
+    
     fileSelected = (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
         importSpeakerFile(results, this.props.speakerIndex, this.props.setSpeaker);
     }
+
     checkIfSpeakerImportIsOk = (event: SyntheticEvent) => {
         if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
             return;
@@ -545,10 +574,13 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
      dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
         dispatch(setLetterSyllable(speakerIndex, index, syllable)),
+     setLetterTime: (speakerIndex: number, index: number, newTime: number) =>
+        dispatch(setLetterTime(speakerIndex, index, newTime)),
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
                           lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
                             latestAnalysisName, lastUploadedLetters)),
      setSpeaker: (speakerIndex: number, speaker: Speaker) => dispatch(setSpeaker(speakerIndex, speaker))
+     
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);

@@ -2,6 +2,7 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Speaker} from "../../types/types";
 import PitchRange from "../AudioViewer/PitchRange";
+import TimeRange from "./TimeRange";
 import PitchArt from "./PitchArt";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
@@ -104,6 +105,10 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.setState({minPitch, maxPitch});
     }
 
+    applyTimeRange = (minTime: number, maxTime: number) => {
+        this.setState({minTime, maxTime});
+    }
+
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
         if (isVerticallyCentered) {
             this.setState({showPitchScale: false});
@@ -119,6 +124,9 @@ class PitchArtContainer extends React.Component<Props, State> {
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
+                        <TimeRange initMinTime={this.state.minTime}
+                                    initMaxTime={this.state.maxTime}
+                                    applyTimeRange={this.applyTimeRange}/>
                         <div className="row metilda-pitch-art-container-control-toggle-list">
                             <PitchArtToggle
                                 label="Accent Symbol"
