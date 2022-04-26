@@ -1,4 +1,5 @@
 import React, {createRef} from "react";
+import Konva from "konva";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
@@ -130,7 +131,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
     private readonly pitchArtSoundLengthSeconds: number;
     private readonly fontSize: number;
     private downloadRef = createRef<HTMLAnchorElement>();
-    private stageRef = createRef<Stage>();
+    private stageRef = createRef<Konva.Stage>();
 
     constructor(props: PitchArtDrawingWindowProps) {
         super(props);
