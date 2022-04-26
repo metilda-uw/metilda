@@ -459,7 +459,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
             });
             const url = URL.createObjectURL(result.blob);
             // const audio = new Audio(url);
-            //const recording = await audio.play();
+            // const recording = await audio.play();
             this.setState({
                 showRecordingConfirmationModal: true,
                 recordingResult: result
