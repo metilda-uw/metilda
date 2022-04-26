@@ -159,10 +159,16 @@
 }
 
 .TargetPitchBarElements{
-    text-align: right;
+    text-align: none;
+    
 }
 .btn{
     text-transform: none
+}.btn-group-analysis-controls {
+  float: right;
+  margin: 5px;
+}.btn-group-file-controls {
+  float: left;
 }
 
 #metilda-drop-down-back-button .audioBackButton {

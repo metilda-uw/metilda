@@ -1,16 +1,14 @@
 import * as React from "react";
-import {Slice} from "react-pie-menu";
 import {connect} from "react-redux";
 import {ThunkDispatch} from "redux-thunk";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
-import "../PitchArtWizard/GlobalStyling.css";
 import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 import {AppState} from "../store";
 import {addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
-import "./AudioAnalysis.css";
+
 import AudioAnalysisImageMenu from "./AudioAnalysisImageMenu";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
@@ -20,6 +18,10 @@ import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
 import "./UploadAudio.css";
 import {NotificationManager} from "react-notifications";
+
+import "./AudioAnalysis.css";
+
+import "../PitchArtWizard/GlobalStyling.css";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;
@@ -646,43 +648,41 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                         {this.renderSpeakerControl()}
                     </div>
                     <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
-                        <div>
-                            <div className="metilda-audio-analysis-image-container">
-                                {nonAudioImg}
-                                {this.maybeRenderImgMenu()}
-                                {
-                                    uploadId ?
-                                        <AudioImg
-                                            key={this.state.audioEditVersion}
-                                            uploadId={uploadId}
-                                            speakerIndex={this.props.speakerIndex}
-                                            src={this.state.imageUrl}
-                                            ref="audioImage"
-                                            imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
-                                            xminPerc={AudioAnalysis.MIN_IMAGE_XPERC}
-                                            xmaxPerc={AudioAnalysis.MAX_IMAGE_XPERC}
-                                            audioIntervalSelected={this.audioIntervalSelected}
-                                            audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                            onAudioImageLoaded={this.onAudioImageLoaded}
-                                            showImgMenu={this.showImgMenu}
-                                            minAudioX={this.state.minAudioX}
-                                            maxAudioX={this.state.maxAudioX}
-                                            minAudioTime={this.state.minAudioTime}
-                                            maxAudioTime={this.state.maxAudioTime}/>
-                                        : []
-                                }
-                            </div>
-                            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
-                            <TargetPitchBar letters={this.props.speakers}
-                                            files={this.props.files}
-                                            minAudioX={this.state.minAudioX}
-                                            maxAudioX={this.state.maxAudioX}
-                                            minAudioTime={this.state.minAudioTime}
-                                            maxAudioTime={this.state.maxAudioTime}
-                                            targetPitchSelected={this.targetPitchSelected}
-                                            speakerIndex={this.props.speakerIndex}
-                                            firebase={this.props.firebase}/>
+                        <div className="metilda-audio-analysis-image-container">
+                            {nonAudioImg}
+                            {this.maybeRenderImgMenu()}
+                            {
+                                uploadId ?
+                                    <AudioImg
+                                        key={this.state.audioEditVersion}
+                                        uploadId={uploadId}
+                                        speakerIndex={this.props.speakerIndex}
+                                        src={this.state.imageUrl}
+                                        ref="audioImage"
+                                        imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
+                                        xminPerc={AudioAnalysis.MIN_IMAGE_XPERC}
+                                        xmaxPerc={AudioAnalysis.MAX_IMAGE_XPERC}
+                                        audioIntervalSelected={this.audioIntervalSelected}
+                                        audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                                        onAudioImageLoaded={this.onAudioImageLoaded}
+                                        showImgMenu={this.showImgMenu}
+                                        minAudioX={this.state.minAudioX}
+                                        maxAudioX={this.state.maxAudioX}
+                                        minAudioTime={this.state.minAudioTime}
+                                        maxAudioTime={this.state.maxAudioTime}/>
+                                    : []
+                            }
                         </div>
+                        {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
+                        <TargetPitchBar letters={this.props.speakers}
+                                        files={this.props.files}
+                                        minAudioX={this.state.minAudioX}
+                                        maxAudioX={this.state.maxAudioX}
+                                        minAudioTime={this.state.minAudioTime}
+                                        maxAudioTime={this.state.maxAudioTime}
+                                        targetPitchSelected={this.targetPitchSelected}
+                                        speakerIndex={this.props.speakerIndex}
+                                        firebase={this.props.firebase}/>
                     </div>
                 </div>
             </div>
