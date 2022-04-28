@@ -1,26 +1,25 @@
 import * as React from "react";
 import {connect} from "react-redux";
 import {ThunkDispatch} from "redux-thunk";
-import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
-import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
-import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 import {AppState} from "../store";
-import {addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
-import {AudioAction} from "../store/audio/types";
-import {Letter, Speaker} from "../types/types";
+import {NotificationManager} from "react-notifications";
 
 import AudioAnalysisImageMenu from "./AudioAnalysisImageMenu";
 import AudioImg from "./AudioImg";
 import AudioImgDefault from "./AudioImgDefault";
 import AudioImgLoading from "./AudioImgLoading";
+import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
+import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
+import {PitchRangeDTO} from "../PitchArtWizard/PitchArtViewer/types";
 import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
+import {addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
+import {AudioAction} from "../store/audio/types";
+import {Letter, Speaker} from "../types/types";
+
 import "./UploadAudio.css";
-import {NotificationManager} from "react-notifications";
-
 import "./AudioAnalysis.css";
-
 import "../PitchArtWizard/GlobalStyling.css";
 
 export interface AudioAnalysisProps {

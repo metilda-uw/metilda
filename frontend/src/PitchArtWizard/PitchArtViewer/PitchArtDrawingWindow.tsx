@@ -513,6 +513,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                     windowConfig={windowConfig}
                     xOrigin={windowConfig.x0}
                     xMax={windowConfig.x0 + windowConfig.innerWidth}
+                    showPerceptualScale={this.props.showPerceptualScale}
+                    showPitchScale={this.props.showPitchScale}
                 />
             );
         }
@@ -524,6 +526,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                 windowConfig={windowConfig}
                 xOrigin={windowConfig.x0}
                 xMax={windowConfig.x0 + windowConfig.innerWidth}
+                showPerceptualScale={this.props.showPerceptualScale}
+                showPitchScale={this.props.showPitchScale}
             />
          );
     }
@@ -573,8 +577,8 @@ render() {
                             onMouseLeave={() => this.setPointerEnabled(false)}/>
                 </Layer>
                 {this.maybeShowPitchScale(windowConfig)}
-                {this.maybeShowMetildaWatermark(windowConfig)}
                 {this.maybeUserPitchView(windowConfig)}
+                {this.maybeShowMetildaWatermark(windowConfig)}
                 <PitchArtGeometry speakers={this.props.speakers}
                                     windowConfig={windowConfig}
                                     setLetterPitch={this.props.setLetterPitch}
