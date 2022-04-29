@@ -2,6 +2,7 @@ import "materialize-css/dist/css/materialize.min.css";
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
 import CreatePitchArt from "./Create/CreatePitchArt";
+import ExploreContainer from "./Explore/ExploreContainer";
 import PeldaView from "./Pelda/PeldaView";
 import WordSyllableCategories from "./Learn/WordSyllableCategories";
 import WordSyllableReview from "./Learn/WordSyllableReview";
@@ -80,6 +81,7 @@ const App = () => (
     <Route path="/home" component={Home} />
     <Route path="/manage-users" component={ManageUsers} />
     <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
+    <Route path="/explore" component={ExploreContainer} />
     <Route path="/peldaview" component={PeldaView} />
     <Route path="/learn/words/syllables" component={WordSyllableCategories} />
     <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
