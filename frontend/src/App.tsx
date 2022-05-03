@@ -2,7 +2,7 @@ import "materialize-css/dist/css/materialize.min.css";
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
 import CreatePitchArt from "./Create/CreatePitchArt";
-import ExploreContainer from "./Explore/ExploreContainer";
+import ExploreContainer from "./Explore/ExploreAudio";
 import PeldaView from "./Pelda/PeldaView";
 import WordSyllableCategories from "./Learn/WordSyllableCategories";
 import WordSyllableReview from "./Learn/WordSyllableReview";
@@ -23,6 +23,7 @@ import { withAuthentication } from "./Session";
 import { createBrowserHistory } from "history";
 import ReactGA from "react-ga";
 import {NotificationContainer} from "react-notifications";
+import ExploreAudio from "./Explore/ExploreAudio";
 
 interface Props {
   firebase: any;
@@ -81,7 +82,7 @@ const App = () => (
     <Route path="/home" component={Home} />
     <Route path="/manage-users" component={ManageUsers} />
     <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
-    <Route path="/explore" component={ExploreContainer} />
+    <Route path="/explore" component={ExploreAudio} />
     <Route path="/peldaview" component={PeldaView} />
     <Route path="/learn/words/syllables" component={WordSyllableCategories} />
     <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
