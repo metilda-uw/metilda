@@ -6,9 +6,9 @@
     margin-left: 16px;
 }
 
-.metilda-audio-analysis-layout {
-    width: 1016px;
-}
+// .metilda-audio-analysis-layout {
+//     width: 1016px;
+// }
 
 .metilda-audio-analysis-controls-list {
 
@@ -55,7 +55,7 @@
 }
 
 .metilda-audio-analysis-image-col-11 {
-    width: 11.5%;
+    width: 12.5%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -158,18 +158,43 @@
     right:40px
 }
 
-.TargetPitchBarElements{
-    text-align: none;
-    
+// Target Pitch Bar and Button elements below
+
+.TargetPitchBar {
+
 }
+
+.TargetPitchBarElements {
+    display: inline-block;
+    padding: 0px;
+    margin: 0px;
+    width: 100%;
+}
+
+.btn-group-analysis-controls {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.btn-group-file-controls {
+  width: 100%;
+  white-space: nowrap;
+}
+
 .btn{
     text-transform: none
-}.btn-group-analysis-controls {
-  float: right;
-  margin: 5px;
-}.btn-group-file-controls {
-  float: left;
 }
+
+.btn-group-analysis-controls .btn {
+  width: 20%;
+  margin: 4px;
+}
+
+.btn-group-file-controls .btn {
+  width: 35%;
+  margin: 4px;
+}
+
 
 #metilda-drop-down-back-button .audioBackButton {
     position: relative;

@@ -49,6 +49,7 @@ interface State {
     selectedIndex: number;
     showNewAnalysisModal: boolean;
     showExistingAnalysisModal: boolean;
+    showEditSyllableModal: boolean;
     currentAnalysisName: string;
     [key: string]: any;
 }
@@ -98,6 +99,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             selectedIndex: -1,
             showNewAnalysisModal: false,
             showExistingAnalysisModal: false,
+            showEditSyllableModal: false,
             currentAnalysisName: ""
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
@@ -223,11 +225,63 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 isValidInput = true;
             }
         }
-        console.log(this.props.speakerIndex + " " + this.state.selectedIndex + " " + newTime);
         this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, newTime);
         this.setState({selectedIndex: -1});
         this.props.targetPitchSelected(-1);
     }
+
+    // Edit Syllable Modal Implementation
+
+    editSyllableModal = () => {
+        let syllable;
+        if (typeof this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex] === 'undefined') {
+            syllable = "X";
+        } else {
+            syllable = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].syllable;
+        }
+
+        return (
+                <Dialog fullWidth={true} maxWidth="xs" open={this.state.showEditSyllableModal}
+                onClose={this.handleCloseSyllableModal}aria-labelledby="form-dialog-title">
+
+                <DialogTitle onClose={this.handleCloseSyllableModal} id="form-dialog-title">
+                    Update Details for the Syllable:
+                </DialogTitle>
+                <DialogContent>
+                Syllable: <input className="syllableLetter" name="currentSyllableLetter" value={syllable}
+                onChange={this.onChange} type="text" placeholder={"Ex: S"} required/>
+                </DialogContent>
+                <DialogActions>
+                    <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
+                    onClick={this.uploadAnalysis}>
+                        <i className="material-icons right">cloud_upload</i>
+                        Save
+                    </button>
+                </DialogActions>
+
+                </Dialog>
+        );
+    }
+
+    editSyllableEvent = () =>  {
+        this.setState( {
+            showEditSyllableModal : true
+        });
+    }
+
+    handleCloseSyllableModal = () => {
+        this.setState({
+            showEditSyllableModal: false
+        });
+      }
+
+    // Other Modals
+
+    handleCloseExistingAnalysis = () => {
+        this.setState({
+            showExistingAnalysisModal: false
+        });
+      }
 
     downloadAnalysis = () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
@@ -329,7 +383,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showNewAnalysisModal: false
         });
       }
-   onChange = (event: any) => {
+   
+    onChange = (event: any) => {
         this.setState({ [event.target.name]: event.target.value });
       }
 
@@ -356,12 +411,6 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             </Dialog>
         );
     }
-
-    handleCloseExistingAnalysis = () => {
-        this.setState({
-            showExistingAnalysisModal: false
-        });
-      }
 
     handleNoExistingAnalysis = () => {
         this.setState({
@@ -485,6 +534,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             <div className="TargetPitchBar">
             {this.saveNewAnalysisModal()}
             {this.saveExisitingAnalysisModal()}
+            {this.editSyllableModal()}
                 <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
                         <span>Target Pitch</span>
@@ -509,28 +559,35 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 </div>
                 <div className="TargetPitchBarElements">
                     <div className="btn-group-analysis-controls">
-                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.selectedIndex === -1}
+                            onClick={this.editSyllableEvent}>
+                        Edit Syllable
+                    </button>
+                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterSyllableEvent}>
                         Set Syllable
                     </button>
-                    <button className="TargetPitchBar-set-time btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-set-time btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterTimeEvent}>
                         Set Time
                     </button>
-                    <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.removeLetterEvent}>
                         Remove
                     </button>
-                    <button className="TargetPitchBar-clear-letter btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-clear-letter btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={speaker.letters.length === 0}
