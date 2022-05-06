@@ -2,11 +2,13 @@ import * as React from "react";
 import { withAuthorization } from "../Session";
 import Header from "../Layout/Header";
 import Select from "react-select";
-import UploadAudio from "../Create/UploadAudio";
-import ReactFileReader from "react-file-reader"
-
-import "./ExploreAudio.css"
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
+
+import UploadAudio from "../Create/UploadAudio";
+import ReactFileReader from "react-file-reader";
+
+import "./ExploreAudio.css";
+
 
 export interface ExploreAudioProps {
     firebase: any;
@@ -47,39 +49,38 @@ export class ExploreAudio extends React.Component<ExploreAudioProps, State> {
         return (
             <div>
                 <Header/>
-            
-                <div className="container m-t-16">
-                    <p>"Hi.  This is the Explore Page where you can use Machine Learning to explore words."</p>
-                    <div className="row m-b-16">
-                        <div className="col s5">
+                <div className="metilda-page-content">
+                    <p>"This is the Explore Page where you can use Machine Learning to explore words."</p>
+                    <div className="metilda-content-explore-select-options row">
+                        <div className="metilda-explore-select-sound col s12">
                             <Select
-                                className="fileOptions"
+                                className="metilda-explore-select-sound-elements file-options"
                                 placeholder="Select Sound File"
                                 options={files}/>
-                        </div>
-                        <div className="col s5">
+
                             <Select
-                                className="modelOptions"
+                                className="metilda-explore-select-sound-elements sound-options"
                                 placeholder="Select Sound Type"
-                                options={options}/>
-                        <div className="col s2">
-                            <button className="waves-effect waves-light btn globalbtn" onClick={this.getResults}>Get Results</button>
+                                options={options}
+                            />
+                            <button className="metilda-explore-select-sound-elements waves-effect waves-light btn globalbtn" onClick={this.getResults}>Get Results</button>
                         </div>
-                    </div>        
-                        </div>
-                        <div className="section">
-                        <div className="row">
-                            <div className="col s4">
-                                <p>Found selected sound in:</p>
-                            </div>
-                            <div className="col s8">
-                                <PlayerBar audioUrl="http://sound.com" /></div>              
-                            </div>
-                        </div>
-                        
                     </div>
+                    <div className="row">
+                        <div className="metilda-explore-review">
+                            <div className="metilda-explore-results col s4">
+                                <p>Found selected sound in:</p>
+                                <p>file1.wav</p>
+                                <p>file2.wav</p>
+                            </div>
+                            <div className="metilda-explore-playerbar col s8">
+                                <PlayerBar audioUrl="http://sound.com" />
+                            </div> 
+                        </div>             
+                    </div>
+                        
                 </div>
-              
+             </div> 
         );
     }
 }
