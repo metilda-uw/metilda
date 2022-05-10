@@ -69,14 +69,20 @@ export default class UpdateSyllable extends Component <UpdateSyllableProps, Stat
         this.state = {
             showEditSyllableModal: this.props.showEditSyllableModal,
             currentSyllable: this.props.currentSyllable,
-            currentT0: parseFloat((this.props.currentT0.toFixed(2))),
-            currentT1: parseFloat((this.props.currentT1.toFixed(2)))
+            currentT0: parseFloat(this.props.currentT0.toFixed(2)),
+            currentT1: parseFloat(this.props.currentT1.toFixed(2))
         };
 
     }
 
 onChange = (event: any) => {
+  if (event.target.name === "currentT0" || event.target.name === "currentT1"){
+    const value = parseFloat(event.target.value);
+    this.setState({ [event.target.name]: value });
+  } else {
     this.setState({ [event.target.name]: event.target.value });
+  }
+  
 }
   
 render() {
@@ -92,7 +98,7 @@ render() {
         <input 
             className="syllableLetter" 
             name="currentSyllable" 
-            defaultValue={this.state.currentSyllable}
+            defaultValue={this.state.currentSyllable.toString()}
             onChange={this.onChange}
             type="text" 
             placeholder={"Set syllable text."} 
