@@ -23,12 +23,11 @@ class TimeRange extends Component {
             return;
         }
 
-        this.props.applyTimeRange(parseFloat(this.minTimeRef.current.value),
-                                   parseFloat(this.maxTimeRef.current.value));
+        this.props.applyTimeRange(0, parseFloat(this.maxTimeRef.current.value));
     }
 
     validateInput = () => {
-        const minTime= this.minTimeRef.current.value;
+        const minTime= 0;
         const maxTime = this.maxTimeRef.current.value;
 
         const errors = [];
@@ -81,12 +80,12 @@ class TimeRange extends Component {
 
         return (
             <div className="metilda-audio-analysis-controls-list-item col s12">
-                <label className="group-label">Time Range</label>
+                <label className="group-label text">Adjust Time Axis:</label>
                 <span className="pitch-range-err-list">
                     {this.state.errors.map((item, index) => <p key={index} className="pitch-range-err-list-item">{item}</p>)}
                 </span>
                 <div className="metilda-audio-analysis-controls-list-item-row">
-                <label>
+                {/* <label>
                     <input name="minTime"
                            id="minTime"
                            ref={this.minTimeRef}
@@ -101,7 +100,7 @@ class TimeRange extends Component {
                 </label>
                     <div>
                         <p>to</p>
-                    </div>
+                    </div> */}
                 <label>
                     <input name="maxTime"
                            id="maxTime"
@@ -116,6 +115,7 @@ class TimeRange extends Component {
                            type="number"
                            step="0.1"/>
                 </label>
+                    Seconds.
                     <button className="waves-effect waves-light btn globalbtn"
                             type="submit"
                             onClick={(event) => this.submitMaxTime(event)}>

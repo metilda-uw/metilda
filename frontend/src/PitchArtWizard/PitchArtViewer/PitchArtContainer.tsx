@@ -106,7 +106,7 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     applyTimeRange = (minTime: number, maxTime: number) => {
-        this.setState({minTime, maxTime});
+        this.setState({maxTime});
     }
 
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
