@@ -101,7 +101,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     }
 
     static get DEFAULT_SYLLABLE_TEXT(): string {
-        return "X";
+        return "";
     }
 
     static get DEFAULT_SEPARATOR_TEXT(): string {
@@ -363,7 +363,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             method: "GET",
             headers: {
                 "Accept": "application/json",
-                "Content-Type": "application/json"            // this.setState({activeWordIndex: 0});
+                "Content-Type": "application/json"            
+            // this.setState({activeWordIndex: 0});
             // this.setState({words: new StaticWordSyallableData().getData(
             //      parseFloat(this.props.match.params.numSyllables), 
             //      parseFloat(this.props.location.search.slice(-1)))});

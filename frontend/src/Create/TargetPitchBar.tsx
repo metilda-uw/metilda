@@ -39,7 +39,7 @@ export interface TargetPitchBarProps {
     resetLetters: (speakerIndex: number) => void;
     setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
-    setLetterTime: (speakerIndex: number, index: number, time: number) => void;
+    setLetterTime: (speakerIndex: number, index: number, t0: number, t1: number) => void;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number,
                           latestAnalysisName: string, lastUploadedLetters: Letter[]) => void;
     setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
@@ -104,7 +104,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showExistingAnalysisModal: false,
             showEditSyllableModal: false,
             currentAnalysisName: "",
-            currentSyllable:"X",
+            currentSyllable:"",
             currentSyllableT0: 0
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
@@ -229,7 +229,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 isValidInput = true;
             }
         }
-        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, newTime);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, newTime, 0);
         this.setState({selectedIndex: -1});
         this.props.targetPitchSelected(-1);
     }
@@ -252,9 +252,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     }
 
     saveSyllable = (syllable: string, t0: number, t1: number) : void => {
-        console.log("Saving Syllable: " + syllable + " " + t0)
         this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
-        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex,t0);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex,t0, t1);
         this.setState({showEditSyllableModal: false});
     }
 
@@ -534,7 +533,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             {this.editSyllableModal()}
                 <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
-                        <span>Target Pitch</span>
+                        <span>Syllables</span>
                     </div>
                     <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container">
                         {
@@ -563,7 +562,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                             onClick={this.editSyllableEvent}>
                         Edit Syllable
                     </button>
-                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
+                    {/* <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
@@ -576,7 +575,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterTimeEvent}>
                         Set Time
-                    </button>
+                    </button> */}
                     <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
@@ -632,8 +631,8 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
      dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
         dispatch(setLetterSyllable(speakerIndex, index, syllable)),
-     setLetterTime: (speakerIndex: number, index: number, newTime: number) =>
-        dispatch(setLetterTime(speakerIndex, index, newTime)),
+     setLetterTime: (speakerIndex: number, index: number, newT0: number, newT1:number) =>
+        dispatch(setLetterTime(speakerIndex, index, newT0, newT1)),
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
                           lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
                             latestAnalysisName, lastUploadedLetters)),

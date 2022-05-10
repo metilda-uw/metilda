@@ -116,12 +116,12 @@ export const setLetterSyllable = (speakerIndex: number, letterIndex: number, syl
     });
 };
 
-export const setLetterTime = (speakerIndex: number, letterIndex: number, newT0: number):
+export const setLetterTime = (speakerIndex: number, letterIndex: number, newT0: number, newT1: number):
     ActionReturn => (dispatch: Dispatch, getState) => {
     const speakers = getState().audio.speakers;
     const letters = getState().audio.speakers[speakerIndex].letters;
 
-    const newLetters = update(letters, {[letterIndex]: {t0: {$set: newT0}}});
+    const newLetters = update(letters, {[letterIndex]: {t0: {$set: newT0}, t1: {$set: newT1}}});
     const newSpeakers = update(speakers, {[speakerIndex]: {letters: {$set: newLetters}}});
 
     dispatch({

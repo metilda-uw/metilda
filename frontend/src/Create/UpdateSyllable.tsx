@@ -6,24 +6,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 
-export interface UpdateSyllableProps {
-    showEditSyllableModal: boolean;
-    currentSyllable: string;
-    currentT0: number;
-    currentT1: number;
-    saveSyllable: (syllable:string, t0:number, t1:number) => void;
-    handleClose: () => void;
-}
-
-export interface State {
-    showEditSyllableModal: boolean;
-    currentSyllable: string;
-    currentT0: number;
-    currentT1: number;
-    // needed for the onChange event to work.
-    [key: string]: any;
-}
-
+// setup details of the dialog box - close button
 const styles = (theme: Theme) =>
   createStyles({
     root: {
@@ -42,7 +25,8 @@ export interface DialogTitleProps extends WithStyles<typeof styles> {
     id: string;
     children: React.ReactNode;
     onClose: () => void;
-  }
+}
+
 const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
     const { children, classes, onClose, ...other } = props;
     return (
@@ -55,7 +39,28 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
         ) : null}
       </MuiDialogTitle>
     );
-  });
+});
+
+
+// UpdateSyllable implementation
+
+export interface UpdateSyllableProps {
+    showEditSyllableModal: boolean;
+    currentSyllable: string;
+    currentT0: number;
+    currentT1: number;
+    saveSyllable: (syllable:string, t0:number, t1:number) => void;
+    handleClose: () => void;
+}
+
+export interface State {
+    showEditSyllableModal: boolean;
+    currentSyllable: string;
+    currentT0: number;
+    currentT1: number;
+    // needed for the onChange event to work.
+    [key: string]: any;
+}
 
 export default class UpdateSyllable extends Component <UpdateSyllableProps, State> {
 
@@ -64,8 +69,8 @@ export default class UpdateSyllable extends Component <UpdateSyllableProps, Stat
         this.state = {
             showEditSyllableModal: this.props.showEditSyllableModal,
             currentSyllable: this.props.currentSyllable,
-            currentT0: this.props.currentT0,
-            currentT1: this.props.currentT1
+            currentT0: parseFloat((this.props.currentT0.toFixed(2))),
+            currentT1: parseFloat((this.props.currentT1.toFixed(2)))
         };
 
     }
@@ -75,12 +80,13 @@ onChange = (event: any) => {
 }
   
 render() {
+   
     return(
         <Dialog fullWidth={true} maxWidth="xs" open={this.props.showEditSyllableModal}
                 onClose={this.props.handleClose}aria-labelledby="form-dialog-title">
 
         <DialogTitle onClose={this.props.handleClose} id="form-dialog-title">
-            Update Details for the Syllable:
+            <p>Syllable Details</p>
         </DialogTitle>
         <DialogContent>
         <input 
@@ -89,7 +95,7 @@ render() {
             defaultValue={this.state.currentSyllable}
             onChange={this.onChange}
             type="text" 
-            placeholder={"Ex: S"} 
+            placeholder={"Set syllable text."} 
             required/>
         <input 
             className="syllableStartTime" 
@@ -97,15 +103,17 @@ render() {
             defaultValue={this.state.currentT0}
             onChange={this.onChange}
             type="number" 
-            placeholder={"Set start time:"} 
+            placeholder={"Set start time."}
+            step="0.01"
             required/>
          <input 
             className="syllableEndTime" 
             name="currentT1" 
-            defaultValue={this.state.currentT1}
+            defaultValue={(this.state.currentT1)}
             onChange={this.onChange}
             type="number" 
-            placeholder={"Set end time:"} 
+            placeholder={"Set end time."}
+            step="0.01"
             required/>
         </DialogContent>
         <DialogActions>
