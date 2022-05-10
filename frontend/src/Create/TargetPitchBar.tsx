@@ -22,6 +22,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
+import UpdateSyllable from "./UpdateSyllable";
 
 export interface TargetPitchBarProps {
     letters: any;
@@ -51,6 +52,8 @@ interface State {
     showExistingAnalysisModal: boolean;
     showEditSyllableModal: boolean;
     currentAnalysisName: string;
+    currentSyllable: string;
+    currentSyllableT0: number;
     [key: string]: any;
 }
 
@@ -100,7 +103,9 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showNewAnalysisModal: false,
             showExistingAnalysisModal: false,
             showEditSyllableModal: false,
-            currentAnalysisName: ""
+            currentAnalysisName: "",
+            currentSyllable:"X",
+            currentSyllableT0: 0
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -209,7 +214,6 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         let isValidInput = false;
         let time = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0;
         let newTime = 0;
-        console.log("Setting Time on Syllable: " + this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0);
         while (!isValidInput) {
             const response = prompt("Enter time ", time.toString());
 
@@ -231,36 +235,27 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     }
 
     // Edit Syllable Modal Implementation
-
     editSyllableModal = () => {
-        let syllable;
-        if (typeof this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex] === 'undefined') {
-            syllable = "X";
-        } else {
-            syllable = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].syllable;
+        if (this.state.showEditSyllableModal) {
+            return (
+                <UpdateSyllable 
+                    showEditSyllableModal={this.state.showEditSyllableModal}
+                    currentSyllable={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].syllable}
+                    currentT0={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0}
+                    currentT1={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t1}
+                    saveSyllable={this.saveSyllable}
+                    handleClose={this.handleCloseEditSyllableModal}
+                    >
+                </UpdateSyllable>
+            );
         }
+    }
 
-        return (
-                <Dialog fullWidth={true} maxWidth="xs" open={this.state.showEditSyllableModal}
-                onClose={this.handleCloseSyllableModal}aria-labelledby="form-dialog-title">
-
-                <DialogTitle onClose={this.handleCloseSyllableModal} id="form-dialog-title">
-                    Update Details for the Syllable:
-                </DialogTitle>
-                <DialogContent>
-                Syllable: <input className="syllableLetter" name="currentSyllableLetter" value={syllable}
-                onChange={this.onChange} type="text" placeholder={"Ex: S"} required/>
-                </DialogContent>
-                <DialogActions>
-                    <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
-                    onClick={this.uploadAnalysis}>
-                        <i className="material-icons right">cloud_upload</i>
-                        Save
-                    </button>
-                </DialogActions>
-
-                </Dialog>
-        );
+    saveSyllable = (syllable: string, t0: number, t1: number) : void => {
+        console.log("Saving Syllable: " + syllable + " " + t0)
+        this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex,t0);
+        this.setState({showEditSyllableModal: false});
     }
 
     editSyllableEvent = () =>  {
@@ -269,11 +264,12 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         });
     }
 
-    handleCloseSyllableModal = () => {
+    handleCloseEditSyllableModal = () => {
         this.setState({
             showEditSyllableModal: false
         });
-      }
+    }
+    
 
     // Other Modals
 
@@ -281,7 +277,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.setState({
             showExistingAnalysisModal: false
         });
-      }
+    }
 
     downloadAnalysis = () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
@@ -417,7 +413,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showNewAnalysisModal: true,
             showExistingAnalysisModal: false
         });
-      }
+    }
+
     handleOkExistingAnalysis = async () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
