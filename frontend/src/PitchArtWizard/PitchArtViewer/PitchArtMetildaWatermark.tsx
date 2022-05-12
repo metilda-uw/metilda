@@ -101,7 +101,8 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
         }
 
         if (this.props.type === "wm2") {
-            let xStart, yStart = 0;
+            let xStart = 0;
+            let yStart = 0;
             if (!this.props.showPitchScale) {
                 xStart = 20;
                 yStart = 20;

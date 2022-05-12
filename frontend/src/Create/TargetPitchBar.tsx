@@ -104,7 +104,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showExistingAnalysisModal: false,
             showEditSyllableModal: false,
             currentAnalysisName: "",
-            currentSyllable:"",
+            currentSyllable: "",
             currentSyllableT0: 0
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
@@ -212,7 +212,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     setLetterTimeEvent() {
 
         let isValidInput = false;
-        let time = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0;
+        const time = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0;
         let newTime = 0;
         while (!isValidInput) {
             const response = prompt("Enter time ", time.toString());
@@ -234,13 +234,14 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.props.targetPitchSelected(-1);
     }
 
-    // Edit Syllable Modal Implementation
+    // Edit Syllable Modal
     editSyllableModal = () => {
         if (this.state.showEditSyllableModal) {
             return (
                 <UpdateSyllable 
                     showEditSyllableModal={this.state.showEditSyllableModal}
-                    currentSyllable={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].syllable}
+                    currentSyllable={this.props.letters[this.props.speakerIndex]
+                        .letters[this.state.selectedIndex].syllable}
                     currentT0={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0}
                     currentT1={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t1}
                     saveSyllable={this.saveSyllable}
@@ -251,9 +252,9 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         }
     }
 
-    saveSyllable = (syllable: string, t0: number, t1: number) : void => {
+    saveSyllable = (syllable: string, t0: number, t1: number): void => {
         this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
-        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex,t0, t1);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, t0, t1);
         this.setState({showEditSyllableModal: false});
     }
 
@@ -268,9 +269,6 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showEditSyllableModal: false
         });
     }
-    
-
-    // Other Modals
 
     handleCloseExistingAnalysis = () => {
         this.setState({
@@ -555,7 +553,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 </div>
                 <div className="TargetPitchBarElements">
                     <div className="btn-group-analysis-controls">
-                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
+                    <button className="TargetPitchBar-edit-syllable btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
@@ -631,7 +629,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
      dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
         dispatch(setLetterSyllable(speakerIndex, index, syllable)),
-     setLetterTime: (speakerIndex: number, index: number, newT0: number, newT1:number) =>
+     setLetterTime: (speakerIndex: number, index: number, newT0: number, newT1: number) =>
         dispatch(setLetterTime(speakerIndex, index, newT0, newT1)),
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
                           lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
