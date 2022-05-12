@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import "./TimeRange.css";
 import "../AudioViewer/PitchRange.css";
 
 class TimeRange extends Component {
@@ -84,24 +85,8 @@ class TimeRange extends Component {
                     {this.state.errors.map((item, index) => <p key={index} className="pitch-range-err-list-item">{item}</p>)}
                 </span>
                 <div className="metilda-audio-analysis-controls-list-item-row">
-                {/* <label>
-                    <input name="minTime"
-                           id="minTime"
-                           ref={this.minTimeRef}
-                           value={minValue}
-                           onChange={(event) => this.handleInputChange(event)}
-                           onKeyPress={(event) => this.enterPressed(event)}
-                           placeholder="min seconds"
-                           className="validate time-range-input"
-                           //pattern="/^\d+(\.\d{1,2})?$/"
-                           required={true}
-                           type="text"/>
-                </label>
-                    <div>
-                        <p>to</p>
-                    </div> */}
-                <label>
-                    <input name="maxTime"
+                    <div class="metilda-audio-analysis-controls-list-item-row col s6">
+                        <input name="maxTime"
                            id="maxTime"
                            ref={this.maxTimeRef}
                            value={maxValue}
@@ -113,13 +98,17 @@ class TimeRange extends Component {
                            required={true}
                            type="number"
                            step="0.1"/>
-                </label>
-                    Seconds.
-                    <button className="waves-effect waves-light btn globalbtn"
+                        <p class="range-label">Seconds.</p>
+                    </div>
+                    <div class="col s6">
+                            <button className="waves-effect waves-light btn globalbtn"
                             type="submit"
                             onClick={(event) => this.submitMaxTime(event)}>
                         Apply
                     </button>
+                    </div>
+
+
                 </div>
 
 
