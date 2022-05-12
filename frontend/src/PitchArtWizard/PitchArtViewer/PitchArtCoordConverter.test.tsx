@@ -15,7 +15,9 @@ describe("PitchArtCoordConverter", () => {
                     y0: 5,
                     x0: 10,
                     dMin: 1,
-                    dMax: 10
+                    dMax: 10,
+                    tMin: 0,
+                    tMax: 4
                 };
                 const subject = new PitchArtCoordConverter(
                     config,

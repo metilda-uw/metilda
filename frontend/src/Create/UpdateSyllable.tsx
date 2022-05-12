@@ -41,7 +41,6 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
     );
 });
 
-
 // UpdateSyllable implementation
 
 export interface UpdateSyllableProps {
@@ -49,7 +48,7 @@ export interface UpdateSyllableProps {
     currentSyllable: string;
     currentT0: number;
     currentT1: number;
-    saveSyllable: (syllable:string, t0:number, t1:number) => void;
+    saveSyllable: (syllable: string, t0: number, t1: number) => void;
     handleClose: () => void;
 }
 
@@ -62,7 +61,7 @@ export interface State {
     [key: string]: any;
 }
 
-export default class UpdateSyllable extends Component <UpdateSyllableProps, State> {
+export class UpdateSyllable extends Component <UpdateSyllableProps, State> {
 
     constructor(props: UpdateSyllableProps) {
         super(props);
@@ -76,7 +75,7 @@ export default class UpdateSyllable extends Component <UpdateSyllableProps, Stat
     }
 
 onChange = (event: any) => {
-  if (event.target.name === "currentT0" || event.target.name === "currentT1"){
+  if (event.target.name === "currentT0" || event.target.name === "currentT1") {
     const value = parseFloat(event.target.value);
     this.setState({ [event.target.name]: value });
   } else {
@@ -123,8 +122,9 @@ render() {
             required/>
         </DialogContent>
         <DialogActions>
-            <button className="SaveAnalysis waves-effect waves-light btn globalbtn"
-            onClick={() => this.props.saveSyllable(this.state.currentSyllable, this.state.currentT0, this.state.currentT1)}>
+            <button className="SaveSyllable waves-effect waves-light btn globalbtn"
+            onClick={() => this.props.saveSyllable(this.state.currentSyllable, 
+                            this.state.currentT0, this.state.currentT1)}>
                 <i className="material-icons right"></i>
                 Save
             </button>
@@ -133,3 +133,4 @@ render() {
     );
   }
 }
+export default (UpdateSyllable);
