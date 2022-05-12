@@ -2,7 +2,6 @@ import * as React from "react";
 import {connect} from "react-redux";
 import {ThunkDispatch} from "redux-thunk";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
-import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store";
 import {addLetter, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";

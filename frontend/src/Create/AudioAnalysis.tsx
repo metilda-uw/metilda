@@ -20,7 +20,6 @@ import {Letter, Speaker} from "../types/types";
 
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
-import "../PitchArtWizard/GlobalStyling.css";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;

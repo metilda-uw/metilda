@@ -5,7 +5,6 @@ import {RouteComponentProps} from "react-router";
 import Recorder from "recorder-js";
 import AudioAnalysis from "../Create/AudioAnalysis";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
-import "../PitchArtWizard/GlobalStyling.css";
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
 import {PitchRangeDTO, RawPitchValue} from "../PitchArtWizard/PitchArtViewer/types";
 import {Speaker} from "../types/types";

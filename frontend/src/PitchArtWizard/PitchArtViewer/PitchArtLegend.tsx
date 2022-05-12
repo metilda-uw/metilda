@@ -1,6 +1,5 @@
 import * as React from "react";
 import {Speaker} from "../../types/types";
-import "../GlobalStyling.css";
 import "./PitchArtLegend.css";
 
 export interface PitchArtLegendProps {

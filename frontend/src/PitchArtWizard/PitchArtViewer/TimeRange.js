@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "../GlobalStyling.css";
 import "../AudioViewer/PitchRange.css";
 
 class TimeRange extends Component {
