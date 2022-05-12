@@ -1,10 +1,11 @@
 import React, {Component} from "react";
-import { Dialog, DialogContent, DialogActions } from "@material-ui/core";
+import { FormGroup, FormControlLabel, Checkbox, Dialog, DialogContent, DialogActions } from "@material-ui/core";
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
+import { blue } from "@material-ui/core/colors";
 
 // setup details of the dialog box - close button
 const styles = (theme: Theme) =>
@@ -57,6 +58,7 @@ export interface State {
     currentSyllable: string;
     currentT0: number;
     currentT1: number;
+    lockRatio: boolean;
     // needed for the onChange event to work.
     [key: string]: any;
 }
@@ -69,19 +71,36 @@ export class UpdateSyllable extends Component <UpdateSyllableProps, State> {
             showEditSyllableModal: this.props.showEditSyllableModal,
             currentSyllable: this.props.currentSyllable,
             currentT0: parseFloat(this.props.currentT0.toFixed(2)),
-            currentT1: parseFloat(this.props.currentT1.toFixed(2))
+            currentT1: parseFloat(this.props.currentT1.toFixed(2)),
+            lockRatio: true
         };
 
     }
 
 onChange = (event: any) => {
-  if (event.target.name === "currentT0" || event.target.name === "currentT1") {
+  if (this.state.lockRatio) {
     const value = parseFloat(event.target.value);
-    this.setState({ [event.target.name]: value });
+    // get the difference between start and end and add or substract that from opposite T value.
+    if (event.target.name === "currentT0") {
+      const diff = value - this.state.currentT0;
+      this.setState({ [event.target.name]: value });
+      this.setState({currentT1: this.state.currentT1 + diff});
+    } else if (event.target.name === "currentT1") {
+      const diff = value - this.state.currentT1;
+      this.setState({ [event.target.name]: value });
+      this.setState({currentT0: this.state.currentT0 + diff});
+    }
   } else {
     this.setState({ [event.target.name]: event.target.value });
   }
-  
+}
+
+handleChange = () => {
+  if (this.state.lockRatio === true) {
+    this.setState({lockRatio: false});
+  } else {
+    this.setState({lockRatio: true});
+  }
 }
   
 render() {
@@ -94,7 +113,12 @@ render() {
             <p>Syllable Details</p>
         </DialogTitle>
         <DialogContent>
-        <input 
+        <div className="row">
+          <div className="col s4">
+            <p>Syllable:</p>
+          </div>
+          <div className="col s4">
+            <input 
             className="syllableLetter" 
             name="currentSyllable" 
             defaultValue={this.state.currentSyllable.toString()}
@@ -102,24 +126,48 @@ render() {
             type="text" 
             placeholder={"Set syllable text."} 
             required/>
-        <input 
-            className="syllableStartTime" 
-            name="currentT0" 
-            defaultValue={this.state.currentT0}
-            onChange={this.onChange}
-            type="number" 
-            placeholder={"Set start time."}
-            step="0.01"
-            required/>
-         <input 
-            className="syllableEndTime" 
-            name="currentT1" 
-            defaultValue={(this.state.currentT1)}
-            onChange={this.onChange}
-            type="number" 
-            placeholder={"Set end time."}
-            step="0.01"
-            required/>
+          </div>
+          </div>
+          <div className="row">
+            <div className="col s4">
+              <p>Start Time:</p>
+              </div>
+              <div className="col s4">
+                <input 
+                className="syllableStartTime" 
+                name="currentT0" 
+                value={this.state.currentT0.toString()}
+                onChange={this.onChange}
+                type="number" 
+                placeholder={"Set start time."}
+                step="0.01"
+                required/>  
+              </div>
+              <div className="col s4">
+                <FormGroup>
+                  <FormControlLabel control={
+                    <Checkbox defaultChecked onChange={this.handleChange} color="default"/>
+                  } label="Lock Ratio" />
+                </FormGroup>
+              </div>
+            </div>
+          <div className="row">
+            <div className="col s4">
+              <p>End Time: </p>
+              </div>
+            <div className="col s4">
+              <input 
+              className="syllableEndTime" 
+              name="currentT1" 
+              value={(this.state.currentT1.toString())}
+              onChange={this.onChange}
+              type="number" 
+              placeholder={"Set end time."}
+              step="0.01"
+              required/>
+            </div>
+          </div>
+          
         </DialogContent>
         <DialogActions>
             <button className="SaveSyllable waves-effect waves-light btn globalbtn"
