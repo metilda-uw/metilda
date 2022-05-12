@@ -78,7 +78,7 @@ export class UpdateSyllable extends Component <UpdateSyllableProps, State> {
     }
 
 onChange = (event: any) => {
-  if (this.state.lockRatio) {
+  if ((event.target.name == "currentT0" || event.target.name == "currentT1") && this.state.lockRatio) {
     const value = parseFloat(event.target.value);
     // get the difference between start and end and add or substract that from opposite T value.
     if (event.target.name === "currentT0") {
@@ -90,7 +90,11 @@ onChange = (event: any) => {
       this.setState({ [event.target.name]: value });
       this.setState({currentT0: this.state.currentT0 + diff});
     }
-  } else {
+  } else if (event.target.name == "currentT0" || event.target.name == "currentT1") {
+    const value = parseFloat(event.target.value);
+    this.setState({ [event.target.name]: value });
+  } 
+  else {
     this.setState({ [event.target.name]: event.target.value });
   }
 }
@@ -121,7 +125,7 @@ render() {
             <input 
             className="syllableLetter" 
             name="currentSyllable" 
-            defaultValue={this.state.currentSyllable.toString()}
+            defaultValue={this.state.currentSyllable}
             onChange={this.onChange}
             type="text" 
             placeholder={"Set syllable text."} 
