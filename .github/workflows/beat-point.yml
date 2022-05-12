@@ -23,4 +23,4 @@ jobs:
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
           heroku_app_name: 'beat-point'
-          heroku_email: 'leec351@uw.edu'
+          heroku_email: 'metilda.uw@gmail.com'
