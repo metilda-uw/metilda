@@ -47,3 +47,75 @@
     transform: rotate(360deg);
   }
 }
+
+.group-label {
+    display: flex;
+    justify-content: flex-start;
+}
+
+label{
+    color:#000000
+}
+
+.top-label {
+    margin-bottom: 8px;
+    display: flex;
+}
+
+.metilda-control-header {
+    display: flex;
+    margin-left: 12px;
+    margin-bottom: 16px;
+}
+
+.hide {
+    display: none;
+}
+
+.metilda-page-content {
+    width: 1016px;
+}
+
+.metilda-page-header {
+    margin-bottom: 0px;
+}
+
+.metilda-page-header h5 {
+    position: relative;
+    margin-left: 24px;
+    text-align: left;
+    font-size: 22px !important;
+}
+
+.metilda-pitch-art-container-control-list {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.metilda-pitch-art-container-control-toggle-list {
+    margin-left: 0 !important;
+}
+
+.metilda-pitch-art-container-control-list-item {
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.metilda-audio-analysis-controls-list-item-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-top: 8px;
+}
+
+.metilda-audio-analysis-controls-list-item-row-left-align {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 8px;
+}
+
+.globalbtn{
+    color: #000000;
+}

@@ -116,6 +116,20 @@ export const setLetterSyllable = (speakerIndex: number, letterIndex: number, syl
     });
 };
 
+export const setLetterTime = (speakerIndex: number, letterIndex: number, newT0: number, newT1: number):
+    ActionReturn => (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const letters = getState().audio.speakers[speakerIndex].letters;
+
+    const newLetters = update(letters, {[letterIndex]: {t0: {$set: newT0}, t1: {$set: newT1}}});
+    const newSpeakers = update(speakers, {[speakerIndex]: {letters: {$set: newLetters}}});
+
+    dispatch({
+        type: constants.SET_LETTER_TIME,
+        speakers: newSpeakers,
+    });
+};
+
 export const setLetterPitch = (speakerIndex: number, letterIndex: number, newPitch: number):
     ActionReturn => (dispatch: Dispatch, getState) => {
     const speakers = getState().audio.speakers;

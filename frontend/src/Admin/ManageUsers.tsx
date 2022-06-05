@@ -9,7 +9,6 @@ import EditUser from "./EditUser";
 import AuthorizeUser from "./AuthorizeUser";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
@@ -161,7 +160,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
 }
 
 handleOkDeleteUserModal = async () => {
-  const responseFromCloud =  deleteUser(this.state.deletedUserId, this.props.firebase);
+  // const responseFromCloud =  deleteUser(this.state.deletedUserId, this.props.firebase);
   const updatedUsers = this.state.users.filter((user) =>
      user.id !== this.state.deletedUserId);
   this.setState({

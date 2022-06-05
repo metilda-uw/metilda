@@ -1,4 +1,5 @@
 import React, {createRef} from "react";
+import Konva from "konva";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
@@ -35,6 +36,8 @@ export interface PitchArtDrawingWindowProps {
     height: number;
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     fileName: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showDynamicContent: boolean;
@@ -128,7 +131,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
     private readonly pitchArtSoundLengthSeconds: number;
     private readonly fontSize: number;
     private downloadRef = createRef<HTMLAnchorElement>();
-    private stageRef = createRef<Stage>();
+    private stageRef = createRef<Konva.Stage>();
 
     constructor(props: PitchArtDrawingWindowProps) {
         super(props);
@@ -145,7 +148,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
-        this.innerHeight = this.props.height * 0.90;
+        this.innerHeight = this.props.height * 0.80;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
         this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
 
@@ -487,7 +490,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         if (!this.props.showPitchScale) {
             return;
         }
-
+        
         return (
             <PitchArtCoordinateSystem
                 fontSize={this.fontSize * 0.75}
@@ -510,6 +513,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                     windowConfig={windowConfig}
                     xOrigin={windowConfig.x0}
                     xMax={windowConfig.x0 + windowConfig.innerWidth}
+                    showPerceptualScale={this.props.showPerceptualScale}
+                    showPitchScale={this.props.showPitchScale}
                 />
             );
         }
@@ -521,6 +526,8 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
                 windowConfig={windowConfig}
                 xOrigin={windowConfig.x0}
                 xMax={windowConfig.x0 + windowConfig.innerWidth}
+                showPerceptualScale={this.props.showPerceptualScale}
+                showPitchScale={this.props.showPitchScale}
             />
          );
     }
@@ -532,7 +539,9 @@ render() {
             y0: this.pointDy0,
             x0: this.pointDx0,
             dMin: this.props.minPitch,
-            dMax: this.props.maxPitch
+            dMax: this.props.maxPitch,
+            tMin: this.props.minTime,
+            tMax: this.props.maxTime
         };
 
         const colorSchemes = this.props.speakers.map((item, index) =>
@@ -568,8 +577,8 @@ render() {
                             onMouseLeave={() => this.setPointerEnabled(false)}/>
                 </Layer>
                 {this.maybeShowPitchScale(windowConfig)}
-                {this.maybeShowMetildaWatermark(windowConfig)}
                 {this.maybeUserPitchView(windowConfig)}
+                {this.maybeShowMetildaWatermark(windowConfig)}
                 <PitchArtGeometry speakers={this.props.speakers}
                                     windowConfig={windowConfig}
                                     setLetterPitch={this.props.setLetterPitch}

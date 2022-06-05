@@ -1,6 +1,6 @@
 import {shallow} from "enzyme";
 import React, {createRef} from "react";
-import {Stage} from "react-konva";
+import Konva from "konva";
 import {expect} from "../../setupTests";
 import {Letter, Speaker} from "../../types/types";
 import {PitchArtDrawingWindow, PitchArtDrawingWindowProps} from "./PitchArtDrawingWindow";
@@ -10,7 +10,7 @@ import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import UserPitchView from "./UserPitchView";
 import {arbitraryRawPitchValue} from "../../testSupport/arbitraryObjects";
 
-const stageRef = createRef<Stage>();
+const stageRef = createRef<Konva.Stage>();
 describe("PitchArtDrawingWindow", () => {
     it("renders a PitchArtDrawingWindow", () => {
         const subject = shallowRender({ref: stageRef});
@@ -53,6 +53,8 @@ interface OptionalProps {
     height?: number;
     minPitch?: number;
     maxPitch?: number;
+    minTime?: number;
+    maxTime?: number;
     fileName?: string;
     setLetterPitch?: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showDynamicContent?: boolean;
@@ -67,6 +69,7 @@ interface OptionalProps {
     showPerceptualScale?: boolean;
     showPitchArtImageColor?: boolean;
     showPrevPitchValueLists?: boolean;
+    showMetildaWatermark?: boolean;
     rawPitchValueLists?: RawPitchValue[][];
     firebase?: any;
     setLatestAnalysisId?: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
@@ -85,6 +88,8 @@ function makeProps(props: OptionalProps): PitchArtDrawingWindowProps {
         height: props.height || 0,
         minPitch: props.minPitch || 0,
         maxPitch: props.maxPitch || 0,
+        minTime: props.minTime || 0,
+        maxTime: props.maxTime || 0,
         fileName: props.fileName || "",
         setLetterPitch: props.setLetterPitch || (() => undefined),
         showDynamicContent: props.showDynamicContent || false,
@@ -99,6 +104,7 @@ function makeProps(props: OptionalProps): PitchArtDrawingWindowProps {
         showPerceptualScale: props.showPerceptualScale || false,
         showPitchArtImageColor: props.showPitchArtImageColor || false,
         showPrevPitchValueLists: props.showPrevPitchValueLists || false,
+        showMetildaWatermark: props.showMetildaWatermark || false,
         rawPitchValueLists: props.rawPitchValueLists || undefined,
         firebase: props.firebase || undefined,
         setLatestAnalysisId: props.setLatestAnalysisId || (() => undefined),

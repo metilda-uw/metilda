@@ -3,7 +3,8 @@ import {connect} from "react-redux";
 import moment from "moment";
 import {ThunkDispatch} from "redux-thunk";
 import {AppState} from "../store";
-import {removeLetter, resetLetters, setLetterSyllable, setLatestAnalysisId, setSpeaker, setUploadId} from "../store/audio/actions";
+import {removeLetter, resetLetters, setLetterSyllable, setLetterTime, setLatestAnalysisId, 
+    setSpeaker, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
 import AudioLetter from "./AudioLetter";
@@ -21,6 +22,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import {NotificationManager} from "react-notifications";
+import UpdateSyllable from "./UpdateSyllable";
 
 export interface TargetPitchBarProps {
     letters: any;
@@ -37,16 +39,21 @@ export interface TargetPitchBarProps {
     resetLetters: (speakerIndex: number) => void;
     setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) => void;
+    setLetterTime: (speakerIndex: number, index: number, t0: number, t1: number) => void;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number,
                           latestAnalysisName: string, lastUploadedLetters: Letter[]) => void;
     setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
+    
 }
 
 interface State {
     selectedIndex: number;
     showNewAnalysisModal: boolean;
     showExistingAnalysisModal: boolean;
+    showEditSyllableModal: boolean;
     currentAnalysisName: string;
+    currentSyllable: string;
+    currentSyllableT0: number;
     [key: string]: any;
 }
 
@@ -95,7 +102,10 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             selectedIndex: -1,
             showNewAnalysisModal: false,
             showExistingAnalysisModal: false,
-            currentAnalysisName: ""
+            showEditSyllableModal: false,
+            currentAnalysisName: "",
+            currentSyllable: "",
+            currentSyllableT0: 0
         };
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -103,6 +113,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.removeLetterEvent = this.removeLetterEvent.bind(this);
         this.resetAllLettersEvent = this.resetAllLettersEvent.bind(this);
         this.setLetterSyllableEvent = this.setLetterSyllableEvent.bind(this);
+        this.setLetterTimeEvent = this.setLetterTimeEvent.bind(this);
     }
 
     resetAllLettersEvent() {
@@ -196,6 +207,73 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
         this.setState({selectedIndex: -1});
         this.props.targetPitchSelected(-1);
+    }
+
+    setLetterTimeEvent() {
+
+        let isValidInput = false;
+        const time = this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0;
+        let newTime = 0;
+        while (!isValidInput) {
+            const response = prompt("Enter time ", time.toString());
+
+            if (response == null) {
+                // user canceled input
+                return;
+            }
+
+            newTime = parseFloat(response);
+            if (newTime === 0) {
+                NotificationManager.error("Please enter a number greater than 0.");
+            } else {
+                isValidInput = true;
+            }
+        }
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, newTime, 0);
+        this.setState({selectedIndex: -1});
+        this.props.targetPitchSelected(-1);
+    }
+
+    // Edit Syllable Modal
+    editSyllableModal = () => {
+        if (this.state.showEditSyllableModal) {
+            return (
+                <UpdateSyllable 
+                    showEditSyllableModal={this.state.showEditSyllableModal}
+                    currentSyllable={this.props.letters[this.props.speakerIndex]
+                        .letters[this.state.selectedIndex].syllable}
+                    currentT0={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t0}
+                    currentT1={this.props.letters[this.props.speakerIndex].letters[this.state.selectedIndex].t1}
+                    saveSyllable={this.saveSyllable}
+                    handleClose={this.handleCloseEditSyllableModal}
+                    >
+                </UpdateSyllable>
+            );
+        }
+    }
+
+    saveSyllable = (syllable: string, t0: number, t1: number): void => {
+        this.props.setLetterSyllable(this.props.speakerIndex, this.state.selectedIndex, syllable);
+        this.props.setLetterTime(this.props.speakerIndex, this.state.selectedIndex, t0, t1);
+        this.setState({showEditSyllableModal: false});
+    }
+
+    editSyllableEvent = () =>  {
+        this.setState( {
+            showEditSyllableModal : true
+        });
+    }
+
+    handleCloseEditSyllableModal = () => {
+        this.setState({
+            showEditSyllableModal: false
+        });
+    }
+
+    handleCloseExistingAnalysis = () => {
+        this.setState({
+            showExistingAnalysisModal: false
+        });
     }
 
     downloadAnalysis = () => {
@@ -298,7 +376,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             showNewAnalysisModal: false
         });
       }
-   onChange = (event: any) => {
+   
+    onChange = (event: any) => {
         this.setState({ [event.target.name]: event.target.value });
       }
 
@@ -326,18 +405,13 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         );
     }
 
-    handleCloseExistingAnalysis = () => {
-        this.setState({
-            showExistingAnalysisModal: false
-        });
-      }
-
     handleNoExistingAnalysis = () => {
         this.setState({
             showNewAnalysisModal: true,
             showExistingAnalysisModal: false
         });
-      }
+    }
+
     handleOkExistingAnalysis = async () => {
         const speaker = this.props.speakers[this.props.speakerIndex];
         const metildaWord = {
@@ -426,9 +500,11 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             currentAnalysisName: ""
         });
     }
+    
     fileSelected = (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => {
         importSpeakerFile(results, this.props.speakerIndex, this.props.setSpeaker);
     }
+
     checkIfSpeakerImportIsOk = (event: SyntheticEvent) => {
         if (this.props.speakers[this.props.speakerIndex].letters.length === 0) {
             return;
@@ -452,9 +528,10 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             <div className="TargetPitchBar">
             {this.saveNewAnalysisModal()}
             {this.saveExisitingAnalysisModal()}
+            {this.editSyllableModal()}
                 <div className="metilda-control-container metilda-target-pitch-bar">
                     <div className="metilda-audio-analysis-image-col-1">
-                        <span>Target Pitch</span>
+                        <span>Syllables</span>
                     </div>
                     <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container">
                         {
@@ -475,47 +552,65 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                     </div>
                 </div>
                 <div className="TargetPitchBarElements">
-                    <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light m-r-16"
+                    <div className="btn-group-analysis-controls">
+                    <button className="TargetPitchBar-edit-syllable btn globalbtn waves-effect waves-light"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.selectedIndex === -1}
+                            onClick={this.editSyllableEvent}>
+                        Edit Syllable
+                    </button>
+                    {/* <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.setLetterSyllableEvent}>
                         Set Syllable
                     </button>
-                    <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-set-time btn globalbtn waves-effect waves-light"
+                            type="submit"
+                            name="action"
+                            disabled={this.state.selectedIndex === -1}
+                            onClick={this.setLetterTimeEvent}>
+                        Set Time
+                    </button> */}
+                    <button className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={this.state.selectedIndex === -1}
                             onClick={this.removeLetterEvent}>
                         Remove
                     </button>
-                    <button className="TargetPitchBar-clear-letter btn globalbtn waves-effect waves-light m-r-16"
+                    <button className="TargetPitchBar-clear-letter btn globalbtn waves-effect waves-light"
                             type="submit"
                             name="action"
                             disabled={speaker.letters.length === 0}
                             onClick={this.resetAllLettersEvent}>
                         Clear
                     </button>
-                    <button onClick={this.checkIfSpeakerImportIsOk}
-                            className="TargetPitchBar-open-analysis btn globalbtn waves-effect waves-light m-r-16">
-                        <FileReaderInput as="binary" onChange={this.fileSelected}>
-                            Open
-                        </FileReaderInput>
-                    </button>
-                    <button className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
-                            type="submit"
-                            name="action"
-                            disabled={speaker.letters.length === 0}
-                            onClick={this.saveAnalysis}>
-                        Save
-                    </button>
-                    <button className="TargetPitchBar-download-analysis btn globalbtn waves-effect waves-light"
-                            type="submit"
-                            name="action"
-                            disabled={speaker.letters.length === 0}
-                            onClick={this.downloadAnalysis}>
-                        Download
-                    </button>
+                    </div>
+                        <div className="btn-group-file-controls">
+                        <button onClick={this.checkIfSpeakerImportIsOk}
+                                className="TargetPitchBar-open-analysis btn globalbtn waves-effect waves-light m-r-16">
+                            <FileReaderInput as="binary" onChange={this.fileSelected}>
+                                Open
+                            </FileReaderInput>
+                        </button>
+                        <button className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
+                                type="submit"
+                                name="action"
+                                disabled={speaker.letters.length === 0}
+                                onClick={this.saveAnalysis}>
+                            Save
+                        </button>
+                        <button className="TargetPitchBar-download-analysis btn globalbtn waves-effect waves-light"
+                                type="submit"
+                                name="action"
+                                disabled={speaker.letters.length === 0}
+                                onClick={this.downloadAnalysis}>
+                            Download
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -534,10 +629,13 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>
      dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
     setLetterSyllable: (speakerIndex: number, index: number, syllable: string) =>
         dispatch(setLetterSyllable(speakerIndex, index, syllable)),
+     setLetterTime: (speakerIndex: number, index: number, newT0: number, newT1: number) =>
+        dispatch(setLetterTime(speakerIndex, index, newT0, newT1)),
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
                           lastUploadedLetters: Letter[]) => dispatch(setLatestAnalysisId(speakerIndex, latestAnalysisId,
                             latestAnalysisName, lastUploadedLetters)),
      setSpeaker: (speakerIndex: number, speaker: Speaker) => dispatch(setSpeaker(speakerIndex, speaker))
+     
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TargetPitchBar);
