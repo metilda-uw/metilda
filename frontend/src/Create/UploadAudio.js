@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './UploadAudio.css'
-import "../PitchArtWizard/GlobalStyling.css";
 import M from 'materialize-css/dist/js/materialize.min.js'
 
 class UploadAudio extends Component {

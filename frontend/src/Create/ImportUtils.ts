@@ -144,7 +144,7 @@ export function deleteUser(
     firebase: any
     ) {
         const filePromise = new Promise((resolve, reject) => {
-            const uid = firebase.auth.currentUser.email;
+            // const uid = firebase.auth.currentUser.email;
             const formData = new FormData();
             formData.append("user_id", userId);
             fetch(`/api/delete-user`, {

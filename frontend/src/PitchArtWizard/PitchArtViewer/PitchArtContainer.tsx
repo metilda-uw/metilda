@@ -2,6 +2,7 @@ import * as React from "react";
 import {SyntheticEvent} from "react";
 import {Speaker} from "../../types/types";
 import PitchRange from "../AudioViewer/PitchRange";
+import TimeRange from "./TimeRange";
 import PitchArt from "./PitchArt";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
@@ -14,6 +15,8 @@ interface Props {
     height: number;
     minPitch?: number;
     maxPitch?: number;
+    minTime?: number;
+    maxTime?: number;
     uploadId: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
 }
@@ -21,6 +24,8 @@ interface Props {
 interface State {
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showVerticallyCentered: boolean;
@@ -30,6 +35,7 @@ interface State {
     showPitchScale: boolean;
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
+    showMetildaWatermark: boolean;
 }
 
 class PitchArtContainer extends React.Component<Props, State> {
@@ -41,11 +47,21 @@ class PitchArtContainer extends React.Component<Props, State> {
         return 500.0;
     }
 
+    static get DEFAULT_MIN_ANALYSIS_TIME(): number {
+        return 0.0;
+    }
+
+    static get DEFAULT_MAX_ANALYSIS_TIME(): number {
+        return 1.0;
+    }
+
     constructor(props: Props) {
         super(props);
         this.state = {
             minPitch: this.props.minPitch || PitchArtContainer.DEFAULT_MIN_ANALYSIS_PITCH,
             maxPitch: this.props.maxPitch || PitchArtContainer.DEFAULT_MAX_ANALYSIS_PITCH,
+            minTime: this.props.minPitch || PitchArtContainer.DEFAULT_MIN_ANALYSIS_TIME,
+            maxTime: this.props.maxPitch || PitchArtContainer.DEFAULT_MAX_ANALYSIS_TIME,
             showAccentPitch: false,
             showSyllableText: false,
             showVerticallyCentered: false,
@@ -54,7 +70,8 @@ class PitchArtContainer extends React.Component<Props, State> {
             showTimeNormalization: false,
             showPitchScale: false,
             showPerceptualScale: true,
-            showPitchArtImageColor: true
+            showPitchArtImageColor: true,
+            showMetildaWatermark: false
         };
         this.handleInputChange = this.handleInputChange.bind(this);
     }
@@ -88,6 +105,10 @@ class PitchArtContainer extends React.Component<Props, State> {
         this.setState({minPitch, maxPitch});
     }
 
+    applyTimeRange = (minTime: number, maxTime: number) => {
+        this.setState({maxTime});
+    }
+
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
         if (isVerticallyCentered) {
             this.setState({showPitchScale: false});
@@ -103,6 +124,9 @@ class PitchArtContainer extends React.Component<Props, State> {
                         <PitchRange initMinPitch={this.state.minPitch}
                                     initMaxPitch={this.state.maxPitch}
                                     applyPitchRange={this.applyPitchRange}/>
+                        <TimeRange initMinTime={this.state.minTime}
+                                    initMaxTime={this.state.maxTime}
+                                    applyTimeRange={this.applyTimeRange}/>
                         <div className="row metilda-pitch-art-container-control-toggle-list">
                             <PitchArtToggle
                                 label="Accent Symbol"
@@ -153,7 +177,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 onChange={this.toggleChanged}
                             />
                             <PitchArtToggle
-                                label={"Pitch Scale"}
+                                label={"Pitch & Time Axis"}
                                 inputName={"showPitchScale"}
                                 isSelected={this.state.showPitchScale}
                                 offText="No"
@@ -177,6 +201,14 @@ class PitchArtContainer extends React.Component<Props, State> {
                                 onText="Pitch Art"
                                 onChange={this.toggleChanged}
                             />
+                            <PitchArtToggle
+                                label={"Metilda Watermark"}
+                                inputName={"showMetildaWatermark"}
+                                isSelected={this.state.showMetildaWatermark}
+                                offText="Option 1"
+                                onText="Option 2"
+                                onChange={this.toggleChanged}
+                            />
                         </div>
                         {
                             this.props.speakers.length > 1
@@ -189,6 +221,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                               height={this.props.height}
                               minPitch={this.state.minPitch}
                               maxPitch={this.state.maxPitch}
+                              minTime={this.state.minTime}
+                              maxTime={this.state.maxTime}
                               uploadId={this.props.uploadId}
                               setLetterPitch={this.props.setLetterPitch}
                               showAccentPitch={this.state.showAccentPitch}
@@ -200,6 +234,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                               showPitchScale={this.state.showPitchScale}
                               showPerceptualScale={this.state.showPerceptualScale}
                               showPitchArtImageColor={this.state.showPitchArtImageColor}
+                              showMetildaWatermark={this.state.showMetildaWatermark}
                               speakers={this.props.speakers}
                               firebase={this.props.firebase}/>
                 </div>

@@ -1,7 +1,6 @@
 import * as React from "react";
 import {SyntheticEvent} from "react";
 import {connect} from "react-redux";
-import "../PitchArtWizard/GlobalStyling.css";
 import {AppState} from "../store";
 import {Speaker} from "../types/types";
 import "./CreatePitchArt.css";

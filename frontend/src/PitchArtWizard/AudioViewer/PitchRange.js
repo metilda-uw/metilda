@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "../GlobalStyling.css";
 import "./PitchRange.css";
 
 class PitchRange extends Component {

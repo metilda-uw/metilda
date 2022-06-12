@@ -9,6 +9,8 @@ interface Props {
     height: number;
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     uploadId: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showAccentPitch: boolean;
@@ -20,6 +22,7 @@ interface Props {
     showPitchScale: boolean;
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
+    showMetildaWatermark: boolean;
     speakers: Speaker[];
     firebase: any;
 }
@@ -66,6 +69,8 @@ class PitchArt extends React.Component<Props> {
                         height={this.props.height}
                         minPitch={this.props.minPitch}
                         maxPitch={this.props.maxPitch}
+                        minTime={this.props.minTime}
+                        maxTime={this.props.maxTime}
                         fileName={this.props.uploadId}
                         setLetterPitch={this.props.setLetterPitch}
                         showAccentPitch={this.props.showAccentPitch}
@@ -77,6 +82,7 @@ class PitchArt extends React.Component<Props> {
                         showPitchScale={this.props.showPitchScale}
                         showPerceptualScale={this.props.showPerceptualScale}
                         showPitchArtImageColor={this.props.showPitchArtImageColor}
+                        showMetildaWatermark={this.props.showMetildaWatermark}
                         showPrevPitchValueLists={false}
                         speakers={this.props.speakers}
                         firebase={this.props.firebase}/>);

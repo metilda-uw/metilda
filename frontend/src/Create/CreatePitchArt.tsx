@@ -152,7 +152,7 @@ export class CreatePitchArt extends React.Component<CreatePitchArtProps, State> 
                             firebase={this.props.firebase}
                             speakers={this.props.speakers}
                             width={AudioAnalysis.AUDIO_IMG_WIDTH}
-                            height={500}
+                            height={AudioAnalysis.AUDIO_IMG_HEIGHT}
                             setLetterPitch={this.props.setLetterPitch}
                             uploadId={uploadId}/>
                     </div>

@@ -5,8 +5,8 @@ import sinon from "sinon";
 import {StudentRecordings, StudentRecordingsProps} from "./StudentRecordings";
 import Firebase from "../Firebase/firebase";
 
-const mockedFetch = sinon.stub(window, "fetch");
-const firebase = new Firebase();
+// const mockedFetch = sinon.stub(window, "fetch");
+// const firebase = new Firebase();
 
 describe("Signup", () => {
   it("renders the Signup Form", () => {

@@ -1,4 +1,5 @@
 import React, {createRef} from "react";
+import Konva from "konva";
 import {Layer, Line, Rect, Stage} from "react-konva";
 import * as Tone from "tone";
 import {Encoding} from "tone";
@@ -10,6 +11,7 @@ import PitchArtCoordConverter from "./PitchArtCoordConverter";
 import PitchArtCoordinateSystem from "./PitchArtCoordinateSystem";
 import PitchArtGeometry from "./PitchArtGeometry";
 import PitchArtLegend from "./PitchArtLegend";
+import PitchArtMetildaWatermark from "./PitchArtMetildaWatermark";
 import {PitchArtWindowConfig, RawPitchValue} from "./types";
 import UserPitchView from "./UserPitchView";
 import {uploadAnalysis, uploadImage, uploadImageAnalysisIds} from "../../Create/ImportUtils";
@@ -34,6 +36,8 @@ export interface PitchArtDrawingWindowProps {
     height: number;
     minPitch: number;
     maxPitch: number;
+    minTime: number;
+    maxTime: number;
     fileName: string;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     showDynamicContent: boolean;
@@ -48,6 +52,7 @@ export interface PitchArtDrawingWindowProps {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showPrevPitchValueLists: boolean;
+    showMetildaWatermark: boolean;
     rawPitchValueLists?: RawPitchValue[][];
     firebase: any;
     setLatestAnalysisId: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
@@ -126,7 +131,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
     private readonly pitchArtSoundLengthSeconds: number;
     private readonly fontSize: number;
     private downloadRef = createRef<HTMLAnchorElement>();
-    private stageRef = createRef<Stage>();
+    private stageRef = createRef<Konva.Stage>();
 
     constructor(props: PitchArtDrawingWindowProps) {
         super(props);
@@ -143,7 +148,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         this.setPointerEnabled = this.setPointerEnabled.bind(this);
 
         this.innerWidth = this.props.width * 0.75;
-        this.innerHeight = this.props.height * 0.90;
+        this.innerHeight = this.props.height * 0.80;
         this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
         this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
 
@@ -485,7 +490,7 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
         if (!this.props.showPitchScale) {
             return;
         }
-
+        
         return (
             <PitchArtCoordinateSystem
                 fontSize={this.fontSize * 0.75}
@@ -498,6 +503,34 @@ export class PitchArtDrawingWindow extends React.Component<PitchArtDrawingWindow
             />
         );
     }
+    
+    maybeShowMetildaWatermark = (windowConfig: PitchArtWindowConfig) => {
+        if (!this.props.showMetildaWatermark) {
+            return (
+                <PitchArtMetildaWatermark
+                    type= "wm1"
+                    fontSize={this.fontSize}
+                    windowConfig={windowConfig}
+                    xOrigin={windowConfig.x0}
+                    xMax={windowConfig.x0 + windowConfig.innerWidth}
+                    showPerceptualScale={this.props.showPerceptualScale}
+                    showPitchScale={this.props.showPitchScale}
+                />
+            );
+        }
+
+        return (
+            <PitchArtMetildaWatermark
+                type= "wm2"
+                fontSize={this.fontSize}
+                windowConfig={windowConfig}
+                xOrigin={windowConfig.x0}
+                xMax={windowConfig.x0 + windowConfig.innerWidth}
+                showPerceptualScale={this.props.showPerceptualScale}
+                showPitchScale={this.props.showPitchScale}
+            />
+         );
+    }
 
 render() {
         const windowConfig = {
@@ -506,7 +539,9 @@ render() {
             y0: this.pointDy0,
             x0: this.pointDx0,
             dMin: this.props.minPitch,
-            dMax: this.props.maxPitch
+            dMax: this.props.maxPitch,
+            tMin: this.props.minTime,
+            tMax: this.props.maxTime
         };
 
         const colorSchemes = this.props.speakers.map((item, index) =>
@@ -521,53 +556,54 @@ render() {
         return (
             <div className="PitchArtDrawingWindow">
             {this.saveNewImageModal()}
-                <Stage className="PitchArtDrawingWindow-pitchart"
-                       ref={this.stageRef}
-                       width={this.props.width}
-                       height={this.props.height}>
-                    <Layer>
-                        <Rect width={this.props.width}
-                              height={this.props.height}
-                              fill="white"/>
-                        <Line points={[this.innerBorderX0, this.innerBorderY0,
-                            this.props.width - this.innerBorderX0, this.innerBorderY0,
-                            this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
-                            this.innerBorderX0, this.props.height - this.innerBorderY0,
-                            this.innerBorderX0, this.innerBorderY0]}
-                              strokeWidth={this.props.showPitchArtImageColor ? this.borderWidth : 0}
-                              stroke={this.props.showArtDesign && colorSchemes.length === 1
-                                  ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
-                              onClick={() => this.imageBoundaryClicked(coordConverter)}
-                              onMouseEnter={() => this.setPointerEnabled(true)}
-                              onMouseLeave={() => this.setPointerEnabled(false)}/>
-                    </Layer>
-                    {this.maybeShowPitchScale(windowConfig)}
-                    <PitchArtGeometry speakers={this.props.speakers}
-                                      windowConfig={windowConfig}
-                                      setLetterPitch={this.props.setLetterPitch}
-                                      colorSchemes={colorSchemes}
-                                      playSound={this.playSound}
-                                      activePlayIndex={
-                                          this.props.speakers.length === 1 ? this.state.activePlayIndex : -1}
-                                      showDynamicContent={this.props.showDynamicContent}
-                                      showArtDesign={this.props.showArtDesign}
-                                      showPitchArtLines={this.props.showPitchArtLines}
-                                      showLargeCircles={this.props.showLargeCircles}
-                                      showVerticallyCentered={this.props.showVerticallyCentered}
-                                      showAccentPitch={this.props.showAccentPitch}
-                                      showSyllableText={this.props.showSyllableText}
-                                      showTimeNormalization={this.props.showTimeNormalization}
-                                      showPerceptualScale={this.props.showPerceptualScale}
-                                      showPrevPitchValueLists={this.props.showPrevPitchValueLists}
-                                      largeCircleRadius={this.largeCircleRadius}
-                                      smallCircleRadius={this.smallCircleRadius}
-                                      graphWidth={this.graphWidth}
-                                      fontSize={this.fontSize}
-                                      circleStrokeWidth={this.circleStrokeWidth}
-                                      pitchArtSoundLengthSeconds={this.pitchArtSoundLengthSeconds}
-                                      accentedCircleRadius={this.accentedCircleRadius}
-                                      setPointerEnabled={this.setPointerEnabled}/>
-                    {this.maybeUserPitchView(windowConfig)}
+            <Stage className="PitchArtDrawingWindow-pitchart"
+                    ref={this.stageRef}
+                    width={this.props.width}
+                    height={this.props.height}>
+                <Layer>
+                    <Rect width={this.props.width}
+                            height={this.props.height}
+                            fill="white"/>
+                    <Line points={[this.innerBorderX0, this.innerBorderY0,
+                        this.props.width - this.innerBorderX0, this.innerBorderY0,
+                        this.props.width - this.innerBorderX0, this.props.height - this.innerBorderY0,
+                        this.innerBorderX0, this.props.height - this.innerBorderY0,
+                        this.innerBorderX0, this.innerBorderY0]}
+                            strokeWidth={this.props.showPitchArtImageColor ? this.borderWidth : 0}
+                            stroke={this.props.showArtDesign && colorSchemes.length === 1
+                                ? colorSchemes[0].windowLineStrokeColor : "#497dba"}
+                            onClick={() => this.imageBoundaryClicked(coordConverter)}
+                            onMouseEnter={() => this.setPointerEnabled(true)}
+                            onMouseLeave={() => this.setPointerEnabled(false)}/>
+                </Layer>
+                {this.maybeShowPitchScale(windowConfig)}
+                {this.maybeUserPitchView(windowConfig)}
+                {this.maybeShowMetildaWatermark(windowConfig)}
+                <PitchArtGeometry speakers={this.props.speakers}
+                                    windowConfig={windowConfig}
+                                    setLetterPitch={this.props.setLetterPitch}
+                                    colorSchemes={colorSchemes}
+                                    playSound={this.playSound}
+                                    activePlayIndex={
+                                        this.props.speakers.length === 1 ? this.state.activePlayIndex : -1}
+                                    showDynamicContent={this.props.showDynamicContent}
+                                    showArtDesign={this.props.showArtDesign}
+                                    showPitchArtLines={this.props.showPitchArtLines}
+                                    showLargeCircles={this.props.showLargeCircles}
+                                    showVerticallyCentered={this.props.showVerticallyCentered}
+                                    showAccentPitch={this.props.showAccentPitch}
+                                    showSyllableText={this.props.showSyllableText}
+                                    showTimeNormalization={this.props.showTimeNormalization}
+                                    showPerceptualScale={this.props.showPerceptualScale}
+                                    showPrevPitchValueLists={this.props.showPrevPitchValueLists}
+                                    largeCircleRadius={this.largeCircleRadius}
+                                    smallCircleRadius={this.smallCircleRadius}
+                                    graphWidth={this.graphWidth}
+                                    fontSize={this.fontSize}
+                                    circleStrokeWidth={this.circleStrokeWidth}
+                                    pitchArtSoundLengthSeconds={this.pitchArtSoundLengthSeconds}
+                                    accentedCircleRadius={this.accentedCircleRadius}
+                                    setPointerEnabled={this.setPointerEnabled}/>
                 </Stage>
                 <a className="hide" ref={this.downloadRef}>
                     Hidden Download Link

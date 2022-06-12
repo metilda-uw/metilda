@@ -95,7 +95,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
     }
 
     imageSrcList = () => {
-        const numSyllables: number = this.getNumSyllables();
+        // const numSyllables: number = this.getNumSyllables();
 
         switch (this.getNumSyllables()) {
             case 2:
@@ -212,6 +212,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
                                                  id={"pitchArt" + numSyllables + index}
                                                  onClick={() => this.enlargeSize
                                                  (numSyllables, index, this.state.imageSrcList.length)}
+                                                 alt=""
                                             />
                                         </Link>;
                                     }
