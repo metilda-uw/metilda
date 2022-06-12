@@ -1,10 +1,10 @@
-import {shallow} from "enzyme";
+import { shallow } from "enzyme";
 import * as React from "react";
-import {expect} from "../setupTests";
+import { expect } from "../setupTests";
 import sinon from "sinon";
-import {MyFiles, MyFilesProps} from "./MyFiles";
+import { MyFiles, MyFilesProps } from "./MyFiles";
 import ImagesForMyFiles from "./ImagesForMyFiles";
-import Header from "../Layout/Header";
+import Header from "../components/header/Header";
 import Firebase from "../Firebase/firebase";
 import { EafsForMyFiles } from "./EafsForMyFiles";
 
@@ -12,15 +12,23 @@ const mockedFetch = sinon.stub(window, "fetch");
 const firebase = new Firebase();
 describe("MyFiles", () => {
   beforeEach(() => {
-    firebase.auth = {currentUser: {email: "test_user@gmail.com"}};
-    mockedFetch.returns((jsonOk({result: [[1, "file_1", "255 KB", "/test_files/file_1", false], [2, "file_2", "255 KB", "/test_files/file_2", true]]})));
+    firebase.auth = { currentUser: { email: "test_user@gmail.com" } };
+    mockedFetch.returns(
+      jsonOk({
+        result: [
+          [1, "file_1", "255 KB", "/test_files/file_1", false],
+          [2, "file_2", "255 KB", "/test_files/file_2", true],
+        ],
+      })
+    );
     function jsonOk(body: any) {
-    const mockResponse = new Response(JSON.stringify(body));
-    return Promise.resolve(mockResponse);
-  }});
+      const mockResponse = new Response(JSON.stringify(body));
+      return Promise.resolve(mockResponse);
+    }
+  });
 
   it("renders the MyFiles page", () => {
-    const subject = shallowRender({firebase});
+    const subject = shallowRender({ firebase });
     expect(subject.find("#myFilesTitle")).to.be.not.present();
     expect(subject.find("#myFiles")).to.be.not.present();
     expect(subject.find(".DeleteFile")).to.be.not.present();
@@ -40,7 +48,8 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: false},
+        checked: false,
+      },
       {
         id: 2,
         name: "file_2",
@@ -48,10 +57,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Upload",
         path: "/test_files/file_2",
-        checked: true}
+        checked: true,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     expect(subject.find("input").length).to.be.equal(3);
     expect(subject.find(".GetImages").length).to.be.equal(4);
   });
@@ -65,7 +75,8 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: false},
+        checked: false,
+      },
       {
         id: 2,
         name: "MyFolder",
@@ -73,10 +84,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Folder",
         path: "/test_files/MyFolder",
-        checked: true}
+        checked: true,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     expect(subject.find("input").length).to.be.equal(2);
     expect(subject.find(".GetImages").length).to.be.equal(2);
     expect(subject.find(".MoveToFolder").length).to.be.equal(1);
@@ -92,18 +104,20 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: false},
+        checked: false,
+      },
       {
-          id: 2,
-          name: "file_1",
-          size: "255 KB ",
-          createdAt: " ",
-          path: "/test_files/file_1",
-          type: "Upload",
-          checked: false}
+        id: 2,
+        name: "file_1",
+        size: "255 KB ",
+        createdAt: " ",
+        path: "/test_files/file_1",
+        type: "Upload",
+        checked: false,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files, checkAll: false});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files, checkAll: false });
     subject.find(".checkBoxForAllFiles").simulate("change");
     expect(subject.state("files")).to.be.deep.equal([
       {
@@ -113,15 +127,17 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: true},
+        checked: true,
+      },
       {
-          id: 2,
-          name: "file_1",
-          size: "255 KB ",
-          createdAt: " ",
-          path: "/test_files/file_1",
-          type: "Upload",
-          checked: true}
+        id: 2,
+        name: "file_1",
+        size: "255 KB ",
+        createdAt: " ",
+        path: "/test_files/file_1",
+        type: "Upload",
+        checked: true,
+      },
     ]);
     expect(subject.state("checkAll")).to.be.equal(true);
   });
@@ -135,10 +151,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Upload",
         path: "/test_files/file_1",
-        checked: false}
+        checked: false,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     expect(subject.find("input").length).to.be.equal(2); // 2 from files and 1 from header
     expect(subject.find(".GetImages").length).to.be.equal(2);
     subject.find(".GetImages").at(0).simulate("click");
@@ -156,10 +173,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Upload",
         path: "/test_files/file_1",
-        checked: false}
+        checked: false,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     expect(subject.find("input").length).to.be.equal(2); // 2 from files and 1 from header
     expect(subject.find(".GetImages").length).to.be.equal(2);
     subject.find(".GetImages").at(1).simulate("click");
@@ -177,18 +195,20 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: true},
+        checked: true,
+      },
       {
-          id: 2,
-          name: "file_1",
-          size: "255 KB ",
-          createdAt: " ",
-          path: "/test_files/file_1",
-          type: "Upload",
-          checked: true}
+        id: 2,
+        name: "file_1",
+        size: "255 KB ",
+        createdAt: " ",
+        path: "/test_files/file_1",
+        type: "Upload",
+        checked: true,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files, checkAll: true});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files, checkAll: true });
     subject.find(".checkBoxForAllFiles").simulate("change");
     expect(subject.state("files")).to.be.deep.equal([
       {
@@ -198,15 +218,17 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: false},
+        checked: false,
+      },
       {
-          id: 2,
-          name: "file_1",
-          size: "255 KB ",
-          createdAt: " ",
-          path: "/test_files/file_1",
-          type: "Upload",
-          checked: false}
+        id: 2,
+        name: "file_1",
+        size: "255 KB ",
+        createdAt: " ",
+        path: "/test_files/file_1",
+        type: "Upload",
+        checked: false,
+      },
     ]);
     expect(subject.state("checkAll")).to.be.equal(false);
   });
@@ -220,12 +242,16 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Upload",
         path: "/test_files/file_1",
-        checked: false}
+        checked: false,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
-    subject.find(".checkBoxForFile").simulate("change",
-    {target: {name: "username", value: 0, checked: true}});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
+    subject
+      .find(".checkBoxForFile")
+      .simulate("change", {
+        target: { name: "username", value: 0, checked: true },
+      });
     expect(subject.state("files")).to.be.deep.equal([
       {
         id: 1,
@@ -234,7 +260,8 @@ describe("MyFiles", () => {
         createdAt: " ",
         type: "Upload",
         path: "/test_files/file_1",
-        checked: true}
+        checked: true,
+      },
     ]);
     expect(subject.state("checkAll")).to.be.equal(true);
     expect(subject.find("input").length).to.be.equal(2);
@@ -250,7 +277,8 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: true},
+        checked: true,
+      },
       {
         id: 2,
         name: "file_2",
@@ -258,10 +286,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_2",
         type: "Upload",
-        checked: false}
+        checked: false,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     subject.find(".DeleteFile").simulate("click");
     expect(subject.state("files")).to.be.equal(files);
   });
@@ -275,7 +304,8 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_1",
         type: "Upload",
-        checked: false},
+        checked: false,
+      },
       {
         id: 2,
         name: "file_2",
@@ -283,10 +313,11 @@ describe("MyFiles", () => {
         createdAt: " ",
         path: "/test_files/file_2",
         type: "Upload",
-        checked: true}
+        checked: true,
+      },
     ];
-    const subject = shallowRender({firebase});
-    subject.setState({files});
+    const subject = shallowRender({ firebase });
+    subject.setState({ files });
     subject.find(".DownloadFile").simulate("click");
   });
 });
@@ -296,11 +327,13 @@ interface OptionalProps {
 }
 
 function shallowRender(props: OptionalProps) {
-    return shallow((<MyFiles {...makeProps(props)}/>), {disableLifecycleMethods: true});
+  return shallow(<MyFiles {...makeProps(props)} />, {
+    disableLifecycleMethods: true,
+  });
 }
 
 function makeProps(props: OptionalProps): MyFilesProps {
-    return {
-      firebase: props.firebase || undefined
-    };
+  return {
+    firebase: props.firebase || undefined,
+  };
 }

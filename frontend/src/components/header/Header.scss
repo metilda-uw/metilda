@@ -1,0 +1,107 @@
+// #metilda-navbar {
+//     text-align: left;
+//     display: flex;
+//     margin-left: 24px;
+// }
+
+// #metilda-navbar .app-logo {
+//     font-size: 32px;
+// }
+
+// .metilda-navbar-item {
+//     margin-right: 16px;
+// }
+
+// #metilda-navbar {
+//     text-align: left;
+//     display: flex;
+//     margin-left: 24px;
+//   }
+
+//   #metilda-navbar .app-logo {
+//     font-size: 32px;
+//   }
+
+//   .metilda-navbar-item {
+//     margin-right: 16px;
+//   }
+
+// .main_Navbar {
+//   background-color: #ee6e73;
+// }
+
+// .menu-container {
+//   text-align: center;
+// }
+
+// nav {
+//   ul {
+//     list-style: none;
+//     padding-left: 0;
+//     margin-top: 0;
+//     margin-bottom: 0;
+//     a {
+//       color: #000000;
+//     }
+//   }
+// }
+
+//$color-blue: #00aeef;
+//$color-blue-dark: #0d2035;
+$submenu-width: 180px;
+
+.nav {
+  display: inline-block;
+  background: #ee6e73;
+  //color: #000000;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  a {
+    color: #000000;
+    display: block;
+    padding: 8 8px;
+    line-height: inherit;
+    cursor: pointer;
+  }
+}
+
+.nav-menu {
+  //line-height: 30px 30px;
+  font-weight: 700;
+  //text-transform: inherit;
+}
+
+.nav-menu-item {
+  display: inline-block;
+  position: relative;
+
+  &:hover {
+    background-color: rgb(216, 94, 94);
+  }
+}
+
+.nav-menu-item:hover {
+  .nav-submenu {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.nav-submenu {
+  display: none;
+  width: $submenu-width;
+  font-weight: 400;
+  text-transform: none;
+  position: absolute;
+  background-color: #e96d71;
+}
+
+.nav-submenu-item {
+  &:hover {
+    background: rgba(#000, 0.1);
+    //display: block;
+  }
+}
