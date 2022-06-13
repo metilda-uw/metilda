@@ -10,10 +10,12 @@ export default function Collections() {
   const { documents: analysis, error } = useCollection("analysis");
 
   return (
-    <div className="page-collections">
+    <>
       <Header />
-      {error && <p className="error">{error}</p>}
-      {analysis && <AnalysisList analysis={analysis} />}
-    </div>
+      <div className="page-collections">
+        {error && <p className="error">{error}</p>}
+        {analysis && <AnalysisList analysis={analysis} />}
+      </div>
+    </>
   );
 }
