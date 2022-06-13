@@ -1,6 +1,11 @@
 import { useReducer, useEffect, useState, useContext } from "react";
 import FirebaseContext from "../Firebase/context";
 
+//The exported response (reducer state) object does not appear to work as expected.
+// For example, in SaveAnalysisFirestore.tsx we should be able to check the response object's state
+// to get the contents of the document, error, success property.  However, it seems to be one
+// render behind.  This could have something to do with with when state updates occur when using a reducer.
+
 let initialState = {
   document: null,
   isPending: false,
@@ -57,21 +62,20 @@ export const useFirestore = (collection) => {
 
   // add a document
   const addDocument = async (doc) => {
-    console.log(response);
     dispatch({ type: "IS_PENDING" });
 
     try {
-      console.log(response);
       const createdAt = timestamp.fromDate(new Date());
       // addedDocument is the document object returned from firebase
-      // need document.id to create thumbnail with a matching id.
+
       const addedDocument = await ref.add({ ...doc, createdAt });
 
       dispatchIfNotCancelled({
         type: "ADDED_DOCUMENT",
         payload: addedDocument,
       });
-      console.log(response);
+      // Calling method expects to receive the document.id
+      // to create thumbnail with a matching id.
       return addedDocument.id;
     } catch (err) {
       dispatchIfNotCancelled({ type: "ERROR", payload: err.message });
