@@ -44,6 +44,7 @@ class PitchArt extends React.Component<Props> {
 
     this.saveImage = this.saveImage.bind(this);
     this.downloadImage = this.downloadImage.bind(this);
+    this.saveThumbnail = this.saveThumbnail.bind(this);
     this.playPitchArt = this.playPitchArt.bind(this);
     this.createPitchArt = this.createPitchArt.bind(this);
   }
@@ -64,11 +65,11 @@ class PitchArt extends React.Component<Props> {
     }
   }
 
-  saveThumbnail() {
+  saveThumbnail(id: string) {
     if (this.props.showPitchArtImageColor) {
-      this.hiddenRef.current!.saveImage();
+      this.hiddenRef.current!.uploadImageWithId(id);
     } else {
-      this.visibleRef.current!.saveImage();
+      this.visibleRef.current!.uploadImageWithId(id);
     }
   }
 
@@ -143,6 +144,8 @@ class PitchArt extends React.Component<Props> {
             Download Image
             <i className="material-icons right">file_download</i>
           </button>
+        </div>
+        <div id="metilda-pitch-art-btn-container">
           <SaveAnalysisFirestore
             analysis={this.props.speakers}
             saveThumbnail={this.saveThumbnail}
