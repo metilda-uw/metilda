@@ -1,120 +1,128 @@
-import React, {Component} from 'react';
+import React, { Component } from "react";
 import "./TimeRange.css";
 import "../AudioViewer/PitchRange.css";
 
 class TimeRange extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            minTime: null,
-            maxTime: null,
-            errors: [],
-            isMinDirty: false,
-            isMaxDirty: false
-        };
-        this.minTimeRef = React.createRef();
-        this.maxTimeRef = React.createRef();
-        this.submitMaxTime = this.submitMaxTime.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = {
+      minTime: null,
+      maxTime: null,
+      errors: [],
+      isMinDirty: false,
+      isMaxDirty: false,
+    };
+    this.minTimeRef = React.createRef();
+    this.maxTimeRef = React.createRef();
+    this.submitMaxTime = this.submitMaxTime.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+  }
+
+  submitMaxTime(event) {
+    if (this.state.errors.length > 0) {
+      return;
     }
 
-    submitMaxTime(event) {
-        if (this.state.errors.length > 0) {
-            return;
-        }
+    this.props.applyTimeRange(0, parseFloat(this.maxTimeRef.current.value));
+  }
 
-        this.props.applyTimeRange(0, parseFloat(this.maxTimeRef.current.value));
+  validateInput = () => {
+    const minTime = 0;
+    const maxTime = this.maxTimeRef.current.value;
+
+    const errors = [];
+    const invalidValues = [minTime, maxTime].filter(
+      (value) => isNaN(value) || value < 0.0
+    );
+    if (invalidValues.length > 0) {
+      errors.push("Time must be a positive number");
     }
 
-    validateInput = () => {
-        const minTime= 0;
-        const maxTime = this.maxTimeRef.current.value;
+    this.setState({ errors: errors });
 
-        const errors = [];
-        const invalidValues = [minTime, maxTime].filter((value) => isNaN(value) || value < 0.0);
-        if (invalidValues.length > 0) {
-            errors.push("Time must be a positive number");
-        }
+    return errors.length === 0;
+  };
 
-        this.setState({errors: errors});
+  handleInputChange(event) {
+    this.validateInput();
 
-        return errors.length === 0;
+    const name = event.target.name;
+    let num = parseFloat(event.target.value);
+
+    if (isNaN(num) || num < 0) {
+      this.setState({ [name]: "" });
+      return;
     }
 
-    handleInputChange(event) {
-        this.validateInput();
+    this.setState({ [name]: num });
 
-        const name = event.target.name;
-        let num = parseFloat(event.target.value);
+    if (name === "minTime") {
+      this.setState({ isMinDirty: true });
+    } else if (name === "maxTime") {
+      this.setState({ isMaxDirty: true });
+    }
+  }
 
-        if (isNaN(num) || num < 0) {
-            this.setState({[name]: ''});
-            return;
-        }
+  enterPressed = (event) => {
+    if (event.key === "Enter") {
+      this.submitMaxTime(event);
+    }
+  };
 
-        this.setState({[name]: num});
-
-        if (name === 'minTime') {
-            this.setState({isMinDirty: true});
-        } else if (name === 'maxTime') {
-            this.setState({isMaxDirty: true});
-        }
+  render() {
+    let minValue = this.props.initMinTime;
+    if (this.state.isMinDirty) {
+      minValue = this.state.minTime;
     }
 
-    enterPressed = (event) => {
-        if (event.key === 'Enter') {
-            this.submitMaxTime(event);
-        }
+    let maxValue = this.props.initMaxTime;
+    if (this.state.isMaxDirty) {
+      maxValue = this.state.maxTime;
     }
 
-    render() {
-        let minValue = this.props.initMinTime;
-        if (this.state.isMinDirty) {
-            minValue = this.state.minTime;
-        }
-
-        let maxValue = this.props.initMaxTime;
-        if (this.state.isMaxDirty) {
-            maxValue = this.state.maxTime;
-        }
-
-        return (
-            <div className="metilda-audio-analysis-controls-list-item col s12">
-                <label className="group-label text">Adjust Time Axis:</label>
-                <span className="pitch-range-err-list">
-                    {this.state.errors.map((item, index) => <p key={index} className="pitch-range-err-list-item">{item}</p>)}
-                </span>
-                <div className="metilda-audio-analysis-controls-list-item-row">
-                    <div class="metilda-audio-analysis-controls-list-item-row col s6">
-                        <input name="maxTime"
-                           id="maxTime"
-                           ref={this.maxTimeRef}
-                           value={maxValue}
-                           onChange={(event) => this.handleInputChange(event)}
-                           onKeyPress={(event) => this.enterPressed(event)}
-                           placeholder="max seconds"
-                           className="validate time-range-input"
-                           //pattern="(\d+)(\.\d+)?"
-                           required={true}
-                           type="number"
-                           step="0.1"/>
-                        <p class="range-label">Seconds.</p>
-                    </div>
-                    <div class="col s6">
-                            <button className="waves-effect waves-light btn globalbtn"
-                            type="submit"
-                            onClick={(event) => this.submitMaxTime(event)}>
-                        Apply
-                    </button>
-                    </div>
-
-
-                </div>
-
-
-            </div>
-        );
-    }
+    return (
+      <div className="metilda-audio-analysis-controls-list-item col s12">
+        <label className="group-label text">
+          Adjust Time (Horizontal) Axis
+        </label>
+        <span className="pitch-range-err-list">
+          {this.state.errors.map((item, index) => (
+            <p key={index} className="pitch-range-err-list-item">
+              {item}
+            </p>
+          ))}
+        </span>
+        <div className="metilda-audio-analysis-controls-list-item-row">
+          <div className="metilda-audio-analysis-controls-list-item-row col s6">
+            <input
+              name="maxTime"
+              id="maxTime"
+              ref={this.maxTimeRef}
+              value={maxValue}
+              onChange={(event) => this.handleInputChange(event)}
+              onKeyPress={(event) => this.enterPressed(event)}
+              placeholder="max seconds"
+              className="validate time-range-input"
+              //pattern="(\d+)(\.\d+)?"
+              required={true}
+              type="number"
+              step="0.1"
+            />
+            <p>Seconds</p>
+          </div>
+          <div className="col s6">
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              type="submit"
+              onClick={(event) => this.submitMaxTime(event)}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default TimeRange;
