@@ -1,14 +1,18 @@
 import "materialize-css/dist/css/materialize.min.css";
+import "./App.scss";
+
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
+import "firebase/auth";
+import "firebase/firestore";
+import ReactGA from "react-ga";
+
+import * as ROUTES from "./constants/routes";
 import CreatePitchArt from "./Create/CreatePitchArt";
 import PeldaView from "./Pelda/PeldaView";
 import WordSyllableCategories from "./Learn/WordSyllableCategories";
 import WordSyllableReview from "./Learn/WordSyllableReview";
 import Home from "./Authentication/home";
-import "firebase/auth";
-import "firebase/firestore";
-import * as ROUTES from "./constants/routes";
 import Landing from "./Authentication/landing";
 import signUp from "./Authentication/signup";
 import signIn from "./Authentication/login";
@@ -20,8 +24,8 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import { withAuthentication } from "./Session";
 import { createBrowserHistory } from "history";
-import ReactGA from "react-ga";
-import {NotificationContainer} from "react-notifications";
+import { NotificationContainer } from "react-notifications";
+import Collections from "./pages/Collections";
 
 interface Props {
   firebase: any;
@@ -43,47 +47,60 @@ const latencyPerformanceCallback = (list: any) => {
     ReactGA.timing({
       category: "Load Performace",
       variable: "Server Latency",
-      value: entry.responseStart - entry.requestStart
+      value: entry.responseStart - entry.requestStart,
     });
-});
+  });
 };
 const renderingPerformanceCallback = (list: any) => {
   list.getEntries().forEach((entry: any) => {
-    if (entry.name.includes("App") ) {
+    if (entry.name.includes("App")) {
       ReactGA.timing({
         category: "App Render Performace",
         variable: entry.name,
-        value: entry.duration
+        value: entry.duration,
       });
     }
-});
+  });
 };
 
-const latencyPerformanceObserver = new PerformanceObserver(latencyPerformanceCallback);
-latencyPerformanceObserver.observe({entryTypes: ["navigation"] });
+const latencyPerformanceObserver = new PerformanceObserver(
+  latencyPerformanceCallback
+);
+latencyPerformanceObserver.observe({ entryTypes: ["navigation"] });
 
-const renderingPerformanceObserver = new PerformanceObserver(renderingPerformanceCallback);
-renderingPerformanceObserver.observe({entryTypes: ["mark", "measure"] });
+const renderingPerformanceObserver = new PerformanceObserver(
+  renderingPerformanceCallback
+);
+renderingPerformanceObserver.observe({ entryTypes: ["mark", "measure"] });
 
 const App = () => (
-<Router history={history}>
-  <div className="App">
-    <NotificationContainer/>
-    <Route exact={true} path={ROUTES.LANDING} component={Landing} />
-    <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
-    <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
-    <Route exact={true} path={ROUTES.PASSWORD_FORGET} component={passwordForget} />
-    <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
-    <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
-    <Route exact={true} path={ROUTES.HISTORY} component={History} />
-    <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
-    <Route path="/home" component={Home} />
-    <Route path="/manage-users" component={ManageUsers} />
-    <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
-    <Route path="/peldaview" component={PeldaView} />
-    <Route path="/learn/words/syllables" component={WordSyllableCategories} />
-    <Route path="/learn/words/syllables/:numSyllables" component={WordSyllableReview} />
-  </div>
-</Router>);
+  <Router history={history}>
+    <div className="App">
+      <NotificationContainer />
+      <Route exact={true} path={ROUTES.LANDING} component={Landing} />
+      <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
+      <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
+      <Route
+        exact={true}
+        path={ROUTES.PASSWORD_FORGET}
+        component={passwordForget}
+      />
+      <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
+      <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
+      <Route exact={true} path={ROUTES.HISTORY} component={History} />
+      <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
+      <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
+      <Route path="/home" component={Home} />
+      <Route path="/manage-users" component={ManageUsers} />
+      <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
+      <Route path="/peldaview" component={PeldaView} />
+      <Route path="/learn/words/syllables" component={WordSyllableCategories} />
+      <Route
+        path="/learn/words/syllables/:numSyllables"
+        component={WordSyllableReview}
+      />
+    </div>
+  </Router>
+);
 
 export default withAuthentication(App as any);
