@@ -83,7 +83,7 @@ class TimeRange extends Component {
     return (
       <div className="metilda-audio-analysis-controls-list-item col s12">
         <label className="group-label text">
-          Adjust Time (Horizontal) Axis:
+          Adjust Time (Horizontal) Axis
         </label>
         <span className="pitch-range-err-list">
           {this.state.errors.map((item, index) => (
