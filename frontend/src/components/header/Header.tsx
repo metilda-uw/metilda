@@ -77,9 +77,6 @@ class Header extends Component<HeaderProps, State> {
               <Link to="/home">Home</Link>
             </li>
             <li className="nav-menu-item">
-              <Link to="/collections">Collections</Link>
-            </li>
-            <li className="nav-menu-item">
               <a>Explore</a>
               <Submenu
                 navLinks={[
