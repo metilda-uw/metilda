@@ -59,6 +59,7 @@
     "react-export-excel": "^0.5.2",
     "react-file-reader": "^1.1.4",
     "react-file-reader-input": "^2.0.0",
+    "react-firebase-hooks": "^3.0.5",
     "react-fontawesome": "^1.7.1",
     "react-ga": "^2.7.0",
     "react-html-parser": "^2.0.2",
