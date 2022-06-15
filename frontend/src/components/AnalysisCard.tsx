@@ -12,7 +12,6 @@ export default function AnalysisCard({ analysis }) {
     });
   });
 
-  console.log(analysis);
   return (
     <div className="col s6 m3">
       <div className="card">
@@ -21,12 +20,9 @@ export default function AnalysisCard({ analysis }) {
           <img src={url} alt="word thumbnail" />
         </div>
         <div className="card-content">
-          {analysis[0].letters && (
+          {analysis.letters && (
             <p>There are {analysis[0].letters.length} letters in this word.</p>
           )}
-        </div>
-        <div className="card-action">
-          <a href="#">This is a link</a>
         </div>
       </div>
     </div>
