@@ -10,7 +10,6 @@ import AnalysisList from "../components/AnalysisList";
 
 export default function Collections() {
   const firebase = useContext(FirebaseContext);
-  const timestamp = firebase.timestamp;
   const [analysis, loading, error] = useCollectionData(
     firebase.firestore.collection("analysis"),
     {

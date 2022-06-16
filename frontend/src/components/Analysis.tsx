@@ -17,11 +17,15 @@ export default function Analysis() {
 
   return (
     <div>
-      <p>
-        {error && <strong>Error: {JSON.stringify(error)}</strong>}
-        {loading && <span>Document: Loading...</span>}
-        {analysis && <span>Document: {JSON.stringify(analysis)}</span>}
-      </p>
+      {error && <strong>Error: {JSON.stringify(error)}</strong>}
+      {loading && <span>Document: Loading...</span>}
+      {analysis && (
+        <div className="analysis">
+          {console.log(analysis)}
+          <div>{analysis[0].uploadId}</div>
+          <span>Document: {JSON.stringify(analysis)}</span>
+        </div>
+      )}
     </div>
   );
 }
