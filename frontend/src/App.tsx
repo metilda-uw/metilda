@@ -27,7 +27,7 @@ import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./pages/Collections";
-import Analysis from "./components/Analysis";
+import Analysis from "./pages/Analysis";
 
 interface Props {
   firebase: any;
