@@ -2,6 +2,8 @@ import React, { useContext } from "react";
 
 import { useDocumentData } from "react-firebase-hooks/firestore";
 import { useParams } from "react-router-dom";
+
+import Header from "../components/header/Header";
 import FirebaseContext from "../Firebase/context";
 
 export default function Analysis() {
@@ -17,6 +19,7 @@ export default function Analysis() {
 
   return (
     <div>
+      <Header />
       {error && <strong>Error: {JSON.stringify(error)}</strong>}
       {loading && <span>Document: Loading...</span>}
       {analysis && (
