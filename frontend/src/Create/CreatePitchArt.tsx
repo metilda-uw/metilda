@@ -1,6 +1,7 @@
 import "./CreatePitchArt.css";
 
 import * as React from "react";
+import {useState} from "react";
 import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
@@ -15,6 +16,7 @@ import { uploadAudio } from "./ImportUtils";
 import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
+import * as DEFAULT from "../constants/create";
 
 export interface CreatePitchArtProps {
   speakers: Speaker[];
@@ -29,7 +31,23 @@ export interface CreatePitchArtProps {
 interface State {
   files: any[];
   selectedFolderName: string;
-  isLoading: boolean;
+  isLoading: boolean
+  pitchArt: {
+    minPitch: number;
+    maxPitch: number;
+    minTime: number;
+    maxTime: number;
+    showAccentPitch: boolean;
+    showSyllableText: boolean;
+    showVerticallyCentered: boolean;
+    showPitchArtLines: boolean;
+    showLargeCircles: boolean;
+    showTimeNormalization: boolean;
+    showPitchScale: boolean;
+    showPerceptualScale: boolean;
+    showPitchArtImageColor: boolean;
+    showMetildaWatermark: boolean;
+  }
 }
 
 export class CreatePitchArt extends React.Component<
@@ -43,10 +61,35 @@ export class CreatePitchArt extends React.Component<
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
+      pitchArt: {
+        minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
+        maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
+        minTime: DEFAULT.MIN_ANALYSIS_TIME,
+        maxTime: DEFAULT.MAX_ANALYSIS_TIME,
+        showAccentPitch: false,
+        showSyllableText: false,
+        showVerticallyCentered: false,
+        showPitchArtLines: true,
+        showLargeCircles: true,
+        showTimeNormalization: false,
+        showPitchScale: false,
+        showPerceptualScale: true,
+        showPitchArtImageColor: true,
+        showMetildaWatermark: false
+      }
     };
   }
   componentDidMount() {
     this.getUserFiles();
+  }
+
+  updatePitchArtValues = (inputName: string, inputValue: any) => {
+    this.setState( prevState => {
+      const state = prevState;
+      state.pitchArt[inputName] = inputValue;
+      return state;
+    });
+    console.log(this.state);
   }
 
   renderSpeakers = () => {
@@ -129,10 +172,12 @@ export class CreatePitchArt extends React.Component<
   };
 
   render() {
+    
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
+
     return (
       <div>
         <Header />
@@ -175,6 +220,8 @@ export class CreatePitchArt extends React.Component<
                 height={AudioAnalysis.AUDIO_IMG_HEIGHT}
                 setLetterPitch={this.props.setLetterPitch}
                 uploadId={uploadId}
+                pitchArt={this.state.pitchArt}
+                updatePitchArtValue = {this.updatePitchArtValues}
               />
             </div>
           </div>
