@@ -28,6 +28,7 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./pages/Collections";
 import Analysis from "./pages/Analysis";
+import SharedPage from "./Create/SharedPage";
 
 interface Props {
   firebase: any;
@@ -98,6 +99,7 @@ const App = () => (
       <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
       <Route path="/peldaview" component={PeldaView} />
       <Route path="/learn/words/syllables" component={WordSyllableCategories} />
+      <Route path="/shared-page" component = {SharedPage} />
       <Route
         path="/learn/words/syllables/:numSyllables"
         component={WordSyllableReview}

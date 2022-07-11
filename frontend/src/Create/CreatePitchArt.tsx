@@ -1,5 +1,5 @@
 import "./CreatePitchArt.css";
-
+import { compose } from "recompose";
 import * as React from "react";
 import {useState} from "react";
 import { connect } from "react-redux";
@@ -17,9 +17,13 @@ import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
+import { withFirebase } from "../Firebase";
 
 export interface CreatePitchArtProps {
   speakers: Speaker[];
+  history: any;
+  isSharedPage: false;
+  isBeingShared: false;
   setLetterPitch: (
     speakerIndex: number,
     letterIndex: number,
@@ -31,7 +35,7 @@ export interface CreatePitchArtProps {
 interface State {
   files: any[];
   selectedFolderName: string;
-  isLoading: boolean
+  isLoading: boolean;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -47,10 +51,10 @@ interface State {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
-  }
+  };
 }
 
-export class CreatePitchArt extends React.Component<
+class CreatePitchArt extends React.Component<
   CreatePitchArtProps,
   State
 > {
@@ -84,12 +88,16 @@ export class CreatePitchArt extends React.Component<
   }
 
   updatePitchArtValues = (inputName: string, inputValue: any) => {
-    this.setState( prevState => {
+    this.setState( (prevState) => {
       const state = prevState;
       state.pitchArt[inputName] = inputValue;
       return state;
     });
     console.log(this.state);
+  }
+
+  routeToSharePage = () => {
+    this.props.history.push({pathname: "/shared-page", createPitchArtProps: this.props, isBeingShared: true});
   }
 
   renderSpeakers = () => {
@@ -123,7 +131,7 @@ export class CreatePitchArt extends React.Component<
       {
         method: "GET",
         headers: {
-          Accept: "application/json",
+          "Accept": "application/json",
           "Content-Type": "application/json",
         },
       }
@@ -192,7 +200,18 @@ export class CreatePitchArt extends React.Component<
               <i className="material-icons right">cloud_upload</i>
               Upload File to cloud
             </button>
+
           </ReactFileReader>
+          <div>
+            <button className="SharePage waves-effect waves-light btn globalbtn" onClick={this.routeToSharePage}>
+               <i className="material-icons right">person_add</i>
+               Share Page
+            </button>
+          </div>
+          <div>
+            {}
+
+          </div>
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
               <div id="metilda-drop-down-back-button">
@@ -246,6 +265,8 @@ const mapDispatchToProps = (
 });
 
 const authCondition = (authUser: any) => !!authUser;
+// const CreateArtWithHist =  compose(CreatePitchArt, withFirebase, withRouter);
+// export {CreateArtWithHist};
 export default connect(
   mapStateToProps,
   mapDispatchToProps
