@@ -34,27 +34,42 @@ class Firebase {
   // *** Auth API ***
 
   doCreateUserWithEmailAndPassword = (email: string, password: string) =>
-    this.auth.createUserWithEmailAndPassword(email, password);
+      this.auth.createUserWithEmailAndPassword(email, password);
 
   doSignInWithEmailAndPassword = (email: string, password: string) =>
-    this.auth.signInWithEmailAndPassword(email, password);
+      this.auth.signInWithEmailAndPassword(email, password);
 
   doSignOut = () => this.auth.signOut();
 
   doPasswordReset = (email: string) => this.auth.sendPasswordResetEmail(email);
 
   doPasswordUpdate = (password: string) =>
-    this.auth.currentUser.updatePassword(password);
+      this.auth.currentUser.updatePassword(password);
 
   // *** Cloud Storage API ***/
   uploadFile = () => this.storage.ref();
 
   getCreatePageData = (path: string) => {
     const data = this.realtimedb.ref(path);
-    data.on('value', (snapshot) => {
+    data.on("value", (snapshot) => {
       console.log(snapshot.val());
-    })
+    });
+  }
+
+  writeDataToPage = (name: string, value: any, path: string) => {
+      firebase.database().ref(path).set({
+          name: value
+      });
+    }
+  createPage = () => {
+    const reference = firebase.database().ref("create");
+    const newReference = reference.push();
+    return `/create/${newReference}`;
+  }
+  updateValue = (name: string, value: any, reference: string) => {
+    const update = {};
+    update[reference] = {name: value};
+    firebase.database().ref().update(update);
   }
 }
-
 export default Firebase;
