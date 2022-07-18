@@ -58,12 +58,11 @@ class Firebase {
 
   writeDataToPage = (name: string, value: any, path: string) => {
       firebase.database().ref(path).set({
-          name: value
+        [name]: value
       });
     }
   createPage = () => {
-    const reference = firebase.database().ref("create");
-    const newReference = reference.push();
+    const newReference = firebase.database().ref().child("create").push().key;
     return `/create/${newReference}`;
   }
   updateValue = (name: string, value: any, reference: string) => {
