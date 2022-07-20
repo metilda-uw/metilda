@@ -17,13 +17,11 @@ import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
-import { withFirebase } from "../Firebase";
+// import StartFirebase from "../firebaseConfig";
 
-export interface CreatePitchArtProps {
+export interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State>  {
   speakers: Speaker[];
   history: any;
-  isSharedPage: false;
-  isBeingShared: false;
   setLetterPitch: (
     speakerIndex: number,
     letterIndex: number,
@@ -33,9 +31,12 @@ export interface CreatePitchArtProps {
 }
 
 interface State {
+  // shared: boolean;
   files: any[];
   selectedFolderName: string;
   isLoading: boolean;
+  isBeingShared: boolean;
+  route: string;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -54,17 +55,18 @@ interface State {
   };
 }
 
-class CreatePitchArt extends React.Component<
+export class CreatePitchArt extends React.Component<
   CreatePitchArtProps,
   State
 > {
   constructor(props: CreatePitchArtProps) {
     super(props);
-
     this.state = {
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
+      isBeingShared: false,
+      route: "/create/",
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
@@ -94,10 +96,23 @@ class CreatePitchArt extends React.Component<
       return state;
     });
     console.log(this.state);
+    if (this.state.isBeingShared) {
+       this.props.firebase.updateValue(inputName, inputValue, this.state.route);
+    }
   }
 
-  routeToSharePage = () => {
-    this.props.history.push({pathname: "/shared-page", createPitchArtProps: this.props, isBeingShared: true});
+  createSharedPage = () => {
+    const newRoute = this.props.firebase.createPage();
+    this.setState({isBeingShared: true});
+    this.setState({route: newRoute});
+    this.props.history.push({pathname: `/pitchartwizard${newRoute}`});
+    this.props.firebase.writeDataToPage("pitchArt", this.state.pitchArt, newRoute);
+  }
+
+  deleteSharedPage = () => {
+    this.props.firebase.deletePage(this.state.route);
+    this.props.history.push({pathname: `/pitchartwizard/`});
+    this.setState({isBeingShared: false});
   }
 
   renderSpeakers = () => {
@@ -180,12 +195,11 @@ class CreatePitchArt extends React.Component<
   };
 
   render() {
-    
+
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
-
     return (
       <div>
         <Header />
@@ -203,15 +217,19 @@ class CreatePitchArt extends React.Component<
 
           </ReactFileReader>
           <div>
-            <button className="SharePage waves-effect waves-light btn globalbtn" onClick={this.routeToSharePage}>
-               <i className="material-icons right">person_add</i>
-               Share Page
-            </button>
-          </div>
-          <div>
-            {}
+             {!this.state.isBeingShared &&
+                 <button className="SharePage waves-effect waves-light btn globalbtn" onClick={this.createSharedPage}>
+                    <i className="material-icons right">person_add</i>
+                 Share Page
+                </button>}
+            {this.state.isBeingShared &&
+                <button className="StopShare waves-effect waves-light btn globalbtn" onClick={this.deleteSharedPage}>
+                  Stop Sharing
+                </button>
+            }
 
           </div>
+
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
               <div id="metilda-drop-down-back-button">
@@ -265,8 +283,7 @@ const mapDispatchToProps = (
 });
 
 const authCondition = (authUser: any) => !!authUser;
-// const CreateArtWithHist =  compose(CreatePitchArt, withFirebase, withRouter);
-// export {CreateArtWithHist};
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps
