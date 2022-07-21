@@ -569,10 +569,8 @@ def modifyPitchOrImageDetails(upload_id):
 
                 return jsonify({'isSuccessful': True, 'wordDeleted': upload_id})
 
-
-
-
-
+# GET: returns words based on # of syllables or accent index position
+# POST: inserts words/letters but is not used at this time
 @app.route('/api/words', methods=["GET", "POST"])
 def getOrCreateWords():
     req_method = flask.request.method
