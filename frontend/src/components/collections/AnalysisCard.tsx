@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import FirebaseContext from "../Firebase/context";
+import FirebaseContext from "../../Firebase/context";
 
 export default function AnalysisCard({ analysis }) {
   const firebase = useContext(FirebaseContext);
