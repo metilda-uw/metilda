@@ -28,6 +28,7 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./pages/Collections";
 import Analysis from "./pages/Analysis";
+import SharedPage from "./Create/SharedPage"
 
 interface Props {
   firebase: any;
@@ -95,8 +96,7 @@ const App = () => (
       <Route exact path="/collections/:id" component={Analysis} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
-      <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
-      <Route path="/pitchartwizard/create/:shareCode?" component={CreatePitchArt} />
+      <Route path="/pitchartwizard/:id?" component={CreatePitchArt} />
       <Route path="/peldaview" component={PeldaView} />
       <Route path="/learn/words/syllables" component={WordSyllableCategories} />
       <Route

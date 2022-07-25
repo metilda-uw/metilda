@@ -50,10 +50,7 @@ class Firebase {
   uploadFile = () => this.storage.ref();
 
   getCreatePageData = (path: string) => {
-    const data = this.realtimedb.ref(path);
-    data.on("value", (snapshot) => {
-      console.log(snapshot.val());
-    });
+    return this.realtimedb.ref(path);
   }
 
   writeDataToPage = (name: string, value: any, path: string) => {
@@ -62,16 +59,14 @@ class Firebase {
       });
   }
   createPage = () => {
-    const newReference = firebase.database().ref().child("create").push().key;
-    return `/create/${newReference}`;
+    const newReference = firebase.database().ref().push().key;
+    return `/${newReference}`;
   }
   deletePage = (path: string) => {
     firebase.database().ref(path).remove();
   }
   updateValue = (name: string, value: any, reference: string) => {
-    const update = {};
-    update[reference] = {name: value};
-    firebase.database().ref().update(update);
+    firebase.database().ref(reference).update({"state" : value});
   }
 }
 export default Firebase;
