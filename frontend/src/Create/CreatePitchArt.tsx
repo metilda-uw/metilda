@@ -93,7 +93,7 @@ class CreatePitchArt extends React.Component<
       const dbRef = this.props.firebase.getCreatePageData(this.props.match.params.id);
       dbRef.on("value", (snapshot) => {
         if (snapshot.val() == null) {
-          this.props.history.push({pathname: "/pitchartwizard"});
+          this.props.history.push({pathname: "/pitchartwizard/"});
           alert("Shared Page Has Been Closed");
         } else {
           this.setState({...snapshot.val().state});
