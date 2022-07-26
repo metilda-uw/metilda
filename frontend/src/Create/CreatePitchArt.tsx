@@ -1,7 +1,7 @@
 import "./CreatePitchArt.css";
 import { compose } from "recompose";
 import * as React from "react";
-import {useState} from "react";
+import { useState } from "react";
 import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
@@ -17,17 +17,19 @@ import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
-// import StartFirebase from "../firebaseConfig";
+import { withRouter } from "react-router-dom";
 
-export interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State>  {
+interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
   history: any;
+  sharedId: any;
   setLetterPitch: (
     speakerIndex: number,
     letterIndex: number,
     newPitch: number
   ) => void;
   firebase: any;
+  match: any;
 }
 
 interface State {
@@ -55,7 +57,7 @@ interface State {
   };
 }
 
-export class CreatePitchArt extends React.Component<
+class CreatePitchArt extends React.Component<
   CreatePitchArtProps,
   State
 > {
@@ -65,8 +67,8 @@ export class CreatePitchArt extends React.Component<
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
-      isBeingShared: false,
-      route: "/create/",
+      isBeingShared: this.props.match.params.id ? true : false,
+      route: this.props.match.params.id + "/state/",
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
@@ -86,33 +88,47 @@ export class CreatePitchArt extends React.Component<
     };
   }
   componentDidMount() {
-    this.getUserFiles();
+
+    if (this.state.isBeingShared) {
+      const dbRef = this.props.firebase.getCreatePageData(this.props.match.params.id);
+      dbRef.on("value", (snapshot) => {
+        if (snapshot.val() == null) {
+          this.props.history.push({pathname: "/pitchartwizard"});
+          alert("Shared Page Has Been Closed");
+        } else {
+          this.setState({...snapshot.val().state});
+          console.log("value" + snapshot.val());
+        }
+      })
+    } else {
+      this.getUserFiles();
+    }
   }
 
   updatePitchArtValues = (inputName: string, inputValue: any) => {
-    this.setState( (prevState) => {
+    this.setState((prevState) => {
       const state = prevState;
       state.pitchArt[inputName] = inputValue;
+      if (this.state.isBeingShared) {
+        this.props.firebase.updateValue("state", this.state, this.state.route);
+      }
       return state;
     });
     console.log(this.state);
-    if (this.state.isBeingShared) {
-       this.props.firebase.updateValue(inputName, inputValue, this.state.route);
-    }
   }
 
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({isBeingShared: true});
-    this.setState({route: newRoute});
-    this.props.history.push({pathname: `/pitchartwizard${newRoute}`});
-    this.props.firebase.writeDataToPage("pitchArt", this.state.pitchArt, newRoute);
+    this.setState({ isBeingShared: true });
+    this.setState({ route: newRoute });
+    this.props.history.push({ pathname: `/pitchartwizard${newRoute}` });
+    this.props.firebase.writeDataToPage("state", this.state, newRoute);
   }
 
   deleteSharedPage = () => {
     this.props.firebase.deletePage(this.state.route);
-    this.props.history.push({pathname: `/pitchartwizard/`});
-    this.setState({isBeingShared: false});
+    this.props.history.push({ pathname: `/pitchartwizard/` });
+    this.setState({ isBeingShared: false });
   }
 
   renderSpeakers = () => {
@@ -142,7 +158,7 @@ export class CreatePitchArt extends React.Component<
     const currentUserId = this.props.firebase.auth.currentUser.email;
     fetch(
       `api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
-        "?file-type1=Folder&file-type2=Upload",
+      "?file-type1=Folder&file-type2=Upload",
       {
         method: "GET",
         headers: {
@@ -217,17 +233,11 @@ export class CreatePitchArt extends React.Component<
 
           </ReactFileReader>
           <div>
-             {!this.state.isBeingShared &&
-                 <button className="SharePage waves-effect waves-light btn globalbtn" onClick={this.createSharedPage}>
-                    <i className="material-icons right">person_add</i>
-                 Share Page
-                </button>}
-            {this.state.isBeingShared &&
-                <button className="StopShare waves-effect waves-light btn globalbtn" onClick={this.deleteSharedPage}>
-                  Stop Sharing
-                </button>
-            }
-
+            <button className="SharePage waves-effect waves-light btn globalbtn"
+              onClick={!this.state.isBeingShared ? this.createSharedPage : this.deleteSharedPage}>
+              <i className="material-icons right">person_add</i>
+              {!this.state.isBeingShared ? "Share Page" : "Stop Sharing"}
+            </button>
           </div>
 
           <div className="metilda-page-content">
@@ -258,7 +268,7 @@ export class CreatePitchArt extends React.Component<
                 setLetterPitch={this.props.setLetterPitch}
                 uploadId={uploadId}
                 pitchArt={this.state.pitchArt}
-                updatePitchArtValue = {this.updatePitchArtValues}
+                updatePitchArtValue={this.updatePitchArtValues}
               />
             </div>
           </div>
@@ -287,4 +297,4 @@ const authCondition = (authUser: any) => !!authUser;
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(withAuthorization(authCondition)(CreatePitchArt as any));
+)(withAuthorization(authCondition)(withRouter(CreatePitchArt as any) as any));
