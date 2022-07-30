@@ -28,7 +28,6 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./pages/Collections";
 import Analysis from "./pages/Analysis";
-import SharedPage from "./Create/SharedPage"
 
 interface Props {
   firebase: any;

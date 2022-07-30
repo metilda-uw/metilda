@@ -33,12 +33,13 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
 }
 
 interface State {
-  // shared: boolean;
   files: any[];
   selectedFolderName: string;
   isLoading: boolean;
   isBeingShared: boolean;
+  isGuest: boolean;
   route: string;
+  speakers: Speaker[];
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -67,8 +68,10 @@ class CreatePitchArt extends React.Component<
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
-      isBeingShared: this.props.match.params.id ? true : false,
+      isBeingShared: !!this.props.match.params.id,
+      isGuest: true,
       route: this.props.match.params.id + "/state/",
+      speakers: this.props.speakers,
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
@@ -88,24 +91,29 @@ class CreatePitchArt extends React.Component<
     };
   }
   componentDidMount() {
-
+   
     if (this.state.isBeingShared) {
-      const dbRef = this.props.firebase.getCreatePageData(this.props.match.params.id);
-      dbRef.on("value", (snapshot) => {
-        if (snapshot.val() == null) {
-          this.props.history.push({pathname: "/pitchartwizard/"});
-          alert("Shared Page Has Been Closed");
-        } else {
-          this.setState({...snapshot.val().state});
-          console.log("value" + snapshot.val());
-        }
-      })
+        this.listenForData();
     } else {
       this.getUserFiles();
     }
   }
 
-  updatePitchArtValues = (inputName: string, inputValue: any) => {
+  listenForData() {
+    const id = this.props.match.params.id ? this.props.match.params.id : this.state.route;
+    const dbRef = this.props.firebase.getCreatePageData(id);
+    dbRef.on("value", (snapshot) => {
+        if (snapshot.val() == null) {
+          this.props.history.push({pathname: "/pitchartwizard"});
+          alert("Shared Page Has Been Closed");
+        } else {
+          this.setState({...snapshot.val().state});
+          console.log("value" + snapshot.val());
+        }
+      });
+  }
+  
+  updatePitchArtValue = (inputName: string, inputValue: any) => {
     this.setState((prevState) => {
       const state = prevState;
       state.pitchArt[inputName] = inputValue;
@@ -116,13 +124,21 @@ class CreatePitchArt extends React.Component<
     });
     console.log(this.state);
   }
-
+  updateSpeakerValues = () => {
+    console.log(this.props.speakers[0].uploadId);
+    if (this.state.isBeingShared) {
+      this.setState({speakers: this.props.speakers},
+          () => {
+            this.props.firebase.updateValue("state", this.state, this.state.route);
+          });
+    }
+  }
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({ isBeingShared: true });
-    this.setState({ route: newRoute });
-    this.props.history.push({ pathname: `/pitchartwizard${newRoute}` });
-    this.props.firebase.writeDataToPage("state", this.state, newRoute);
+    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers },
+        () => {this.props.firebase.writeDataToPage("state", this.state, newRoute); this.listenForData(); } );
+    this.props.history.push({ pathname: `/pitchartwizard/${newRoute}` });
+
   }
 
   deleteSharedPage = () => {
@@ -139,6 +155,7 @@ class CreatePitchArt extends React.Component<
         firebase={this.props.firebase}
         files={this.state.files}
         parentCallBack={this.callBackSelectionInterval}
+        updateSpeakerValue={this.updateSpeakerValues}
       />
     ));
   };
@@ -211,7 +228,6 @@ class CreatePitchArt extends React.Component<
   };
 
   render() {
-
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
@@ -268,7 +284,7 @@ class CreatePitchArt extends React.Component<
                 setLetterPitch={this.props.setLetterPitch}
                 uploadId={uploadId}
                 pitchArt={this.state.pitchArt}
-                updatePitchArtValue={this.updatePitchArtValues}
+                updatePitchArtValue={this.updatePitchArtValue}
               />
             </div>
           </div>

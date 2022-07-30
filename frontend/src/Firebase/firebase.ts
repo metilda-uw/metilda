@@ -60,7 +60,7 @@ class Firebase {
   }
   createPage = () => {
     const newReference = firebase.database().ref().push().key;
-    return `/${newReference}`;
+    return newReference;
   }
   deletePage = (path: string) => {
     firebase.database().ref(path).remove();
