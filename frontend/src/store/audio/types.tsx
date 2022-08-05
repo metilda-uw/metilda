@@ -16,6 +16,11 @@ export interface RemoveSpeaker extends Action {
     speakers: Speaker[];
 }
 
+export interface ReplaceSpeakers extends Action {
+    type: constants.REPLACE_SPEAKERS;
+    speakers: Speaker[];
+}
+
 export interface AddLetter extends Action {
     type: constants.ADD_LETTER;
     speakers: Speaker[];
@@ -59,4 +64,4 @@ export interface ManualPitchAdjust extends Action {
 export type AudioAction = (
     AddSpeaker | RemoveSpeaker | AddLetter | RemoveLetter |
     ResetLetters | SetSpeaker | SetLetterSyllable |SetLetterTime | 
-    SetActiveLetter | ManualPitchAdjust);
+    SetActiveLetter | ManualPitchAdjust | ReplaceSpeakers);

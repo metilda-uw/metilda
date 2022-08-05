@@ -66,7 +66,7 @@ class Firebase {
     firebase.database().ref(path).remove();
   }
   updateValue = (name: string, value: any, reference: string) => {
-    firebase.database().ref(reference).update({"state" : value});
+    firebase.database().ref(reference).update({[name] : value});
   }
 }
 export default Firebase;

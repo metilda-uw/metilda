@@ -8,6 +8,15 @@ import {AudioAction} from "./types";
 
 type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
 
+export const replaceSpeakers = (speakers: Speaker[]):
+    ActionReturn => (dispatch: Dispatch) => {
+    const newSpeakers = speakers;
+    dispatch({
+        type: constants.REPLACE_SPEAKERS,
+        speakers: newSpeakers,
+    });
+};
+
 export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => {
     const speakers = getState().audio.speakers;
     const newSpeakers = update(speakers, {$push: [{uploadId: "", letters: []}]});

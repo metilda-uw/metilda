@@ -33,7 +33,6 @@ export interface AudioAnalysisProps {
     addLetter: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
     parentCallBack: (selectedFolderName: string ) => void;
-    updateSpeakerValue: () => void;
 }
 
 interface State {
@@ -477,7 +476,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     }
 
     onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
-        this.props.updateSpeakerValue();
         this.setState({
             isAudioImageLoaded: true,
             closeImgSelectionCallback: cancelCallback,

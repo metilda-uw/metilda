@@ -6,9 +6,9 @@ import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import { AppState } from "../store";
-import { setLetterPitch } from "../store/audio/actions";
+import { setLetterPitch, replaceSpeakers } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
-import { Speaker } from "../types/types";
+import { Speaker,} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
 import Header from "../components/header/Header";
@@ -28,6 +28,7 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
     letterIndex: number,
     newPitch: number
   ) => void;
+  replaceSpeakers: (speakers: Speaker[]) => void;
   firebase: any;
   match: any;
 }
@@ -40,6 +41,8 @@ interface State {
   isGuest: boolean;
   route: string;
   speakers: Speaker[];
+  currentUserId: string;
+  update: boolean;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -65,12 +68,14 @@ class CreatePitchArt extends React.Component<
   constructor(props: CreatePitchArtProps) {
     super(props);
     this.state = {
+      update: false,
+      currentUserId: this.props.firebase.auth.currentUser.email,
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
       isBeingShared: !!this.props.match.params.id,
       isGuest: true,
-      route: this.props.match.params.id + "/state/",
+      route: this.props.match.params.id,
       speakers: this.props.speakers,
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
@@ -91,11 +96,11 @@ class CreatePitchArt extends React.Component<
     };
   }
   componentDidMount() {
-   
     if (this.state.isBeingShared) {
         this.listenForData();
+        this.listenForSpeakerData();
     } else {
-      this.getUserFiles();
+        this.getUserFiles();
     }
   }
 
@@ -107,38 +112,46 @@ class CreatePitchArt extends React.Component<
           this.props.history.push({pathname: "/pitchartwizard"});
           alert("Shared Page Has Been Closed");
         } else {
-          this.setState({...snapshot.val().state});
-          console.log("value" + snapshot.val());
+           this.setState({...snapshot.val().state, update: false},
+               () => {this.getUserFiles(); this.setState({update: true}); } );
         }
       });
   }
-  
+  listenForSpeakerData() {
+    const id = this.props.match.params.id ? this.props.match.params.id : this.state.route;
+    const dbRef = this.props.firebase.getCreatePageData(id + "/state/speakers");
+    dbRef.on("value", (snapshot) => {
+      if (snapshot.val() !== null) {
+        const newSpeakers = snapshot.val();
+        newSpeakers.forEach((speaker) => {
+          if (speaker.letters === undefined)  {speaker.letters = []; }
+        });
+        this.props.replaceSpeakers(newSpeakers as Speaker[] );
+      }
+    });
+  }
+
   updatePitchArtValue = (inputName: string, inputValue: any) => {
     this.setState((prevState) => {
-      const state = prevState;
-      state.pitchArt[inputName] = inputValue;
-      if (this.state.isBeingShared) {
-        this.props.firebase.updateValue("state", this.state, this.state.route);
+      if (inputName === "state") {
+        return inputValue;
+      } else {
+        const state = prevState;
+        state.pitchArt[inputName] = inputValue;
+        if (this.state.isBeingShared) {
+          this.props.firebase.updateValue("state", this.state, this.state.route);
+        }
+        return state;
       }
-      return state;
     });
-    console.log(this.state);
   }
-  updateSpeakerValues = () => {
-    console.log(this.props.speakers[0].uploadId);
-    if (this.state.isBeingShared) {
-      this.setState({speakers: this.props.speakers},
-          () => {
-            this.props.firebase.updateValue("state", this.state, this.state.route);
-          });
-    }
-  }
+
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers },
-        () => {this.props.firebase.writeDataToPage("state", this.state, newRoute); this.listenForData(); } );
+    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers, update: true },
+        () => {this.props.firebase.writeDataToPage("state", this.state, newRoute);
+               this.listenForSpeakerData(); this.listenForData(); } );
     this.props.history.push({ pathname: `/pitchartwizard/${newRoute}` });
-
   }
 
   deleteSharedPage = () => {
@@ -148,6 +161,10 @@ class CreatePitchArt extends React.Component<
   }
 
   renderSpeakers = () => {
+    if (this.state.isBeingShared && this.state.update) {
+       this.props.firebase.updateValue("state/speakers", this.props.speakers, this.state.route);
+    }
+
     return this.props.speakers.map((item, index) => (
       <AudioAnalysis
         speakerIndex={index}
@@ -155,10 +172,9 @@ class CreatePitchArt extends React.Component<
         firebase={this.props.firebase}
         files={this.state.files}
         parentCallBack={this.callBackSelectionInterval}
-        updateSpeakerValue={this.updateSpeakerValues}
       />
     ));
-  };
+  }
 
   formatFileName = (uploadId: string): string => {
     const splitIndex = uploadId.lastIndexOf(".");
@@ -168,11 +184,18 @@ class CreatePitchArt extends React.Component<
     }
 
     return uploadId;
-  };
+  }
 
   getUserFiles = () => {
     // Get files of a user
-    const currentUserId = this.props.firebase.auth.currentUser.email;
+    console.log("from props: " + this.props.firebase.auth.currentUser.email);
+    let currentUserId;
+    if (this.state.isBeingShared) {
+        currentUserId = this.state.currentUserId;
+        console.log("from state: " + this.state.currentUserId);
+    } else {
+        currentUserId = this.props.firebase.auth.currentUser.email;
+    }
     fetch(
       `api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
       "?file-type1=Folder&file-type2=Upload",
@@ -190,7 +213,7 @@ class CreatePitchArt extends React.Component<
           files: data.result.map((item: any) => item),
         })
       );
-  };
+  }
 
   fileSelected = async (files: any) => {
     this.setState({
@@ -209,14 +232,14 @@ class CreatePitchArt extends React.Component<
     this.setState({
       isLoading: false,
     });
-  };
+  }
 
   folderBackButtonClicked = async () => {
     await this.setState({
       selectedFolderName: "Uploads",
     });
     this.getUserFiles();
-  };
+  }
 
   callBackSelectionInterval = (childSelectedFolderName: string) => {
     this.setState({
@@ -225,7 +248,7 @@ class CreatePitchArt extends React.Component<
     if (this.state.selectedFolderName !== "Uploads") {
       this.getUserFiles();
     }
-  };
+  }
 
   render() {
     const { isLoading } = this.state;
@@ -306,6 +329,10 @@ const mapDispatchToProps = (
     letterIndex: number,
     newPitch: number
   ) => dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
+  replaceSpeakers: (
+    speakers: Speaker[]
+  ) => dispatch(replaceSpeakers(speakers))
+
 });
 
 const authCondition = (authUser: any) => !!authUser;
