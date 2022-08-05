@@ -4,16 +4,27 @@ import React, { useContext, useEffect, useState } from "react";
 import Select from "react-select";
 import { NotificationManager } from "react-notifications";
 
+import FirebaseContext from "../Firebase/context";
+
 import Header from "../components/header/Header";
-import CollectionsView from "../components/collections/CollectionsView";
+import CollectionView from "../components/collections/CollectionView";
 
 export default function Collections() {
-  const [collections, setCollections] = useState([]);
-  const [selectedCollection, setSelectedCollection] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
+  const firebase = useContext(FirebaseContext);
+
+  const [availableCollections, setAvailableCollections] = useState([]);
   const [createCollectionName, setCreateCollectionName] = useState("");
+  // used to keep track of whether new collections have been added
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
 
+  const [selectedCollection, setSelectedCollection] = useState("default");
+  const [words, setWords] = useState({});
+  const [update, setUpdate] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Populate collections drop down
+  // useEffect calls the collections api to get a list of the collections we know about
   useEffect(() => {
     fetch(`api/collections`, {
       method: "GET",
@@ -23,16 +34,45 @@ export default function Collections() {
       },
     })
       .then((res) => res.json())
-      .then((data) => setCollections(data.result))
+      .then((data) => setAvailableCollections(data.result))
       .then(() => setIsLoading(false))
       .catch((error) => {
         console.log(error);
       });
   }, [collectionsUpdated]);
 
+  // query firestore for documents when the activeCollection is changed
+  useEffect(() => {
+    console.log(
+      "CollectionsView - useEffect - query firestore for: " + selectedCollection
+    );
+    if (Object.keys(words).length && !update) {
+      return;
+    }
+    firebase.firestore
+      .collection(selectedCollection)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          // The following line will result in an array of objects (each object is your document data)
+          // doc.id and doc.data()
+          const wordsInCollection = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            analysis: doc.data()["0"],
+          }));
+          setWords(wordsInCollection);
+        });
+        setUpdate(false);
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+      });
+  }, [update, selectedCollection]);
+
+  // Create the list of options for the collection select
   const getCollectionOptions = () => {
     let result = [];
-    collections.map((col) => {
+    availableCollections.map((col) => {
       result = [
         ...result,
         {
@@ -44,11 +84,8 @@ export default function Collections() {
     return result;
   };
 
-  const handleCollectionChange = () => {
-    console.log("Changed collection");
-    //this.setSelectedCollection(value);
-  };
-
+  // Create a collection
+  // onSubmit for the create collection
   const onSubmit = async (event: any) => {
     event.preventDefault();
     console.log("Create New Collection");
@@ -70,44 +107,55 @@ export default function Collections() {
     NotificationManager.success("Added collection successfully!");
   };
 
+  // two way binding for new collection
+  // onChange for the create collection form
   const onChange = (event) => {
-    console.log("Update Collection Name");
     setCreateCollectionName(event.target.value);
+  };
+
+  // sets state for the currently selected option...changing this causes
+  // CollectionView to re-render
+  const handleCollectionChange = (option: any) => {
+    setSelectedCollection(option.value);
+    setUpdate(true);
   };
 
   return (
     <>
       <Header />
       <div className="page-collections">
-        {/* Select the Collection to View */}
-        <div className="collections-select-create">
-          <Select
-            className="collections-dropdown"
-            placeholder="Collection"
-            value="Select a collection"
-            options={getCollectionOptions()}
-            //styles={colourStyles}
-            onChange={handleCollectionChange}
+        {/* Form to create collection */}
+        <form onSubmit={onSubmit} className="collections-create">
+          <span className="collections-create-describe">
+            Enter a new collection name:
+          </span>
+          <input
+            className="collections-create-name"
+            name="Collection Name"
+            value={createCollectionName}
+            onChange={onChange}
+            type="text"
+            placeholder="Collection Name"
+            required
           />
-          <form onSubmit={onSubmit} className="collections-create">
-            <input
-              className="collections-create-name"
-              name="Collection Name"
-              value={createCollectionName}
-              onChange={onChange}
-              type="text"
-              placeholder="Collection Name"
-              required
-            />
-            <button type="submit" className="collections-submit globalbtn">
-              Create
-            </button>
-          </form>
-        </div>
-
+          <button
+            type="submit"
+            className="collections-create-submit btn waves-light globalbtn"
+          >
+            Create
+          </button>
+        </form>
+        {/* Select the Collection to View */}
+        <Select
+          className="collections-dropdown"
+          placeholder="Collection"
+          value="Select a collection"
+          options={getCollectionOptions()}
+          //styles={colourStyles}
+          onChange={handleCollectionChange}
+        />
         {/* View of Collection w/ filtering capability */}
-        {/* TODO: Add collection props.  Add to the CollectionsView component as well */}
-        <CollectionsView collection={selectedCollection} />
+        <CollectionView words={words} />
       </div>
     </>
   );

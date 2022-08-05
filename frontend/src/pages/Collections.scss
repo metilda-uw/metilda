@@ -6,11 +6,21 @@
   color: black;
 }
 
-.collections-select-create .collections-create {
-  display: flex-box;
+.collections-create {
+  display: inline-flex;
+  flex-direction: row;
+  justify-content: left;
 }
 
-.collections-dropdown .collections-create-name {
-  width: 10%;
-  padding-bottom: 5px;
+.collections-create-describe {
+  flex: 1;
+  text-align: left;
+}
+
+.collections-create-name {
+  flex: 1;
+}
+
+.collections-create-submit {
+  flex: 1;
 }
