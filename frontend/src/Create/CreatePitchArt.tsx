@@ -41,7 +41,7 @@ interface State {
   isGuest: boolean;
   route: string;
   speakers?: Speaker[];
-  currentUserId: string;
+  owner: string;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -67,7 +67,7 @@ class CreatePitchArt extends React.Component<
   constructor(props: CreatePitchArtProps) {
     super(props);
     this.state = {
-      currentUserId: this.props.firebase.auth.currentUser.email,
+      owner: this.props.firebase.auth.currentUser.email,
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
@@ -146,8 +146,17 @@ class CreatePitchArt extends React.Component<
     this.props.history.push({ pathname: `/pitchartwizard/${newRoute}` });
   }
 
+  isOwner = () => {
+    if (this.state.owner === this.props.firebase.auth.currentUser.email) {
+      return true;
+    }
+    return false;
+  }
+
   deleteSharedPage = () => {
-    this.props.firebase.deletePage(this.state.route);
+    if (this.isOwner()) {
+      this.props.firebase.deletePage(this.state.route);
+    }
     this.props.history.push({ pathname: `/pitchartwizard/` });
     this.setState({ isBeingShared: false });
   }
@@ -182,7 +191,7 @@ class CreatePitchArt extends React.Component<
     // Get files of a user
 
     const currentUserId = this.state.isBeingShared
-      ? this.state.currentUserId
+      ? this.state.owner
       : this.props.firebase.auth.currentUser.email;
 
     fetch(
@@ -264,7 +273,12 @@ class CreatePitchArt extends React.Component<
             <button className="SharePage waves-effect waves-light btn globalbtn"
               onClick={!this.state.isBeingShared ? this.createSharedPage : this.deleteSharedPage}>
               <i className="material-icons right">person_add</i>
-              {!this.state.isBeingShared ? "Share Page" : "Stop Sharing"}
+              {!this.state.isBeingShared 
+                ? "Share Page" 
+                : this.isOwner()
+                  ? "Stop Sharing"
+                  : "Leave Page"
+              }
             </button>
           </div>
 
@@ -295,7 +309,7 @@ class CreatePitchArt extends React.Component<
                 height={DEFAULT.AUDIO_IMG_HEIGHT}
                 setLetterPitch={this.props.setLetterPitch}
                 uploadId={uploadId}
-                pitchArt={this.state.pitchArt} 
+                pitchArt={this.state.pitchArt}
                 updatePitchArtValue={this.updatePitchArtValue}
               />
             </div>
