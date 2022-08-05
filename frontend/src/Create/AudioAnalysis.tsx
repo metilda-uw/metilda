@@ -17,6 +17,7 @@ import UploadAudio from "./UploadAudio";
 import {addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId} from "../store/audio/actions";
 import {AudioAction} from "../store/audio/types";
 import {Letter, Speaker} from "../types/types";
+import * as DEFAULT from "../constants/create";
 
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
@@ -71,42 +72,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
      * below were altered slightly, the bug went away. Likely it
      * was a result of a weird, undocumented edge case in that library.
      */
-    static SPEAKER_LIMIT(): number {
-        return 4;
-    }
-
-    static get MIN_IMAGE_XPERC(): number {
-        return 351.0 / 2800.0;
-    }
-
-    static get MAX_IMAGE_XPERC(): number {
-        return 2522.0 / 2800.0;
-    }
-
-    static get AUDIO_IMG_WIDTH(): number {
-        return 653;
-    }
-
-        static get AUDIO_IMG_HEIGHT(): number {
-        return 500;
-    }
-
-    static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
-        return 75.0;
-    }
-
-    static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
-        return 500.0;
-    }
-
-    static get DEFAULT_SYLLABLE_TEXT(): string {
-        return "";
-    }
-
-    static get DEFAULT_SEPARATOR_TEXT(): string {
-        return "";
-    }
-
     static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
         let url = `/api/audio/${uploadId}.png/image`;
         const urlOptions = [];
@@ -153,22 +118,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             isAudioImageLoaded: false,
             soundLength: -1,
             selectionInterval: "Letter",
-            maxPitch: AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
-            minPitch: AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
+            maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
+            minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
             imageUrl: AudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
-                AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
-                AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH),
+                DEFAULT.MIN_ANALYSIS_PITCH,
+                DEFAULT.MAX_ANALYSIS_PITCH),
             audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
             maxSelectX: -1,
-            minAudioX: AudioAnalysis.MIN_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
-            maxAudioX: AudioAnalysis.MAX_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
+            minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
+            maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
             minAudioTime: 0.0,
             maxAudioTime: -1.0,
-            audioImgWidth: (AudioAnalysis.MAX_IMAGE_XPERC - AudioAnalysis.MIN_IMAGE_XPERC)
-                * AudioAnalysis.AUDIO_IMG_WIDTH,
+            audioImgWidth: (DEFAULT.MAX_IMAGE_XPERC - DEFAULT.MIN_IMAGE_XPERC)
+                * DEFAULT.AUDIO_IMG_WIDTH,
             closeImgSelectionCallback: () => (null),
             selectionCallback: (t1, t2) => (null),
         };
@@ -328,7 +293,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             t0: ts[0],
             t1: ts[1],
             pitch,
-            syllable: AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
+            syllable: DEFAULT.SYLLABLE_TEXT,
             isManualPitch,
             isWordSep,
         };
@@ -345,12 +310,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
 
         if (manualPitch !== undefined) {
-            this.addPitch(manualPitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, true);
+            this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
             return;
         }
 
         if (isWordSep) {
-            this.addPitch(-1, AudioAnalysis.DEFAULT_SEPARATOR_TEXT, ts, false, true);
+            this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
             return;
         }
 
@@ -374,7 +339,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             },
         })
             .then((response) => response.json())
-            .then((data) => this.addPitch(data.avg_pitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, false),
+            .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
             );
     }
 
@@ -395,7 +360,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         })
             .then((response) => response.json())
             .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
-                AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
+                DEFAULT.SYLLABLE_TEXT,
                 [item[0], item[0]])),
             );
     }
@@ -514,8 +479,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             imageUrl: newUrl,
             isAudioImageLoaded: false,
             audioEditVersion: this.state.audioEditVersion + 1,
-            minPitch: minPitch || AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
-            maxPitch: maxPitch || AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
+            minPitch: minPitch || DEFAULT.MIN_ANALYSIS_PITCH,
+            maxPitch: maxPitch || DEFAULT.MAX_ANALYSIS_PITCH,
         });
     }
 
@@ -589,7 +554,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 speakerIndex={this.props.speakerIndex}
                 addSpeaker={this.props.addSpeaker}
                 removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-                canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (AudioAnalysis.SPEAKER_LIMIT() - 1)}
+                canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
                 canRemoveSpeaker={!isFirstSpeaker}/>
         );
     }
@@ -658,9 +623,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                                         speakerIndex={this.props.speakerIndex}
                                         src={this.state.imageUrl}
                                         ref="audioImage"
-                                        imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
-                                        xminPerc={AudioAnalysis.MIN_IMAGE_XPERC}
-                                        xmaxPerc={AudioAnalysis.MAX_IMAGE_XPERC}
+                                        imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                                        xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+                                        xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
                                         audioIntervalSelected={this.audioIntervalSelected}
                                         audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
                                         onAudioImageLoaded={this.onAudioImageLoaded}

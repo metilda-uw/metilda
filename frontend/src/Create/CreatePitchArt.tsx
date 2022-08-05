@@ -8,7 +8,7 @@ import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContaine
 import { AppState } from "../store";
 import { setLetterPitch, replaceSpeakers } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
-import { Speaker,} from "../types/types";
+import { Speaker, } from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
 import Header from "../components/header/Header";
@@ -40,9 +40,8 @@ interface State {
   isBeingShared: boolean;
   isGuest: boolean;
   route: string;
-  speakers: Speaker[];
+  speakers?: Speaker[];
   currentUserId: string;
-  update: boolean;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -68,7 +67,6 @@ class CreatePitchArt extends React.Component<
   constructor(props: CreatePitchArtProps) {
     super(props);
     this.state = {
-      update: false,
       currentUserId: this.props.firebase.auth.currentUser.email,
       files: [],
       selectedFolderName: "Uploads",
@@ -76,7 +74,6 @@ class CreatePitchArt extends React.Component<
       isBeingShared: !!this.props.match.params.id,
       isGuest: true,
       route: this.props.match.params.id,
-      speakers: this.props.speakers,
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
@@ -94,13 +91,13 @@ class CreatePitchArt extends React.Component<
         showMetildaWatermark: false
       }
     };
+
   }
   componentDidMount() {
     if (this.state.isBeingShared) {
-        this.listenForData();
-        this.listenForSpeakerData();
+      this.listenForData();
     } else {
-        this.getUserFiles();
+      this.getUserFiles();
     }
   }
 
@@ -108,25 +105,18 @@ class CreatePitchArt extends React.Component<
     const id = this.props.match.params.id ? this.props.match.params.id : this.state.route;
     const dbRef = this.props.firebase.getCreatePageData(id);
     dbRef.on("value", (snapshot) => {
-        if (snapshot.val() == null) {
-          this.props.history.push({pathname: "/pitchartwizard"});
-          alert("Shared Page Has Been Closed");
-        } else {
-           this.setState({...snapshot.val().state, update: false},
-               () => {this.getUserFiles(); this.setState({update: true}); } );
-        }
-      });
-  }
-  listenForSpeakerData() {
-    const id = this.props.match.params.id ? this.props.match.params.id : this.state.route;
-    const dbRef = this.props.firebase.getCreatePageData(id + "/state/speakers");
-    dbRef.on("value", (snapshot) => {
-      if (snapshot.val() !== null) {
-        const newSpeakers = snapshot.val();
+      if (snapshot.exists()) {
+        const newSpeakers = snapshot.val().state.speakers;
         newSpeakers.forEach((speaker) => {
-          if (speaker.letters === undefined)  {speaker.letters = []; }
+          if (speaker.letters === undefined) { speaker.letters = []; }
         });
-        this.props.replaceSpeakers(newSpeakers as Speaker[] );
+        this.props.replaceSpeakers(newSpeakers as Speaker[]);
+
+        this.setState({ ...snapshot.val().state },
+          () => { this.getUserFiles(); });
+      } else {
+        this.props.history.push({ pathname: "/pitchartwizard" });
+        alert("Shared Page Has Been Closed");
       }
     });
   }
@@ -148,9 +138,11 @@ class CreatePitchArt extends React.Component<
 
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers, update: true },
-        () => {this.props.firebase.writeDataToPage("state", this.state, newRoute);
-               this.listenForSpeakerData(); this.listenForData(); } );
+    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers },
+      () => {
+        this.props.firebase.writeDataToPage("state", this.state, newRoute);
+        this.listenForData();
+      });
     this.props.history.push({ pathname: `/pitchartwizard/${newRoute}` });
   }
 
@@ -161,8 +153,8 @@ class CreatePitchArt extends React.Component<
   }
 
   renderSpeakers = () => {
-    if (this.state.isBeingShared && this.state.update) {
-       this.props.firebase.updateValue("state/speakers", this.props.speakers, this.state.route);
+    if (this.state.isBeingShared && this.state.speakers) {
+      this.props.firebase.updateValue("state/speakers", this.props.speakers, this.state.route);
     }
 
     return this.props.speakers.map((item, index) => (
@@ -188,14 +180,11 @@ class CreatePitchArt extends React.Component<
 
   getUserFiles = () => {
     // Get files of a user
-    console.log("from props: " + this.props.firebase.auth.currentUser.email);
-    let currentUserId;
-    if (this.state.isBeingShared) {
-        currentUserId = this.state.currentUserId;
-        console.log("from state: " + this.state.currentUserId);
-    } else {
-        currentUserId = this.props.firebase.auth.currentUser.email;
-    }
+
+    const currentUserId = this.state.isBeingShared
+      ? this.state.currentUserId
+      : this.props.firebase.auth.currentUser.email;
+
     fetch(
       `api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
       "?file-type1=Folder&file-type2=Upload",
@@ -302,11 +291,11 @@ class CreatePitchArt extends React.Component<
               <PitchArtContainer
                 firebase={this.props.firebase}
                 speakers={this.props.speakers}
-                width={AudioAnalysis.AUDIO_IMG_WIDTH}
-                height={AudioAnalysis.AUDIO_IMG_HEIGHT}
+                width={DEFAULT.AUDIO_IMG_WIDTH}
+                height={DEFAULT.AUDIO_IMG_HEIGHT}
                 setLetterPitch={this.props.setLetterPitch}
                 uploadId={uploadId}
-                pitchArt={this.state.pitchArt}
+                pitchArt={this.state.pitchArt} 
                 updatePitchArtValue={this.updatePitchArtValue}
               />
             </div>
