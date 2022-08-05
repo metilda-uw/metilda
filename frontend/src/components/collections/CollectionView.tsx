@@ -13,7 +13,6 @@ export default function CollectionView({ words }) {
 
   return (
     <div className="row">
-      {console.log("Rendering WordListComponent...")}
       <ul>
         {w.map((word) => (
           // <li key={word["id"]}>{word["id"]}</li>

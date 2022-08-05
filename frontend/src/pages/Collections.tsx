@@ -14,10 +14,12 @@ export default function Collections() {
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [createCollectionName, setCreateCollectionName] = useState("");
+  const [createCollectionDescription, setCreateCollectionDescription] =
+    useState("");
   // used to keep track of whether new collections have been added
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
 
-  const [selectedCollection, setSelectedCollection] = useState("default");
+  const [selectedCollection, setSelectedCollection] = useState("analysis");
   const [words, setWords] = useState({});
   const [update, setUpdate] = useState(false);
 
@@ -35,7 +37,7 @@ export default function Collections() {
     })
       .then((res) => res.json())
       .then((data) => setAvailableCollections(data.result))
-      .then(() => setIsLoading(false))
+
       .catch((error) => {
         console.log(error);
       });
@@ -53,17 +55,22 @@ export default function Collections() {
       .collection(selectedCollection)
       .get()
       .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          // The following line will result in an array of objects (each object is your document data)
-          // doc.id and doc.data()
-          const wordsInCollection = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            analysis: doc.data()["0"],
-          }));
-          setWords(wordsInCollection);
-        });
+        if (querySnapshot.empty) {
+          setWords({});
+        } else {
+          querySnapshot.forEach((doc) => {
+            // The following line will result in an array of objects (each object is your document data)
+            // doc.id and doc.data()
+            const wordsInCollection = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              analysis: doc.data()["0"],
+            }));
+            setWords(wordsInCollection);
+          });
+        }
         setUpdate(false);
       })
+      .then(() => setIsLoading(false))
       .catch((error) => {
         console.log("Error getting documents: ", error);
       });
@@ -85,12 +92,12 @@ export default function Collections() {
   };
 
   // Create a collection
-  // onSubmit for the create collection
   const onSubmit = async (event: any) => {
     event.preventDefault();
-    console.log("Create New Collection");
     const formData = new FormData();
     formData.append("collection_name", createCollectionName);
+    formData.append("owner_id", firebase.auth.currentUser.email);
+    formData.append("collection_description", createCollectionDescription);
     const response = await fetch(`/api/collections`, {
       method: "POST",
       headers: {
@@ -99,18 +106,24 @@ export default function Collections() {
       body: formData,
     });
     const body = await response.json();
-    console.log(body.result);
+    console.log(response.body);
     setCreateCollectionName("");
     setCollectionsUpdated(collectionsUpdated + 1);
-    //Notificaiton that Collection was created.
-    //TODO: ADD error handling
-    NotificationManager.success("Added collection successfully!");
+    if (response.status == 200) {
+      NotificationManager.success("Added collection successfully!");
+    } else {
+      NotificationManager.error("Adding collection failed!");
+    }
   };
 
   // two way binding for new collection
   // onChange for the create collection form
-  const onChange = (event) => {
+  const onNameChange = (event) => {
     setCreateCollectionName(event.target.value);
+  };
+
+  const onDescriptionChange = (event) => {
+    setCreateCollectionDescription(event.target.value);
   };
 
   // sets state for the currently selected option...changing this causes
@@ -124,19 +137,26 @@ export default function Collections() {
     <>
       <Header />
       <div className="page-collections">
-        {/* Form to create collection */}
+        {/* create collection form */}
         <form onSubmit={onSubmit} className="collections-create">
-          <span className="collections-create-describe">
-            Enter a new collection name:
-          </span>
+          <span>New collection name:</span>
           <input
             className="collections-create-name"
             name="Collection Name"
             value={createCollectionName}
-            onChange={onChange}
+            onChange={onNameChange}
             type="text"
             placeholder="Collection Name"
             required
+          />
+          <span className="collections-create-describe">Description:</span>
+          <input
+            className="collections-create-description"
+            name="Collection Description"
+            value={createCollectionDescription}
+            onChange={onDescriptionChange}
+            type="text"
+            placeholder="Collection Description"
           />
           <button
             type="submit"
@@ -155,7 +175,11 @@ export default function Collections() {
           onChange={handleCollectionChange}
         />
         {/* View of Collection w/ filtering capability */}
-        <CollectionView words={words} />
+        {isLoading && <p>Loading collection...</p>}
+        {Object.keys(words).length === 0 && (
+          <p>The {selectedCollection} collection is currently empty</p>
+        )}
+        {words && <CollectionView words={words} />}
       </div>
     </>
   );
