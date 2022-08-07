@@ -157,7 +157,7 @@ class CreatePitchArt extends React.Component<
     if (this.isOwner()) {
       this.props.firebase.deletePage(this.state.route);
     }
-    this.props.history.push({ pathname: `/pitchartwizard/` });
+    this.props.history.push({ pathname: `/pitchartwizard` });
     this.setState({ isBeingShared: false });
   }
 
@@ -195,7 +195,7 @@ class CreatePitchArt extends React.Component<
       : this.props.firebase.auth.currentUser.email;
 
     fetch(
-      `api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
+      `/api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
       "?file-type1=Folder&file-type2=Upload",
       {
         method: "GET",
