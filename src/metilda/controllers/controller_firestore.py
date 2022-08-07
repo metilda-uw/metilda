@@ -4,7 +4,7 @@ from metilda import app
 from .Postgres import Postgres
 
 
-@app.route('/api/collections', methods=["GET", "POST"])
+@app.route('/api/collections', methods=["GET", "POST", "DELETE"])
 def getOrCreate_Collections():
     req_method = request.method
 
@@ -28,3 +28,15 @@ def getOrCreate_Collections():
             return Response("{'result': 'query unsuccessful'}", status=500, mimetype='application/json')
         else:
             return jsonify({'result': last_row_id})
+
+    elif req_method == "DELETE":
+        with Postgres() as connection:
+            postgres_delete_query = """ DELETE FROM collections WHERE COLLECTION_NAME = %s """
+            result = connection.execute_update_query(postgres_delete_query, (request.form['collection_name'], ) )
+
+        # if results = 1 then success, if none then failed
+        #TODO: Figure out why this doesn't work when there is data in the "{}"
+        if result is None:
+            return Response("{}", status=500, mimetype='application/json')
+        else:
+            return jsonify({'result': 'success'})
