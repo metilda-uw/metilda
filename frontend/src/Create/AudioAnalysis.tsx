@@ -173,7 +173,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     this.state = {
       selectedFolderName: "Uploads",
-      speakerName: "hi, i'm a speaker",
+      speakerName: "Enter a speaker name",
       showImgMenu: false,
       imgMenuX: -1,
       imgMenuY: -1,
@@ -726,7 +726,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   onChangeSpeakerName = (event: any) => {
-    console.log(event.target.name, event.target.value);
     this.setState({ [event.target.name]: event.target.value });
   };
 
