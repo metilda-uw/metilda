@@ -13,6 +13,7 @@ export default function Collections() {
   const firebase = useContext(FirebaseContext);
 
   const [availableCollections, setAvailableCollections] = useState([]);
+
   const [createCollectionName, setCreateCollectionName] = useState("");
   const [createCollectionDescription, setCreateCollectionDescription] =
     useState("");
@@ -20,9 +21,9 @@ export default function Collections() {
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
 
   const [selectedCollection, setSelectedCollection] = useState("analysis");
+
   const [words, setWords] = useState({});
   const [update, setUpdate] = useState(false);
-
   const [isLoading, setIsLoading] = useState(true);
 
   // Populate collections drop down
@@ -74,7 +75,7 @@ export default function Collections() {
       .catch((error) => {
         console.log("Error getting documents: ", error);
       });
-  }, [update, selectedCollection]);
+  }, [update]);
 
   // Create the list of options for the collection select
   const getCollectionOptions = () => {
@@ -109,10 +110,58 @@ export default function Collections() {
     console.log(response.body);
     setCreateCollectionName("");
     setCollectionsUpdated(collectionsUpdated + 1);
+
     if (response.status == 200) {
       NotificationManager.success("Added collection successfully!");
     } else {
       NotificationManager.error("Adding collection failed!");
+    }
+  };
+
+  // sets state for the currently selected option...changing this causes
+  // CollectionView to re-render
+  // onChange={handleCollectionChange}
+  const handleViewCollection = (event: any) => {
+    event.preventDefault();
+    setSelectedCollection(selectedCollection);
+    setUpdate(true);
+  };
+
+  const handleDeleteColleciton = async (event: any) => {
+    event.preventDefault();
+    //TODO: Add Confirmation
+    const formData = new FormData();
+    formData.append("collection_name", selectedCollection);
+    const response = await fetch(`/api/collections`, {
+      method: "DELETE",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+    const body = await response.json();
+
+    //Add call to delete the collection from firestore
+    //TODO: Should also handle deleting thumbnails
+    //TODO: Check whether current logged in user is owner before deleting
+
+    const result = firebase.firestore
+      .collection(selectedCollection)
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          doc.ref.delete();
+          console.log("delete: " + doc.id);
+        });
+      });
+
+    console.log(result);
+    if (response.status == 200) {
+      NotificationManager.success("Collection deleted successfully!");
+      setSelectedCollection("");
+      setCollectionsUpdated(collectionsUpdated + 1);
+    } else {
+      NotificationManager.error("Deleting collection failed!");
     }
   };
 
@@ -126,22 +175,19 @@ export default function Collections() {
     setCreateCollectionDescription(event.target.value);
   };
 
-  // sets state for the currently selected option...changing this causes
-  // CollectionView to re-render
-  const handleCollectionChange = (option: any) => {
-    setSelectedCollection(option.value);
-    setUpdate(true);
+  const collectionSelectOnChange = (event) => {
+    setSelectedCollection(event.value);
   };
 
   return (
-    <>
+    <div className="page-collections">
       <Header />
-      <div className="page-collections">
-        {/* create collection form */}
-        <form onSubmit={onSubmit} className="collections-create">
+      {/* create collection form */}
+      <div className="page-collections-manage">
+        <form onSubmit={onSubmit} className="form-collections-create">
           <span>New collection name:</span>
           <input
-            className="collections-create-name"
+            className="form-collections-create-name"
             name="Collection Name"
             value={createCollectionName}
             onChange={onNameChange}
@@ -149,7 +195,7 @@ export default function Collections() {
             placeholder="Collection Name"
             required
           />
-          <span className="collections-create-describe">Description:</span>
+          <span className="form-collections-create-describe">Description:</span>
           <input
             className="collections-create-description"
             name="Collection Description"
@@ -160,27 +206,49 @@ export default function Collections() {
           />
           <button
             type="submit"
-            className="collections-create-submit btn waves-light globalbtn"
+            className="form-collections-create-submit btn waves-light globalbtn"
           >
             Create
           </button>
         </form>
-        {/* Select the Collection to View */}
-        <Select
-          className="collections-dropdown"
-          placeholder="Collection"
-          value="Select a collection"
-          options={getCollectionOptions()}
-          //styles={colourStyles}
-          onChange={handleCollectionChange}
-        />
-        {/* View of Collection w/ filtering capability */}
-        {isLoading && <p>Loading collection...</p>}
-        {Object.keys(words).length === 0 && (
-          <p>The {selectedCollection} collection is currently empty</p>
-        )}
-        {words && <CollectionView words={words} />}
       </div>
-    </>
+
+      {/* Select the Collection to View */}
+      <div className="page-collections-select">
+        <form className="form-collections-view-delete">
+          <Select
+            className="collections-dropdown"
+            placeholder={selectedCollection}
+            value={"Select a collection"}
+            options={getCollectionOptions()}
+            onChange={collectionSelectOnChange}
+            //styles={colourStyles}
+          />
+          <button
+            onClick={handleViewCollection}
+            className="collections-delete-submit btn waves-light globalbtn"
+          >
+            View
+          </button>
+
+          <button
+            onClick={handleDeleteColleciton}
+            className="collections-delete-submit btn waves-light globalbtn"
+          >
+            Delete
+          </button>
+        </form>
+
+        {/* View of Collection w/ filtering capability */}
+
+        <div className="page-collections-voew">
+          {isLoading && <p>Loading collection...</p>}
+          {Object.keys(words).length === 0 && (
+            <p>The {selectedCollection} collection is currently empty</p>
+          )}
+          {words && <CollectionView words={words} />}
+        </div>
+      </div>
+    </div>
   );
 }
