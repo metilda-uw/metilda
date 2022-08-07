@@ -20,7 +20,7 @@ export default function Collections() {
   // used to keep track of whether new collections have been added
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
 
-  const [selectedCollection, setSelectedCollection] = useState("analysis");
+  const [selectedCollection, setSelectedCollection] = useState("default");
 
   const [words, setWords] = useState({});
   const [update, setUpdate] = useState(false);
@@ -64,7 +64,7 @@ export default function Collections() {
             // doc.id and doc.data()
             const wordsInCollection = querySnapshot.docs.map((doc) => ({
               id: doc.id,
-              analysis: doc.data()["0"],
+              data: doc.data(),
             }));
             setWords(wordsInCollection);
           });
@@ -142,7 +142,6 @@ export default function Collections() {
     const body = await response.json();
 
     //Add call to delete the collection from firestore
-    //TODO: Should also handle deleting thumbnails
     //TODO: Check whether current logged in user is owner before deleting
 
     const result = firebase.firestore
@@ -150,12 +149,33 @@ export default function Collections() {
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
+          //check if owner is the one deleting.
+          //const uid = firebase.auth.currentUser.email;
+
           doc.ref.delete();
-          console.log("delete: " + doc.id);
+          console.log("deleted: " + doc.id + " from firestore.");
+
+          // delete thumbnails - create a reference to the thumbnail then delete it
+          const storageRef = firebase.uploadFile();
+          let thumbnailRef = storageRef.child(
+            "thumbnails/" + selectedCollection + "/" + doc.id
+          );
+          thumbnailRef
+            .delete()
+            .then(() => {
+              console.log("Successfully deleted: " + doc.id);
+            })
+            .catch((error) => {
+              console.log(
+                "There was an error deleting " + doc.id + " from storage."
+              );
+            });
         });
       });
 
-    console.log(result);
+    setSelectedCollection("");
+    setWords({});
+
     if (response.status == 200) {
       NotificationManager.success("Collection deleted successfully!");
       setSelectedCollection("");
@@ -228,25 +248,30 @@ export default function Collections() {
             onClick={handleViewCollection}
             className="collections-delete-submit btn waves-light globalbtn"
           >
-            View
+            View Collection
           </button>
 
           <button
             onClick={handleDeleteColleciton}
             className="collections-delete-submit btn waves-light globalbtn"
           >
-            Delete
+            Delete Collection
           </button>
         </form>
 
         {/* View of Collection w/ filtering capability */}
 
         <div className="page-collections-voew">
+          {words && (
+            <CollectionView
+              words={words}
+              selectedCollection={selectedCollection}
+            />
+          )}
           {isLoading && <p>Loading collection...</p>}
           {Object.keys(words).length === 0 && (
             <p>The {selectedCollection} collection is currently empty</p>
           )}
-          {words && <CollectionView words={words} />}
         </div>
       </div>
     </div>

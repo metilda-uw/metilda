@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from "react";
 import FirebaseContext from "../../Firebase/context";
 
-export default function WordCard({ analysis }) {
+export default function WordCard({ word, selectedCollection }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
   const [url, setURL] = useState("");
 
   useEffect(() => {
-    const storageRef = firebase.storage.ref("thumbnails/" + analysis.id);
+    const storageRef = firebase.storage.ref(
+      "thumbnails/" + selectedCollection + "/" + word.id
+    );
     storageRef.getDownloadURL().then((url) => {
       setURL(url);
     });
@@ -16,21 +18,22 @@ export default function WordCard({ analysis }) {
   return (
     <div className="col s6 m3">
       <div className="card">
-        {/* 0 is the speaker index */}
-        <span className="card-title">{analysis["uploadId"]}</span>
+        <span className="card-title">{word["data"].uploadId}</span>
         <div className="card-image">
           <img src={url} alt="word thumbnail" />
         </div>
         <div className="card-content">
-          {analysis["letters"] && (
-            <p>
-              There are {analysis["letters"].letters.length} letters in this
-              word.
-            </p>
+          {word["data"].speakerName && (
+            <p>Speaker: {word["data"].speakerName}</p>
           )}
-          {/* <div className="created-date">
-            Created: {analysis["createdAt"].toDate().toDateString()}
-          </div> */}
+          {word["data"].letters && (
+            <p>There are {word["data"].letters.length} letters in this word.</p>
+          )}
+          {word["data"].createdAt && (
+            <div className="created-date">
+              Created: {word["data"].createdAt.toDate().toDateString()}
+            </div>
+          )}
         </div>
       </div>
     </div>
