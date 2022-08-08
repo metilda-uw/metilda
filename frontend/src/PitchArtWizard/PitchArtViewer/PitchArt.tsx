@@ -145,12 +145,10 @@ class PitchArt extends React.Component<Props> {
             <i className="material-icons right">file_download</i>
           </button>
         </div>
-        <div id="metilda-pitch-art-btn-container">
-          <SaveAnalysisFirestore
-            analysis={this.props.speakers}
-            saveThumbnail={this.saveThumbnail}
-          ></SaveAnalysisFirestore>
-        </div>
+        <SaveAnalysisFirestore
+          analysis={this.props.speakers}
+          saveThumbnail={this.saveThumbnail}
+        ></SaveAnalysisFirestore>
       </div>
     );
   }

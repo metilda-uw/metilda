@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import FirebaseContext from "../../Firebase/context";
-import { useStorage } from "../../hooks/useStorage";
 import { useHistory } from "react-router-dom";
 import Select from "react-select";
 
 export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
+
   const history = useHistory();
 
   const [availableCollections, setAvailableCollections] = useState([]);
@@ -69,14 +69,15 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   };
 
   return (
-    <div>
-      <form className="form-collections-view-delete">
+    <div className="page-create-save-collections">
+      <form className="page-create-save-collections-form">
         <Select
-          className="collections-dropdown"
+          id="collections-dropdown"
           placeholder={selectedCollection}
           value={"Select a collection"}
           options={getCollectionOptions()}
           onChange={collectionSelectOnChange}
+          menuPlacement="auto"
           //styles={colourStyles}
         />
         <button
