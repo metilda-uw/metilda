@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom";
 import Header from "../header/Header";
 import FirebaseContext from "../../Firebase/context";
 
+// Currently this component just displays the data for the word object
+// TODO: From the WordCard go to either the create or learn page.
 export default function Word() {
   //TODO: Why id not working
   const { id } = useParams();

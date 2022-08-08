@@ -17,7 +17,8 @@ export default function Collections() {
   const [createCollectionName, setCreateCollectionName] = useState("");
   const [createCollectionDescription, setCreateCollectionDescription] =
     useState("");
-  // used to keep track of whether new collections have been added
+  // keep track of whether new collections have been added, if collectionsUpdated
+  // is true the list of availableCollections will be updated.
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
 
   const [selectedCollection, setSelectedCollection] = useState("default");
@@ -27,7 +28,7 @@ export default function Collections() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Populate collections drop down
-  // useEffect calls the collections api to get a list of the collections we know about
+  // useEffect calls the collections api to get a list of collections
   useEffect(() => {
     fetch(`api/collections`, {
       method: "GET",
@@ -38,7 +39,6 @@ export default function Collections() {
     })
       .then((res) => res.json())
       .then((data) => setAvailableCollections(data.result))
-
       .catch((error) => {
         console.log(error);
       });
@@ -46,9 +46,7 @@ export default function Collections() {
 
   // query firestore for documents when the activeCollection is changed
   useEffect(() => {
-    console.log(
-      "CollectionsView - useEffect - query firestore for: " + selectedCollection
-    );
+    // check whether the list has changed with update === true
     if (Object.keys(words).length && !update) {
       return;
     }
@@ -60,8 +58,7 @@ export default function Collections() {
           setWords({});
         } else {
           querySnapshot.forEach((doc) => {
-            // The following line will result in an array of objects (each object is your document data)
-            // doc.id and doc.data()
+            //  creates an array of words in the collection
             const wordsInCollection = querySnapshot.docs.map((doc) => ({
               id: doc.id,
               data: doc.data(),
@@ -77,7 +74,7 @@ export default function Collections() {
       });
   }, [update]);
 
-  // Create the list of options for the collection select
+  // Create the list of options for the collection select element
   const getCollectionOptions = () => {
     let result = [];
     availableCollections.map((col) => {
@@ -93,7 +90,7 @@ export default function Collections() {
   };
 
   // Create a collection
-  const onSubmit = async (event: any) => {
+  const handleCreateCollection = async (event: any) => {
     event.preventDefault();
     const formData = new FormData();
     formData.append("collection_name", createCollectionName);
@@ -195,84 +192,90 @@ export default function Collections() {
     setCreateCollectionDescription(event.target.value);
   };
 
-  const collectionSelectOnChange = (event) => {
+  const onCollectionSelectChange = (event) => {
     setSelectedCollection(event.value);
   };
 
   return (
     <div className="page-collections">
       <Header />
-      {/* create collection form */}
       <div className="page-collections-manage">
-        <form onSubmit={onSubmit} className="form-collections-create">
-          <span>New collection name:</span>
-          <input
-            className="form-collections-create-name"
-            name="Collection Name"
-            value={createCollectionName}
-            onChange={onNameChange}
-            type="text"
-            placeholder="Collection Name"
-            required
-          />
-          <span className="form-collections-create-describe">Description:</span>
-          <input
-            className="collections-create-description"
-            name="Collection Description"
-            value={createCollectionDescription}
-            onChange={onDescriptionChange}
-            type="text"
-            placeholder="Collection Description"
-          />
-          <button
-            type="submit"
-            className="form-collections-create-submit btn waves-light globalbtn"
+        {/* Select the Collection to View */}
+        <div className="page-collections-select">
+          <p>Select a collection:</p>
+          <form className="form-collections-view-delete">
+            <Select
+              className="collections-dropdown"
+              placeholder={selectedCollection}
+              value={"Select a collection"}
+              options={getCollectionOptions()}
+              onChange={onCollectionSelectChange}
+              //styles={colourStyles}
+            />
+            <button
+              onClick={handleViewCollection}
+              className="collections-delete-view btn waves-light globalbtn"
+            >
+              View Collection
+            </button>
+
+            <button
+              onClick={handleDeleteColleciton}
+              className="collections-delete-view btn waves-light globalbtn"
+            >
+              Delete Collection
+            </button>
+          </form>
+        </div>
+
+        {/* create collection form */}
+        <div className="page-collections-create">
+          <p>Create a new collection:</p>
+          <form
+            onSubmit={handleCreateCollection}
+            className="form-collections-create"
           >
-            Create
-          </button>
-        </form>
+            <p>Name:</p>
+            <input
+              className="form-collections-create-name"
+              name="Collection Name"
+              value={createCollectionName}
+              onChange={onNameChange}
+              type="text"
+              placeholder="Collection Name"
+              required
+            />
+            <p className="form-collections-create-describe">Description:</p>
+            <input
+              className="collections-create-description"
+              name="Collection Description"
+              value={createCollectionDescription}
+              onChange={onDescriptionChange}
+              type="text"
+              placeholder="Collection Description"
+            />
+            <button
+              type="submit"
+              className="form-collections-create-submit btn waves-light globalbtn"
+            >
+              Create
+            </button>
+          </form>
+        </div>
       </div>
 
-      {/* Select the Collection to View */}
-      <div className="page-collections-select">
-        <form className="form-collections-view-delete">
-          <Select
-            className="collections-dropdown"
-            placeholder={selectedCollection}
-            value={"Select a collection"}
-            options={getCollectionOptions()}
-            onChange={collectionSelectOnChange}
-            //styles={colourStyles}
+      {/* View of Collection w/ filtering capability */}
+      <div className="page-collections-view">
+        {words && (
+          <CollectionView
+            words={words}
+            selectedCollection={selectedCollection}
           />
-          <button
-            onClick={handleViewCollection}
-            className="collections-delete-submit btn waves-light globalbtn"
-          >
-            View Collection
-          </button>
-
-          <button
-            onClick={handleDeleteColleciton}
-            className="collections-delete-submit btn waves-light globalbtn"
-          >
-            Delete Collection
-          </button>
-        </form>
-
-        {/* View of Collection w/ filtering capability */}
-
-        <div className="page-collections-voew">
-          {words && (
-            <CollectionView
-              words={words}
-              selectedCollection={selectedCollection}
-            />
-          )}
-          {isLoading && <p>Loading collection...</p>}
-          {Object.keys(words).length === 0 && (
-            <p>The {selectedCollection} collection is currently empty</p>
-          )}
-        </div>
+        )}
+        {isLoading && <p>Loading collection...</p>}
+        {/* {Object.keys(words).length === 0 && (
+          <p>The {selectedCollection} collection is currently empty</p>
+        )} */}
       </div>
     </div>
   );

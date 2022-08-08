@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState } from "react";
 
 import { Link } from "react-router-dom";
 
@@ -51,21 +51,26 @@ export default function CollectionView({ words, selectedCollection }) {
     : null;
 
   return (
-    <div className="row">
-      <div className="collections-filter">
-        Filter by:
+    <div className="page-collections-view">
+      <div className="page-collections-view-filter">
+        <p>Filter the {selectedCollection} collection by:</p>
         {filterList.map((f) => (
           <button
             key={f}
             onClick={() => handleClick(f)}
-            className={currentFilter === f ? "active" : ""}
+            className={
+              currentFilter === f
+                ? "active collections-filter btn waves-light globalbtn"
+                : "collections-filter btn waves-light globalbtn"
+            }
           >
             {f}
           </button>
         ))}
+        <p>Currently showing {filteredWords.length} items.</p>
       </div>
 
-      <div className="collections-view">
+      <div className="row collections-view-wordcards">
         <ul>
           {filteredWords.map((word) => (
             // <li key={word["id"]}>{word["id"]}</li>
