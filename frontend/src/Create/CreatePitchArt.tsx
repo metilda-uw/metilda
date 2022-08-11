@@ -40,8 +40,12 @@ interface State {
   isBeingShared: boolean;
   isGuest: boolean;
   route: string;
-  speakers?: Speaker[];
   owner: string;
+  speakers?: Speaker[];
+  pitchRange: Array<{
+    minPitch: number;
+    maxPitch: number;
+  }>;
   pitchArt: {
     minPitch: number;
     maxPitch: number;
@@ -74,6 +78,11 @@ class CreatePitchArt extends React.Component<
       isBeingShared: !!this.props.match.params.id,
       isGuest: true,
       route: this.props.match.params.id,
+      pitchRange: new Array(DEFAULT.SPEAKER_LIMIT).fill(
+        {
+          minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
+          maxPitch: DEFAULT.MAX_ANALYSIS_PITCH
+        }),
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
@@ -91,7 +100,6 @@ class CreatePitchArt extends React.Component<
         showMetildaWatermark: false
       }
     };
-
   }
   componentDidMount() {
     if (this.state.isBeingShared) {
@@ -136,6 +144,12 @@ class CreatePitchArt extends React.Component<
     });
   }
 
+  updateAudioPitch = (index: number, minPitch: number, maxPitch: number) => {
+    this.state.pitchRange[index].minPitch = minPitch;
+    this.state.pitchRange[index].maxPitch = maxPitch;
+    this.props.firebase.updateValue("state", this.state, this.state.route);
+  }
+
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
     this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers },
@@ -154,11 +168,11 @@ class CreatePitchArt extends React.Component<
   }
 
   deleteSharedPage = () => {
+    this.props.history.push({ pathname: `/pitchartwizard` });
+    this.setState({ isBeingShared: false });
     if (this.isOwner()) {
       this.props.firebase.deletePage(this.state.route);
     }
-    this.props.history.push({ pathname: `/pitchartwizard` });
-    this.setState({ isBeingShared: false });
   }
 
   renderSpeakers = () => {
@@ -172,7 +186,10 @@ class CreatePitchArt extends React.Component<
         key={`audio-analysis-${index}-${item.uploadId}`}
         firebase={this.props.firebase}
         files={this.state.files}
+        minPitch={this.state.pitchRange[index].minPitch}
+        maxPitch={this.state.pitchRange[index].maxPitch}
         parentCallBack={this.callBackSelectionInterval}
+        updateAudioPitch={this.updateAudioPitch}
       />
     ));
   }
@@ -273,8 +290,8 @@ class CreatePitchArt extends React.Component<
             <button className="SharePage waves-effect waves-light btn globalbtn"
               onClick={!this.state.isBeingShared ? this.createSharedPage : this.deleteSharedPage}>
               <i className="material-icons right">person_add</i>
-              {!this.state.isBeingShared 
-                ? "Share Page" 
+              {!this.state.isBeingShared
+                ? "Share Page"
                 : this.isOwner()
                   ? "Stop Sharing"
                   : "Leave Page"
