@@ -38,7 +38,6 @@ interface State {
   selectedFolderName: string;
   isLoading: boolean;
   isBeingShared: boolean;
-  isGuest: boolean;
   route: string;
   speakers?: Speaker[];
   owner: string;
@@ -72,7 +71,6 @@ class CreatePitchArt extends React.Component<
       selectedFolderName: "Uploads",
       isLoading: false,
       isBeingShared: !!this.props.match.params.id,
-      isGuest: true,
       route: this.props.match.params.id,
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
@@ -115,6 +113,7 @@ class CreatePitchArt extends React.Component<
         this.setState({ ...snapshot.val().state },
           () => { this.getUserFiles(); });
       } else {
+        this.setState({owner: this.props.firebase.auth.currentUser.email, isBeingShared: false});
         this.props.history.push({ pathname: "/pitchartwizard" });
         alert("Shared Page Has Been Closed");
       }
@@ -157,7 +156,7 @@ class CreatePitchArt extends React.Component<
     if (this.isOwner()) {
       this.props.firebase.deletePage(this.state.route);
     }
-    this.props.history.push({ pathname: `/pitchartwizard/` });
+    this.props.history.push({ pathname: `/pitchartwizard` });
     this.setState({ isBeingShared: false });
   }
 
@@ -195,7 +194,7 @@ class CreatePitchArt extends React.Component<
       : this.props.firebase.auth.currentUser.email;
 
     fetch(
-      `api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
+      `/api/get-files-and-folders/${currentUserId}/${this.state.selectedFolderName}` +
       "?file-type1=Folder&file-type2=Upload",
       {
         method: "GET",
@@ -273,8 +272,8 @@ class CreatePitchArt extends React.Component<
             <button className="SharePage waves-effect waves-light btn globalbtn"
               onClick={!this.state.isBeingShared ? this.createSharedPage : this.deleteSharedPage}>
               <i className="material-icons right">person_add</i>
-              {!this.state.isBeingShared 
-                ? "Share Page" 
+              {!this.state.isBeingShared
+                ? "Share Page"
                 : this.isOwner()
                   ? "Stop Sharing"
                   : "Leave Page"
