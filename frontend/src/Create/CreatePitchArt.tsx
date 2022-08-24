@@ -14,7 +14,7 @@ import { withAuthorization } from "../Session";
 import Header from "../components/header/Header";
 import { uploadAudio } from "./ImportUtils";
 import { spinner } from "../Utils/LoadingSpinner";
-import ReactGA from "react-ga";
+import ReactGA, { initialize } from "react-ga";
 import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
 import { withRouter } from "react-router-dom";
@@ -38,8 +38,6 @@ interface State {
   selectedFolderName: string;
   isLoading: boolean;
   isBeingShared: boolean;
-  isGuest: boolean;
-  route: string;
   owner: string;
   speakers?: Speaker[];
   pitchRange: Array<{
@@ -68,6 +66,7 @@ class CreatePitchArt extends React.Component<
   CreatePitchArtProps,
   State
 > {
+
   constructor(props: CreatePitchArtProps) {
     super(props);
     this.state = {
@@ -76,8 +75,6 @@ class CreatePitchArt extends React.Component<
       selectedFolderName: "Uploads",
       isLoading: false,
       isBeingShared: !!this.props.match.params.id,
-      isGuest: true,
-      route: this.props.match.params.id,
       pitchRange: new Array(DEFAULT.SPEAKER_LIMIT).fill(
         {
           minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
@@ -101,6 +98,7 @@ class CreatePitchArt extends React.Component<
       }
     };
   }
+
   componentDidMount() {
     if (this.state.isBeingShared) {
       this.listenForData();
@@ -110,7 +108,7 @@ class CreatePitchArt extends React.Component<
   }
 
   listenForData() {
-    const id = this.props.match.params.id ? this.props.match.params.id : this.state.route;
+    const id = this.props.match.params.id ? this.props.match.params.id : "";
     const dbRef = this.props.firebase.getCreatePageData(id);
     dbRef.on("value", (snapshot) => {
       if (snapshot.exists()) {
@@ -125,6 +123,7 @@ class CreatePitchArt extends React.Component<
       } else {
         this.props.history.push({ pathname: "/pitchartwizard" });
         alert("Shared Page Has Been Closed");
+        this.setState({ isBeingShared: false });
       }
     });
   }
@@ -137,7 +136,7 @@ class CreatePitchArt extends React.Component<
         const state = prevState;
         state.pitchArt[inputName] = inputValue;
         if (this.state.isBeingShared) {
-          this.props.firebase.updateValue("state", this.state, this.state.route);
+          this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
         }
         return state;
       }
@@ -145,14 +144,20 @@ class CreatePitchArt extends React.Component<
   }
 
   updateAudioPitch = (index: number, minPitch: number, maxPitch: number) => {
-    this.state.pitchRange[index].minPitch = minPitch;
-    this.state.pitchRange[index].maxPitch = maxPitch;
-    this.props.firebase.updateValue("state", this.state, this.state.route);
+    this.setState((prevState) => {
+      const state = prevState;
+      state.pitchRange[index].minPitch = minPitch;
+      state.pitchRange[index].maxPitch = maxPitch;
+      if (this.state.isBeingShared) {
+        this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
+      }
+      return state;
+    });
   }
 
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({ route: newRoute, isBeingShared: true, speakers: this.props.speakers },
+    this.setState({ isBeingShared: true, speakers: this.props.speakers },
       () => {
         this.props.firebase.writeDataToPage("state", this.state, newRoute);
         this.listenForData();
@@ -168,16 +173,16 @@ class CreatePitchArt extends React.Component<
   }
 
   deleteSharedPage = () => {
-    this.props.history.push({ pathname: `/pitchartwizard` });
-    this.setState({ isBeingShared: false });
     if (this.isOwner()) {
-      this.props.firebase.deletePage(this.state.route);
+      this.props.firebase.deletePage(this.props.match.params.id);
     }
+    this.props.history.push({ pathname: `/pitchartwizard` });
   }
 
   renderSpeakers = () => {
-    if (this.state.isBeingShared && this.state.speakers) {
-      this.props.firebase.updateValue("state/speakers", this.props.speakers, this.state.route);
+    if (this.state.isBeingShared && this.state.speakers && this.props.match.params.id) {
+
+      this.props.firebase.updateValue("state/speakers", this.props.speakers, this.props.match.params.id);
     }
 
     return this.props.speakers.map((item, index) => (
