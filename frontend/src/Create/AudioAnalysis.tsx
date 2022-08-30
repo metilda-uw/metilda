@@ -21,6 +21,7 @@ import * as DEFAULT from "../constants/create";
 
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
+import { isTypeFlagSet } from "tslint";
 
 export interface AudioAnalysisProps {
     speakerIndex: number;
@@ -54,6 +55,8 @@ interface State {
     maxSelectX: number;
     minAudioX: number;
     maxAudioX: number;
+    minPitch: number;
+    maxPitch: number;
     minAudioTime: number;
     maxAudioTime: number;
     audioImgWidth: number;
@@ -108,6 +111,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         }
     }
 
+    static getDerivedStateFromProps(props, state) {
+        state.imageUrl = AudioAnalysis.formatImageUrl(
+            props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
+        state.minPitch = props.minPitch;
+        state.maxPitch = props.maxPitch;
+        console.log(state);
+        return state;
+    }
+
     constructor(props: AudioAnalysisProps) {
         super(props);
 
@@ -121,12 +133,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             selectionInterval: "Letter",
             imageUrl: AudioAnalysis.formatImageUrl(
                 this.getSpeaker().uploadId,
-                DEFAULT.MIN_ANALYSIS_PITCH,
-                DEFAULT.MAX_ANALYSIS_PITCH),
+                this.props.minPitch,
+                this.props.maxPitch),
             audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
             audioEditVersion: 0,
             minSelectX: -1,
             maxSelectX: -1,
+            minPitch: this.props.minPitch,
+            maxPitch: this.props.maxPitch,
             minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
             maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
             minAudioTime: 0.0,
@@ -191,6 +205,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                     maxAudioTime: data.duration,
                 });
             });
+
+        console.log(this.state);
     }
 
     setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
@@ -301,7 +317,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         this.state.closeImgSelectionCallback();
     }
 
-    imageIntervalSelected(leftX: number,
+    imageIntervalSelected(
+        leftX: number,
         rightX: number,
         manualPitch?: number,
         isWordSep: boolean = false,
@@ -478,6 +495,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         this.setState({
             imageUrl: newUrl,
             isAudioImageLoaded: false,
+            minPitch,
+            maxPitch,
             audioEditVersion: this.state.audioEditVersion + 1,
         });
 
