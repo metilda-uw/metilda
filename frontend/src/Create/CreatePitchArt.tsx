@@ -174,6 +174,7 @@ class CreatePitchArt extends React.Component<
   }
 
   deleteSharedPage = () => {
+    this.setState({ isBeingShared: false });
     if (this.isOwner()) {
       this.props.firebase.deletePage(this.props.match.params.id);
     }
