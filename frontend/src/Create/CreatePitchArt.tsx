@@ -121,6 +121,7 @@ class CreatePitchArt extends React.Component<
         this.setState({ ...snapshot.val().state },
           () => { this.getUserFiles(); });
       } else {
+        this.setState({owner: this.props.firebase.auth.currentUser.email, isBeingShared: false});
         this.props.history.push({ pathname: "/pitchartwizard" });
         alert("Shared Page Has Been Closed");
         this.setState({ isBeingShared: false });
