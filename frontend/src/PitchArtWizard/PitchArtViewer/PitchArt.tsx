@@ -6,7 +6,7 @@ import { Letter, Speaker } from "../../types/types";
 
 import PitchArtDrawingWindow from "./PitchArtDrawingWindow";
 
-import SaveAnalysisFirestore from "../../components/create/SaveAnalysisFirestore";
+import SaveAnalysisFirestore from "../../Components/create/SaveAnalysisFirestore";
 
 interface Props {
   width: number;

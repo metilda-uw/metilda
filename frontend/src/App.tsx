@@ -26,8 +26,9 @@ import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
-import Collections from "./pages/Collections";
-import Word from "./components/collections/Word";
+import Collections from "./Pages/Collections";
+import LearnNew from "./Pages/LearnNew";
+import Word from "./Components/collections/Word";
 
 interface Props {
   firebase: any;
@@ -93,6 +94,7 @@ const App = () => (
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
       <Route exact path="/collections/:id" component={Word} />
+      <Route exact path="/learn/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
       <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />

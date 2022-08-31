@@ -1,7 +1,7 @@
 import "./home.scss";
 import * as React from "react";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 
 class Home extends React.Component {
   render() {

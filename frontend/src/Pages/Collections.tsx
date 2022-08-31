@@ -6,8 +6,8 @@ import { NotificationManager } from "react-notifications";
 
 import FirebaseContext from "../Firebase/context";
 
-import Header from "../components/header/Header";
-import CollectionView from "../components/collections/CollectionView";
+import Header from "../Components/header/Header";
+import CollectionView from "../Components/collections/CollectionView";
 
 export default function Collections() {
   const firebase = useContext(FirebaseContext);

@@ -73,8 +73,10 @@ export default function CollectionView({ words, selectedCollection }) {
       <div className="row collections-view-wordcards">
         <ul>
           {filteredWords.map((word) => (
-            // <li key={word["id"]}>{word["id"]}</li>
-            <Link to={`/collections/${word["id"]}`} key={word["id"]}>
+            <Link
+              to={`/learn/${selectedCollection}/${word["id"]}`}
+              key={word["id"]}
+            >
               <WordCard
                 word={word}
                 selectedCollection={selectedCollection}
