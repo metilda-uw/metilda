@@ -62,7 +62,7 @@ pip-review==1.1.0
 pipdeptree==2.2.0
 pluggy==0.13.1
 praat-parselmouth==0.4.0
-protobuf==3.17.3
+protobuf==3.18.3
 psycopg2==2.9.2
 py==1.11.0
 pyasn1==0.4.8
