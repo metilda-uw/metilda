@@ -85,6 +85,10 @@ class Header extends Component<HeaderProps, State> {
                     link: "/pitchartwizard",
                   },
                   {
+                    name: "Audio Classifier",
+                    link: "/audioclassifier",
+                  },
+                  {
                     name: "Learn",
                     link: "/learn/words/syllables",
                   },

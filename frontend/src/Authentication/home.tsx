@@ -9,7 +9,7 @@ class Home extends React.Component {
       <div className="Home">
         <Header />
         <br />
-        <h3>Welcome to MeTILDA</h3>
+        <h3>Welcome to MeTILDA!</h3>
         <p>
           <b>
             Melodic Transcription in Language Documentation and Application

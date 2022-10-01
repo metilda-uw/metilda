@@ -23,6 +23,7 @@ import { withAuthentication } from "./Session";
 import { createBrowserHistory } from "history";
 import ReactGA from "react-ga";
 import { NotificationContainer } from "react-notifications";
+import AudioClassifier from "./AudioClassifier/AudioClassifier"
 
 interface Props {
   firebase: any;
@@ -86,6 +87,7 @@ const App = () => (
       <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
+      <Route exact={true} path={ROUTES.AUDIOCLASSIFIER} component={AudioClassifier} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
       <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
