@@ -1,29 +1,46 @@
-.metilda-content-explore-select-options{
+.metilda-exploreaudio-select-audio{
     display: flex;
   }
   
   
-  .metilda-explore-select-sound {
+  .metilda-exploreaudio-select-sound {
     display: flex;
+    
   }
   
-  .metilda-explore-select-sound-elements{
-    margin: 8px;
-    width: 40%;
+  .metilda-exploreaudio-select-file-options{
+    padding-left: 1in;
+    margin: 50px;
+    width: 30%;
+  }
+
+  .metilda-exploreaudio-select-sound-options{
+    padding-left: 1.2in;
+    margin: 50px;
+    width: 30%;
   }
   
+  .metilda-exploreaudio-results{
+    margin: 90px;
+    width: 30%;
+  }
+
   .metilda-explore-review {
     display: flex;
   }
   
-  .metilda-explore-results {
-    height: 150px;
+  .metilda-exploreaudio-results {
+    height: 40px;
     border: 2px solid black;
+    margin: 70px;
+
   }
   
   .metilda-explore-playerbar {
     display: flex;
     width: 40%;
+    margin: 70px;
+    
   }
   
   .m-t-16 {
@@ -31,4 +48,25 @@
   }
   .m-b-16 {
     margin-bottom: 16px;
+  }
+
+  h3 {
+    text-align: center;
+    color: brown;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif;
+  }
+
+  h5 { 
+    text-align:left;
+    color: black;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif;
+    padding-left: 1in;
+  }
+
+  p {
+    text-align: center;
+    letter-spacing: 1px;
+    font-family: 'Trebuchet MS', Helvetica, sans-serif;
+    padding: 0px 20px;
+    color: brown;
   }

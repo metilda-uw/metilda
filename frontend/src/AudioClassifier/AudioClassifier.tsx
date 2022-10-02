@@ -1,17 +1,13 @@
 
-
-
 import React from "react";
 import { withAuthorization } from "../Session";
 import Header from '../components/header/Header';
 import Select from "react-select";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
-
 import UploadAudio from "../Create/UploadAudio";
 import ReactFileReader from "react-file-reader";
 
 import "./AudioClassifier.scss";
-
 
 export interface ExploreAudioProps {
     firebase: any;
@@ -25,10 +21,8 @@ export class AudioClassifier extends React.Component<ExploreAudioProps, State> {
         super(props);
 
         this.state = {
-
         };
     }
-
 
     fileSelected() {
         console.log("File Selected");
@@ -38,48 +32,55 @@ export class AudioClassifier extends React.Component<ExploreAudioProps, State> {
         console.log("Get Results");
     }
 
+
     render () {
 
-        // https://react-select.com/home
-        const options = [
-            { value: 'vowel', label: 'Vowel' },
-            { value: 'consonant', label: 'Consonant' },
-            { value: 'h-sound', label: 'H-Sound' }
-        ]
-
         const files = [{value: 'TestFile.wav', label: 'TestFile.wav'}];
+
+        const options = [
+            { value: 'vowelconsonant', label: 'Vowel/Consonant' },
+            { value: 'other', label: 'Other...' },
+        ]
         
         return (
             <div>
                 <Header/>
-                <div className="metilda-page-content">
-                    <p>"This is the Explore Page where you can use Machine Learning to explore words."</p>
-                    <div className="metilda-content-explore-select-options row">
-                        <div className="metilda-explore-select-sound col s12">
+                <div className="metilda-exploreaudio-content">
+                    <h3> MeTILDA - Audio Classifier </h3>
+                    
+                    <div className="paragraph">
+                    <p>This automated audio classifier is powered by Machine Learning technologies and allows you to identify specified sounds within an audio file.</p>
+                    <br />
+                    </div>
+
+
+                    <h5> Classifier: </h5>
+                    <div className="metilda-exploreaudio-select-audio row">
+                        <div className="metilda-exploreaudio-select-sound col s12">
                             <Select
-                                className="metilda-explore-select-sound-elements file-options"
-                                placeholder="Select Sound File"
+                                className="metilda-exploreaudio-select-file-options"
+                                placeholder="Select audio file..."
                                 options={files}/>
 
-                            <Select
-                                className="metilda-explore-select-sound-elements sound-options"
-                                placeholder="Select Sound Type"
-                                options={options}
-                            />
-                            <button className="metilda-explore-select-sound-elements waves-effect waves-light btn globalbtn" onClick={this.getResults}>Get Results</button>
+                            <div className="metilda-explore-playerbar col s15">
+                                <PlayerBar audioUrl="http://sound.com" />
+                            </div>    
+
+                            
                         </div>
                     </div>
                     <div className="row">
-                        <div className="metilda-explore-review">
-                            <div className="metilda-explore-results col s4">
-                                <p>Found selected sound in:</p>
-                                <p>file1.wav</p>
-                                <p>file2.wav</p>
-                            </div>
-                            <div className="metilda-explore-playerbar col s8">
-                                <PlayerBar audioUrl="http://sound.com" />
-                            </div> 
-                        </div>             
+                       <div className="metilda-explore-review">
+                           
+                       <Select
+                                className="metilda-exploreaudio-select-sound-options"
+                                placeholder="Select sound to classify..."
+                                options={options}
+                            />
+                        <button className="metilda-exploreaudio-results waves-effect waves-light btn globalbtn" onClick={this.getResults}>Predict!</button>
+                            
+                       </div>   
+                                 
                     </div>
                         
                 </div>
