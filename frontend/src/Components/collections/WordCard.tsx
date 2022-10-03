@@ -1,14 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+
 import FirebaseContext from "../../Firebase/context";
 
-export default function WordCard({ word, selectedCollection }) {
+export default function WordCard({ word, selectedCollectionUuid }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
   const [url, setURL] = useState("");
 
   useEffect(() => {
     const storageRef = firebase.storage.ref(
-      "thumbnails/" + selectedCollection + "/" + word.id
+      "thumbnails/" + selectedCollectionUuid + "/" + word.id
     );
     storageRef.getDownloadURL().then((url) => {
       setURL(url);
@@ -27,7 +29,7 @@ export default function WordCard({ word, selectedCollection }) {
             <p>Speaker: {word["data"].speakerName}</p>
           )}
           {word["data"].letters && (
-            <p>There are {word["data"].letters.length} letters in this word.</p>
+            <p>Syllables: {word["data"].letters.length}</p>
           )}
           {word["data"].createdAt && (
             <div className="created-date">
@@ -39,3 +41,8 @@ export default function WordCard({ word, selectedCollection }) {
     </div>
   );
 }
+
+WordCard.propTypes = {
+  word: PropTypes.object,
+  selectedCollectionUuid: PropTypes.string,
+};

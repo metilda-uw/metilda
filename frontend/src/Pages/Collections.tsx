@@ -2,6 +2,7 @@ import "./Collections.css";
 
 import React, { useContext, useEffect, useState } from "react";
 import Select from "react-select";
+
 import { NotificationManager } from "react-notifications";
 
 import FirebaseContext from "../Firebase/context";
@@ -9,26 +10,49 @@ import FirebaseContext from "../Firebase/context";
 import Header from "../Components/header/Header";
 import CollectionView from "../Components/collections/CollectionView";
 
+import Modal from "react-modal";
+
+const customStyles = {
+  content: {
+    margin: 0,
+    top: "50%",
+    left: "50%",
+    right: "auto",
+    bottom: "auto",
+    marginRight: "-50%",
+    transform: "translate(-50%, -50%)",
+  },
+};
+
 export default function Collections() {
   const firebase = useContext(FirebaseContext);
 
-  const [availableCollections, setAvailableCollections] = useState([]);
-
+  const [availableCollections, setAvailableCollections] = useState([
+    [
+      81,
+      "default",
+      " ",
+      " ",
+      "A default collection.",
+      "b3dd3d7b-3909-40f3-8000-f5471c1775cf",
+    ],
+  ]);
   const [createCollectionName, setCreateCollectionName] = useState("");
   const [createCollectionDescription, setCreateCollectionDescription] =
     useState("");
-  // keep track of whether new collections have been added, if collectionsUpdated
-  // is true the list of availableCollections will be updated.
+
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
-
   const [selectedCollection, setSelectedCollection] = useState("default");
-
-  const [words, setWords] = useState({});
+  const [selectedCollectionUuid, setSelectedCollectionUuid] = useState("");
+  const [words, setWords] = useState([]);
   const [update, setUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Populate collections drop down
-  // useEffect calls the collections api to get a list of collections
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [renameCollection, setRenameCollection] = useState("");
+
+  // call the collections api to get a list of collections
+  // occurs on first render & when collectionsUpdated is changed
   useEffect(() => {
     fetch(`api/collections`, {
       method: "GET",
@@ -50,12 +74,19 @@ export default function Collections() {
     if (Object.keys(words).length && !update) {
       return;
     }
+    // console.log(
+    //   "Active Collection Changed: " +
+    //     selectedCollection +
+    //     " " +
+    //     availableCollections
+    //   //getCollectionUuidFromName(selectedCollection)
+    // );
     firebase.firestore
-      .collection(selectedCollection)
+      .collection(getCollectionUuidFromName(selectedCollection))
       .get()
       .then((querySnapshot) => {
         if (querySnapshot.empty) {
-          setWords({});
+          setWords([]);
         } else {
           querySnapshot.forEach((doc) => {
             //  creates an array of words in the collection
@@ -81,6 +112,7 @@ export default function Collections() {
       result = [
         ...result,
         {
+          id: col[0],
           value: col[1],
           label: col[1],
         },
@@ -89,6 +121,7 @@ export default function Collections() {
     return result;
   };
 
+  // *** Event Handlers ***
   // Create a collection
   const handleCreateCollection = async (event: any) => {
     event.preventDefault();
@@ -104,7 +137,7 @@ export default function Collections() {
       body: formData,
     });
     const body = await response.json();
-    console.log(response.body);
+    // console.log(response.body);
     setCreateCollectionName("");
     setCollectionsUpdated(collectionsUpdated + 1);
 
@@ -116,15 +149,50 @@ export default function Collections() {
   };
 
   // sets state for the currently selected option...changing this causes
-  // CollectionView to re-render
-  // onChange={handleCollectionChange}
+  // the CollectionView component to re-render
   const handleViewCollection = (event: any) => {
     event.preventDefault();
+    //console.log("Calling handleViewCollection");
     setSelectedCollection(selectedCollection);
     setUpdate(true);
+
+    setSelectedCollectionUuid(
+      getCollectionUuidFromName(selectedCollection).toString()
+    );
   };
 
-  const handleDeleteColleciton = async (event: any) => {
+  // Update a collection name
+  const handleRenameCollection = async (event: any) => {
+    event.preventDefault();
+    setModalIsOpenToFalse();
+
+    let collectionUuid = getCollectionIdFromName(selectedCollection);
+    setSelectedCollectionUuid(collectionUuid.toString());
+
+    const formData = new FormData();
+    formData.append("collection_name", renameCollection);
+    const response = await fetch(`/api/collections/` + collectionUuid, {
+      method: "PUT",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+    const body = await response.json();
+
+    //console.log("Handle Rename Collection: " + renameCollection);
+
+    if (response.status == 200) {
+      setSelectedCollection(renameCollection);
+      setCollectionsUpdated(collectionsUpdated + 1);
+      NotificationManager.success("Collection name updated successfully!");
+    } else {
+      NotificationManager.error("Renaming collection failed!");
+    }
+  };
+
+  // Delete a collection
+  const handleDeleteCollection = async (event: any) => {
     event.preventDefault();
     //TODO: Add Confirmation
     const formData = new FormData();
@@ -142,7 +210,7 @@ export default function Collections() {
     //TODO: Check whether current logged in user is owner before deleting
 
     const result = firebase.firestore
-      .collection(selectedCollection)
+      .collection(selectedCollectionUuid)
       .get()
       .then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
@@ -155,7 +223,7 @@ export default function Collections() {
           // delete thumbnails - create a reference to the thumbnail then delete it
           const storageRef = firebase.uploadFile();
           let thumbnailRef = storageRef.child(
-            "thumbnails/" + selectedCollection + "/" + doc.id
+            "thumbnails/" + selectedCollectionUuid + "/" + doc.id
           );
           thumbnailRef
             .delete()
@@ -170,37 +238,66 @@ export default function Collections() {
         });
       });
 
-    setSelectedCollection("");
-    setWords({});
+    setSelectedCollection("default");
+    setWords([]);
 
     if (response.status == 200) {
       NotificationManager.success("Collection deleted successfully!");
-      setSelectedCollection("");
+      setSelectedCollection("default");
       setCollectionsUpdated(collectionsUpdated + 1);
     } else {
       NotificationManager.error("Deleting collection failed!");
     }
   };
 
-  // two way binding for new collection
-  // onChange for the create collection form
-  const onNameChange = (event) => {
+  // onChange methods for two way binding.
+  const onNameChange = (event: any) => {
     setCreateCollectionName(event.target.value);
   };
 
-  const onDescriptionChange = (event) => {
+  const onDescriptionChange = (event: any) => {
     setCreateCollectionDescription(event.target.value);
   };
 
-  const onCollectionSelectChange = (event) => {
+  const onCollectionSelectChange = (event: any) => {
     setSelectedCollection(event.value);
+  };
+
+  const onChangeCollectionName = (event: any) => {
+    setRenameCollection(event.target.value);
+  };
+
+  // *** Helper Functions ***
+  const getCollectionIdFromName = (name: string) => {
+    let result = availableCollections.filter(
+      (collection) => collection[1] === name
+    );
+    return result[0][0];
+  };
+
+  const getCollectionUuidFromName = (name: string) => {
+    //console.log("Find: " + name + "in" + availableCollections);
+    let result = availableCollections.filter(
+      (collection) => collection[1] === name
+    );
+    //console.log(result);
+    return result[0][5];
+  };
+
+  const setModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setModalIsOpen(true);
+  };
+
+  const setModalIsOpenToFalse = () => {
+    setModalIsOpen(false);
   };
 
   return (
     <div className="page-collections">
       <Header />
+      {/* Select the Collection to View */}
       <div className="page-collections-manage">
-        {/* Select the Collection to View */}
         <div className="page-collections-select">
           <p>Select a collection:</p>
           <form className="form-collections-view-delete">
@@ -210,7 +307,6 @@ export default function Collections() {
               value={"Select a collection"}
               options={getCollectionOptions()}
               onChange={onCollectionSelectChange}
-              //styles={colourStyles}
             />
             <button
               onClick={handleViewCollection}
@@ -220,14 +316,50 @@ export default function Collections() {
             </button>
 
             <button
-              onClick={handleDeleteColleciton}
+              onClick={handleDeleteCollection}
               className="collections-delete-view btn waves-light globalbtn"
             >
               Delete Collection
             </button>
+            <button
+              onClick={setModalIsOpenToTrue}
+              className="collections-delete-view btn waves-light globalbtn"
+            >
+              Rename Collection
+            </button>
+            <Modal
+              isOpen={modalIsOpen}
+              style={customStyles}
+              appElement={document.getElementById("root" || undefined)}
+            >
+              <p>Enter a new name: </p>
+              <div className="col s4">
+                <input
+                  className="collectionRename"
+                  name="currentCollectionName"
+                  onChange={onChangeCollectionName}
+                  type="text"
+                  placeholder={selectedCollection}
+                  required
+                />
+                <div className="collectionRename-cancel-save">
+                  <button
+                    className="btn waves-light globalbtn"
+                    onClick={setModalIsOpenToFalse}
+                  >
+                    cancel
+                  </button>
+                  <button
+                    className="btn waves-light globalbtn"
+                    onClick={handleRenameCollection}
+                  >
+                    save
+                  </button>
+                </div>
+              </div>
+            </Modal>
           </form>
         </div>
-
         {/* create collection form */}
         <div className="page-collections-create">
           <p>Create a new collection:</p>
@@ -270,12 +402,10 @@ export default function Collections() {
           <CollectionView
             words={words}
             selectedCollection={selectedCollection}
+            selectedCollectionUuid={selectedCollectionUuid}
           />
         )}
         {isLoading && <p>Loading collection...</p>}
-        {/* {Object.keys(words).length === 0 && (
-          <p>The {selectedCollection} collection is currently empty</p>
-        )} */}
       </div>
     </div>
   );

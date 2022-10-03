@@ -8,7 +8,9 @@ import { useDocumentData } from "react-firebase-hooks/firestore";
 import FirebaseContext from "../Firebase/context";
 
 import Header from "../Components/header/Header";
+
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
+import PitchArtPrevPitchValueToggle from "../Learn/PitchArtPrevPitchValueToggle";
 
 import { RawPitchValue } from "../PitchArtWizard/PitchArtViewer/types";
 
@@ -53,12 +55,12 @@ export default function LearnNew() {
             <h6 className="metilda-control-header">Previous Recordings</h6>
             {/* {this.renderPreviousRecordings()} */}
             <h6 className="metilda-control-header">Pitch Art</h6>
-            <div className="metilda-pitch-art-container-control-list col s12">
-              {/* <PitchArtPrevPitchValueToggle
-              handleInputChange={this.handleInputChange}
-              showPrevPitchValueLists={this.state.showPrevPitchValueLists}
-            /> */}
-            </div>
+            {/* <div className="metilda-pitch-art-container-control-list col s12">
+              <PitchArtPrevPitchValueToggle
+                handleInputChange={this.handleInputChange}
+                showPrevPitchValueLists={this.state.showPrevPitchValueLists}
+              />
+            </div> */}
             <div className="row metilda-pitch-art-container-control-toggle-list">
               {/* <PitchArtToggle
               label="Show Sample Pitch Tracking"

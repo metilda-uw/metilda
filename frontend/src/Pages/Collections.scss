@@ -79,3 +79,15 @@
   font-size: small;
   color: black;
 }
+
+//Rename Modal
+.collectionRename-cancel-save {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+
+.collectionRename-cancel-save .btn {
+  width: 50%;
+  margin: 4px;
+}

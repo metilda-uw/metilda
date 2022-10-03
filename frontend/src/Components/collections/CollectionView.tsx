@@ -1,4 +1,5 @@
 import React, { useContext, useState } from "react";
+import PropTypes from "prop-types";
 
 import { Link } from "react-router-dom";
 
@@ -6,12 +7,15 @@ import WordCard from "./WordCard";
 
 import FirebaseContext from "../../Firebase/context";
 
-export default function CollectionView({ words, selectedCollection }) {
+export default function CollectionView({
+  words,
+  selectedCollection,
+  selectedCollectionUuid,
+}) {
   const firebase = useContext(FirebaseContext);
 
   const [currentFilter, setCurrentFilter] = useState("all");
   const [filter, setFilter] = useState("all");
-
   const inputWords = Object.values(words);
 
   const filterList = [
@@ -72,14 +76,14 @@ export default function CollectionView({ words, selectedCollection }) {
 
       <div className="row collections-view-wordcards">
         <ul>
-          {filteredWords.map((word) => (
+          {filteredWords.map((word: {}) => (
             <Link
-              to={`/learn/${selectedCollection}/${word["id"]}`}
+              to={`/learnnew/${selectedCollectionUuid}/${word["id"]}`}
               key={word["id"]}
             >
               <WordCard
                 word={word}
-                selectedCollection={selectedCollection}
+                selectedCollectionUuid={selectedCollectionUuid}
                 key={word["id"]}
               ></WordCard>
             </Link>
@@ -89,3 +93,9 @@ export default function CollectionView({ words, selectedCollection }) {
     </div>
   );
 }
+
+CollectionView.propTypes = {
+  words: PropTypes.array,
+  selectedCollection: PropTypes.string,
+  selectedCollectionUuid: PropTypes.string,
+};
