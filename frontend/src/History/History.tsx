@@ -1,6 +1,6 @@
 import React from "react";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import "./History.scss";
 import AnalysesForImage from "./AnalysesForImage";
 import { spinner } from "../Utils/LoadingSpinner";

@@ -2,7 +2,7 @@ import "./ManageUsers.scss";
 
 import React from "react";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import { spinner } from "../Utils/LoadingSpinner";
 import { deleteUser } from "../Create/ImportUtils";
 import CreateUser from "./CreateUser";

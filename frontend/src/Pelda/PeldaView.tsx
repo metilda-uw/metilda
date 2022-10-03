@@ -9,7 +9,7 @@ import { AudioAction } from "../store/audio/types";
 import { Speaker } from "../types/types";
 import PeldaAudioAnalysis from "./PeldaAudioAnalysis";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import { uploadAudio, uploadEaf } from "../Create/ImportUtils";
 import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";

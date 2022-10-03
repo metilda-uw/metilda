@@ -1,15 +1,22 @@
 import "materialize-css/dist/css/materialize.min.css";
 import "./App.scss";
+
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
+import "firebase/auth";
+import "firebase/firestore";
+import ReactGA from "react-ga";
+
+import { withAuthentication } from "./Session";
+import { createBrowserHistory } from "history";
+import { NotificationContainer } from "react-notifications";
+
+import * as ROUTES from "./constants/routes";
 import CreatePitchArt from "./Create/CreatePitchArt";
 import PeldaView from "./Pelda/PeldaView";
 import WordSyllableCategories from "./Learn/WordSyllableCategories";
 import WordSyllableReview from "./Learn/WordSyllableReview";
 import Home from "./Authentication/home";
-import "firebase/auth";
-import "firebase/firestore";
-import * as ROUTES from "./constants/routes";
 import Landing from "./Authentication/landing";
 import signUp from "./Authentication/signup";
 import signIn from "./Authentication/login";
@@ -19,10 +26,9 @@ import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
-import { withAuthentication } from "./Session";
-import { createBrowserHistory } from "history";
-import ReactGA from "react-ga";
-import { NotificationContainer } from "react-notifications";
+import Collections from "./Pages/Collections";
+import LearnNew from "./Pages/LearnNew";
+// import Word from "./Components/collections/Word";
 
 interface Props {
   firebase: any;
@@ -86,6 +92,9 @@ const App = () => (
       <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
+      <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
+      {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
+      <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
       <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />

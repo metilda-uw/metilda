@@ -1,9 +1,9 @@
 .CreatePitchArt {
-    margin-top: 16px;
+  margin-top: 16px;
 }
 
 .metilda-audio-analysis-form {
-    margin-left: 16px;
+  margin-left: 16px;
 }
 
 // .metilda-audio-analysis-layout {
@@ -11,164 +11,171 @@
 // }
 
 .metilda-audio-analysis-controls-list {
-
 }
 
 .metilda-audio-analysis-controls-list-item {
-    margin-bottom: 16px;
+  margin-bottom: 16px;
 }
 
 .metilda-audio-analysis {
-
 }
 
 .metilda-audio-analysis-image-container {
-    margin-bottom: 0px;
+  margin-bottom: 0px;
 }
 
 .metilda-audio-analysis-image {
-    border: 1px solid black;
-    width: 653px;
+  border: 1px solid black;
+  width: 653px;
 }
 
 .metilda-audio-analysis-input {
-    text-align: left;
+  text-align: left;
 }
 
 .metilda-checkbox-label {
-    margin-right: 16px;
+  margin-right: 16px;
 }
 
 .metilda-audio-analysis-image-col-1,
 .metilda-audio-analysis-image-col-11,
 .metilda-audio-analysis-image-col-2 {
-    border: 1px solid black;
-    height: 32px;
+  border: 1px solid black;
+  height: 32px;
 }
 
 .metilda-audio-analysis-image-col-1 {
-    width: 12.5%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: lightgray;
+  width: 12.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: lightgray;
 }
 
 .metilda-audio-analysis-image-col-11 {
-    width: 12.5%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: lightgray;
+  width: 12.5%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: lightgray;
 }
 
 .metilda-audio-analysis-image-col-2 {
-    width: 77.5%;
+  width: 77.5%;
 }
 
 .metilda-control-container {
-    display: flex;
-    align-items: center;
-    width: 725px;
+  display: flex;
+  align-items: center;
+  width: 725px;
 }
 
 .metilda-target-pitch-bar {
-    margin-bottom: 4px;
+  margin-bottom: 4px;
 }
 
 .metilda-audio-analysis-image-col-2.metilda-audio-analysis-letter-container {
-    display: flex;
+  display: flex;
 }
 
 .metilda-transcribe-letter {
-    position: relative;
-    background: lightblue;
-    outline: 1px solid black;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  position: relative;
+  background: lightblue;
+  outline: 1px solid black;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .metilda-transcribe-letter.selected {
-    background: lightyellow !important;
+  background: lightyellow !important;
 }
 
 .metilda-transcribe-letter.seperator {
-    background: lightpink !important;
+  background: lightpink !important;
 }
 
 .metilda-audio-analysis-image-loading,
 .metilda-audio-analysis-image-default {
-    width: 653px;
-    height: 303px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 1px solid black;
-    margin-bottom: 6px;
+  width: 653px;
+  height: 303px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  margin-bottom: 6px;
 }
 
 .metilda-audio-analysis-image-loading .preloader-wrapper.big {
-    width: 160px;
-    height: 160px;
+  width: 160px;
+  height: 160px;
 }
 
 .metilda-audio-analysis-pitch-art {
-    margin-left: 48px;
+  margin-left: 48px;
 }
 
 .m-r-16 {
-    margin-right: 8px;
+  margin-right: 8px;
 }
 
 .no-border {
-    border: none !important;
+  border: none !important;
 }
 
 .vert-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .fill-parent {
-    width: 100%;
-    height: 100%;
+  width: 100%;
+  height: 100%;
 }
 
 #metilda-audio-function-btns {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 4px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
 }
 
 #metilda-audio-function-btns button {
-
 }
 
+// Create page
 #metilda-pitch-art-btn-container {
-    display: flex;
-    justify-content: flex-end;
+  display: flex;
+  //justify-content: flex-start;
+  margin-bottom: 10px;
+}
+
+.page-create-save-collections-form {
+  display: flex;
+  flex-direction: row;
+}
+
+#collections-dropdown {
+  width: 50%;
 }
 
 .UploadFile {
-    position: fixed;
-    top: 85px;
-    right:40px
+  position: fixed;
+  top: 85px;
+  right: 40px;
 }
 
 // Target Pitch Bar and Button elements below
 
 .TargetPitchBar {
-
 }
 
 .TargetPitchBarElements {
-    display: inline-block;
-    padding: 0px;
-    margin: 0px;
-    width: 100%;
+  display: inline-block;
+  padding: 0px;
+  margin: 0px;
+  width: 100%;
 }
 
 .btn-group-analysis-controls {
@@ -181,8 +188,8 @@
   white-space: nowrap;
 }
 
-.btn{
-    text-transform: none
+.btn {
+  text-transform: none;
 }
 
 .btn-group-analysis-controls .btn {
@@ -195,41 +202,43 @@
   margin: 4px;
 }
 
-
 #metilda-drop-down-back-button .audioBackButton {
-    position: relative;
-    left: 15px;
-    top: 78px;
-    width: 40px;
-    font-size: 14px;
-    text-align: center;
-    cursor: pointer;
-    height: 40px;
-    background-color: #26a69a;
-    border: none;
-    color: black;
-    border-radius: 5px;
-    z-index: 1;
-    letter-spacing: 0.5px;
-    display: block; }
-  
+  position: relative;
+  left: 15px;
+  top: 78px;
+  width: 40px;
+  font-size: 14px;
+  text-align: center;
+  cursor: pointer;
+  height: 40px;
+  background-color: #26a69a;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
 #metilda-drop-down-back-button .audioBackButtonDisabled {
-    position: relative;
-    left: 15px;
-    top: 78px;
-    width: 40px;
-    font-size: 14px;
-    text-align: center;
-    cursor: not-allowed;
-    height: 40px;
-    background-color: #c7c7c7;
-    border: none;
-    color: black;
-    border-radius: 5px;
-    z-index: 1;
-    letter-spacing: 0.5px;
-    display: block; }
-  
-  #button-drop-down-image-side-by-side {
-    display: flex;
-    flex-direction: row; }
+  position: relative;
+  left: 15px;
+  top: 78px;
+  width: 40px;
+  font-size: 14px;
+  text-align: center;
+  cursor: not-allowed;
+  height: 40px;
+  background-color: #c7c7c7;
+  border: none;
+  color: black;
+  border-radius: 5px;
+  z-index: 1;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+#button-drop-down-image-side-by-side {
+  display: flex;
+  flex-direction: row;
+}
