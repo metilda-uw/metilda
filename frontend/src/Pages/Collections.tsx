@@ -29,12 +29,12 @@ export default function Collections() {
 
   const [availableCollections, setAvailableCollections] = useState([
     [
-      81,
+      1,
+      "b3dd3d7b-3909-40f3-8000-f5471c1775cf",
       "default",
       " ",
       " ",
       "A default collection.",
-      "b3dd3d7b-3909-40f3-8000-f5471c1775cf",
     ],
   ]);
   const [createCollectionName, setCreateCollectionName] = useState("");
@@ -113,8 +113,8 @@ export default function Collections() {
         ...result,
         {
           id: col[0],
-          value: col[1],
-          label: col[1],
+          value: col[2],
+          label: col[2],
         },
       ];
     });
@@ -270,18 +270,18 @@ export default function Collections() {
   // *** Helper Functions ***
   const getCollectionIdFromName = (name: string) => {
     let result = availableCollections.filter(
-      (collection) => collection[1] === name
+      (collection) => collection[2] === name
     );
     return result[0][0];
   };
 
   const getCollectionUuidFromName = (name: string) => {
-    //console.log("Find: " + name + "in" + availableCollections);
+    console.log("Find: " + name + "in" + availableCollections);
     let result = availableCollections.filter(
-      (collection) => collection[1] === name
+      (collection) => collection[2] === name
     );
-    //console.log(result);
-    return result[0][5];
+    console.log(result);
+    return result[0][1];
   };
 
   const setModalIsOpenToTrue = (event: any) => {

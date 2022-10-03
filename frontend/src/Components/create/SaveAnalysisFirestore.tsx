@@ -45,8 +45,8 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
       result = [
         ...result,
         {
-          value: col[1],
-          label: col[1],
+          value: col[2],
+          label: col[2],
         },
       ];
     });
@@ -55,9 +55,9 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
 
   const getCollectionUuidFromName = (name: string) => {
     let result = availableCollections.filter(
-      (collection) => collection[1] === name
+      (collection) => collection[2] === name
     );
-    return result[0][5];
+    return result[0][1];
   };
 
   // use analysis prop - contains an array of each speaker.
