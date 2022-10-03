@@ -6,12 +6,13 @@ import "firebase/firestore";
 import "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyApNGjZ64mit03pD_92T7EZZ15UjeSxy44",
-  authDomain: "metilda-development.firebaseapp.com",
-  projectId: "metilda-development",
-  storageBucket: "metilda-development.appspot.com",
-  messagingSenderId: "1093113246351",
-  appId: "1:1093113246351:web:38d5913355eb8fe32eb6fa",
+  apiKey: "AIzaSyBO-NeTgR5i13a4fawJylwyoOfTXigvYmU",
+  authDomain: "metilda-c5ed6.firebaseapp.com",
+  databaseURL: "https://metilda-c5ed6.firebaseio.com",
+  projectId: "metilda-c5ed6",
+  storageBucket: "gs://metilda-c5ed6.appspot.com/",
+  messagingSenderId: "844859558075",
+  appId: "1:844859558075:web:ef6fb0e686fb4d3b",
 };
 
 class Firebase {
