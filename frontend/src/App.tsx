@@ -28,7 +28,7 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./Pages/Collections";
 import LearnNew from "./Pages/LearnNew";
-import Word from "./Components/collections/Word";
+// import Word from "./Components/collections/Word";
 
 interface Props {
   firebase: any;
@@ -93,8 +93,8 @@ const App = () => (
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
-      <Route exact path="/collections/:id" component={Word} />
-      <Route exact path="/learn/:collection/:id" component={LearnNew} />
+      {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
+      <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
       <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
