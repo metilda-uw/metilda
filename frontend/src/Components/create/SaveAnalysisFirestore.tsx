@@ -1,7 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import FirebaseContext from "../../Firebase/context";
+import PropTypes from "prop-types";
+
 import { useHistory } from "react-router-dom";
 import Select from "react-select";
+import { NotificationManager } from "react-notifications";
+
+import FirebaseContext from "../../Firebase/context";
 
 export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   const firebase = useContext(FirebaseContext);
@@ -49,21 +53,33 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
     return result;
   };
 
+  const getCollectionUuidFromName = (name: string) => {
+    let result = availableCollections.filter(
+      (collection) => collection[1] === name
+    );
+    return result[0][5];
+  };
+
   // use analysis prop - contains an array of each speaker.
   // map over array and save each speakers word to the selected firestore collection
   const handleSaveToCollections = async (event: any) => {
     event.preventDefault();
+    const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
     analysis.map((word) => {
       firebase.firestore
-        .collection(selectedCollection)
+        .collection(collectionUuid)
         .add({ ...word, createdAt: timestamp.fromDate(new Date()) })
         .then((docRef) => {
-          console.log("Document written with ID: ", docRef.id);
-          saveThumbnail(selectedCollection + "/" + docRef.id);
+          //console.log("Document written with ID: ", docRef.id);
+          saveThumbnail(collectionUuid + "/" + docRef.id);
+          NotificationManager.success(
+            "Pitch Art added to collection successfully!"
+          );
         })
         .catch((error) => {
           console.error("Error adding document: ", error);
+          NotificationManager.error("Renaming collection failed!");
         });
     });
   };
@@ -92,3 +108,8 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
     </div>
   );
 }
+
+SaveAnalysisFirestore.propTypes = {
+  analysis: PropTypes.array,
+  saveThumbnail: PropTypes.func,
+};
