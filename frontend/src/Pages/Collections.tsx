@@ -46,6 +46,8 @@ export default function Collections() {
   const [selectedCollectionUuid, setSelectedCollectionUuid] = useState("");
   const [words, setWords] = useState([]);
   const [update, setUpdate] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
   const [renameModalIsOpen, setRenameModalIsOpen] = useState(false);
@@ -63,9 +65,18 @@ export default function Collections() {
         "Content-Type": "application/json",
       },
     })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          console.log(res);
+          return res.json();
+        }
+
+        throw new Error("Error: Unable to get the list of collections.");
+      })
       .then((data) => setAvailableCollections(data.result))
       .catch((error) => {
+        setIsError(true);
+        setError(error.message);
         console.log(error);
       });
   }, [collectionsUpdated]);
@@ -308,6 +319,7 @@ export default function Collections() {
       <div className="page-collections-manage">
         <div className="page-collections-select">
           <p>Select a collection:</p>
+          {isError && <p>{error}</p>}
           <form className="form-collections-view-delete">
             <Select
               className="collections-dropdown"
@@ -436,6 +448,7 @@ export default function Collections() {
             selectedCollectionUuid={selectedCollectionUuid}
           />
         )}
+
         {isLoading && <p>Loading collection...</p>}
       </div>
     </div>
