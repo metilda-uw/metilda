@@ -48,8 +48,10 @@ export default function Collections() {
   const [update, setUpdate] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [renameModalIsOpen, setRenameModalIsOpen] = useState(false);
   const [renameCollection, setRenameCollection] = useState("");
+
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
 
   // call the collections api to get a list of collections
   // occurs on first render & when collectionsUpdated is changed
@@ -164,7 +166,7 @@ export default function Collections() {
   // Update a collection name
   const handleRenameCollection = async (event: any) => {
     event.preventDefault();
-    setModalIsOpenToFalse();
+    setRenameModalIsOpenToFalse();
 
     let collectionUuid = getCollectionIdFromName(selectedCollection);
     setSelectedCollectionUuid(collectionUuid.toString());
@@ -194,7 +196,6 @@ export default function Collections() {
   // Delete a collection
   const handleDeleteCollection = async (event: any) => {
     event.preventDefault();
-    //TODO: Add Confirmation
     const formData = new FormData();
     formData.append("collection_name", selectedCollection);
     const response = await fetch(`/api/collections`, {
@@ -206,9 +207,6 @@ export default function Collections() {
     });
     const body = await response.json();
 
-    //Add call to delete the collection from firestore
-    //TODO: Check whether current logged in user is owner before deleting
-
     const result = firebase.firestore
       .collection(selectedCollectionUuid)
       .get()
@@ -218,7 +216,7 @@ export default function Collections() {
           //const uid = firebase.auth.currentUser.email;
 
           doc.ref.delete();
-          console.log("deleted: " + doc.id + " from firestore.");
+          //console.log("deleted: " + doc.id + " from firestore.");
 
           // delete thumbnails - create a reference to the thumbnail then delete it
           const storageRef = firebase.uploadFile();
@@ -238,6 +236,7 @@ export default function Collections() {
         });
       });
 
+    setDeleteModalIsOpenToFalse();
     setSelectedCollection("default");
     setWords([]);
 
@@ -276,21 +275,30 @@ export default function Collections() {
   };
 
   const getCollectionUuidFromName = (name: string) => {
-    console.log("Find: " + name + "in" + availableCollections);
+    //console.log("Find: " + name + "in" + availableCollections);
     let result = availableCollections.filter(
       (collection) => collection[2] === name
     );
-    console.log(result);
+    //console.log(result);
     return result[0][1];
   };
 
-  const setModalIsOpenToTrue = (event: any) => {
+  const setRenameModalIsOpenToTrue = (event: any) => {
     event.preventDefault();
-    setModalIsOpen(true);
+    setRenameModalIsOpen(true);
   };
 
-  const setModalIsOpenToFalse = () => {
-    setModalIsOpen(false);
+  const setRenameModalIsOpenToFalse = () => {
+    setRenameModalIsOpen(false);
+  };
+
+  const setDeleteModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setDeleteModalIsOpen(true);
+  };
+
+  const setDeleteModalIsOpenToFalse = () => {
+    setDeleteModalIsOpen(false);
   };
 
   return (
@@ -316,19 +324,19 @@ export default function Collections() {
             </button>
 
             <button
-              onClick={handleDeleteCollection}
+              onClick={setDeleteModalIsOpenToTrue}
               className="collections-delete-view btn waves-light globalbtn"
             >
               Delete Collection
             </button>
             <button
-              onClick={setModalIsOpenToTrue}
+              onClick={setRenameModalIsOpenToTrue}
               className="collections-delete-view btn waves-light globalbtn"
             >
               Rename Collection
             </button>
             <Modal
-              isOpen={modalIsOpen}
+              isOpen={renameModalIsOpen}
               style={customStyles}
               appElement={document.getElementById("root" || undefined)}
             >
@@ -345,7 +353,7 @@ export default function Collections() {
                 <div className="collectionRename-cancel-save">
                   <button
                     className="btn waves-light globalbtn"
-                    onClick={setModalIsOpenToFalse}
+                    onClick={setRenameModalIsOpenToFalse}
                   >
                     cancel
                   </button>
@@ -354,6 +362,29 @@ export default function Collections() {
                     onClick={handleRenameCollection}
                   >
                     save
+                  </button>
+                </div>
+              </div>
+            </Modal>
+            <Modal
+              isOpen={deleteModalIsOpen}
+              style={customStyles}
+              appElement={document.getElementById("root" || undefined)}
+            >
+              <p>Are you sure you want to delete "{selectedCollection}"</p>
+              <div className="col s4">
+                <div className="collection-delete-yes-no">
+                  <button
+                    className="btn waves-light globalbtn"
+                    onClick={handleDeleteCollection}
+                  >
+                    yes
+                  </button>
+                  <button
+                    className="btn waves-light globalbtn"
+                    onClick={setDeleteModalIsOpenToFalse}
+                  >
+                    no
                   </button>
                 </div>
               </div>
