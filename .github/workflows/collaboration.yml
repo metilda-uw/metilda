@@ -1,4 +1,4 @@
-name: Beat-Point workflow
+name: Collaboration workflow
 
 on:
   push:
