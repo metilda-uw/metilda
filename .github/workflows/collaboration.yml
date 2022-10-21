@@ -22,5 +22,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: 'metilda-collab'
+          heroku_app_name: 'metilda-collaborative'
           heroku_email: 'metilda.uw@gmail.com'
