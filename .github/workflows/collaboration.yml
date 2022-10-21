@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Beat Point Feature Code
+      - name: Collaboration Code
         uses: actions/checkout@v3
       - name: Use Node.js 14.8.2
         uses: actions/setup-node@v3
