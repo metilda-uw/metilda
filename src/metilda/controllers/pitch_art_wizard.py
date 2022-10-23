@@ -24,6 +24,47 @@ import lxml.etree as etree
 from PIL import Image
 
 
+
+from flask import Flask, render_template, json
+import pickle
+
+#imports for DL model
+import tensorflow as tf
+import librosa
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+#%matplotlib inline
+import os
+from PIL import Image
+import pathlib
+
+from keras import layers
+from keras import layers
+import keras
+import csv 
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+
+from keras.models import Sequential
+import warnings
+#warnings.filterwarnings('ignore')
+from keras.wrappers.scikit_learn import KerasClassifier
+from sklearn.model_selection import cross_val_score
+from keras.models import Sequential
+from keras.layers import Dense
+
+from io import BytesIO
+
+
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score
+
+
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = "0"
+
+
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
     return '.' in filename and \
@@ -978,3 +1019,86 @@ def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2,
     os.remove(filepath)
 
     return eafstring
+
+
+
+
+
+
+@app.route('/url_route', methods=['POST'])
+def upload_file():
+    """Handles the upload of a file."""
+    d = {}
+    try:
+        file = request.files['file']
+        filename = file.filename
+        print(f"Uploading file {filename}")
+        file_bytes = file.read()
+        file_content = BytesIO(file_bytes).readlines()
+        print(file_content)
+        d['status'] = 1
+
+    except Exception as e:
+        print(f"Couldn't upload file {e}")
+        d['status'] = 0
+
+    return jsonify(d)
+
+
+
+
+
+
+
+
+
+
+@app.route('/api/audio/classifier', methods=['POST'])
+def audio_classify():
+    
+    f = request.files['file']
+  
+    fileobj=open('/home/ubuntu/metilda/src/metilda/controllers/rbmANN.pickle','rb')
+    model = pickle.load(fileobj)
+    # pass the f into the ML Model
+    # run the predict function on the ML model
+    # get the output from the ML model
+    # return the output
+    audiodata, sr = librosa.load(f)
+
+
+    # extract mfccs
+    mfccs = librosa.feature.mfcc(y=audiodata, n_mfcc=20, sr=sr)
+    mfccmean1 = []
+
+    mfccmean1.append(np.mean(mfccs[0]))
+    mfccmean1.append(np.mean(mfccs[1]))
+    mfccmean1.append(np.mean(mfccs[2]))
+    mfccmean1.append(np.mean(mfccs[3]))
+    mfccmean1.append(np.mean(mfccs[4]))
+    mfccmean1.append(np.mean(mfccs[5]))
+    mfccmean1.append(np.mean(mfccs[6]))
+    mfccmean1.append(np.mean(mfccs[7]))
+    mfccmean1.append(np.mean(mfccs[8]))
+    mfccmean1.append(np.mean(mfccs[9]))
+    mfccmean1.append(np.mean(mfccs[10]))
+    mfccmean1.append(np.mean(mfccs[11]))
+    mfccmean1.append(np.mean(mfccs[12]))
+    mfccmean1.append(np.mean(mfccs[13]))
+    mfccmean1.append(np.mean(mfccs[14]))
+    mfccmean1.append(np.mean(mfccs[15]))
+    mfccmean1.append(np.mean(mfccs[16]))
+    mfccmean1.append(np.mean(mfccs[17]))
+    mfccmean1.append(np.mean(mfccs[18]))
+    mfccmean1.append(np.mean(mfccs[19]))
+
+
+    mfccmean1 = np.array(mfccmean1)
+    mfccnew = mfccmean1.reshape(1, -1)
+    prediction = model.predict(mfccnew)
+    prediction = np.round(prediction)
+    if prediction == [[0.]]:
+        return jsonify({'success' : True, 'consonant': True, 'vowel': False})
+    elif prediction == [[1.]]:    
+        return jsonify({'success' : True,'consonant': False, 'vowel': True})
+    return jsonify({'success' : False,'consonant': False, 'vowel': True})

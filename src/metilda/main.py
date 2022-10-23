@@ -12,6 +12,12 @@
 
 from __future__ import absolute_import
 from metilda import get_app
+import pickle
+
 
 if __name__ == "__main__":
+
+    #file = '/home/ubuntu/metilda/src/metilda/controllers/trialmodel.pickle'
+    #model = pickle.load(open(file, 'rb'))
     get_app().run()
+    
