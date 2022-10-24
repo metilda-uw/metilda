@@ -462,6 +462,65 @@ export class PitchArtDrawingWindow extends React.Component<
     Tone.Transport.start();
   }
 
+  playPitchArtRhythm() {
+    if (this.props.speakers.length !== 1) {
+      return;
+    }
+
+    const letters: Letter[] = this.props.speakers[0].letters;
+    const env = new Tone.AmplitudeEnvelope({
+      attack: 0.001,
+      decay: 0.001,
+      sustain: 0.001,
+      release: 0.001,
+    }).toMaster();
+
+    const filter = new Tone.Filter({
+      type: "highpass",
+      frequency: 50,
+      rolloff: -48,
+    }).toMaster();
+
+    // var synth = new window.Tone.Synth().toMaster().chain(filter, env);
+    const synth = new Tone.Synth().toMaster().chain(filter, env);
+
+    const tStart = letters.length > 0 ? letters[0].t0 : 0;
+    const tEnd = letters.length > 0 ? letters[letters.length - 1].t1 : 0;
+
+    interface PitchArtNote {
+      time: number;
+      index: number;
+      duration: number;
+      pitch: number;
+    }
+
+    const notes = letters.map(function (item, index) {
+      return {
+        time: item.t0 - tStart,
+        duration: item.t1 - item.t0,
+        pitch: 100,
+        index,
+      } as PitchArtNote;
+    });
+    notes.push({ time: tEnd, duration: 1, pitch: 1, index: -1 });
+    const controller = this;
+
+    // @ts-ignore
+    const midiPart = new Tone.Part(function (
+      time: Encoding.Time,
+      note: PitchArtNote
+    ) {
+      controller.setState({ activePlayIndex: note.index });
+      if (note.index !== -1) {
+        synth.triggerAttackRelease(note.pitch, note.duration, time);
+      }
+      // @ts-ignore
+    },
+    notes).start();
+
+    Tone.Transport.start();
+  }
+
   playSound(pitch: number) {
     const synth = new Tone.Synth().toMaster();
     synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);

@@ -46,6 +46,7 @@ class PitchArt extends React.Component<Props> {
     this.downloadImage = this.downloadImage.bind(this);
     this.saveThumbnail = this.saveThumbnail.bind(this);
     this.playPitchArt = this.playPitchArt.bind(this);
+    this.playPitchArtRhythm = this.playPitchArtRhythm.bind(this);
     this.createPitchArt = this.createPitchArt.bind(this);
   }
 
@@ -75,6 +76,10 @@ class PitchArt extends React.Component<Props> {
 
   playPitchArt() {
     this.visibleRef.current!.playPitchArt();
+  }
+
+  playPitchArtRhythm() {
+    this.visibleRef.current!.playPitchArtRhythm();
   }
 
   createPitchArt(isVisible: boolean) {
@@ -127,6 +132,17 @@ class PitchArt extends React.Component<Props> {
           >
             <i className="material-icons right">play_circle_filled</i>
             Play Tones
+          </button>
+          <button
+            className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+            disabled={
+              this.props.speakers.length !== 1 ||
+              this.props.speakers[0].letters.length === 0
+            }
+            onClick={this.playPitchArtRhythm}
+          >
+            <i className="material-icons right">play_circle_filled</i>
+            Play Rhythm
           </button>
           <button
             className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
