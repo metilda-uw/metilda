@@ -19,6 +19,10 @@ const reducer: Reducer<AudioAnalysisState> = (
       return { ...state, speakers: action.speakers };
     case constants.SET_UPLOAD_ID:
       return { ...state, speakers: action.speakers };
+    case constants.SET_WORD:
+      return { ...state, speakers: action.speakers };
+    case constants.SET_WORD_TRANSLATION:
+      return { ...state, speakers: action.speakers };
     case constants.SET_SPEAKER_NAME:
       return { ...state, speakers: action.speakers };
     case constants.ADD_LETTER:
@@ -27,10 +31,11 @@ const reducer: Reducer<AudioAnalysisState> = (
       return { ...state, speakers: action.speakers };
     case constants.RESET_LETTERS:
       return { ...state, speakers: action.speakers };
-
     case constants.SET_LETTER_SYLLABLE:
       return { ...state, speakers: action.speakers };
     case constants.SET_LETTER_TIME:
+      return { ...state, speakers: action.speakers };
+    case constants.SET_WORD_TIME:
       return { ...state, speakers: action.speakers };
     case constants.MANUAL_PITCH_ADJUST:
       return { ...state, speakers: action.speakers };

@@ -10,6 +10,9 @@ export interface Letter {
 export interface Speaker {
   uploadId: string;
   speakerName?: string;
+  word?: string;
+  wordTranslation?;
+  wordTime?;
   letters: Letter[];
   fileIndex?: number;
   latestAnalysisId?: number;

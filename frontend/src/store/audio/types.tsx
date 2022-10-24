@@ -26,6 +26,16 @@ export interface SetSpeakerName extends Action {
   speakers: Speaker[];
 }
 
+export interface SetWord extends Action {
+  type: constants.SET_WORD;
+  speakers: Speaker[];
+}
+
+export interface SetWordTranslation extends Action {
+  type: constants.SET_WORD_TRANSLATION;
+  speakers: Speaker[];
+}
+
 export interface AddLetter extends Action {
   type: constants.ADD_LETTER;
   speakers: Speaker[];
@@ -51,6 +61,11 @@ export interface SetLetterTime extends Action {
   speakers: Speaker[];
 }
 
+export interface SetWordTime extends Action {
+  type: constants.SET_WORD_TIME;
+  speakers: Speaker[];
+}
+
 export interface SetActiveLetter extends Action {
   type: constants.SET_ACTIVE_LETTER;
   speakers: Speaker[];
@@ -66,10 +81,13 @@ export type AudioAction =
   | RemoveSpeaker
   | SetSpeaker
   | SetSpeakerName
+  | SetWord
+  | SetWordTranslation
   | AddLetter
   | RemoveLetter
   | ResetLetters
   | SetLetterSyllable
   | SetLetterTime
+  | SetWordTime
   | SetActiveLetter
   | ManualPitchAdjust;

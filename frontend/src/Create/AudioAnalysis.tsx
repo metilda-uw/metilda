@@ -19,6 +19,9 @@ import {
   addSpeaker,
   removeSpeaker,
   setSpeakerName,
+  setWord,
+  setWordTranslation,
+  setWordTime,
   resetLetters,
   setLetterPitch,
   setUploadId,
@@ -43,7 +46,10 @@ export interface AudioAnalysisProps {
   ) => void;
   resetLetters: (speakerIndex: number) => void;
   setSpeakerName: (speakerIndex: number, speakerName: string) => void;
+  setWord: (speakerIndex: number, word: string) => void;
+  setWordTranslation: (speakerIndex: number, wordTranslation: string) => void;
   addLetter: (speakerIndex: number, letter: Letter) => void;
+  setWordTime: (speakerIndex: number, time: number) => void;
   setLetterPitch: (
     speakerIndex: number,
     letterIndex: number,
@@ -73,6 +79,8 @@ interface State {
   maxAudioTime: number;
   audioImgWidth: number;
   speakerName: string;
+  word: string;
+  wordTranslation: string;
   closeImgSelectionCallback: () => void;
   selectionCallback: (t1: number, t2: number) => void;
   // needed for the onChange event to work.
@@ -173,7 +181,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     this.state = {
       selectedFolderName: "Uploads",
-      speakerName: "Enter a speaker name",
+      speakerName: "Speaker",
+      word: "Word",
+      wordTranslation: "Word Translation",
       showImgMenu: false,
       imgMenuX: -1,
       imgMenuY: -1,
@@ -230,6 +240,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   componentDidMount() {
     const uploadId = this.getSpeaker().uploadId;
+
     if (!uploadId) {
       return;
     }
@@ -285,6 +296,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             body: formData,
           });
           this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+
           this.props.resetLetters(this.props.speakerIndex);
         })
         .catch(function (error: any) {
@@ -722,16 +734,26 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   onSubmitSpeakerName = (event: any) => {
     event.preventDefault();
     const { speakerName } = this.state;
+    const { word } = this.state;
+    const { wordTranslation } = this.state;
     this.props.setSpeakerName(this.props.speakerIndex, speakerName);
+    this.props.setWord(this.props.speakerIndex, word);
+    this.props.setWordTranslation(this.props.speakerIndex, wordTranslation);
   };
 
-  onChangeSpeakerName = (event: any) => {
+  onChange = (event: any) => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  onChangeWord = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
   render() {
     const uploadId = this.getSpeaker().uploadId;
     const { speakerName } = this.state;
+    const { word } = this.state;
+    const { wordTranslation } = this.state;
 
     const isInvalid = speakerName === "";
 
@@ -767,13 +789,31 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               <input
                 name="speakerName"
                 value={speakerName}
-                onChange={this.onChangeSpeakerName}
+                onChange={this.onChange}
                 type="text"
                 placeholder="Speaker Name"
               />
+              <input
+                name="word"
+                value={word}
+                onChange={this.onChange}
+                type="text"
+                placeholder="Word"
+              />
+              <input
+                name="wordTranslation"
+                value={wordTranslation}
+                onChange={this.onChange}
+                type="text"
+                placeholder="Word Translation"
+              />
 
-              <button disabled={isInvalid} type="submit" className="globalbtn">
-                Save
+              <button
+                disabled={isInvalid}
+                type="submit"
+                className="waves-effect waves-light btn globalbtn"
+              >
+                Save Details
               </button>
             </form>
 
@@ -844,6 +884,12 @@ const mapDispatchToProps = (
     dispatch(removeSpeaker(speakerIndex)),
   setSpeakerName: (speakerIndex: number, speakerName: string) =>
     dispatch(setSpeakerName(speakerIndex, speakerName)),
+  setWord: (speakerIndex: number, word: string) =>
+    dispatch(setWord(speakerIndex, word)),
+  setWordTranslation: (speakerIndex: number, wordTranslation: string) =>
+    dispatch(setWord(speakerIndex, wordTranslation)),
+  setWordTime: (speakerIndex: number, time: number) =>
+    dispatch(setWordTime(speakerIndex, time)),
   setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
     dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
   addLetter: (speakerIndex: number, newLetter: Letter) =>

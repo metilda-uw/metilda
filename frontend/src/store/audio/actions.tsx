@@ -81,6 +81,38 @@ export const setUploadId =
     });
   };
 
+export const setWord =
+  (speakerIndex: number, word: string): ActionReturn =>
+  (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const newSpeakers = update(speakers, {
+      [speakerIndex]: {
+        word: { $set: word },
+      },
+    });
+
+    dispatch({
+      type: constants.SET_WORD,
+      speakers: newSpeakers,
+    });
+  };
+
+export const setWordTranslation =
+  (speakerIndex: number, wordTranslation: string): ActionReturn =>
+  (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const newSpeakers = update(speakers, {
+      [speakerIndex]: {
+        word: { $set: wordTranslation },
+      },
+    });
+
+    dispatch({
+      type: constants.SET_WORD,
+      speakers: newSpeakers,
+    });
+  };
+
 export const setLatestAnalysisId =
   (
     speakerIndex: number,
@@ -191,6 +223,22 @@ export const setLetterTime =
 
     dispatch({
       type: constants.SET_LETTER_TIME,
+      speakers: newSpeakers,
+    });
+  };
+
+export const setWordTime =
+  (speakerIndex: number, time: number): ActionReturn =>
+  (dispatch: Dispatch, getState) => {
+    const speakers = getState().audio.speakers;
+    const newSpeakers = update(speakers, {
+      [speakerIndex]: {
+        wordTime: { $set: time },
+      },
+    });
+
+    dispatch({
+      type: constants.SET_WORD,
       speakers: newSpeakers,
     });
   };
