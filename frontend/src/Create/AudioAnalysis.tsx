@@ -887,7 +887,7 @@ const mapDispatchToProps = (
   setWord: (speakerIndex: number, word: string) =>
     dispatch(setWord(speakerIndex, word)),
   setWordTranslation: (speakerIndex: number, wordTranslation: string) =>
-    dispatch(setWord(speakerIndex, wordTranslation)),
+    dispatch(setWordTranslation(speakerIndex, wordTranslation)),
   setWordTime: (speakerIndex: number, time: number) =>
     dispatch(setWordTime(speakerIndex, time)),
   setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
