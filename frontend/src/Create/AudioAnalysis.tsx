@@ -742,6 +742,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   onChange = (event: any) => {
+    console.log(event.target);
     this.setState({ [event.target.name]: event.target.value });
   };
 

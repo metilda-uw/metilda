@@ -20,13 +20,16 @@ export default function WordCard({ word, selectedCollectionUuid }) {
   return (
     <div className="col s6 m3">
       <div className="card">
-        <span className="card-title">{word["data"].uploadId}</span>
+        <span className="card-title">{word["data"].word}</span>
         <div className="card-image">
           <img src={url} alt="word thumbnail" />
         </div>
         <div className="card-content">
           {word["data"].speakerName && (
             <p>Speaker: {word["data"].speakerName}</p>
+          )}
+          {word["data"].wordTranslation && (
+            <p>Translation: {word["data"].wordTranslation}</p>
           )}
           {word["data"].letters && (
             <p>Syllables: {word["data"].letters.length}</p>

@@ -50,7 +50,6 @@ export const setSpeaker =
 export const setSpeakerName =
   (speakerIndex: number, speakerName: string): ActionReturn =>
   (dispatch: Dispatch, getState) => {
-    console.log("Setting speaker name", speakerIndex, speakerName);
     const speakers = getState().audio.speakers;
     const newSpeakers = update(speakers, {
       [speakerIndex]: {
@@ -103,12 +102,12 @@ export const setWordTranslation =
     const speakers = getState().audio.speakers;
     const newSpeakers = update(speakers, {
       [speakerIndex]: {
-        word: { $set: wordTranslation },
+        wordTranslation: { $set: wordTranslation },
       },
     });
 
     dispatch({
-      type: constants.SET_WORD,
+      type: constants.SET_WORD_TRANSLATION,
       speakers: newSpeakers,
     });
   };
