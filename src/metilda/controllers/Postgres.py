@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 import metilda
 import psycopg2
+import psycopg2.extras
 import os
 
 class Postgres(object):
@@ -52,6 +53,7 @@ class Postgres(object):
             return self.cursor.rowcount
     
     def execute_insert_query(self, query, record, need_last_row_id=True):
+        psycopg2.extras.register_uuid()
         try:
             self.cursor.execute(query, record)
         except Exception as error:

@@ -3,7 +3,7 @@ import * as React from "react";
 import { expect } from "../setupTests";
 import sinon from "sinon";
 import { ManageUsers, ManageUsersProps } from "./ManageUsers";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import Firebase from "../Firebase/firebase";
 import CreateUser from "./CreateUser";
 import EditUser from "./EditUser";

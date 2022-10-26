@@ -39,7 +39,8 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
 import UpdateSyllable from "./UpdateSyllable";
-import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
+
+//import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
 
 export interface TargetPitchBarProps {
   letters: any;

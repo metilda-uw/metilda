@@ -5,7 +5,7 @@ import { AuthUserContext } from "../Session/";
 import { PasswordForgetForm } from "./password_forget";
 import PasswordChangeForm from "./password_change";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 
 const AccountPage = () => (
   <AuthUserContext.Consumer>

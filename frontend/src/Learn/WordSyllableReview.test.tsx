@@ -4,7 +4,7 @@ import { expect } from "../setupTests";
 import sinon from "sinon";
 import { WordSyllableReview, Props } from "./WordSyllableReview";
 import Firebase from "../Firebase/firebase";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import PitchArtPrevPitchValueToggle from "./PitchArtPrevPitchValueToggle";
 import PlayerBar from "../PitchArtWizard/AudioViewer/PlayerBar";
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";

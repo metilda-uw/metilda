@@ -14,7 +14,18 @@ import { PitchRangeDTO } from "../PitchArtWizard/PitchArtViewer/types";
 import SpeakerControl from "./SpeakerControl";
 import TargetPitchBar from "./TargetPitchBar";
 import UploadAudio from "./UploadAudio";
-import { addLetter, addSpeaker, removeSpeaker, resetLetters, setLetterPitch, setUploadId } from "../store/audio/actions";
+import {
+  addLetter,
+  addSpeaker,
+  removeSpeaker,
+  setSpeakerName,
+  setWord,
+  setWordTranslation,
+  setWordTime,
+  resetLetters,
+  setLetterPitch,
+  setUploadId,
+} from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
 import { Letter, Speaker } from "../types/types";
 import * as DEFAULT from "../constants/create";
@@ -24,668 +35,750 @@ import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
 
 export interface AudioAnalysisProps {
-    speakerIndex: number;
-    speakers: Speaker[];
-    firebase: any;
-    files: any[];
-    maxPitch: number;
-    minPitch: number;
-    addSpeaker: () => void;
-    removeSpeaker: (speakerIndex: number) => void;
-    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
-    resetLetters: (speakerIndex: number) => void;
-    addLetter: (speakerIndex: number, letter: Letter) => void;
-    setLetterPitch: (speakerIndex: number, letterIndex: number, pitch: number) => void;
-    parentCallBack: (selectedFolderName: string) => void;
-    updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
+  speakerIndex: number;
+  speakers: Speaker[];
+  firebase: any;
+  files: any[];
+  maxPitch: number;
+  minPitch: number;
+  addSpeaker: () => void;
+  removeSpeaker: (speakerIndex: number) => void;
+  setUploadId: (
+    speakerIndex: number,
+    uploadId: string,
+    fileIndex: number
+  ) => void;
+  resetLetters: (speakerIndex: number) => void;
+  setSpeakerName: (speakerIndex: number, speakerName: string) => void;
+  setWord: (speakerIndex: number, word: string) => void;
+  setWordTranslation: (speakerIndex: number, wordTranslation: string) => void;
+  addLetter: (speakerIndex: number, letter: Letter) => void;
+  setWordTime: (speakerIndex: number, time: number) => void;
+  setLetterPitch: (
+    speakerIndex: number,
+    letterIndex: number,
+    pitch: number
+  ) => void;
+  parentCallBack: (selectedFolderName: string) => void;
+  updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
 }
 
 interface State {
-    selectedFolderName: string;
-    showImgMenu: boolean;
-    imgMenuX: number;
-    imgMenuY: number;
-    isAudioImageLoaded: boolean;
-    soundLength: number;
-    selectionInterval: string;
-    imageUrl: string;
-    audioUrl: string;
-    audioEditVersion: number;
-    minSelectX: number;
-    maxSelectX: number;
-    minAudioX: number;
-    maxAudioX: number;
-    minPitch: number;
-    maxPitch: number;
-    minAudioTime: number;
-    maxAudioTime: number;
-    audioImgWidth: number;
-    closeImgSelectionCallback: () => void;
-    selectionCallback: (t1: number, t2: number) => void;
+  selectedFolderName: string;
+  showImgMenu: boolean;
+  imgMenuX: number;
+  imgMenuY: number;
+  isAudioImageLoaded: boolean;
+  soundLength: number;
+  selectionInterval: string;
+  imageUrl: string;
+  audioUrl: string;
+  audioEditVersion: number;
+  minSelectX: number;
+  maxSelectX: number;
+  minAudioX: number;
+  maxAudioX: number;
+  minPitch: number;
+  maxPitch: number;
+  minAudioTime: number;
+  maxAudioTime: number;
+  audioImgWidth: number;
+  speakerName: string;
+  word: string;
+  wordTranslation: string;
+  closeImgSelectionCallback: () => void;
+  selectionCallback: (t1: number, t2: number) => void;
+  // needed for the onChange event to work.
+  [key: string]: any;
 }
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
-    /**
-     * WARNING:
-     * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
-     * on the audio analysis image returned by the API. If the image
-     * content changes, then these values should change.
-     *
-     * Also, a weird bug popped up once in the imgareaselect library up
-     * that resulted in a infinite recursion. Once the dimensions
-     * below were altered slightly, the bug went away. Likely it
-     * was a result of a weird, undocumented edge case in that library.
-     */
-    static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
-        let url = `/api/audio/${uploadId}.png/image`;
-        const urlOptions = [];
+  /**
+   * WARNING:
+   * MIN_IMAGE_XPERC and MAX_IMAGE_XPERC are statically set based
+   * on the audio analysis image returned by the API. If the image
+   * content changes, then these values should change.
+   *
+   * Also, a weird bug popped up once in the imgareaselect library up
+   * that resulted in a infinite recursion. Once the dimensions
+   * below were altered slightly, the bug went away. Likely it
+   * was a result of a weird, undocumented edge case in that library.
+   */
+  static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
+    let url = `/api/audio/${uploadId}.png/image`;
+    const urlOptions = [];
 
-        if (minPitch !== undefined) {
-            urlOptions.push(`min-pitch=${minPitch}`);
-        }
-
-        if (maxPitch !== undefined) {
-            urlOptions.push(`max-pitch=${maxPitch}`);
-        }
-
-        if (tmin !== undefined) {
-            urlOptions.push(`tmin=${tmin}`);
-        }
-
-        if (tmax !== undefined) {
-            urlOptions.push(`&tmax=${tmax}`);
-        }
-
-        if (urlOptions.length > 0) {
-            url += "?" + urlOptions.join("&");
-        }
-
-        return url;
+    if (minPitch !== undefined) {
+      urlOptions.push(`min-pitch=${minPitch}`);
     }
 
-    static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
-        if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
-            return `/api/audio/${uploadId}/file?tmin=${tmin}&tmax=${tmax}`;
-        } else {
-            return `/api/audio/${uploadId}/file`;
-        }
+    if (maxPitch !== undefined) {
+      urlOptions.push(`max-pitch=${maxPitch}`);
     }
 
-    static getDerivedStateFromProps(props, state) {
-        state.imageUrl = AudioAnalysis.formatImageUrl(
-            props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
-        state.minPitch = props.minPitch;
-        state.maxPitch = props.maxPitch;
-        console.log(state);
-        return state;
+    if (tmin !== undefined) {
+      urlOptions.push(`tmin=${tmin}`);
     }
 
-    constructor(props: AudioAnalysisProps) {
-        super(props);
-
-        this.state = {
-            selectedFolderName: "Uploads",
-            showImgMenu: false,
-            imgMenuX: -1,
-            imgMenuY: -1,
-            isAudioImageLoaded: false,
-            soundLength: -1,
-            selectionInterval: "Letter",
-            imageUrl: AudioAnalysis.formatImageUrl(
-                this.getSpeaker().uploadId,
-                this.props.minPitch,
-                this.props.maxPitch),
-            audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
-            audioEditVersion: 0,
-            minSelectX: -1,
-            maxSelectX: -1,
-            minPitch: this.props.minPitch,
-            maxPitch: this.props.maxPitch,
-            minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
-            maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
-            minAudioTime: 0.0,
-            maxAudioTime: -1.0,
-            audioImgWidth: (DEFAULT.MAX_IMAGE_XPERC - DEFAULT.MIN_IMAGE_XPERC)
-                * DEFAULT.AUDIO_IMG_WIDTH,
-            closeImgSelectionCallback: () => (null),
-            selectionCallback: (t1, t2) => (null),
-        };
-        this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
-        this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
-        this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
-        this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
-        this.handleInputChange = this.handleInputChange.bind(this);
-        this.applyPitchRange = this.applyPitchRange.bind(this);
-        this.showAllClicked = this.showAllClicked.bind(this);
-        this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
-        this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
-        this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
-        this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
-        this.wordSplitClicked = this.wordSplitClicked.bind(this);
-        this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
-        this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
-        this.manualPitchChange = this.manualPitchChange.bind(this);
-        this.addPitch = this.addPitch.bind(this);
-        this.targetPitchSelected = this.targetPitchSelected.bind(this);
+    if (tmax !== undefined) {
+      urlOptions.push(`&tmax=${tmax}`);
     }
 
-    getSpeaker = (): Speaker => {
-        return this.props.speakers[this.props.speakerIndex];
+    if (urlOptions.length > 0) {
+      url += "?" + urlOptions.join("&");
     }
 
-    componentDidMount() {
-        const uploadId = this.getSpeaker().uploadId;
-        if (!uploadId) {
-            return;
-        }
+    return url;
+  }
 
-        const controller = this;
-        const request: RequestInit = {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-            }
-        };
+  static formatAudioUrl(uploadId: string, tmin?: number, tmax?: number) {
+    if (tmin !== undefined && tmax !== undefined && tmax !== -1) {
+      return `/api/audio/${uploadId}/file?tmin=${tmin}&tmax=${tmax}`;
+    } else {
+      return `/api/audio/${uploadId}/file`;
+    }
+  }
 
-        const imageUrl = AudioAnalysis.formatImageUrl(
-            uploadId,
-            this.props.minPitch,
-            this.props.maxPitch);
+  static getDerivedStateFromProps(props, state) {
+    state.imageUrl = AudioAnalysis.formatImageUrl(
+      props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
+    state.minPitch = props.minPitch;
+    state.maxPitch = props.maxPitch;
+    console.log(state);
+    return state;
+  }
 
-        const audioUrl = AudioAnalysis.formatAudioUrl(uploadId);
+  constructor(props: AudioAnalysisProps) {
+    super(props);
 
-        fetch(`/api/audio/${uploadId}/duration`, request)
-            .then((response) => response.json())
-            .then(function (data: any) {
-                controller.setState({
-                    imageUrl,
-                    audioUrl,
-                    soundLength: data.duration,
-                    maxAudioTime: data.duration,
-                });
-            });
+    this.state = {
+      selectedFolderName: "Uploads",
+      speakerName: "Speaker",
+      word: "Word",
+      wordTranslation: "Word Translation",
+      showImgMenu: false,
+      imgMenuX: -1,
+      imgMenuY: -1,
+      isAudioImageLoaded: false,
+      soundLength: -1,
+      selectionInterval: "Letter",
+      imageUrl: AudioAnalysis.formatImageUrl(
+        this.getSpeaker().uploadId,
+        this.props.minPitch,
+        this.props.maxPitch),
+      audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
+      audioEditVersion: 0,
+      minSelectX: -1,
+      maxSelectX: -1,
+      minPitch: this.props.minPitch,
+      maxPitch: this.props.maxPitch,
+      minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
+      maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
+      minAudioTime: 0.0,
+      maxAudioTime: -1.0,
+      audioImgWidth: (DEFAULT.MAX_IMAGE_XPERC - DEFAULT.MIN_IMAGE_XPERC)
+        * DEFAULT.AUDIO_IMG_WIDTH,
+      closeImgSelectionCallback: () => (null),
+      selectionCallback: (t1, t2) => (null),
+    };
+    this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+    this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
+    this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
+    this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
+    this.handleInputChange = this.handleInputChange.bind(this);
+    this.applyPitchRange = this.applyPitchRange.bind(this);
+    this.showAllClicked = this.showAllClicked.bind(this);
+    this.selectionIntervalClicked = this.selectionIntervalClicked.bind(this);
+    this.pitchArtRangeClicked = this.pitchArtRangeClicked.bind(this);
+    this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
+    this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
+    this.wordSplitClicked = this.wordSplitClicked.bind(this);
+    this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
+    this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
+    this.manualPitchChange = this.manualPitchChange.bind(this);
+    this.addPitch = this.addPitch.bind(this);
+    this.targetPitchSelected = this.targetPitchSelected.bind(this);
+  }
 
-        console.log(this.state);
+  getSpeaker = (): Speaker => {
+    return this.props.speakers[this.props.speakerIndex];
+  }
+
+  componentDidMount() {
+    const uploadId = this.getSpeaker().uploadId;
+    if (!uploadId) {
+      return;
     }
 
-    setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
-        if (fileType !== "Folder") {
-            const storageRef = this.props.firebase.uploadFile();
-            storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
-                // `url` is the download URL for file
-                const response = await fetch(url);
-                const responseBlob = await response.blob();
-                const formData = new FormData();
-                formData.append("file", responseBlob, uploadId);
-                const analysisResponse = await fetch(`/api/audio/download-file`, {
-                    method: "POST",
-                    body: formData,
-                });
-                this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
-                this.props.resetLetters(this.props.speakerIndex);
-            }).catch(function (error: any) {
-                // return;
-            });
-        } else {
-            await this.setState({
-                selectedFolderName: uploadId,
-            });
-            this.props.parentCallBack(this.state.selectedFolderName);
-        }
-    }
+    const controller = this;
+    const request: RequestInit = {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      }
+    };
 
-    getAudioConfigForSelection(leftX?: number, rightX?: number) {
-        // Compute the new time scale
-        let ts;
-        if (leftX !== undefined && rightX !== undefined) {
-            ts = this.imageIntervalToTimeInterval(leftX, rightX);
-        } else {
-            ts = [this.state.minAudioTime, this.state.maxAudioTime];
-        }
+    const imageUrl = AudioAnalysis.formatImageUrl(
+      uploadId,
+      this.props.minPitch,
+      this.props.maxPitch);
 
-        const newAudioUrl = AudioAnalysis.formatAudioUrl(
-            this.getSpeaker().uploadId,
-            ts[0],
-            ts[1]);
+    const audioUrl = AudioAnalysis.formatAudioUrl(uploadId);
 
-        return {
-            audioUrl: newAudioUrl,
-            minAudioTime: ts[0],
-            maxAudioTime: ts[1],
-        };
-    }
-
-    targetPitchSelected(index: number) {
-        if (index !== -1) {
-            const letter = this.props.speakers[this.props.speakerIndex].letters[index];
-            this.state.selectionCallback(letter.t0, letter.t1);
-
-            const newAudioUrl = AudioAnalysis.formatAudioUrl(
-                this.getSpeaker().uploadId,
-                letter.t0,
-                letter.t1);
-
-            this.setState({
-                audioUrl: newAudioUrl,
-            });
-        }
-    }
-
-    audioIntervalSelectionCanceled() {
-        const config = this.getAudioConfigForSelection();
-        this.setState({
-            audioUrl: config.audioUrl,
-            minSelectX: -1,
-            maxSelectX: -1,
+    fetch(`/api/audio/${uploadId}/duration`, request)
+      .then((response) => response.json())
+      .then(function (data: any) {
+        controller.setState({
+          imageUrl,
+          audioUrl,
+          soundLength: data.duration,
+          maxAudioTime: data.duration,
         });
-    }
+      });
+  }
 
-    audioIntervalSelected(leftX: number, rightX: number) {
-        const config = this.getAudioConfigForSelection(leftX, rightX);
-        this.setState({
-            audioUrl: config.audioUrl,
-            minSelectX: leftX,
-            maxSelectX: rightX,
+  setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
+    if (fileType !== "Folder") {
+      const storageRef = this.props.firebase.uploadFile();
+      storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
+        // `url` is the download URL for file
+        const response = await fetch(url);
+        const responseBlob = await response.blob();
+        const formData = new FormData();
+        formData.append("file", responseBlob, uploadId);
+        const analysisResponse = await fetch(`/api/audio/download-file`, {
+          method: "POST",
+          body: formData,
         });
+        this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+        this.props.resetLetters(this.props.speakerIndex);
+      }).catch(function (error: any) {
+        // return;
+      });
+    } else {
+      await this.setState({
+        selectedFolderName: uploadId,
+      });
+      this.props.parentCallBack(this.state.selectedFolderName);
+    }
+  }
+
+  getAudioConfigForSelection(leftX?: number, rightX?: number) {
+    // Compute the new time scale
+    let ts;
+    if (leftX !== undefined && rightX !== undefined) {
+      ts = this.imageIntervalToTimeInterval(leftX, rightX);
+    } else {
+      ts = [this.state.minAudioTime, this.state.maxAudioTime];
     }
 
-    addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false) {
-        if (!isWordSep) {
-            if (pitch < this.props.minPitch || pitch > this.props.maxPitch) {
-                // the pitch outside the bounds of the window, omit it
-                return;
-            }
-        }
+    const newAudioUrl = AudioAnalysis.formatAudioUrl(
+      this.getSpeaker().uploadId,
+      ts[0],
+      ts[1]
+    );
 
-        if (ts[0] === ts[1]) {
-            // add buffer to avoid adding a very narrow box to Target Pitch
-            ts[0] = Math.max(ts[0] - 0.001, 0);
-            ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
-        }
+    return {
+      audioUrl: newAudioUrl,
+      minAudioTime: ts[0],
+      maxAudioTime: ts[1],
+    };
+  }
 
-        const newLetter = {
-            t0: ts[0],
-            t1: ts[1],
-            pitch,
-            syllable: DEFAULT.SYLLABLE_TEXT,
-            isManualPitch,
-            isWordSep,
-        };
+  targetPitchSelected(index: number) {
+    if (index !== -1) {
+      const letter = this.props.speakers[this.props.speakerIndex].letters[index];
+      this.state.selectionCallback(letter.t0, letter.t1);
 
-        this.props.addLetter(this.props.speakerIndex, newLetter);
+      const newAudioUrl = AudioAnalysis.formatAudioUrl(
+        this.getSpeaker().uploadId,
+        letter.t0,
+        letter.t1
+      );
+
+      this.setState({
+        audioUrl: newAudioUrl,
+      });
+    }
+  }
+
+  audioIntervalSelectionCanceled() {
+    const config = this.getAudioConfigForSelection();
+    this.setState({
+      audioUrl: config.audioUrl,
+      minSelectX: -1,
+      maxSelectX: -1,
+    });
+  }
+
+  audioIntervalSelected(leftX: number, rightX: number) {
+    const config = this.getAudioConfigForSelection(leftX, rightX);
+    this.setState({
+      audioUrl: config.audioUrl,
+      minSelectX: leftX,
+      maxSelectX: rightX,
+    });
+  }
+
+  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false) {
+    if (!isWordSep) {
+      if (pitch < this.props.minPitch || pitch > this.props.maxPitch) {
+        // the pitch outside the bounds of the window, omit it
+        return;
+      }
+    }
+
+    if (ts[0] === ts[1]) {
+      // add buffer to avoid adding a very narrow box to Target Pitch
+      ts[0] = Math.max(ts[0] - 0.001, 0);
+      ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
+    }
+
+    const newLetter = {
+      t0: ts[0],
+      t1: ts[1],
+      pitch,
+      syllable: DEFAULT.SYLLABLE_TEXT,
+      isManualPitch,
+      isWordSep,
+    };
+
+    this.props.addLetter(this.props.speakerIndex, newLetter);
+    this.state.closeImgSelectionCallback();
+  }
+
+  imageIntervalSelected(
+    leftX: number,
+    rightX: number,
+    manualPitch?: number,
+    isWordSep: boolean = false,
+    tsOverride?: number[]) {
+    const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
+
+    if (manualPitch !== undefined) {
+      this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
+      return;
+    }
+
+    if (isWordSep) {
+      this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
+      return;
+    }
+
+    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
+      + "?t0=" + ts[0]
+      + "&t1=" + ts[1]
+      + "&max-pitch=" + this.props.maxPitch
+      + "&min-pitch=" + this.props.minPitch, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+        // this.setState({activeWordIndex: 0});
+        // this.setState({words: new StaticWordSyallableData().getData(
+        //      parseFloat(this.props.match.params.numSyllables), 
+        //      parseFloat(this.props.location.search.slice(-1)))});
+        // this.getPreviousRecordings();
+        // this.resetSamplePitch();
+        // this.resetSlider(this.state.activeWordIndex);
+        // this.toggleChanged("showRedDot", false);",
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
+      );
+  }
+
+  pitchArtRangeClicked() {
+    const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+
+    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
+      + "?max-pitch="
+      + this.props.maxPitch
+      + "&min-pitch=" + this.props.minPitch
+      + "&t0=" + ts[0]
+      + "&t1=" + ts[1], {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      }
+    })
+      .then((response) => response.json())
+      .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
+        DEFAULT.SYLLABLE_TEXT,
+        [item[0], item[0]])),
+      );
+  }
+
+  averagePitchArtClicked() {
+    this.imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX);
+  }
+
+  wordSplitClicked() {
+    this.imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX,
+      undefined,
+      true);
+  }
+
+  manualPitchChange(index: number, newPitch: number) {
+    this.props.setLetterPitch(this.props.speakerIndex, index, newPitch);
+  }
+
+  manualPitchArtClicked() {
+    let manualPitch: number | undefined;
+    let isValidNumber = false;
+
+    while (!isValidNumber) {
+      const msg = `Enter pitch value between ${this.props.minPitch.toFixed(2)}Hz `
+        + `and ${this.props.maxPitch.toFixed(2)}Hz`;
+
+      const manualPitchStr: string | null = prompt(msg);
+
+      if (manualPitchStr === null) {
+        // user cancelled manual input
         this.state.closeImgSelectionCallback();
-    }
+        return;
+      }
 
-    imageIntervalSelected(
-        leftX: number,
-        rightX: number,
-        manualPitch?: number,
-        isWordSep: boolean = false,
-        tsOverride?: number[]) {
-        const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
-
-        if (manualPitch !== undefined) {
-            this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
-            return;
-        }
-
-        if (isWordSep) {
-            this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
-            return;
-        }
-
-        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
-            + "?t0=" + ts[0]
-            + "&t1=" + ts[1]
-            + "&max-pitch=" + this.props.maxPitch
-            + "&min-pitch=" + this.props.minPitch, {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-                // this.setState({activeWordIndex: 0});
-                // this.setState({words: new StaticWordSyallableData().getData(
-                //      parseFloat(this.props.match.params.numSyllables), 
-                //      parseFloat(this.props.location.search.slice(-1)))});
-                // this.getPreviousRecordings();
-                // this.resetSamplePitch();
-                // this.resetSlider(this.state.activeWordIndex);
-                // this.toggleChanged("showRedDot", false);",
-            },
-        })
-            .then((response) => response.json())
-            .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
-        );
-    }
-
-    pitchArtRangeClicked() {
-        const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
-
-        fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
-            + "?max-pitch="
-            + this.props.maxPitch
-            + "&min-pitch=" + this.props.minPitch
-            + "&t0=" + ts[0]
-            + "&t1=" + ts[1], {
-            method: "GET",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json",
-            }
-        })
-            .then((response) => response.json())
-            .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
-                DEFAULT.SYLLABLE_TEXT,
-                [item[0], item[0]])),
-            );
-    }
-
-    averagePitchArtClicked() {
-        this.imageIntervalSelected(
-            this.state.minSelectX,
-            this.state.maxSelectX);
-    }
-
-    wordSplitClicked() {
-        this.imageIntervalSelected(
-            this.state.minSelectX,
-            this.state.maxSelectX,
+      if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
+        try {
+          const values = manualPitchStr.split(",");
+          const t0: number = parseFloat(values[0]);
+          const t1: number = parseFloat(values[1]);
+          this.imageIntervalSelected(
+            -1,
+            -1,
             undefined,
-            true);
-    }
-
-    manualPitchChange(index: number, newPitch: number) {
-        this.props.setLetterPitch(this.props.speakerIndex, index, newPitch);
-    }
-
-    manualPitchArtClicked() {
-        let manualPitch: number | undefined;
-        let isValidNumber = false;
-
-        while (!isValidNumber) {
-            const msg = `Enter pitch value between ${this.props.minPitch.toFixed(2)}Hz `
-                + `and ${this.props.maxPitch.toFixed(2)}Hz`;
-
-            const manualPitchStr: string | null = prompt(msg);
-
-            if (manualPitchStr === null) {
-                // user cancelled manual input
-                this.state.closeImgSelectionCallback();
-                return;
-            }
-
-            if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
-                try {
-                    const values = manualPitchStr.split(",");
-                    const t0: number = parseFloat(values[0]);
-                    const t1: number = parseFloat(values[1]);
-                    this.imageIntervalSelected(
-                        -1,
-                        -1,
-                        undefined,
-                        undefined,
-                        [t0, t1]);
-                    return;
-                } catch {
-                    // do nothing
-                }
-            }
-
-            manualPitch = parseFloat(manualPitchStr);
-
-            isValidNumber = !isNaN(manualPitch);
-
-            if (!isValidNumber) {
-                NotificationManager.error("Invalid frequency, expected a number");
-                continue;
-            }
-
-            isValidNumber = !(manualPitch < this.props.minPitch || manualPitch > this.props.maxPitch);
-            if (!isValidNumber) {
-                const errorMsg
-                    = `${manualPitch}Hz is not between between ${this.props.minPitch.toFixed(2)}Hz `
-                    + `and ${this.props.maxPitch.toFixed(2)}Hz`;
-                NotificationManager.error(errorMsg);
-            }
+            undefined,
+            [t0, t1]);
+          return;
+        } catch {
+          // do nothing
         }
+      }
 
-        this.imageIntervalSelected(
-            this.state.minSelectX,
-            this.state.maxSelectX,
-            manualPitch);
+      manualPitch = parseFloat(manualPitchStr);
+
+      isValidNumber = !isNaN(manualPitch);
+
+      if (!isValidNumber) {
+        NotificationManager.error("Invalid frequency, expected a number");
+        continue;
+      }
+
+      isValidNumber = !(manualPitch < this.props.minPitch || manualPitch > this.props.maxPitch);
+      if (!isValidNumber) {
+        const errorMsg
+          = `${manualPitch}Hz is not between between ${this.props.minPitch.toFixed(2)}Hz `
+          + `and ${this.props.maxPitch.toFixed(2)}Hz`;
+        NotificationManager.error(errorMsg);
+      }
     }
 
-    onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
-        this.setState({
-            isAudioImageLoaded: true,
-            closeImgSelectionCallback: cancelCallback,
-            selectionCallback,
-        });
+    this.imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX,
+      manualPitch);
+  }
+
+  onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
+    this.setState({
+      isAudioImageLoaded: true,
+      closeImgSelectionCallback: cancelCallback,
+      selectionCallback,
+    });
+  }
+
+  handleInputChange(event: Event) {
+    const target = event.target as HTMLInputElement;
+
+    let value: boolean | File | string;
+    if (target.type === "checkbox") {
+      value = target.checked;
+    } else if (target.type === "file") {
+      value = target.files![0];
+    } else {
+      value = target.value;
     }
 
-    handleInputChange(event: Event) {
-        const target = event.target as HTMLInputElement;
+    const name = target.name;
 
-        let value: boolean | File | string;
-        if (target.type === "checkbox") {
-            value = target.checked;
-        } else if (target.type === "file") {
-            value = target.files![0];
-        } else {
-            value = target.value;
-        }
+    this.setState({ [name]: value } as any);
+  }
 
-        const name = target.name;
+  applyPitchRange(minPitch: number, maxPitch: number) {
 
-        this.setState({ [name]: value } as any);
+    const newUrl = AudioAnalysis.formatImageUrl(
+      this.getSpeaker().uploadId,
+      minPitch,
+      maxPitch,
+      this.state.minAudioTime,
+      this.state.maxAudioTime);
+
+    this.state.closeImgSelectionCallback();
+
+    this.setState({
+      imageUrl: newUrl,
+      isAudioImageLoaded: false,
+      minPitch,
+      maxPitch,
+      audioEditVersion: this.state.audioEditVersion + 1,
+    });
+
+    this.props.updateAudioPitch(this.props.speakerIndex, minPitch, maxPitch);
+  }
+
+  showAllClicked() {
+    const newUrl = AudioAnalysis.formatImageUrl(
+      this.getSpeaker().uploadId,
+      this.props.minPitch,
+      this.props.maxPitch,
+      0,
+      this.state.soundLength);
+
+    const newAudioUrl = AudioAnalysis.formatAudioUrl(
+      this.getSpeaker().uploadId,
+      0,
+      this.state.soundLength);
+
+    this.state.closeImgSelectionCallback();
+
+    this.setState({
+      imageUrl: newUrl,
+      audioUrl: newAudioUrl,
+      isAudioImageLoaded: false,
+      audioEditVersion: this.state.audioEditVersion + 1,
+      minAudioTime: 0,
+      maxAudioTime: this.state.soundLength,
+    });
+  }
+
+  imageIntervalToTimeInterval(x1: number, x2: number) {
+    const dt = this.state.maxAudioTime - this.state.minAudioTime;
+    const dx = this.state.maxAudioX - this.state.minAudioX;
+    const u0 = x1 / dx;
+    const u1 = x2 / dx;
+
+    const t0 = this.state.minAudioTime + (u0 * dt);
+    const t1 = this.state.minAudioTime + (u1 * dt);
+    return [t0, t1];
+  }
+
+  selectionIntervalClicked() {
+    // Compute the new time scale
+    const config = this.getAudioConfigForSelection(
+      this.state.minSelectX,
+      this.state.maxSelectX);
+
+    const newImageUrl = AudioAnalysis.formatImageUrl(
+      this.getSpeaker().uploadId,
+      this.props.minPitch,
+      this.props.maxPitch,
+      config.minAudioTime,
+      config.maxAudioTime);
+
+    this.state.closeImgSelectionCallback();
+
+    this.setState({
+      imageUrl: newImageUrl,
+      audioUrl: config.audioUrl,
+      isAudioImageLoaded: false,
+      audioEditVersion: this.state.audioEditVersion + 1,
+      minAudioTime: config.minAudioTime,
+      maxAudioTime: config.maxAudioTime,
+    });
+  }
+
+  renderSpeakerControl = () => {
+    const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
+    const isFirstSpeaker = this.props.speakerIndex === 0;
+
+    return (
+      <SpeakerControl
+        speakerIndex={this.props.speakerIndex}
+        addSpeaker={this.props.addSpeaker}
+        removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
+        canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
+        canRemoveSpeaker={!isFirstSpeaker} />
+    );
+  }
+
+  showImgMenu = (imgMenuX: number, imgMenuY: number) => {
+    this.setState({ imgMenuX, imgMenuY });
+  }
+
+  maybeRenderImgMenu = () => {
+    if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
+      const isSelectionActive = this.state.minSelectX !== -1
+        && this.state.maxSelectX !== -1;
+
+      const isAllShown = this.state.minAudioTime === 0
+        && this.state.maxAudioTime === this.state.soundLength;
+
+      return (
+        <AudioAnalysisImageMenu
+          imgMenuX={this.state.imgMenuX}
+          imgMenuY={this.state.imgMenuY}
+          isSelectionActive={isSelectionActive}
+          isAllShown={isAllShown}
+          splitWord={this.wordSplitClicked}
+          intervalSelected={this.selectionIntervalClicked}
+          newManualPitch={this.manualPitchArtClicked}
+          newAvgPitch={this.averagePitchArtClicked}
+          newRangePitch={this.pitchArtRangeClicked}
+          showAllAudio={this.showAllClicked}
+          onClick={() => this.showImgMenu(-1, -1)}
+        />
+      );
+    }
+  }
+
+  onSubmitSpeakerName = (event: any) => {
+    event.preventDefault();
+    const { speakerName } = this.state;
+    const { word } = this.state;
+    const { wordTranslation } = this.state;
+    this.props.setSpeakerName(this.props.speakerIndex, speakerName);
+    this.props.setWord(this.props.speakerIndex, word);
+    this.props.setWordTranslation(this.props.speakerIndex, wordTranslation);
+  };
+
+  onChange = (event: any) => {
+    console.log(event.target);
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  onChangeWord = (event: any) => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+
+  render() {
+    const uploadId = this.getSpeaker().uploadId;
+    const { speakerName } = this.state;
+    const { word } = this.state;
+    const { wordTranslation } = this.state;
+
+    const isInvalid = speakerName === "";
+
+    let nonAudioImg;
+    if (!uploadId) {
+      nonAudioImg = <AudioImgDefault />;
+    } else if (!this.state.isAudioImageLoaded) {
+      nonAudioImg = <AudioImgLoading />;
     }
 
-    applyPitchRange(minPitch: number, maxPitch: number) {
+    return (
+      <div className="AudioAnalysis">
+        <div className="row">
+          <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
+            <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
+            <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}
+              userFiles={this.props.files} firebase={this.props.firebase} />
+            <PitchRange initMinPitch={this.props.minPitch}
+              initMaxPitch={this.props.maxPitch}
+              applyPitchRange={this.applyPitchRange} />
+            <form
+              className="set-speaker-name"
+              onSubmit={this.onSubmitSpeakerName}
+            >
+              <input
+                name="speakerName"
+                value={speakerName}
+                onChange={this.onChange}
+                type="text"
+                placeholder="Speaker Name"
+              />
+              <input
+                name="word"
+                value={word}
+                onChange={this.onChange}
+                type="text"
+                placeholder="Word"
+              />
+              <input
+                name="wordTranslation"
+                value={wordTranslation}
+                onChange={this.onChange}
+                type="text"
+                placeholder="Word Translation"
+              />
 
-        const newUrl = AudioAnalysis.formatImageUrl(
-            this.getSpeaker().uploadId,
-            minPitch,
-            maxPitch,
-            this.state.minAudioTime,
-            this.state.maxAudioTime);
-
-        this.state.closeImgSelectionCallback();
-
-        this.setState({
-            imageUrl: newUrl,
-            isAudioImageLoaded: false,
-            minPitch,
-            maxPitch,
-            audioEditVersion: this.state.audioEditVersion + 1,
-        });
-
-        this.props.updateAudioPitch(this.props.speakerIndex, minPitch, maxPitch);
-    }
-
-    showAllClicked() {
-        const newUrl = AudioAnalysis.formatImageUrl(
-            this.getSpeaker().uploadId,
-            this.props.minPitch,
-            this.props.maxPitch,
-            0,
-            this.state.soundLength);
-
-        const newAudioUrl = AudioAnalysis.formatAudioUrl(
-            this.getSpeaker().uploadId,
-            0,
-            this.state.soundLength);
-
-        this.state.closeImgSelectionCallback();
-
-        this.setState({
-            imageUrl: newUrl,
-            audioUrl: newAudioUrl,
-            isAudioImageLoaded: false,
-            audioEditVersion: this.state.audioEditVersion + 1,
-            minAudioTime: 0,
-            maxAudioTime: this.state.soundLength,
-        });
-    }
-
-    imageIntervalToTimeInterval(x1: number, x2: number) {
-        const dt = this.state.maxAudioTime - this.state.minAudioTime;
-        const dx = this.state.maxAudioX - this.state.minAudioX;
-        const u0 = x1 / dx;
-        const u1 = x2 / dx;
-
-        const t0 = this.state.minAudioTime + (u0 * dt);
-        const t1 = this.state.minAudioTime + (u1 * dt);
-        return [t0, t1];
-    }
-
-    selectionIntervalClicked() {
-        // Compute the new time scale
-        const config = this.getAudioConfigForSelection(
-            this.state.minSelectX,
-            this.state.maxSelectX);
-
-        const newImageUrl = AudioAnalysis.formatImageUrl(
-            this.getSpeaker().uploadId,
-            this.props.minPitch,
-            this.props.maxPitch,
-            config.minAudioTime,
-            config.maxAudioTime);
-
-        this.state.closeImgSelectionCallback();
-
-        this.setState({
-            imageUrl: newImageUrl,
-            audioUrl: config.audioUrl,
-            isAudioImageLoaded: false,
-            audioEditVersion: this.state.audioEditVersion + 1,
-            minAudioTime: config.minAudioTime,
-            maxAudioTime: config.maxAudioTime,
-        });
-    }
-
-    renderSpeakerControl = () => {
-        const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
-        const isFirstSpeaker = this.props.speakerIndex === 0;
-
-        return (
-            <SpeakerControl
-                speakerIndex={this.props.speakerIndex}
-                addSpeaker={this.props.addSpeaker}
-                removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-                canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
-                canRemoveSpeaker={!isFirstSpeaker} />
-        );
-    }
-
-    showImgMenu = (imgMenuX: number, imgMenuY: number) => {
-        this.setState({ imgMenuX, imgMenuY });
-    }
-
-    maybeRenderImgMenu = () => {
-        if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
-            const isSelectionActive = this.state.minSelectX !== -1
-                && this.state.maxSelectX !== -1;
-
-            const isAllShown = this.state.minAudioTime === 0
-                && this.state.maxAudioTime === this.state.soundLength;
-
-            return (
-                <AudioAnalysisImageMenu
-                    imgMenuX={this.state.imgMenuX}
-                    imgMenuY={this.state.imgMenuY}
-                    isSelectionActive={isSelectionActive}
-                    isAllShown={isAllShown}
-                    splitWord={this.wordSplitClicked}
-                    intervalSelected={this.selectionIntervalClicked}
-                    newManualPitch={this.manualPitchArtClicked}
-                    newAvgPitch={this.averagePitchArtClicked}
-                    newRangePitch={this.pitchArtRangeClicked}
-                    showAllAudio={this.showAllClicked}
-                    onClick={() => this.showImgMenu(-1, -1)}
-                />
-            );
-        }
-    }
-
-    render() {
-        const uploadId = this.getSpeaker().uploadId;
-
-        let nonAudioImg;
-        if (!uploadId) {
-            nonAudioImg = <AudioImgDefault />;
-        } else if (!this.state.isAudioImageLoaded) {
-            nonAudioImg = <AudioImgLoading />;
-        }
-
-        return (
-            <div className="AudioAnalysis">
-                <div className="row">
-                    <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
-                        <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
-                        <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}
-                            userFiles={this.props.files} firebase={this.props.firebase} />
-                        <PitchRange initMinPitch={this.props.minPitch}
-                            initMaxPitch={this.props.maxPitch}
-                            applyPitchRange={this.applyPitchRange} />
-                        {this.renderSpeakerControl()}
-                    </div>
-                    <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
-                        <div className="metilda-audio-analysis-image-container">
-                            {nonAudioImg}
-                            {this.maybeRenderImgMenu()}
-                            {
-                                uploadId ?
-                                    <AudioImg
-                                        key={this.state.audioEditVersion}
-                                        uploadId={uploadId}
-                                        speakerIndex={this.props.speakerIndex}
-                                        src={this.state.imageUrl}
-                                        ref="audioImage"
-                                        imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
-                                        xminPerc={DEFAULT.MIN_IMAGE_XPERC}
-                                        xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
-                                        audioIntervalSelected={this.audioIntervalSelected}
-                                        audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                                        onAudioImageLoaded={this.onAudioImageLoaded}
-                                        showImgMenu={this.showImgMenu}
-                                        minAudioX={this.state.minAudioX}
-                                        maxAudioX={this.state.maxAudioX}
-                                        minAudioTime={this.state.minAudioTime}
-                                        maxAudioTime={this.state.maxAudioTime} />
-                                    : []
-                            }
-                        </div>
-                        {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
-                        <TargetPitchBar letters={this.props.speakers}
-                            files={this.props.files}
-                            minAudioX={this.state.minAudioX}
-                            maxAudioX={this.state.maxAudioX}
-                            minAudioTime={this.state.minAudioTime}
-                            maxAudioTime={this.state.maxAudioTime}
-                            targetPitchSelected={this.targetPitchSelected}
-                            speakerIndex={this.props.speakerIndex}
-                            firebase={this.props.firebase} />
-                    </div>
-                </div>
+              <button
+                disabled={isInvalid}
+                type="submit"
+                className="waves-effect waves-light btn globalbtn"
+              >
+                Save Details
+              </button>
+            </form>
+            {this.renderSpeakerControl()}
+          </div>
+          <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
+            <div className="metilda-audio-analysis-image-container">
+              {nonAudioImg}
+              {this.maybeRenderImgMenu()}
+              {
+                uploadId ?
+                  <AudioImg
+                    key={this.state.audioEditVersion}
+                    uploadId={uploadId}
+                    speakerIndex={this.props.speakerIndex}
+                    src={this.state.imageUrl}
+                    ref="audioImage"
+                    imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                    xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+                    xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
+                    audioIntervalSelected={this.audioIntervalSelected}
+                    audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                    onAudioImageLoaded={this.onAudioImageLoaded}
+                    showImgMenu={this.showImgMenu}
+                    minAudioX={this.state.minAudioX}
+                    maxAudioX={this.state.maxAudioX}
+                    minAudioTime={this.state.minAudioTime}
+                    maxAudioTime={this.state.maxAudioTime} />
+                  : []
+              }
             </div>
-        );
-    }
+            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+            <TargetPitchBar letters={this.props.speakers}
+              files={this.props.files}
+              minAudioX={this.state.minAudioX}
+              maxAudioX={this.state.maxAudioX}
+              minAudioTime={this.state.minAudioTime}
+              maxAudioTime={this.state.maxAudioTime}
+              targetPitchSelected={this.targetPitchSelected}
+              speakerIndex={this.props.speakerIndex}
+              firebase={this.props.firebase} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 const mapStateToProps = (state: AppState) => ({
-    speakers: state.audio.speakers,
+  speakers: state.audio.speakers,
 });
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
-    addSpeaker: () => dispatch(addSpeaker()),
-    removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
-    setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
-        dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
-    addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
-    resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
-    setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
-        dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch))
+  addSpeaker: () => dispatch(addSpeaker()),
+  removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
+  setSpeakerName: (speakerIndex: number, speakerName: string) => dispatch(setSpeakerName(speakerIndex, speakerName)),
+  setWord: (speakerIndex: number, word: string) => dispatch(setWord(speakerIndex, word)),
+  setWordTranslation: (speakerIndex: number, wordTranslation: string) => dispatch(setWordTranslation(speakerIndex, wordTranslation)),
+  setWordTime: (speakerIndex: number, time: number) => dispatch(setWordTime(speakerIndex, time)),
+  setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
+  addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
+  resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
+  setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
+    dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioAnalysis);

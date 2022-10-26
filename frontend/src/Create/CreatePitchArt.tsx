@@ -11,7 +11,7 @@ import { AudioAction } from "../store/audio/types";
 import { Speaker, } from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import { uploadAudio } from "./ImportUtils";
 import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA, { initialize } from "react-ga";

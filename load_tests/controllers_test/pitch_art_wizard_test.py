@@ -4,11 +4,11 @@ Run with this command from the root-level folder:
 """
 import os
 
-from locust import HttpLocust, TaskSet, task
+from locust import HttpUser, task
 from test_data import *
 
 
-class WebsiteTasks(TaskSet):
+class WebsiteTasks():
     email = "NOT_FOUND"
     userid = "NOT_FOUND"
     username = "NOT_FOUND"
@@ -245,7 +245,10 @@ class WebsiteTasks(TaskSet):
             'file_id': self.file_id
         })
 
-class WebsiteUser(HttpLocust):
-    task_set = WebsiteTasks
+class WebsiteUser(HttpUser):
     min_wait = 5000
     max_wait = 15000
+    
+    @task
+    def hello_world(self):
+        self.client.get("/api")

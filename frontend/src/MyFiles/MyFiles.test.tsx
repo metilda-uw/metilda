@@ -4,7 +4,7 @@ import { expect } from "../setupTests";
 import sinon from "sinon";
 import { MyFiles, MyFilesProps } from "./MyFiles";
 import ImagesForMyFiles from "./ImagesForMyFiles";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import Firebase from "../Firebase/firebase";
 import { EafsForMyFiles } from "./EafsForMyFiles";
 
@@ -247,11 +247,9 @@ describe("MyFiles", () => {
     ];
     const subject = shallowRender({ firebase });
     subject.setState({ files });
-    subject
-      .find(".checkBoxForFile")
-      .simulate("change", {
-        target: { name: "username", value: 0, checked: true },
-      });
+    subject.find(".checkBoxForFile").simulate("change", {
+      target: { name: "username", value: 0, checked: true },
+    });
     expect(subject.state("files")).to.be.deep.equal([
       {
         id: 1,

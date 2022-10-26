@@ -1,0 +1,105 @@
+//Create area of the page
+
+.page-collections-manage {
+  margin: 4px;
+  border: 1px solid black;
+}
+
+.page-collections-create {
+  padding: 5px;
+}
+
+.page-collections-create p {
+  text-align: left;
+}
+
+.form-collections-create {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+}
+
+.form-collections-create p {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.form-collections-create-name {
+  display: inline;
+}
+
+//Select, View, Delete area of the page
+.page-collections-select {
+  padding: 5px;
+}
+
+.page-collections-select p {
+  text-align: left;
+}
+
+.form-collections-view-delete {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+}
+
+.collections-dropdown {
+  width: 25%;
+}
+
+.collections-delete-view {
+  margin-left: 20px;
+}
+
+// Collections View Area
+.page-collections-view {
+  margin-top: 15px;
+}
+
+//Styling Filter
+
+.page-collections-view-filter {
+  margin: 0px;
+}
+.page-collections-view-filter p {
+  display: inline;
+}
+
+.collections-filter {
+  margin-left: 5px;
+}
+
+//Styling cards
+
+.created-date {
+  position: relative;
+  top: 20px;
+  left: 20px;
+  font-size: small;
+  color: black;
+}
+
+//Rename Modal
+.collectionRename-cancel-save {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+
+.collectionRename-cancel-save .btn {
+  width: 50%;
+  margin: 4px;
+}
+
+//Delete Modal
+.collection-delete-yes-no {
+  display: flex;
+  flex-direction: row;
+  padding: 10px;
+}
+
+.collection-delete-yes-no .btn {
+  width: 50%;
+  margin: 4px;
+}

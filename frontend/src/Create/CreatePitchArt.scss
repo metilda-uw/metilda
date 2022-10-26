@@ -144,9 +144,21 @@
 #metilda-audio-function-btns button {
 }
 
+// Create page
 #metilda-pitch-art-btn-container {
   display: flex;
-  justify-content: flex-start;
+  //justify-content: flex-start;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.page-create-save-collections-form {
+  display: flex;
+  flex-direction: row;
+}
+
+#collections-dropdown {
+  width: 50%;
 }
 
 .UploadFile {
