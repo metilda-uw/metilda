@@ -19,7 +19,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   // Populate collections drop down
   // useEffect calls the collections api to get a list of the collections we know about
   useEffect(() => {
-    fetch(`api/collections`, {
+    fetch(`/api/collections`, {
       method: "GET",
       headers: {
         Accept: "application/json",

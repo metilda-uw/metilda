@@ -153,9 +153,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     this.state = {
       selectedFolderName: "Uploads",
-      speakerName: "Speaker",
-      word: "Word",
-      wordTranslation: "Word Translation",
+      speakerName: this.props.speakers[this.props.speakerIndex].speakerName,
+      word: this.props.speakers[this.props.speakerIndex].word,
+      wordTranslation: this.props.speakers[this.props.speakerIndex].wordTranslation,
       showImgMenu: false,
       imgMenuX: -1,
       imgMenuY: -1,
@@ -641,9 +641,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   onSubmitSpeakerName = (event: any) => {
     event.preventDefault();
-    const { speakerName } = this.state;
-    const { word } = this.state;
-    const { wordTranslation } = this.state;
+    const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
     this.props.setSpeakerName(this.props.speakerIndex, speakerName);
     this.props.setWord(this.props.speakerIndex, word);
     this.props.setWordTranslation(this.props.speakerIndex, wordTranslation);
@@ -651,19 +649,30 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   onChange = (event: any) => {
     console.log(event.target);
+    if (event.target.name === "speakerName") {
+      this.props.setSpeakerName(this.props.speakerIndex, event.target.value);
+    } else if (event.target.name === "word") {
+      this.props.setWord(this.props.speakerIndex, event.target.value);
+    } else if (event.target.name === "wordTranslation") {
+      this.props.setWordTranslation(this.props.speakerIndex, event.target.value);
+    }
+
     this.setState({ [event.target.name]: event.target.value });
   };
-
-  onChangeWord = (event: any) => {
-    this.setState({ [event.target.name]: event.target.value });
-  };
-
 
   render() {
     const uploadId = this.getSpeaker().uploadId;
-    const { speakerName } = this.state;
-    const { word } = this.state;
-    const { wordTranslation } = this.state;
+    const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
+
+    if (speakerName === undefined) {
+      this.props.setSpeakerName(this.props.speakerIndex, "Speaker");
+    }
+    if (word === undefined) {
+      this.props.setWord(this.props.speakerIndex, "Word");
+    }
+    if (wordTranslation === undefined) {
+      this.props.setWordTranslation(this.props.speakerIndex, "WordTranslation");
+    }
 
     const isInvalid = speakerName === "";
 

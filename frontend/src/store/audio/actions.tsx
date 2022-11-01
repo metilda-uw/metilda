@@ -20,7 +20,7 @@ export const replaceSpeakers = (speakers: Speaker[]):
 export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => {
   const speakers = getState().audio.speakers;
   const newSpeakers = update(speakers, {
-    $push: [{ uploadId: "", letters: [] }],
+    $push: [{ uploadId: "", letters: [], speakerName: "Spearker", word: "Word", wordTranslation: "Word Translation" }],
   });
   dispatch({
     type: constants.ADD_SPEAKER,
@@ -46,6 +46,7 @@ export const setSpeaker =
   (speakerIndex: number, speaker: Speaker): ActionReturn =>
     (dispatch: Dispatch, getState) => {
       const speakers = getState().audio.speakers;
+      speaker.speakerName = "";
 
       const newSpeakers = update(speakers, { [speakerIndex]: { $set: speaker } });
 
