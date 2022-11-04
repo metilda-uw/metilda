@@ -229,6 +229,16 @@ def test_data_api_getOrCreateWords_get(client):
                 u'isSuccessful': True}
     assert result == json.loads(rv.data)
 
+def test_data_api_get_collections(client):
+    rv = client.get(
+        '/api/collections'
+    )
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 
+                [[1,"b3dd3d7b-3909-40f3-8000-f5471c1775cf","default","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
+    assert result == json.loads(rv.data)
+
 @pytest.mark.skip
 def test_data_api_modify_pitch_or_image_details(client):
     assert False
@@ -472,4 +482,42 @@ def test_data_api_delete_user(client):
     assert rv.content_type == "application/json"
     result = {'result': "success"}
     assert result == json.loads(rv.data)
+
+def test_data_api_collections_create(client):
+    rv = client.post(
+        '/api/collections', data = {
+        'collection_name': "test", 'owner_id': "test@uw.edu", 'collection_description': "test description"
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    #returned data will be a unique luid so cannot test the returned data on a newly created collection.
+
+def test_data_api_collections_delete(client):
+    rv = client.delete(
+        '/api/collections', data = {
+        'collection_name': "test"
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "success"}
+    assert result == json.loads(rv.data)
+
+def test_data_api_collections_update(client):
+    rv = client.put(
+        '/api/collections/1', data = {
+        'collection_name': "test2"
+        })
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': "success"}
+    assert result == json.loads(rv.data)
+    rv = client.get(
+        '/api/collections'
+    )
+    assert rv.status_code == 200
+    assert rv.content_type == "application/json"
+    result = {'result': 
+                [[1,"b3dd3d7b-3909-40f3-8000-f5471c1775cf","test2","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
+    assert result == json.loads(rv.data)
+
 
