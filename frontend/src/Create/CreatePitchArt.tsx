@@ -37,7 +37,6 @@ interface State {
   files: any[];
   selectedFolderName: string;
   isLoading: boolean;
-  isBeingShared: boolean;
   owner: string;
   speakers?: Speaker[];
   pitchRange: Array<{
@@ -74,7 +73,6 @@ class CreatePitchArt extends React.Component<
       files: [],
       selectedFolderName: "Uploads",
       isLoading: false,
-      isBeingShared: !!this.props.match.params.id,
       pitchRange: new Array(DEFAULT.SPEAKER_LIMIT).fill(
         {
           minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
@@ -100,8 +98,10 @@ class CreatePitchArt extends React.Component<
   }
 
   componentDidMount() {
-    if (this.state.isBeingShared) {
+    if (this.props.match.params.type === "share") {
       this.listenForData();
+    } else if (this.props.match.params.type) {
+      alert(this.props.match.params.type);
     } else {
       this.getUserFiles();
     }
@@ -121,10 +121,9 @@ class CreatePitchArt extends React.Component<
         this.setState({ ...snapshot.val().state },
           () => { this.getUserFiles(); });
       } else {
-        this.setState({owner: this.props.firebase.auth.currentUser.email, isBeingShared: false});
+        this.setState({owner: this.props.firebase.auth.currentUser.email});
         this.props.history.push({ pathname: "/pitchartwizard" });
         alert("Shared Page Has Been Closed");
-        this.setState({ isBeingShared: false });
       }
     });
   }
@@ -136,7 +135,7 @@ class CreatePitchArt extends React.Component<
       } else {
         const state = prevState;
         state.pitchArt[inputName] = inputValue;
-        if (this.state.isBeingShared) {
+        if (this.props.match.params.type === "share") {
           this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
         }
         return state;
@@ -149,7 +148,7 @@ class CreatePitchArt extends React.Component<
       const state = prevState;
       state.pitchRange[index].minPitch = minPitch;
       state.pitchRange[index].maxPitch = maxPitch;
-      if (this.state.isBeingShared) {
+      if (this.props.match.params.type === "share") {
         this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
       }
       return state;
@@ -158,12 +157,12 @@ class CreatePitchArt extends React.Component<
 
   createSharedPage = () => {
     const newRoute = this.props.firebase.createPage();
-    this.setState({ isBeingShared: true, speakers: this.props.speakers },
+    this.setState({ speakers: this.props.speakers },
       () => {
         this.props.firebase.writeDataToPage("state", this.state, newRoute);
         this.listenForData();
       });
-    this.props.history.push({ pathname: `/pitchartwizard/${newRoute}` });
+    this.props.history.push({ pathname: `/pitchartwizard/share/${newRoute}` });
   }
 
   isOwner = () => {
@@ -174,7 +173,7 @@ class CreatePitchArt extends React.Component<
   }
 
   deleteSharedPage = () => {
-    this.setState({ isBeingShared: false });
+
     if (this.isOwner()) {
       this.props.firebase.deletePage(this.props.match.params.id);
     }
@@ -182,7 +181,7 @@ class CreatePitchArt extends React.Component<
   }
 
   renderSpeakers = () => {
-    if (this.state.isBeingShared && this.state.speakers && this.props.match.params.id) {
+    if (this.props.match.params.type === "share" && this.state.speakers && this.props.match.params.id) {
 
       this.props.firebase.updateValue("state/speakers", this.props.speakers, this.props.match.params.id);
     }
@@ -214,7 +213,7 @@ class CreatePitchArt extends React.Component<
   getUserFiles = () => {
     // Get files of a user
 
-    const currentUserId = this.state.isBeingShared
+    const currentUserId = this.props.match.params.type === "share"
       ? this.state.owner
       : this.props.firebase.auth.currentUser.email;
 
@@ -232,7 +231,18 @@ class CreatePitchArt extends React.Component<
       .then((response) => response.json())
       .then((data) =>
         this.setState({
-          files: data.result.map((item: any) => item),
+          files: data.result.map((item: any) => {
+            return {
+              index: item[0],
+              name: item[1],
+              path: item[2],
+              size: item[3],
+              type: item[4],
+              created: item[5],
+              updated: item[6],
+              user: item[7]
+            };
+          }),
         })
       );
   }
@@ -295,9 +305,9 @@ class CreatePitchArt extends React.Component<
           </ReactFileReader>
           <div>
             <button className="SharePage waves-effect waves-light btn globalbtn"
-              onClick={!this.state.isBeingShared ? this.createSharedPage : this.deleteSharedPage}>
+              onClick={!(this.props.match.params.type === "share") ? this.createSharedPage : this.deleteSharedPage}>
               <i className="material-icons right">person_add</i>
-              {!this.state.isBeingShared
+              {!(this.props.match.params.type === "share")
                 ? "Share Page"
                 : this.isOwner()
                   ? "Stop Sharing"

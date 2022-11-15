@@ -144,7 +144,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
     state.minPitch = props.minPitch;
     state.maxPitch = props.maxPitch;
-    console.log(state);
     return state;
   }
 
@@ -228,7 +227,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     fetch(`/api/audio/${uploadId}/duration`, request)
       .then((response) => response.json())
-      .then(function (data: any) {
+      .then(function(data: any) {
         controller.setState({
           imageUrl,
           audioUrl,
@@ -253,7 +252,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         });
         this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
         this.props.resetLetters(this.props.speakerIndex);
-      }).catch(function (error: any) {
+      }).catch(function(error: any) {
         // return;
       });
     } else {
