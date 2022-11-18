@@ -109,23 +109,24 @@ class CreatePitchArt extends React.Component<
 
   listenForData() {
     const id = this.props.match.params.id ? this.props.match.params.id : "";
-    const dbRef = this.props.firebase.getCreatePageData(id);
-    dbRef.on("value", (snapshot) => {
-      if (snapshot.exists()) {
-        const newSpeakers = snapshot.val().state.speakers;
-        newSpeakers.forEach((speaker) => {
-          if (speaker.letters === undefined) { speaker.letters = []; }
-        });
-        this.props.replaceSpeakers(newSpeakers as Speaker[]);
 
-        this.setState({ ...snapshot.val().state },
-          () => { this.getUserFiles(); });
-      } else {
-        this.setState({owner: this.props.firebase.auth.currentUser.email});
-        this.props.history.push({ pathname: "/pitchartwizard" });
-        alert("Shared Page Has Been Closed");
-      }
-    });
+    this.props.firebase.firestore.collection(this.props.match.params.type).doc(this.props.match.params.id)
+      .onSnapshot((doc) => {
+        if (doc.data()) {
+          const newSpeakers = doc.data().speakers;
+          newSpeakers.forEach((speaker) => {
+            if (speaker.letters === undefined) { speaker.letters = []; }
+          });
+          this.props.replaceSpeakers(newSpeakers as Speaker[]);
+          this.setState({ ...doc.data() },
+            () => { this.getUserFiles(); });
+        } else {
+          this.setState({ owner: this.props.firebase.auth.currentUser.email });
+          this.props.history.push({ pathname: "/pitchartwizard" });
+          alert("Shared Page Has Been Closed");
+          window.location.reload();
+        }
+      });
   }
 
   updatePitchArtValue = (inputName: string, inputValue: any) => {
@@ -136,7 +137,7 @@ class CreatePitchArt extends React.Component<
         const state = prevState;
         state.pitchArt[inputName] = inputValue;
         if (this.props.match.params.type === "share") {
-          this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
+          this.props.firebase.updateSharedPage(this.state, this.props.match.params.id);
         }
         return state;
       }
@@ -149,20 +150,24 @@ class CreatePitchArt extends React.Component<
       state.pitchRange[index].minPitch = minPitch;
       state.pitchRange[index].maxPitch = maxPitch;
       if (this.props.match.params.type === "share") {
-        this.props.firebase.updateValue("state", this.state, this.props.match.params.id);
+        this.props.firebase.updateSharedPage(this.state, this.props.match.params.id);
       }
       return state;
     });
   }
 
   createSharedPage = () => {
-    const newRoute = this.props.firebase.createPage();
-    this.setState({ speakers: this.props.speakers },
-      () => {
-        this.props.firebase.writeDataToPage("state", this.state, newRoute);
-        this.listenForData();
-      });
-    this.props.history.push({ pathname: `/pitchartwizard/share/${newRoute}` });
+
+    this.setState({ speakers: this.props.speakers });
+
+    const pageId = this.props.firebase.firestore.collection("share").add({
+      ...this.state
+    }).then((docRef) => {
+      this.props.history.push({ pathname: `/pitchartwizard/share/${docRef.id}` });
+      this.listenForData();
+    }).catch((error) => {
+      console.error("Error adding document: ", error);
+    });
   }
 
   isOwner = () => {
@@ -173,17 +178,21 @@ class CreatePitchArt extends React.Component<
   }
 
   deleteSharedPage = () => {
-
     if (this.isOwner()) {
-      this.props.firebase.deletePage(this.props.match.params.id);
+      this.props.firebase.firestore.collection("share").doc(this.props.match.params.id).delete().then(() => {
+        console.log("Sharing for this page is disabled");
+      }).catch((error) => {
+        console.error("Error removing doc: ", error);
+      });
     }
     this.props.history.push({ pathname: `/pitchartwizard` });
+    window.location.reload();
   }
 
   renderSpeakers = () => {
-    if (this.props.match.params.type === "share" && this.state.speakers && this.props.match.params.id) {
+    if (this.props.match.params.type && this.state.speakers && this.props.match.params.id) {
 
-      this.props.firebase.updateValue("state/speakers", this.props.speakers, this.props.match.params.id);
+      this.props.firebase.updateSharedPageSpeakers(this.props.speakers, this.props.match.params.id);
     }
 
     return this.props.speakers.map((item, index) => (

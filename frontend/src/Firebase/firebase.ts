@@ -10,9 +10,9 @@ const firebaseConfig = {
   authDomain: "metilda-c5ed6.firebaseapp.com",
   databaseURL: "https://metilda-c5ed6.firebaseio.com",
   projectId: "metilda-c5ed6",
-  storageBucket: "gs://metilda-c5ed6.appspot.com/",
+  storageBucket: "metilda-c5ed6.appspot.com",
   messagingSenderId: "844859558075",
-  appId: "1:844859558075:web:ef6fb0e686fb4d3b",
+  appId: "1:844859558075:web:ef6fb0e686fb4d3b"
 };
 
 class Firebase {
@@ -62,6 +62,33 @@ class Firebase {
     const newReference = firebase.database().ref().push().key;
     return newReference;
   }
+
+  updateSharedPage = (state, pageId) => {
+    const ref = firebase.firestore().collection("share").doc(pageId);
+
+    return ref.update({
+      ...state
+    }).then(() => {
+      console.log("Document successfully updated!");
+  }).catch((error) => {
+      // The document probably doesn't exist.
+      console.error("Error updating document: ", error);
+  });
+  }
+
+  updateSharedPageSpeakers = (speakers, pageId) => {
+    const ref = firebase.firestore().collection("share").doc(pageId);
+
+    return ref.update({
+      speakers
+    }).then(() => {
+      console.log("Document successfully updated!");
+  }).catch((error) => {
+      // The document probably doesn't exist.
+      console.error("Error updating document: ", error);
+  });
+  }
+
   deletePage = (path: string) => {
     firebase.database().ref(path).remove();
   }
