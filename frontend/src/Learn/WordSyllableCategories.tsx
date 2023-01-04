@@ -12,7 +12,7 @@ import pitchArt42 from "./images/Pitch Art - 42-01.jpg";
 import pitchArt43 from "./images/Pitch Art - 43-01.jpg";
 import "./WordSyllableCategories.css";
 import { withAuthorization } from "../Session";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import StudentsInfo from "./StudentsInfo";
 import wordSyllableService from "./services/WordSyllables";
 

@@ -11,34 +11,32 @@ import shutil
 import tempfile
 from math import isnan
 
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 import parselmouth
 
 # sns.set()  # Use seaborn's default style to make attractive graph
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 
-
-def draw_spectrogram(spectrogram, dynamic_range=70):
+def draw_spectrogram(ax, spectrogram, dynamic_range=70):
     X, Y = spectrogram.x_grid(), spectrogram.y_grid()
     sg_db = 10 * np.log10(spectrogram.values)
-    plt.pcolormesh(X, Y, sg_db, vmin=sg_db.max() - dynamic_range, cmap='afmhot')
-    plt.ylim([spectrogram.ymin, spectrogram.ymax])
-    plt.xlabel("time [s]")
-    plt.ylabel("frequency [Hz]")
+    ax.pcolormesh(X, Y, sg_db, vmin=sg_db.max() - dynamic_range, cmap='afmhot')  
+    ax.set_ylim([spectrogram.ymin, spectrogram.ymax])
+    ax.set_xlabel("time [s]")
+    ax.set_ylabel("frequency [Hz]")
 
 
-def draw_pitch(pitch, min_pitch, max_pitch):
+def draw_pitch(ax, pitch, min_pitch, max_pitch):
     # Extract selected pitch contour, and
     # replace unvoiced samples by NaN to not plot
     pitch_values = pitch.selected_array['frequency']
     pitch_values[pitch_values==0] = np.nan
-    plt.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='w')
-    plt.plot(pitch.xs(), pitch_values, 'o', markersize=2)
-    plt.grid(False)
-    plt.ylim(min_pitch, max_pitch)
-    plt.ylabel("fundamental frequency [Hz]")
-
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='w')
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=2)
+    ax.grid(False)
+    ax.set_ylim(min_pitch, max_pitch)
+    ax.set_ylabel("fundamental frequency [Hz]")
 
 def audio_analysis_image(upload_path,
                          tmin=-1,
@@ -55,37 +53,41 @@ def audio_analysis_image(upload_path,
         snd = snd.extract_part(from_time=tmin, to_time=tmax)
         snd.scale_times_to(tmin, tmax)
 
-    fig, (ax1, ax2) = plt.subplots(ncols=1, nrows=2, figsize=(7, 3.25), gridspec_kw = {'height_ratios':[1, 2]}, dpi=400)
+    fig = Figure(figsize=(7, 3.25), dpi=400)
+
+    (ax1, ax2) = fig.subplots(ncols=1, nrows=2, gridspec_kw = {'height_ratios':[1, 2]})
+
+    #fig, (ax1, ax2) = plt.subplots(ncols=1, nrows=2, figsize=(7, 3.25), gridspec_kw = {'height_ratios':[1, 2]}, dpi=400)
 
     # Draw waveform
-    plt.sca(ax1)
-    plt.plot(snd.xs(), snd.values.T)
-    plt.xlim([snd.xmin, snd.xmax])
+    ax1.set_xscale
+    ax1.plot(snd.xs(), snd.values.T)
+    ax1.set_xlim([snd.xmin, snd.xmax])
     ax1.set_xticklabels([])
-    plt.ylabel("amplitude")
+    ax1.set_ylabel("amplitude")
 
     # Draw spectogram
-    plt.sca(ax2)
-    draw_spectrogram(snd.to_spectrogram())
+    ax2.set_xscale
+    draw_spectrogram(ax2, snd.to_spectrogram())
 
     # Draw pitch
-    plt.twinx()
-    draw_pitch(snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch), min_pitch, max_pitch)
-    plt.xlim([snd.xmin, snd.xmax])
+    pitchAxis = ax2.twinx()
+    draw_pitch(pitchAxis, snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch), min_pitch, max_pitch)
+    ax2.set_xlim([snd.xmin, snd.xmax])
 
-    plt.subplots_adjust(hspace=0.1, top=0.98, bottom=0.14)
+    fig.subplots_adjust(hspace=0.1, top=0.98, bottom=0.14)
 
     image = io.BytesIO()
-    plt.savefig(image, format="png")
+    fig.savefig(image, format="png")
     image.seek(0)
 
     if output_path is not None:
-        plt.savefig(output_path, format="png")
+        fig.savefig(output_path, format="png")
 
     # Free up memory
-    plt.cla()
-    plt.clf()
-    plt.close('all')
+    #plt.cla()
+    #fig.clf()
+    #plt.close(fig)
 
     return image
 

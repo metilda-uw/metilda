@@ -3,7 +3,7 @@ import "./MyFiles.scss";
 import React, { createRef } from "react";
 import { NotificationManager } from "react-notifications";
 import { AddFolder, MoveToFolder } from "../Create/ImportUtils";
-import Header from "../components/header/Header";
+import Header from "../Components/header/Header";
 import { withAuthorization } from "../Session";
 import { spinner } from "../Utils/LoadingSpinner";
 import EafsForMyFiles from "./EafsForMyFiles";

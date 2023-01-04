@@ -64,10 +64,33 @@ CREATE SEQUENCE public.analysis_analysis_id_seq1
 
 ALTER SEQUENCE public.analysis_analysis_id_seq1 OWNED BY public.analysis.analysis_id;
 
-
 --
 -- Name: audio; Type: TABLE; Schema: public; Owner: -
 --
+
+CREATE TABLE public.collections
+(
+    collection_id integer NOT NULL,
+    collection_luid uuid,
+    collection_name character varying(50) COLLATE pg_catalog."default",
+    owner_id character varying COLLATE pg_catalog."default",
+    created_at timestamp without time zone,
+    collection_description text COLLATE pg_catalog."default",
+    
+    CONSTRAINT collections_pkey PRIMARY KEY (collection_id)
+);
+
+CREATE SEQUENCE public.collections_collection_id_seq
+    START WITH 2
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER SEQUENCE public.collections_collection_id_seq OWNED BY public.collections.collection_id;
+
+
+
 
 CREATE TABLE public.audio (
     audio_id integer NOT NULL,
@@ -91,7 +114,6 @@ CREATE SEQUENCE public.audio_audio_id_seq
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-
 
 --
 -- Name: audio_audio_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
@@ -285,6 +307,8 @@ CREATE TABLE public.word (
 );
 
 
+
+
 --
 -- Name: analysis analysis_id; Type: DEFAULT; Schema: public; Owner: -
 --
@@ -312,7 +336,7 @@ ALTER TABLE ONLY public.eaf ALTER COLUMN eaf_id SET DEFAULT nextval('public.eaf_
 
 ALTER TABLE ONLY public.image ALTER COLUMN image_id SET DEFAULT nextval('public.image_image_id_seq'::regclass);
 
-
+ALTER TABLE ONLY public.collections ALTER COLUMN collection_id SET DEFAULT nextval('public.collections_collection_id_seq'::regclass);
 --
 -- Name: analysis analysis_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --

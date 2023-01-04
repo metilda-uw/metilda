@@ -28,3 +28,5 @@ INSERT INTO public.image_analysis(analysis_id, image_id) VALUES (100, 100);
 
 INSERT INTO public.word (id, user_id, num_syllables, accent_index, min_pitch, max_pitch, image_path) VALUES ('PHEOP019 onni.wav', 'student@uw.edu',	2,	1,	30,	38, '/images/Pitch Art - 21-01.jpg');
 INSERT INTO public.word (id, user_id, num_syllables, accent_index, min_pitch, max_pitch, image_path) VALUES ('PHEOP002 aakiiwa.wav', 'student@uw.edu',	2,	2,	75,	500, '/images/Pitch Art - 22-01.jpg');
+
+INSERT INTO public.collections (collection_id, collection_luid, collection_name, owner_id, created_at, collection_description) VALUES (1, 'b3dd3d7b-3909-40f3-8000-f5471c1775cf', 'default',	'metilda.uw@gmail.com', '2022-10-04 21:17:11.602348', 'description');
