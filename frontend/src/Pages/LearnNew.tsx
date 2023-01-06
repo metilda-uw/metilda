@@ -10,19 +10,31 @@ import FirebaseContext from "../Firebase/context";
 import Header from "../Components/header/Header";
 
 import PitchArtDrawingWindow from "../PitchArtWizard/PitchArtViewer/PitchArtDrawingWindow";
+import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PitchArtPrevPitchValueToggle from "../Learn/PitchArtPrevPitchValueToggle";
 
-import { RawPitchValue } from "../PitchArtWizard/PitchArtViewer/types";
+import {
+  PitchRangeDTO,
+  RawPitchValue,
+} from "../PitchArtWizard/PitchArtViewer/types";
+
+import Recorder from "recorder-js";
 
 export default function LearnNew() {
   const { collection, id } = useParams();
   const firebase = useContext(FirebaseContext);
   const [showPrevPitchValueLists, setShowPrevPitchValueLists] = useState(false);
   const [userPitchValueLists, setUserPitchValueLlists] = useState([]);
+
+  const [minPitch, setMinPitch] = useState(75.0);
+  const [maxPitch, setMaxPitch] = useState(500.0);
+
+  const [isRecording, setIsRecording] = useState(false);
+
   const _audioImgWidth = useRef(653);
   const _defaultMinAnalysisPitch = useRef(75);
   const _defaultMaxAnalysisPitch = useRef(500);
-  const pitchArtRef = useRef();
+  const pitchArtRef = useRef<any>();
 
   const [word, loading, error] = useDocumentData(
     firebase.firestore.doc(collection + "/" + id),
@@ -31,12 +43,69 @@ export default function LearnNew() {
     }
   );
 
+  let recorder: any;
+
   let speakers = [];
   speakers.push(word);
 
-  // playPitchArt = () => {
-  //   pitchArtRef.current!.playPitchArt();
-  // };
+  const applyPitchRange = (minPitch: number, maxPitch: number) => {
+    setMinPitch(minPitch);
+    setMaxPitch(maxPitch);
+  };
+
+  const toggleRecord = async () => {
+    const audioClass =
+      (window as any).AudioContext || (window as any).webkitAudioContext;
+    const audioContext = new audioClass();
+
+    if (recorder == null) {
+      recorder = new Recorder(audioContext);
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then((stream) => recorder.init(stream).then(() => recorder.start()))
+        .catch((err) => console.error("Unable to initiate recording", err));
+      setIsRecording(true);
+    } else {
+      //const controller = this;
+      const result = await recorder.stop();
+      const formData = new FormData();
+      formData.append("file", result.blob);
+      const response = await fetch(
+        `/api/upload/pitch/range?min-pitch=30.0&max-pitch=300.0`,
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+          },
+          body: formData,
+        }
+      );
+      const data = await response.json();
+      const pitchValues: RawPitchValue[] = (data as PitchRangeDTO).pitches.map(
+        (item) =>
+          ({ t0: item[0], t1: item[0], pitch: item[1] } as RawPitchValue)
+      );
+      // controller.recorder = null;
+      // controller.setState({
+      //   userPitchValueLists: controller.state.userPitchValueLists.concat([
+      //     pitchValues,
+      //   ]),
+      //   isRecording: false,
+      // });
+      const url = URL.createObjectURL(result.blob);
+      // const audio = new Audio(url);
+      // const recording = await audio.play();
+
+      // setState({
+      //   showRecordingConfirmationModal: true,
+      //   recordingResult: result,
+      // });
+    }
+  };
+
+  const playPitchArt = () => {
+    pitchArtRef.current!.playPitchArt();
+  };
 
   return (
     <div>
@@ -46,11 +115,11 @@ export default function LearnNew() {
         <div className="row">
           <div className="col s4">
             <div className="metilda-pitch-art-container-control-list">
-              {/* <PitchRange
-              initMinPitch={this.state.minPitch}
-              initMaxPitch={this.state.maxPitch}
-              applyPitchRange={this.applyPitchRange}
-            /> */}
+              <PitchRange
+                initMinPitch={minPitch}
+                initMaxPitch={maxPitch}
+                applyPitchRange={applyPitchRange}
+              />
             </div>
             <h6 className="metilda-control-header">Previous Recordings</h6>
             {/* {this.renderPreviousRecordings()} */}
@@ -173,16 +242,16 @@ export default function LearnNew() {
                 <div className="pitch-art-btn-container">
                   <button
                     className="waves-effect waves-light btn metilda-btn globalbtn"
-                    //   onClick={this.toggleRecord}
+                    onClick={toggleRecord}
                     //   disabled={this.state.isLoadingPitchResults}
                   >
-                    {/* {!this.state.isRecording ? "Start Record" : "Stop Record"} */}
+                    {!isRecording ? "Start Record" : "Stop Record"}
                     <i className="material-icons right">record_voice_over</i>
                   </button>
                   <button
                     className="waves-effect waves-light btn metilda-btn globalbtn"
-                    //   onClick={this.playPitchArt}
-                    //   disabled={this.state.isRecording}
+                    onClick={playPitchArt}
+                    // disabled={this.state.isRecording}
                   >
                     <i className="material-icons right">play_circle_filled</i>
                     Play Tones
