@@ -33,6 +33,7 @@ interface Props {
   showMetildaWatermark: boolean;
   speakers: Speaker[];
   firebase: any;
+  data: any;
 }
 
 class PitchArt extends React.Component<Props> {
@@ -164,6 +165,7 @@ class PitchArt extends React.Component<Props> {
         <SaveAnalysisFirestore
           analysis={this.props.speakers}
           saveThumbnail={this.saveThumbnail}
+          data = {this.props.data}
         ></SaveAnalysisFirestore>
       </div>
     );

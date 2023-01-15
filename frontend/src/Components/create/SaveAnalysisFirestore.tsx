@@ -1,17 +1,18 @@
 import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
-import { useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { NotificationManager } from "react-notifications";
 
 import FirebaseContext from "../../Firebase/context";
+import { render } from "enzyme";
 
-export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
+export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
-  const history = useHistory();
+  //const { type, id } = useParams();
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [selectedCollection, setSelectedCollection] = useState("default");
@@ -66,26 +67,31 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
     event.preventDefault();
     const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
-    analysis.map((word) => {
-      firebase.firestore
-        .collection(collectionUuid)
-        .add({ ...word, createdAt: timestamp.fromDate(new Date()) })
-        .then((docRef) => {
-          //console.log("Document written with ID: ", docRef.id);
-          saveThumbnail(collectionUuid + "/" + docRef.id);
-          NotificationManager.success(
-            "Pitch Art added to collection successfully!"
-          );
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-          NotificationManager.error("Renaming collection failed!");
-        });
-    });
+    firebase.firestore
+      .collection(collectionUuid)
+      .add({ 
+        word: analysis[0].word, 
+        wordTranslation: analysis[0].wordTranslation,
+        speakerName: analysis[0].speakerName,
+        ...data,
+        speakers: analysis,
+        createdAt: timestamp.fromDate(new Date()) 
+      })
+      .then((docRef) => {
+        //console.log("Document written with ID: ", docRef.id);
+        saveThumbnail(collectionUuid + "/" + docRef.id);
+        NotificationManager.success(
+          "Pitch Art added to collection successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+        NotificationManager.error("Renaming collection failed!");
+      });
   };
 
-  return (
-    <div className="page-create-save-collections">
+const renderSave = () => {
+ return( <div className="page-create-save-collections">
       <form className="page-create-save-collections-form">
         <Select
           id="collections-dropdown"
@@ -94,7 +100,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
           options={getCollectionOptions()}
           onChange={collectionSelectOnChange}
           menuPlacement="auto"
-          //styles={colourStyles}
+        //styles={colourStyles}
         />
         <button
           className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
@@ -109,7 +115,14 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   );
 }
 
+  return (
+    renderSave()
+  );
+    
+}
+
 SaveAnalysisFirestore.propTypes = {
   analysis: PropTypes.array,
   saveThumbnail: PropTypes.func,
+  data: PropTypes.any
 };

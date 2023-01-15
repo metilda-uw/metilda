@@ -78,7 +78,7 @@ export default function CollectionView({
         <ul>
           {filteredWords.map((word: {}) => (
             <Link
-              to={`/learnnew/${selectedCollectionUuid}/${word["id"]}`}
+              to={`/pitchartwizard/${selectedCollectionUuid}/${word["id"]}`}
               key={word["id"]}
             >
               <WordCard

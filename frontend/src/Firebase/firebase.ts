@@ -63,8 +63,8 @@ class Firebase {
     return newReference;
   }
 
-  updateSharedPage = (state, pageId) => {
-    const ref = firebase.firestore().collection("share").doc(pageId);
+  updateSharedPage = (state, type, pageId) => {
+    const ref = firebase.firestore().collection(type).doc(pageId);
 
     return ref.update({
       ...state
@@ -76,8 +76,8 @@ class Firebase {
   });
   }
 
-  updateSharedPageSpeakers = (speakers, pageId) => {
-    const ref = firebase.firestore().collection("share").doc(pageId);
+  updateSharedPageSpeakers = (speakers, type, pageId) => {
+    const ref = firebase.firestore().collection(type).doc(pageId);
 
     return ref.update({
       speakers

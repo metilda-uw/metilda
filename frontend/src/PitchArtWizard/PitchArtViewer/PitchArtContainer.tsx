@@ -1,6 +1,6 @@
 import * as React from "react";
-import {SyntheticEvent} from "react";
-import {Speaker} from "../../types/types";
+import { SyntheticEvent } from "react";
+import { Speaker } from "../../types/types";
 import PitchRange from "../AudioViewer/PitchRange";
 import TimeRange from "./TimeRange";
 import PitchArt from "./PitchArt";
@@ -21,6 +21,7 @@ interface Props {
     pitchArt: any;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     updatePitchArtValue: (inputName: string, inputValue: any) => void;
+    data: any;
 }
 
 class PitchArtContainer extends React.Component<Props> {
@@ -75,11 +76,11 @@ class PitchArtContainer extends React.Component<Props> {
                     <h6 className="metilda-control-header">Pitch Art</h6>
                     <div className="metilda-pitch-art-container-control-list">
                         <PitchRange initMinPitch={this.props.pitchArt.minPitch}
-                                    initMaxPitch={this.props.pitchArt.maxPitch}
-                                    applyPitchRange={this.applyPitchRange}/>
+                            initMaxPitch={this.props.pitchArt.maxPitch}
+                            applyPitchRange={this.applyPitchRange} />
                         <TimeRange initMinTime={this.props.pitchArt.minTime}
-                                    initMaxTime={this.props.pitchArt.maxTime}
-                                    applyTimeRange={this.applyTimeRange}/>
+                            initMaxTime={this.props.pitchArt.maxTime}
+                            applyTimeRange={this.applyTimeRange} />
                         <div className="row metilda-pitch-art-container-control-toggle-list">
                             <PitchArtToggle
                                 label="Accent Symbol"
@@ -165,31 +166,33 @@ class PitchArtContainer extends React.Component<Props> {
                         </div>
                         {
                             this.props.speakers.length > 1
-                            && <PitchArtLegend speakers={this.props.speakers}/>
+                            && <PitchArtLegend speakers={this.props.speakers} />
                         }
                     </div>
                 </div>
                 <div className="col s7">
-                    <PitchArt width={this.props.width}
-                              height={this.props.height}
-                              minPitch={this.props.pitchArt.minPitch}
-                              maxPitch={this.props.pitchArt.maxPitch}
-                              minTime={this.props.pitchArt.minTime}
-                              maxTime={this.props.pitchArt.maxTime}
-                              uploadId={this.props.uploadId}
-                              setLetterPitch={this.props.setLetterPitch}
-                              showAccentPitch={this.props.pitchArt.showAccentPitch}
-                              showSyllableText={this.props.pitchArt.showSyllableText}
-                              showVerticallyCentered={this.props.pitchArt.showVerticallyCentered}
-                              showPitchArtLines={this.props.pitchArt.showPitchArtLines}
-                              showLargeCircles={this.props.pitchArt.showLargeCircles}
-                              showTimeNormalization={this.props.pitchArt.showTimeNormalization}
-                              showPitchScale={this.props.pitchArt.showPitchScale}
-                              showPerceptualScale={this.props.pitchArt.showPerceptualScale}
-                              showPitchArtImageColor={this.props.pitchArt.showPitchArtImageColor}
-                              showMetildaWatermark={this.props.pitchArt.showMetildaWatermark}
-                              speakers={this.props.speakers}
-                              firebase={this.props.firebase}/>
+                    <PitchArt
+                        width={this.props.width}
+                        height={this.props.height}
+                        minPitch={this.props.pitchArt.minPitch}
+                        maxPitch={this.props.pitchArt.maxPitch}
+                        minTime={this.props.pitchArt.minTime}
+                        maxTime={this.props.pitchArt.maxTime}
+                        uploadId={this.props.uploadId}
+                        setLetterPitch={this.props.setLetterPitch}
+                        showAccentPitch={this.props.pitchArt.showAccentPitch}
+                        showSyllableText={this.props.pitchArt.showSyllableText}
+                        showVerticallyCentered={this.props.pitchArt.showVerticallyCentered}
+                        showPitchArtLines={this.props.pitchArt.showPitchArtLines}
+                        showLargeCircles={this.props.pitchArt.showLargeCircles}
+                        showTimeNormalization={this.props.pitchArt.showTimeNormalization}
+                        showPitchScale={this.props.pitchArt.showPitchScale}
+                        showPerceptualScale={this.props.pitchArt.showPerceptualScale}
+                        showPitchArtImageColor={this.props.pitchArt.showPitchArtImageColor}
+                        showMetildaWatermark={this.props.pitchArt.showMetildaWatermark}
+                        speakers={this.props.speakers}
+                        firebase={this.props.firebase}
+                        data={this.props.data} />
                 </div>
             </div>
         );

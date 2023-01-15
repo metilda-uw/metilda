@@ -18,6 +18,7 @@ import ReactGA, { initialize } from "react-ga";
 import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
 import { withRouter } from "react-router-dom";
+import { createRef } from "react";
 
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
@@ -66,6 +67,8 @@ class CreatePitchArt extends React.Component<
   State
 > {
 
+  private pitchArtRef = createRef<any>();
+
   constructor(props: CreatePitchArtProps) {
     super(props);
     this.state = {
@@ -98,10 +101,8 @@ class CreatePitchArt extends React.Component<
   }
 
   componentDidMount() {
-    if (this.props.match.params.type === "share") {
+    if (this.props.match.params.type) {
       this.listenForData();
-    } else if (this.props.match.params.type) {
-      alert(this.props.match.params.type);
     } else {
       this.getUserFiles();
     }
@@ -113,7 +114,7 @@ class CreatePitchArt extends React.Component<
     this.props.firebase.firestore.collection(this.props.match.params.type).doc(this.props.match.params.id)
       .onSnapshot((doc) => {
         if (doc.data()) {
-          const newSpeakers = doc.data().speakers;
+          const newSpeakers = doc.data().speakers === undefined ? [{uploadId: ""}] : doc.data().speakers;
           newSpeakers.forEach((speaker) => {
             if (speaker.letters === undefined) { speaker.letters = []; }
           });
@@ -123,7 +124,7 @@ class CreatePitchArt extends React.Component<
         } else {
           this.setState({ owner: this.props.firebase.auth.currentUser.email });
           this.props.history.push({ pathname: "/pitchartwizard" });
-          alert("Shared Page Has Been Closed");
+          alert("The page no longer exists");
           window.location.reload();
         }
       });
@@ -136,8 +137,8 @@ class CreatePitchArt extends React.Component<
       } else {
         const state = prevState;
         state.pitchArt[inputName] = inputValue;
-        if (this.props.match.params.type === "share") {
-          this.props.firebase.updateSharedPage(this.state, this.props.match.params.id);
+        if (this.props.match.params.type !== undefined) {
+          this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
         }
         return state;
       }
@@ -149,8 +150,8 @@ class CreatePitchArt extends React.Component<
       const state = prevState;
       state.pitchRange[index].minPitch = minPitch;
       state.pitchRange[index].maxPitch = maxPitch;
-      if (this.props.match.params.type === "share") {
-        this.props.firebase.updateSharedPage(this.state, this.props.match.params.id);
+      if (this.props.match.params.type !== undefined) {
+        this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
       }
       return state;
     });
@@ -179,7 +180,7 @@ class CreatePitchArt extends React.Component<
 
   deleteSharedPage = () => {
     if (this.isOwner()) {
-      this.props.firebase.firestore.collection("share").doc(this.props.match.params.id).delete().then(() => {
+      this.props.firebase.firestore.collection(this.props.match.params.type).doc(this.props.match.params.id).delete().then(() => {
         console.log("Sharing for this page is disabled");
       }).catch((error) => {
         console.error("Error removing doc: ", error);
@@ -192,7 +193,7 @@ class CreatePitchArt extends React.Component<
   renderSpeakers = () => {
     if (this.props.match.params.type && this.state.speakers && this.props.match.params.id) {
 
-      this.props.firebase.updateSharedPageSpeakers(this.props.speakers, this.props.match.params.id);
+      this.props.firebase.updateSharedPageSpeakers(this.props.speakers, this.props.match.params.type, this.props.match.params.id);
     }
 
     return this.props.speakers.map((item, index) => (
@@ -291,6 +292,40 @@ class CreatePitchArt extends React.Component<
     }
   }
 
+  renderPageOptions(){
+    if(this.props.match.params.type === "share"){
+      return(
+        <button className="page-options waves-effect waves-light btn globalbtn"
+          onClick={this.deleteSharedPage}>
+          <i className="material-icons right">person_add</i>
+          {this.isOwner()
+              ? "Stop Sharing"
+              : "Leave Page"
+          }
+        </button>
+      );
+    } else if(this.props.match.params.type !== undefined) {
+      return(
+        <button className="page-options waves-effect waves-light btn globalbtn"
+          onClick={this.deleteSharedPage}>
+          <i className="material-icons right">person_add</i>
+          {this.isOwner()
+              ? "Delete from Collection"
+              : "Close Page"
+          }
+        </button>
+      );
+    } else {
+      return(
+        <button className="page-options waves-effect waves-light btn globalbtn"
+          onClick={this.createSharedPage}>
+          <i className="material-icons right">person_add</i>
+          {"Share Page"}
+        </button>
+      );
+    }
+  }
+
   render() {
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
@@ -313,18 +348,8 @@ class CreatePitchArt extends React.Component<
 
           </ReactFileReader>
           <div>
-            <button className="SharePage waves-effect waves-light btn globalbtn"
-              onClick={!(this.props.match.params.type === "share") ? this.createSharedPage : this.deleteSharedPage}>
-              <i className="material-icons right">person_add</i>
-              {!(this.props.match.params.type === "share")
-                ? "Share Page"
-                : this.isOwner()
-                  ? "Stop Sharing"
-                  : "Leave Page"
-              }
-            </button>
+            {this.renderPageOptions()}
           </div>
-
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
               <div id="metilda-drop-down-back-button">
@@ -346,6 +371,7 @@ class CreatePitchArt extends React.Component<
             </div>
             <div className="row">
               <PitchArtContainer
+                ref={this.pitchArtRef}
                 firebase={this.props.firebase}
                 speakers={this.props.speakers}
                 width={DEFAULT.AUDIO_IMG_WIDTH}
@@ -354,6 +380,7 @@ class CreatePitchArt extends React.Component<
                 uploadId={uploadId}
                 pitchArt={this.state.pitchArt}
                 updatePitchArtValue={this.updatePitchArtValue}
+                data={this.state}
               />
             </div>
           </div>
