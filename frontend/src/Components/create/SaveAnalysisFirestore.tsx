@@ -12,7 +12,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
-  //const { type, id } = useParams();
+  const params = useParams();
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [selectedCollection, setSelectedCollection] = useState("default");
@@ -90,7 +90,79 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
       });
   };
 
+  const handleUpdateToCollections = async (event: any) => {
+    event.preventDefault();
+
+    firebase.firestore
+      .collection(params['type'])
+      .doc(params['id'])
+      .update({ 
+        word: analysis[0].word, 
+        wordTranslation: analysis[0].wordTranslation,
+        speakerName: analysis[0].speakerName,
+        ...data,
+        speakers: analysis
+      })
+      .then(() => {
+        //console.log("Document written with ID: ", docRef.id);
+        saveThumbnail(params['type'] + "/" + params['id']);
+        NotificationManager.success(
+          "Pitch Art Updated Successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error Updating document: ", error);
+        NotificationManager.error("Updating collection failed!");
+      });
+  };
+
+  const handleDeleteCollection = async (event: any) => {
+    event.preventDefault();
+
+    firebase.firestore
+      .collection(params['type'])
+      .doc(params['id'])
+      .delete()
+      .then(() => {
+        firebase.storage()
+          .child('thumbnails/'+params['type']+"/"+params['id'])
+          .delete()
+          .catch((error) => {
+            console.error("Error deleting thumbnail: ", error)
+          })
+        NotificationManager.success(
+          "Pitch Art Deleted Successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error Deleting document: ", error);
+        NotificationManager.error("Deleting Word from collection failed!");
+      });
+  };
 const renderSave = () => {
+  if(params['type']){
+    return( <div className="page-create-save-collections">
+      <form className="page-create-save-collections-form">
+        <button
+          className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+          type="submit"
+          name="action"
+          onClick={handleUpdateToCollections}
+        >
+          Update PitchArt
+        </button>
+        <button
+          className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+          type="submit"
+          name="action"
+          onClick={handleDeleteCollection}
+        >
+          Delete PitchArt
+        </button>
+      </form>
+    </div>
+  );
+  }
  return( <div className="page-create-save-collections">
       <form className="page-create-save-collections-form">
         <Select

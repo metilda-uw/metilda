@@ -305,16 +305,7 @@ class CreatePitchArt extends React.Component<
         </button>
       );
     } else if(this.props.match.params.type !== undefined) {
-      return(
-        <button className="page-options waves-effect waves-light btn globalbtn"
-          onClick={this.deleteSharedPage}>
-          <i className="material-icons right">person_add</i>
-          {this.isOwner()
-              ? "Delete from Collection"
-              : "Close Page"
-          }
-        </button>
-      );
+      //No Options
     } else {
       return(
         <button className="page-options waves-effect waves-light btn globalbtn"
