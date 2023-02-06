@@ -19,6 +19,7 @@ import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
 import { withRouter } from "react-router-dom";
 import { createRef } from "react";
+import { NotificationManager } from "react-notifications";
 
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
@@ -166,6 +167,9 @@ class CreatePitchArt extends React.Component<
     }).then((docRef) => {
       this.props.history.push({ pathname: `/pitchartwizard/share/${docRef.id}` });
       this.listenForData();
+      NotificationManager.success(
+        "Page Sharing Started. The URL can be shared with other MeTILDA users."
+      );
     }).catch((error) => {
       console.error("Error adding document: ", error);
     });
