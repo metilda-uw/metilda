@@ -1,3 +1,5 @@
+export const REPLACE_SPEAKERS = "REPLACE_SPEAKERS";
+export type REPLACE_SPEAKERS = typeof REPLACE_SPEAKERS;
 export const ADD_SPEAKER = "ADD_SPEAKER";
 export type ADD_SPEAKER = typeof ADD_SPEAKER;
 export const REMOVE_SPEAKER = "REMOVE_SPEAKER";

@@ -1,25 +1,50 @@
-import React, { useContext, useEffect, useState } from "react";
+import "./SaveAnalysisFirestore.scss"
+import React, { useContext, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
-import { useHistory } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Select from "react-select";
 import { NotificationManager } from "react-notifications";
 
 import FirebaseContext from "../../Firebase/context";
+import Modal from "react-modal";
+import { render } from "enzyme";
 
-export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
+export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
-  const history = useHistory();
+  const params = useParams();
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [selectedCollection, setSelectedCollection] = useState("default");
+  //Create Collection
+  const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
+  const [saveModalIsOpen, setSaveModalIsOpen] = useState(false);
+  const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [createCollectionName, setCreateCollectionName] = useState("");
+  const [createCollectionDescription, setCreateCollectionDescription] = useState("");
+  const [collectionOptions, setCollectionOptions] = useState([]);
+  const [updateOptions, setUpdateOptions] = useState(0);
+  const selectRef = useRef(null);
+
+
+  const customStyles = {
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
 
   // Populate collections drop down
   // useEffect calls the collections api to get a list of the collections we know about
   useEffect(() => {
-    fetch(`api/collections`, {
+    fetch(`/api/collections`, {
       method: "GET",
       headers: {
         Accept: "application/json",
@@ -32,10 +57,68 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
       .catch((error) => {
         console.log(error);
       });
-  }, []);
+  }, [updateOptions]);
 
   const collectionSelectOnChange = (event) => {
     setSelectedCollection(event.value);
+  };
+
+  const setCreateModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setCreateModalIsOpen(true);
+  };
+  const setCreateModalIsOpenToFalse = () => {
+    setCreateModalIsOpen(false);
+  };
+
+  const setSaveModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setSaveModalIsOpen(true);
+  };
+  const setSaveModalIsOpenToFalse = () => {
+    setSaveModalIsOpen(false);
+  };
+
+  const setDeleteModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setDeleteModalIsOpen(true);
+  };
+  const setDeleteModalIsOpenToFalse = () => {
+    setDeleteModalIsOpen(false);
+  };
+
+  const onChangeCollectionName = (event: any) => {
+    setCreateCollectionName(event.target.value);
+  };
+  const onChangeCollectionDesc = (event: any) => {
+    setCreateCollectionDescription(event.target.value);
+  };
+
+  const handleCreateCollection = async (event: any) => {
+    event.preventDefault();
+    const formData = new FormData();
+    formData.append("collection_name", createCollectionName);
+    formData.append("owner_id", firebase.auth.currentUser.email);
+    formData.append("collection_description", createCollectionDescription);
+    const response = await fetch(`/api/collections`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+      },
+      body: formData,
+    });
+    const body = await response.json();
+
+
+    setUpdateOptions(updateOptions + 1)
+    setCreateCollectionName("");
+    setCreateCollectionDescription("");
+    setCreateModalIsOpenToFalse();
+    if (response.status == 200) {
+      NotificationManager.success("Added collection successfully!");
+    } else {
+      NotificationManager.error("Adding collection failed!");
+    }
   };
 
   // Create the list of options for the collection select
@@ -64,52 +147,227 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail }) {
   // map over array and save each speakers word to the selected firestore collection
   const handleSaveToCollections = async (event: any) => {
     event.preventDefault();
+    setSaveModalIsOpenToFalse();
     const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
-    analysis.map((word) => {
-      firebase.firestore
-        .collection(collectionUuid)
-        .add({ ...word, createdAt: timestamp.fromDate(new Date()) })
-        .then((docRef) => {
-          //console.log("Document written with ID: ", docRef.id);
-          saveThumbnail(collectionUuid + "/" + docRef.id);
-          NotificationManager.success(
-            "Pitch Art added to collection successfully!"
-          );
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-          NotificationManager.error("Renaming collection failed!");
-        });
-    });
+    firebase.firestore
+      .collection(collectionUuid)
+      .add({
+        word: analysis[0].word,
+        wordTranslation: analysis[0].wordTranslation,
+        speakerName: analysis[0].speakerName,
+        ...data,
+        speakers: analysis,
+        createdAt: timestamp.fromDate(new Date())
+      })
+      .then((docRef) => {
+        //console.log("Document written with ID: ", docRef.id);
+        saveThumbnail(collectionUuid + "/" + docRef.id);
+        NotificationManager.success(
+          "Pitch Art added to collection successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+        NotificationManager.error("Renaming collection failed!");
+      });
   };
 
-  return (
-    <div className="page-create-save-collections">
+  const handleUpdateToCollections = async (event: any) => {
+    event.preventDefault();
+
+    firebase.firestore
+      .collection(params['type'])
+      .doc(params['id'])
+      .update({
+        word: analysis[0].word,
+        wordTranslation: analysis[0].wordTranslation,
+        speakerName: analysis[0].speakerName
+      })
+      .then(() => {
+        //console.log("Document written with ID: ", docRef.id);
+        saveThumbnail(params['type'] + "/" + params['id']);
+        NotificationManager.success(
+          "Pitch Art Updated Successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error Updating document: ", error);
+        NotificationManager.error("Updating collection failed!");
+      });
+  };
+
+  const handleDeleteCollection = async (event: any) => {
+    event.preventDefault();
+
+    firebase.firestore
+      .collection(params['type'])
+      .doc(params['id'])
+      .delete()
+      .then(() => {
+        firebase.storage()
+          .child('thumbnails/' + params['type'] + "/" + params['id'])
+          .delete()
+          .catch((error) => {
+            console.error("Error deleting thumbnail: ", error)
+          })
+        NotificationManager.success(
+          "Pitch Art Deleted Successfully!"
+        );
+      })
+      .catch((error) => {
+        console.error("Error Deleting document: ", error);
+        NotificationManager.error("Deleting Word from collection failed!");
+      });
+  };
+  const renderSave = () => {
+    if (params['type']) {
+      return (<div className="page-create-save-collections">
+        <form className="page-create-save-collections-form">
+          <button
+            className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+            type="submit"
+            name="action"
+            onClick={handleUpdateToCollections}
+          >
+            Update PitchArt
+          </button>
+          <button
+            className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+            type="submit"
+            name="action"
+            onClick={setDeleteModalIsOpenToTrue}
+          >
+            Delete PitchArt
+          </button>
+          <Modal
+            isOpen={deleteModalIsOpen}
+            style={customStyles}
+            appElement={document.getElementById("root" || undefined)}
+          >
+            <p> Do you want to delete the Pitch Art?</p>
+            <div className="collectionRename-cancel-save">
+              <button
+                className="btn waves-light globalbtn"
+                onClick={setDeleteModalIsOpenToFalse}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn waves-light globalbtn"
+                onClick={handleDeleteCollection}
+              >
+                Delete
+              </button>
+            </div>
+          </Modal>
+        </form>
+      </div>
+      );
+    }
+    return (<div className="page-create-save-collections">
       <form className="page-create-save-collections-form">
         <Select
+          ref={selectRef}
           id="collections-dropdown"
           placeholder={selectedCollection}
           value={"Select a collection"}
           options={getCollectionOptions()}
           onChange={collectionSelectOnChange}
           menuPlacement="auto"
-          //styles={colourStyles}
+        //styles={colourStyles}
         />
         <button
           className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
           type="submit"
           name="action"
-          onClick={handleSaveToCollections}
+          onClick={setSaveModalIsOpenToTrue}
         >
           Save to Collections
         </button>
+        <Modal
+          isOpen={saveModalIsOpen}
+          style={customStyles}
+          appElement={document.getElementById("root" || undefined)}
+        >
+          <p> Do you want to save the Pitch Art to {selectedCollection} ?</p>
+          <div className="collectionRename-cancel-save">
+            <button
+              className="btn waves-light globalbtn"
+              onClick={setSaveModalIsOpenToFalse}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn waves-light globalbtn"
+              onClick={handleSaveToCollections}
+            >
+              Save
+            </button>
+          </div>
+        </Modal>
+        <button
+          onClick={setCreateModalIsOpenToTrue}
+          className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+        >
+          Create New Collection
+        </button>
+        <Modal
+          isOpen={createModalIsOpen}
+          style={customStyles}
+          appElement={document.getElementById("root" || undefined)}
+        >
+          <form
+            onSubmit={handleCreateCollection}
+            className="form-collections-create"
+          >
+            <div className="col s4">
+              <input
+                className="CreateCollection"
+                name="currentCollectionName"
+                onChange={onChangeCollectionName}
+                type="text"
+                placeholder="Collection Name"
+                required
+              />
+              <input
+                className="CreateCollection"
+                name="currentCollectionDesc"
+                onChange={onChangeCollectionDesc}
+                type="text"
+                placeholder="Collection Description"
+                required
+              />
+              <div className="collectionRename-cancel-save">
+                <button
+                  className="btn waves-light globalbtn"
+                  onClick={setCreateModalIsOpenToFalse}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn waves-light globalbtn"
+                  type="submit"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </form>
+        </Modal>
       </form>
     </div>
+    );
+  }
+
+  return (
+    renderSave()
   );
+
 }
 
 SaveAnalysisFirestore.propTypes = {
   analysis: PropTypes.array,
   saveThumbnail: PropTypes.func,
+  data: PropTypes.any
 };

@@ -1,5 +1,5 @@
 import {combineReducers, Reducer} from "redux";
-import audioReducuer from "../reducers/audio/reducer";
+import audioReducer from "../reducers/audio/reducer";
 import {AudioAnalysisState} from "./audio/types";
 
 export interface AppState {
@@ -7,5 +7,5 @@ export interface AppState {
 }
 
 export const reducers: Reducer<AppState> = combineReducers<AppState>({
-    audio: audioReducuer,
+    audio: audioReducer,
 });
