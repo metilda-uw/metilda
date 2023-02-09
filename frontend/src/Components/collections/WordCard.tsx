@@ -14,6 +14,8 @@ export default function WordCard({ word, selectedCollectionUuid }) {
     );
     storageRef.getDownloadURL().then((url) => {
       setURL(url);
+    }).catch((error) => {
+      //Do Nothing
     });
   });
 
