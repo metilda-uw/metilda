@@ -405,6 +405,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       "Enter name of the subfolder: ",
       "untitled folder"
     );
+    // bugs exists here
     await AddFolder(folderName, this.props.firebase);
     await this.getUserFiles();
   };
