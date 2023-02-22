@@ -13,6 +13,8 @@ const reducer: Reducer<AudioAnalysisState> = (
   switch (action.type) {
     case constants.ADD_SPEAKER:
       return { ...state, speakers: action.speakers };
+    case constants.REPLACE_SPEAKERS:
+      return { ...state, speakers: action.speakers };
     case constants.REMOVE_SPEAKER:
       return { ...state, speakers: action.speakers };
     case constants.SET_SPEAKER:

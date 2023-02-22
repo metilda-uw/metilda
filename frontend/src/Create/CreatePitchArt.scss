@@ -152,13 +152,10 @@
   margin-bottom: 10px;
 }
 
-.page-create-save-collections-form {
-  display: flex;
-  flex-direction: row;
-}
 
 #collections-dropdown {
-  width: 50%;
+  width: 75%;
+  margin: auto;
 }
 
 .UploadFile {
@@ -167,6 +164,20 @@
   right: 40px;
 }
 
+.page-options {
+  position: fixed;
+  right: 40px;
+  min-width: 200px;
+  margin-top: 50px;
+  //padding: 20px;
+}
+
+.StopShare {
+  position: fixed;
+  right: 40px;
+  width: 200px;
+  margin-top: 50px;
+}
 // Target Pitch Bar and Button elements below
 
 .TargetPitchBar {

@@ -57,25 +57,25 @@ class UploadAudio extends Component {
         }
 
         const index = event.target.value;
-        this.props.setUploadId(this.props.userFiles[index][1], this.props.userFiles[index][2], this.props.userFiles[index][0], this.props.userFiles[index][4]);
+        this.props.setUploadId(this.props.userFiles[index].name, this.props.userFiles[index].path, this.props.userFiles[index].index, this.props.userFiles[index].type);
     }
 
     render() {
         const { userFiles } = this.props;
         const availableFilesList = userFiles.map((item, index) => {
-            if (item[4] === "Upload") {
+            if (item.type === "Upload") {
                 return (
-                    <option key={index} value={index}>{item[1]}</option>
+                    <option key={index} value={index}>{item.name}</option>
                 );
             } else {
                 return (
                     <option key={index} value={index} className="folderOption">
-                        &#xf07c; {item[1]}
+                        &#xf07c; {item.name}
                     </option>
                 );
             }
         });
-        const selectedIndex = userFiles.findIndex(file => file[1] === this.props.initFileName);
+        const selectedIndex = userFiles.findIndex(file => file.name === this.props.initFileName);
         return (
             <div className="metilda-audio-amenu-icon-top-rightnalysis-controls-list-item col s12"
                  key={this.state.updateCounter}>

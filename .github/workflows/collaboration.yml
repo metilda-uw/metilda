@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-      - name: Beat Point Feature Code
+      - name: Collaboration Code
         uses: actions/checkout@v3
       - name: Use Node.js 14.8.2
         uses: actions/setup-node@v3
@@ -22,5 +22,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: 'metilda-collab'
+          heroku_app_name: 'metilda-collaborative'
           heroku_email: 'metilda.uw@gmail.com'

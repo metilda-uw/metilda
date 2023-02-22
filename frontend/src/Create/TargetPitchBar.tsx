@@ -374,7 +374,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     let matchingFile = [];
     if (speaker.fileIndex === undefined) {
       matchingFile = this.props.files.filter(
-        (currentRow: any[]) => currentRow[1] === speaker.uploadId
+        (currentRow: any) => currentRow.name === speaker.uploadId
       );
       // Check if the upload id from the analysis file loaded using 'Open' option
       // matches any of the existing files
@@ -622,7 +622,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
       letters: speaker.letters,
     } as Speaker;
     const matchingFile = this.props.files.filter(
-      (currentRow: any[]) => currentRow[1] === speaker.uploadId
+      (currentRow: any) => currentRow.name === speaker.uploadId
     );
     const fileStatus: string = this.evalFileName(
       this.state.currentAnalysisName

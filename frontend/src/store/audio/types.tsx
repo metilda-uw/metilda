@@ -36,6 +36,11 @@ export interface SetWordTranslation extends Action {
   speakers: Speaker[];
 }
 
+export interface ReplaceSpeakers extends Action {
+  type: constants.REPLACE_SPEAKERS;
+  speakers: Speaker[];
+}
+
 export interface AddLetter extends Action {
   type: constants.ADD_LETTER;
   speakers: Speaker[];
@@ -90,4 +95,5 @@ export type AudioAction =
   | SetLetterTime
   | SetWordTime
   | SetActiveLetter
-  | ManualPitchAdjust;
+  | ManualPitchAdjust
+  | ReplaceSpeakers;

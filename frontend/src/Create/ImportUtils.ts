@@ -305,9 +305,9 @@ export function uploadThumbnail(
   firebase: any
 ): Promise<number> {
   const promise = new Promise<number>((resolve, reject) => {
-    //const uid = firebase.auth.currentUser.email;
+    // const uid = firebase.auth.currentUser.email;
     const storageRef = firebase.uploadFile();
-    //const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+    // const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
     const filesRef = storageRef.child(`/thumbnails/${imageName}`);
     filesRef
       .putString(dataURL, "data_url")
