@@ -411,9 +411,8 @@ export function uploadEaf(
   return promise;
 }
 
-export function AddFolder(folderName: any, firebase: any) {
+export function AddFolder(folderName: any, firebase: any, uid: any) {
   const filePromise = new Promise((resolve, reject) => {
-    const uid = firebase.auth.currentUser.email;
     const storageRef = firebase.uploadFile();
     const filesRef = storageRef.child(`${uid}/Uploads/${folderName}/.ignore`);
     filesRef
@@ -484,4 +483,47 @@ export function MoveToFolder(
       });
   });
   return filePromise;
+}
+
+export function ShareFile(
+  audioId: any,
+  userId: any,
+  permission: string,
+  selectedFolderName: any,
+  firebase: any
+) {
+  if (selectedFolderName != "Uploads") {
+    AddFolder(selectedFolderName, firebase, userId)
+  }
+  const formData = new FormData();
+  formData.append("audio_id", audioId.toString());
+  formData.append("user_id", userId.toString());
+  formData.append("permission", permission.toString())
+  fetch(`/api/share-file`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+    },
+    body: formData,
+  }).then((response) => {
+    console.log(response);
+  });
+}
+
+export function DeleteViewPermission(
+  audioId: any,
+  userId: any
+) {
+  const formData = new FormData();
+  formData.append("audio_id", audioId.toString());
+  formData.append("user_id", userId.toString());
+  fetch(`/api/delete-shared-user`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json"
+    },
+    body: formData
+  }).then((response) => {
+    console.log(response);
+  });
 }

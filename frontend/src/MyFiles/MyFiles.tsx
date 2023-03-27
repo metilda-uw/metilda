@@ -2,12 +2,15 @@ import "./MyFiles.scss";
 
 import React, { createRef } from "react";
 import { NotificationManager } from "react-notifications";
-import { AddFolder, MoveToFolder } from "../Create/ImportUtils";
+import { AddFolder, MoveToFolder, ShareFile, DeleteViewPermission } from "../Create/ImportUtils";
 import Header from "../Components/header/Header";
 import { withAuthorization } from "../Session";
 import { spinner } from "../Utils/LoadingSpinner";
 import EafsForMyFiles from "./EafsForMyFiles";
 import ImagesForMyFiles from "./ImagesForMyFiles";
+import SharedUsersForMyFiles from "./SharedUsersForMyFiles"
+import Modal from "react-modal";
+import { Radio, RadioGroup, FormControlLabel } from "@material-ui/core"
 
 export interface MyFilesProps {
   firebase: any;
@@ -22,12 +25,19 @@ interface State {
   isGetAnalysesClicked: boolean;
   isGetEafsClicked: boolean;
   isGetSubFolderClicked: boolean;
+  isSharedUsersClicked: boolean;
   fileIdSelectedForAnalyses: number;
   analysesForSelectedFile: any[];
   selectedFileName: string;
   selectedFolderName: string;
   imagesForSelectedFile: any[];
   selectedFileId: number | null;
+  shareModal: boolean;
+  shareUserId: string;
+  shareViewModal: boolean;
+  shareViewUserId: any;
+  shareViewPermission: string;
+  editUserPermission: string;
 }
 
 interface FileEntity {
@@ -38,10 +48,26 @@ interface FileEntity {
   path: string;
   checked: boolean;
   type: string;
+  permission: string;
 }
 
 export class MyFiles extends React.Component<MyFilesProps, State> {
   private downloadRef = createRef<HTMLAnchorElement>();
+  customStyles = {
+    overlay: {
+      position: "fixed",
+      zIndex: 100
+    },
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
   constructor(props: MyFilesProps) {
     super(props);
 
@@ -53,6 +79,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       isGetImagesClicked: false,
       isGetAnalysesClicked: false,
       isGetEafsClicked: false,
+      isSharedUsersClicked: false,
       isGetSubFolderClicked: false,
       fileIdSelectedForAnalyses: 0,
       analysesForSelectedFile: [],
@@ -60,11 +87,20 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       selectedFolderName: "Uploads",
       imagesForSelectedFile: [],
       selectedFileId: null,
+      shareModal: false,
+      shareUserId: "",
+      shareViewModal: false,
+      shareViewUserId: 1988,
+      shareViewPermission: "view",
+      editUserPermission: "view"
     };
   }
 
   componentDidMount() {
     this.getUserFiles();
+  }
+  componentDidUpdate() {
+    console.log(this.state);
   }
 
   getUserFiles = async () => {
@@ -96,6 +132,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
           path: item[2],
           checked: false,
           type: item[4],
+          permission: item[8]
         });
         return null;
       });
@@ -115,13 +152,36 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       },
       () => {
         const updatedFiles = [...this.state.files];
-        updatedFiles.map((file) => (file.checked = this.state.checkAll));
+        updatedFiles.map((file) => {
+          if (file.permission !== "view") {
+            file.checked = this.state.checkAll
+          }
+        });
         this.setState({
           files: updatedFiles,
         });
       }
     );
   };
+
+  getSharedUsers = async (audioId) => {
+    const response = await fetch(
+      `api/get-shared-users/${audioId}`,
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const body = await response.json();
+    const users = []
+    body.map((item) => {
+      users.push(item[1])
+    })
+    console.log(users)
+  }
 
   handleCheckboxChange = (event: any) => {
     const index = Number(event.target.value);
@@ -157,13 +217,21 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
     });
   };
 
+  handleGetSharedUsers = (fileId: number, fileName: string, permission: string) => {
+    this.setState({
+      isSharedUsersClicked: true,
+      selectedFileId: fileId,
+      selectedFileName: fileName,
+      editUserPermission: permission
+    })
+  }
+
   renderTableHeader() {
     const headerNames = [
       "File Name",
       "File Size",
       "Created At",
-      "Images for file",
-      "ELAN Annotation files",
+      "Options"
     ];
     const headers = [];
     headers.push(
@@ -200,6 +268,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
                   checked={file.checked}
                   onChange={this.handleCheckboxChange}
                   value={index}
+                  disabled={file.permission === "view"}
                 />
                 <span />
               </label>
@@ -221,7 +290,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
           <td>
             {file.type === "Upload" && (
               <button
-                className="GetImages waves-effect waves-light btn globalbtn"
+                className="file-folder-options waves-effect waves-light btn globalbtn"
                 title="Get images for the file"
                 onClick={() => this.handleGetImages(file.id, file.name)}
               >
@@ -231,28 +300,52 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
             )}
             {file.type === "Folder" && (
               <button
-                className="OpenFolder waves-effect waves-light btn globalbtn"
+                className="file-folder-options waves-effect waves-light btn globalbtn"
                 onClick={() => this.openFolder(file)}
               >
                 <i className="material-icons right">folder_open</i>
                 Open Folder
               </button>
             )}
-          </td>
-          <td>
             {file.type === "Upload" && (
-              <button
-                className="GetImages waves-effect waves-light btn globalbtn"
-                title="Get EAFs for the file"
-                onClick={() => this.handleGetEafs(file.id, file.name)}
-              >
-                <i className="material-icons right">insert_drive_file</i>
-                Get EAFs
-              </button>
+              <>
+                <button
+                  className="file-folder-options waves-effect waves-light btn globalbtn"
+                  title="Get EAFs for the file"
+                  onClick={() => this.handleGetEafs(file.id, file.name)}
+                >
+                  <i className="material-icons right">insert_drive_file</i>
+                  Get EAFs
+                </button>
+                {
+                  file.permission === "view" && (
+                    <button
+                      className="file-folder-options waves-effect waves-light btn globalbtn"
+                      title="Manage Access"
+                      onClick={() => { this.handleRemoveAccess(file) }}
+                    >
+                      <i className="material-icons right">insert_drive_file</i>
+                      Delete Access
+                    </button>
+                  )
+                }
+                {
+                  file.permission !== "view" && (
+                    <button
+                      className="file-folder-options waves-effect waves-light btn globalbtn"
+                      title="Manage Access"
+                      onClick={() => { this.handleGetSharedUsers(file.id, file.name, file.permission) }}
+                    >
+                      <i className="material-icons right">insert_drive_file</i>
+                      Manage Access
+                    </button>
+                  )
+                }
+              </>
             )}
             {file.type === "Folder" && (
               <button
-                className="MoveToFolder waves-effect waves-light btn globalbtn"
+                className="file-folder-options waves-effect waves-light btn globalbtn"
                 title="Move selected audio files to folder"
                 onClick={() => this.handleMoveFiles(file)}
               >
@@ -295,6 +388,26 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
           );
           MoveToFolder(file.id, newFilePath, fileData, this.props.firebase);
           await this.deleteFile(file);
+        } else {
+          uncheckedFiles.push(file);
+        }
+      }
+      await this.setState({
+        files: uncheckedFiles,
+      });
+    } catch (ex) {
+      console.log(ex);
+    }
+  };
+
+  handleRemoveAccess = async (selectedFile: FileEntity) => {
+    const uncheckedFiles = [];
+    const fileId = selectedFile.id;
+    alert(fileId)
+    try {
+      for (const file of this.state.files) {
+        if (file.id === fileId) {
+          DeleteViewPermission(file.id, this.props.firebase.auth.currentUser.email);
         } else {
           uncheckedFiles.push(file);
         }
@@ -376,14 +489,23 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
   imagesBackButtonClicked = () => {
     this.setState({
       isGetImagesClicked: false,
+      selectedFileId: 0
     });
   };
 
   analysesBackButtonClicked = () => {
     this.setState({
       isGetAnalysesClicked: false,
+      selectedFileId: 0
     });
   };
+
+  sharedUserBackButtonClicked = () => {
+    this.setState({
+      isSharedUsersClicked: false,
+      selectedFileId: 0
+    });
+  }
 
   eafsBackButtonClicked = () => {
     this.setState({
@@ -406,9 +528,26 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       "untitled folder"
     );
     // bugs exists here
-    await AddFolder(folderName, this.props.firebase);
+    await AddFolder(folderName, this.props.firebase, this.props.firebase.auth.currentUser.email);
     await this.getUserFiles();
   };
+
+  shareFile = async () => {
+    const userId = this.state.shareUserId;
+    const permission = this.state.shareViewPermission;
+    try {
+      for (const file of this.state.files) {
+        if (file.checked) {
+          await ShareFile(file.id, userId, permission, this.state.selectedFolderName, this.props.firebase)
+        } else {
+        }
+      }
+    } catch (ex) {
+      console.log(ex);
+    }
+    this.setState({ shareModal: false });
+    await this.getUserFiles();
+  }
 
   deleteFolder = async () => {
     const isOk: boolean = window.confirm(
@@ -525,6 +664,50 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
                   Download Files
                 </button>
                 <button
+                  className="DownloadFile waves-effect waves-light btn globalbtn"
+                  onClick={() => { this.setState({ shareModal: true }) }}
+                >
+                  <i className="material-icons right">queue</i>
+                  Share Files
+                </button>
+                <Modal
+                  isOpen={this.state.shareModal}
+                  style={this.customStyles}
+                  appElement={document.getElementById("root" || undefined)}
+                >
+                  <p> Enter email id to share with:</p>
+                  <input
+                    className="share-modal-input"
+                    name="emailId"
+                    onChange={(event) => { this.setState({ shareUserId: event.target.value }) }}
+                    type="text"
+                    required
+                  />
+                  <RadioGroup
+                    row
+                    aria-labelledby="demo-row-radio-buttons-group-label"
+                    name="row-radio-buttons-group"
+                    onChange={(event) => { this.setState({ shareViewPermission: event.target.value }) }}
+                  >
+                    <FormControlLabel value="view" control={<Radio />} label="View" />
+                    <FormControlLabel value="edit" control={<Radio />} label="Edit" />
+                  </RadioGroup>
+                  <div className="share-cancel-save">
+                    <button
+                      className="btn waves-light globalbtn"
+                      onClick={() => { this.setState({ shareModal: false }) }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn waves-light globalbtn modal-btn"
+                      onClick={this.shareFile}
+                    >
+                      Share
+                    </button>
+                  </div>
+                </Modal>
+                <button
                   className="DeleteFile waves-effect waves-light btn globalbtn"
                   onClick={this.deleteFiles}
                 >
@@ -554,6 +737,13 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
           eafsBackButtonClicked={this.eafsBackButtonClicked}
           fileId={this.state.selectedFileId}
           fileName={this.state.selectedFileName}
+        />
+        <SharedUsersForMyFiles
+          showSharedUsers={this.state.isSharedUsersClicked}
+          sharedUsersBackButtonClicked={this.sharedUserBackButtonClicked}
+          fileId={this.state.selectedFileId}
+          fileName={this.state.selectedFileName}
+          permission={this.state.editUserPermission}
         />
       </div>
     );

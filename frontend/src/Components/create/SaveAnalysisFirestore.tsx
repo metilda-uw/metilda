@@ -221,7 +221,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
       });
   };
   const renderSave = () => {
-    if (params['type'] && params['type'] != "share") {
+    if (params['type']) {
       return (<div className="page-create-save-collections">
         <form className="page-create-save-collections-form">
           <button
