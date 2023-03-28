@@ -174,7 +174,7 @@ def create_file():
         request.form['file_size'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
 
-        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID) VALUES( %s, %s) """
+        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
         insert_values = (last_row_id, request.form['user_id'], "own")
         connection.execute_insert_query(postgres_insert_audio_user, insert_values)
 
@@ -203,8 +203,7 @@ def create_folder():
         record_to_insert = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'],
         request.form['file_size'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
-
-        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID) VALUES( %s, %s) """
+        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
         insert_values = (last_row_id, request.form['user_id'], "own")
         connection.execute_insert_query(postgres_insert_audio_user, insert_values)
 
