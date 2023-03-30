@@ -691,40 +691,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             <PitchRange initMinPitch={this.props.minPitch}
               initMaxPitch={this.props.maxPitch}
               applyPitchRange={this.applyPitchRange} />
-            <form
-              className="set-speaker-name"
-              onSubmit={this.onSubmitSpeakerName}
-            >
-              <input
-                name="speakerName"
-                value={speakerName}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Speaker Name"
-              />
-              <input
-                name="word"
-                value={word}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Word"
-              />
-              <input
-                name="wordTranslation"
-                value={wordTranslation}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Word Translation"
-              />
-
-              <button
-                disabled={isInvalid}
-                type="submit"
-                className="waves-effect waves-light btn globalbtn"
-              >
-                Save Details
-              </button>
-            </form>
             {this.renderSpeakerControl()}
           </div>
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
