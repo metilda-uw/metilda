@@ -80,6 +80,7 @@ export const setUploadId =
         [speakerIndex]: {
           uploadId: { $set: uploadId },
           fileIndex: { $set: fileIndex },
+          letters: { $set: [] } 
         },
       });
 
