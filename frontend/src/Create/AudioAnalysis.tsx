@@ -141,8 +141,13 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   static getDerivedStateFromProps(props, state) {
     //alert("here")
-    //state.imageUrl = AudioAnalysis.formatImageUrl(
-      //props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
+    if(state.minAudioTime === 0 && state.maxAudioTime === -1){
+      state.imageUrl = AudioAnalysis.formatImageUrl(
+        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
+    } else {
+      state.imageUrl = AudioAnalysis.formatImageUrl(
+        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch, state.minAudioTime, state.maxAudioTime);
+    }
     state.minPitch = props.minPitch;
     state.maxPitch = props.maxPitch;
     return state;
