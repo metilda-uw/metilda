@@ -403,7 +403,6 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
   handleRemoveAccess = async (selectedFile: FileEntity) => {
     const uncheckedFiles = [];
     const fileId = selectedFile.id;
-    alert(fileId)
     try {
       for (const file of this.state.files) {
         if (file.id === fileId) {
