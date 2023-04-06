@@ -162,27 +162,32 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
     setSaveModalIsOpenToFalse();
     const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
-    firebase.firestore
-      .collection(collectionUuid)
-      .add({
-        word: word,
-        wordTranslation: wordTranslate,
-        speakerName: speakerName,
-        ...data,
-        speakers: analysis,
-        createdAt: timestamp.fromDate(new Date())
-      })
-      .then((docRef) => {
-        //console.log("Document written with ID: ", docRef.id);
-        saveThumbnail(collectionUuid + "/" + docRef.id);
-        NotificationManager.success(
-          "Pitch Art added to collection successfully!"
-        );
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-        NotificationManager.error("Renaming collection failed!");
-      });
+    if (word === undefined || wordTranslate === undefined || speakerName === undefined) {
+      NotificationManager.error("Invalid Spearker Name or Word or Word Translation !!!");
+    }
+    else {
+      firebase.firestore
+        .collection(collectionUuid)
+        .add({
+          word: word,
+          wordTranslation: wordTranslate,
+          speakerName: speakerName,
+          ...data,
+          speakers: analysis,
+          createdAt: timestamp.fromDate(new Date())
+        })
+        .then((docRef) => {
+          //console.log("Document written with ID: ", docRef.id);
+          saveThumbnail(collectionUuid + "/" + docRef.id);
+          NotificationManager.success(
+            "Pitch Art added to collection successfully!"
+          );
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+          NotificationManager.error("Renaming collection failed!");
+        });
+    }
   };
 
   const handleUpdateToCollections = async (event: any) => {
@@ -234,7 +239,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
       });
   };
   const renderSave = () => {
-    if (params['type']) {
+    if (params['type'] && params['type'] != "share") {
       return (<div className="page-create-save-collections">
         <form className="page-create-save-collections-form">
           <button
@@ -251,30 +256,30 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
             appElement={document.getElementById("root" || undefined)}
           >
             <p> Enter the updated details:</p>
-          <input
-            className="CreateCollection"
-            name="speakerName"
-            onChange={(event) => { setSpeakerName(event.target.value) }}
-            type="text"
-            defaultValue = {data.speakerName}
-            required
-          />
-          <input
-            className="CreateCollection"
-            name="word"
-            onChange={(event) => { setWord(event.target.value) }}
-            type="text"
-            defaultValue = {data.word}
-            required
-          />
-          <input
-            className="CreateCollection"
-            name="wordTranslate"
-            onChange={(event) => { setWordTranslate(event.target.value) }}
-            type="text"
-            defaultValue = {data.wordTranslation}
-            required
-          />
+            <input
+              className="CreateCollection"
+              name="speakerName"
+              onChange={(event) => { setSpeakerName(event.target.value) }}
+              type="text"
+              defaultValue={data.speakerName}
+              required
+            />
+            <input
+              className="CreateCollection"
+              name="word"
+              onChange={(event) => { setWord(event.target.value) }}
+              type="text"
+              defaultValue={data.word}
+              required
+            />
+            <input
+              className="CreateCollection"
+              name="wordTranslate"
+              onChange={(event) => { setWordTranslate(event.target.value) }}
+              type="text"
+              defaultValue={data.wordTranslation}
+              required
+            />
             <div className="collectionRename-cancel-save">
               <button
                 className="btn waves-light globalbtn"
