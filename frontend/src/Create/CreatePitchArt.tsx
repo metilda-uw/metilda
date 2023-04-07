@@ -60,6 +60,7 @@ interface State {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
+    linkPitchAxis?: boolean;
   };
 }
 
@@ -115,7 +116,7 @@ class CreatePitchArt extends React.Component<
     this.props.firebase.firestore.collection(this.props.match.params.type).doc(this.props.match.params.id)
       .onSnapshot((doc) => {
         if (doc.data()) {
-          const newSpeakers = doc.data().speakers === undefined ? [{uploadId: ""}] : doc.data().speakers;
+          const newSpeakers = doc.data().speakers === undefined ? [{ uploadId: "" }] : doc.data().speakers;
           newSpeakers.forEach((speaker) => {
             if (speaker.letters === undefined) { speaker.letters = []; }
           });
@@ -151,6 +152,12 @@ class CreatePitchArt extends React.Component<
       const state = prevState;
       state.pitchRange[index].minPitch = minPitch;
       state.pitchRange[index].maxPitch = maxPitch;
+     
+      if (state.pitchArt.linkPitchAxis) {
+        state.pitchArt.minPitch = minPitch;
+        state.pitchArt.maxPitch = maxPitch;
+      }
+
       if (this.props.match.params.type !== undefined) {
         this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
       }
@@ -297,22 +304,22 @@ class CreatePitchArt extends React.Component<
     }
   }
 
-  renderPageOptions(){
-    if(this.props.match.params.type === "share"){
-      return(
+  renderPageOptions() {
+    if (this.props.match.params.type === "share") {
+      return (
         <button className="page-options waves-effect waves-light btn globalbtn"
           onClick={this.deleteSharedPage}>
           <i className="material-icons right">person_add</i>
           {this.isOwner()
-              ? "Stop Sharing"
-              : "Leave Page"
+            ? "Stop Sharing"
+            : "Leave Page"
           }
         </button>
       );
-    } else if(this.props.match.params.type !== undefined) {
+    } else if (this.props.match.params.type !== undefined) {
       //No Options
     } else {
-      return(
+      return (
         <button className="page-options waves-effect waves-light btn globalbtn"
           onClick={this.createSharedPage}>
           <i className="material-icons right">person_add</i>

@@ -63,6 +63,10 @@ class PitchArtContainer extends React.Component<Props> {
         this.props.updatePitchArtValue("maxTime", maxTime);
     }
 
+    changeAxisLink = (event) => {
+        this.props.updatePitchArtValue("linkPitchAxis", event.target.checked);
+    }
+
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
         if (isVerticallyCentered) {
             this.props.updatePitchArtValue("showPitchScale", false);
@@ -78,6 +82,10 @@ class PitchArtContainer extends React.Component<Props> {
                         <PitchRange initMinPitch={this.props.pitchArt.minPitch}
                             initMaxPitch={this.props.pitchArt.maxPitch}
                             applyPitchRange={this.applyPitchRange} />
+                        <div className="link-picth-axis">
+                            <input id="linkPitch" className="checkBoxForFile" type="checkbox" onChange={this.changeAxisLink} checked={this.props.pitchArt.linkPitchAxis}/>
+                            <label htmlFor="linkPitch"> Link Pitch(Vertical) Axis with the Audio Analysis </label>                            
+                        </div>
                         <TimeRange initMinTime={this.props.pitchArt.minTime}
                             initMaxTime={this.props.pitchArt.maxTime}
                             applyTimeRange={this.applyTimeRange} />
