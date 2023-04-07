@@ -157,6 +157,7 @@ class CreatePitchArt extends React.Component<
       return state;
     });
   }
+   
 
   createSharedPage = () => {
 
