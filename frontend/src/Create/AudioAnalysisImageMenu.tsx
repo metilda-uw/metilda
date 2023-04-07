@@ -72,7 +72,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                                 <FontAwesomeIcon icon={faSearchPlus}
                                                  size="2x"/>
                                 <br/>
-                                <span className="AudioAnalysisImageMenu-label">Zoom</span>
+                                <span className="AudioAnalysisImageMenu-label">Zoom In</span>
                             </div>
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newManualPitch)}
@@ -112,7 +112,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                                 <FontAwesomeIcon icon={faEllipsisH}
                                                  size="2x"/>
                                 <br/>
-                                <span className="AudioAnalysisImageMenu-label">Range</span>
+                                <span className="AudioAnalysisImageMenu-label">Contour</span>
                             </div>
                         </Slice>
                         <Slice onSelect={() => maybeDo(this.props.isAllShown, this.props.showAllAudio)}
@@ -123,7 +123,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                                 <FontAwesomeIcon icon={faSearchMinus}
                                                  size="2x"/>
                                 <br/>
-                                <span className="AudioAnalysisImageMenu-label">All</span>
+                                <span className="AudioAnalysisImageMenu-label">Zoom Out</span>
                             </div>
                         </Slice>
                     </PieMenu>

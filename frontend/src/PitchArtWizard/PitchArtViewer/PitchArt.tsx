@@ -145,6 +145,8 @@ class PitchArt extends React.Component<Props> {
             <i className="material-icons right">play_circle_filled</i>
             Play Rhythm
           </button>
+        </div>
+        <div id="metilda-pitch-art-btn-container">
           <button
             className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
             disabled={this.props.speakers.length === 0}

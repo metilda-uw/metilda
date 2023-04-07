@@ -53,7 +53,7 @@ State > {
         eafs: [],
         isLoading: true,
       });
-      const response = await fetch(`/api/get-eafs-for-files/${nextProps.fileId.toString()}`, {
+      const response = await fetch(`/api/get-analyses-for-file/${nextProps.fileId.toString()}`, {
         method: "GET",
         headers: {
           Accept: "application/json"
@@ -69,6 +69,7 @@ State > {
       this.setState({
         isLoading: false,
       });
+      console.log()
     }
   }
 
