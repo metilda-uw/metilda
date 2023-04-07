@@ -1,14 +1,3 @@
 .metilda-audio-analysis-controls-list-item p {
   color: black;
 }
-.link-picth-axis{
-  width: 100%;
-  padding: 10px;
-
-  [type="checkbox"]:not(:checked), [type="checkbox"]:checked {
-    position: unset;
-    opacity: unset;
-    pointer-events: unset;
-    margin: 0px 2px;
-  }
-}
