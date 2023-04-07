@@ -60,7 +60,6 @@ interface State {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
-    linkPitchAxis?: boolean;
   };
 }
 
@@ -152,12 +151,6 @@ class CreatePitchArt extends React.Component<
       const state = prevState;
       state.pitchRange[index].minPitch = minPitch;
       state.pitchRange[index].maxPitch = maxPitch;
-     
-      if (state.pitchArt.linkPitchAxis) {
-        state.pitchArt.minPitch = minPitch;
-        state.pitchArt.maxPitch = maxPitch;
-      }
-
       if (this.props.match.params.type !== undefined) {
         this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
       }
