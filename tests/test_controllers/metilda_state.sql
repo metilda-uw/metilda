@@ -15,6 +15,9 @@ INSERT INTO public.user_research_language (user_id, user_language) VALUES ('teac
 INSERT INTO public.audio (audio_id, file_name, file_path, file_size, file_type, created_at, updated_at, user_id) VALUES
 (260, 'test.wav', 'student@uw.edu/Recordings/test.wav/03-06-2020_06_50_25__test.wav', 311340, 'Recording', '2020-03-07 02:50:27.052024', '2020-03-07 02:50:27.052024', 'student@uw.edu');
 
+INSERT INTO public.audio_user (audio_id, user_id, permission) VALUES
+(260, 'student@uw.edu', 'own');
+
 INSERT INTO public.eaf (eaf_id, eaf_file_name, eaf_file_path, audio_id, generated_at, updated_at) VALUES
 (841,'testeaf_test.eaf','student@uw.edu/Eafs/06-01-2020_08_57_31_testeaf_test.eaf',260,'2020-06-01 14:57:31.384778','2020-06-01 14:57:31.384778');
 
@@ -29,4 +32,4 @@ INSERT INTO public.image_analysis(analysis_id, image_id) VALUES (100, 100);
 INSERT INTO public.word (id, user_id, num_syllables, accent_index, min_pitch, max_pitch, image_path) VALUES ('PHEOP019 onni.wav', 'student@uw.edu',	2,	1,	30,	38, '/images/Pitch Art - 21-01.jpg');
 INSERT INTO public.word (id, user_id, num_syllables, accent_index, min_pitch, max_pitch, image_path) VALUES ('PHEOP002 aakiiwa.wav', 'student@uw.edu',	2,	2,	75,	500, '/images/Pitch Art - 22-01.jpg');
 
-INSERT INTO public.collections (collection_id, collection_luid, collection_name, owner_id, created_at, collection_description) VALUES (1, 'b3dd3d7b-3909-40f3-8000-f5471c1775cf', 'default',	'metilda.uw@gmail.com', '2022-10-04 21:17:11.602348', 'description');
+INSERT INTO public.collections (collection_id, collection_luid, collection_name, owner_id, created_at, collection_description) VALUES (33, '1880f9eb-e274-4093-ac6b-8e7fa9a05a84', 'default',	'metilda.uw@gmail.com', '2022-10-04 21:17:11.602348', 'description');
