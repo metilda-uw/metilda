@@ -524,7 +524,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
   addSubfolder = async () => {
     const folderName = prompt(
       "Enter name of the subfolder: ",
-      "untitled folder"
+      ""
     );
     if(folderName === ""){
       NotificationManager.error("Invalid Folder Name");
