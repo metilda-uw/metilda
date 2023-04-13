@@ -526,9 +526,15 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       "Enter name of the subfolder: ",
       "untitled folder"
     );
-    // bugs exists here
-    await AddFolder(folderName, this.props.firebase, this.props.firebase.auth.currentUser.email);
-    await this.getUserFiles();
+    if(folderName === ""){
+      NotificationManager.error("Invalid Folder Name");
+    } else if(folderName){
+      await AddFolder(folderName, this.props.firebase, this.props.firebase.auth.currentUser.email);
+      await this.getUserFiles();
+    } else {
+      //Do Nothing
+    }
+    
   };
 
   shareFile = async () => {
