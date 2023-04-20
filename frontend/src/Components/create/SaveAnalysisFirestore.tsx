@@ -373,7 +373,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
           />
           <input
             className="CreateCollection"
-            name="wordTranslate"
+            name="wordTranslation"
             onChange={(event) => { setWordTranslate(event.target.value) }}
             type="text"
             placeholder="Word Translate"
