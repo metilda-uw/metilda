@@ -173,11 +173,17 @@ def create_file():
         record_to_insert = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'],
         request.form['file_size'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+
+        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
+        insert_values = (last_row_id, request.form['user_id'], "own")
+        connection.execute_insert_query(postgres_insert_audio_user, insert_values)
+
         if request.form['file_type'] == 'Recording':
             postgres_insert_query = """ INSERT INTO recording_info (AUDIO_ID, NUMBER_OF_SYLLABLES, RECORDING_NAME) VALUES (%s,%s,%s) RETURNING AUDIO_ID"""
             record_to_insert = (last_row_id, request.form['number_of_syllables'], request.form['recording_word_name'])
             connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
+
 
 @app.route('/api/move-to-folder', methods=["POST"])
 def move_to_folder():
@@ -197,7 +203,19 @@ def create_folder():
         record_to_insert = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'],
         request.form['file_size'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
+        insert_values = (last_row_id, request.form['user_id'], "own")
+        connection.execute_insert_query(postgres_insert_audio_user, insert_values)
+
     return jsonify({'result': last_row_id})
+
+@app.route('/api/share-file', methods=["POST"])
+def share_file():
+    with Postgres() as connection:
+        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
+        insert_values = (request.form['audio_id'], request.form['user_id'], request.form['permission'])
+        results = connection.execute_insert_query(postgres_insert_audio_user, insert_values)
+    return jsonify({'result': results})
 
 @app.route('/api/delete-file', methods=["POST"])
 def delete_file():
@@ -211,6 +229,13 @@ def delete_eaf_file():
     with Postgres() as connection:
         postgres_select_query = """ DELETE FROM eaf WHERE EAF_ID = %s"""
         results = connection.execute_update_query(postgres_select_query, (request.form['eaf_id'],))
+    return jsonify({'result': results})
+
+@app.route('/api/delete-shared-user', methods=["POST"])
+def delete_shared_user():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM audio_user WHERE AUDIO_ID = %s AND USER_ID = %s"""
+        results = connection.execute_update_query(postgres_select_query, (request.form['audio_id'], request.form['user_id'], ))
     return jsonify({'result': results})
 
 @app.route('/api/delete-folder', methods=["POST"])
@@ -239,7 +264,10 @@ def delete_recording():
 def get_file(user_id):
     file_type = request.args.get('file-type', type=None)
     with Postgres() as connection:
-        postgres_select_query = """ SELECT * FROM audio WHERE USER_ID = %s AND FILE_TYPE = %s"""
+        postgres_select_query = """ SELECT x.audio_id, x.file_name, x.file_path, x.file_size, x.file_type, x.created_at, x.updated_at, y.user_id, y.permission 
+        FROM audio AS x, audio_user AS y 
+        WHERE x.audio_id = y.audio_id 
+        AND y.USER_ID = %s AND FILE_TYPE = %s"""
         filter_values= (user_id, file_type)
         results = connection.execute_select_query(postgres_select_query, filter_values)
     return jsonify({'result': results})
@@ -251,11 +279,16 @@ def get_files_and_folders(user_id, folder_name):
     file_path = ""
     filteredResults = []
     with Postgres() as connection:
-        postgres_select_query = """ SELECT * FROM audio WHERE USER_ID = %s AND (FILE_TYPE = %s OR FILE_TYPE = %s) AND FILE_PATH LIKE %s"""
+        postgres_select_query = """ SELECT x.audio_id, x.file_name, x.file_path, x.file_size, x.file_type, x.created_at, x.updated_at, y.user_id, y.permission 
+        FROM audio AS x, audio_user AS y 
+        WHERE x.audio_id = y.audio_id 
+        AND y.user_id = %s 
+        AND (x.FILE_TYPE = %s OR x.FILE_TYPE = %s) 
+        AND x.FILE_PATH LIKE %s"""
         if folder_name != 'Uploads':
-            file_path = user_id + "/Uploads/" + folder_name + "/%"
+            file_path = "%/Uploads/" + folder_name + "/%"
         else: 
-            file_path = user_id + "/Uploads/%"
+            file_path = "%/Uploads/%"
         filter_values= (user_id, file_type1, file_type2, file_path)
         results = connection.execute_select_query(postgres_select_query, filter_values)
         if folder_name == 'Uploads':
@@ -266,6 +299,17 @@ def get_files_and_folders(user_id, folder_name):
             return jsonify({'result': filteredResults})
         else:
             return jsonify({'result': results})
+
+@app.route('/api/get-shared-users/<audio_id>', methods=["GET"])
+def get_shared_users(audio_id):
+    with Postgres() as connection:
+        postgres_select_query = """ SELECT * from audio_user WHERE audio_id = %s """
+        filter_values = (audio_id)
+        results = connection.execute_select_query(postgres_select_query, (filter_values,))
+
+        return jsonify({'result': results})
+
+
 
 @app.route('/api/get-eaf-files/<string:audio_id>', methods=["GET"])
 def get_eaf_file(audio_id):

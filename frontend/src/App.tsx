@@ -97,7 +97,7 @@ const App = () => (
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
-      <Route path="/pitchartwizard/:uploadId?" component={CreatePitchArt} />
+      <Route path="/pitchartwizard/:type?/:id?" component={CreatePitchArt} />
       <Route path="/peldaview" component={PeldaView} />
       <Route path="/learn/words/syllables" component={WordSyllableCategories} />
       <Route

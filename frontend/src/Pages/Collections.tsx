@@ -29,12 +29,12 @@ export default function Collections() {
 
   const [availableCollections, setAvailableCollections] = useState([
     [
-      1,
-      "b3dd3d7b-3909-40f3-8000-f5471c1775cf",
+      33,
+      "1880f9eb-e274-4093-ac6b-8e7fa9a05a84",
       "default",
       " ",
       " ",
-      "A default collection.",
+      "",
     ],
   ]);
   const [createCollectionName, setCreateCollectionName] = useState("");
@@ -43,7 +43,7 @@ export default function Collections() {
 
   const [collectionsUpdated, setCollectionsUpdated] = useState(0);
   const [selectedCollection, setSelectedCollection] = useState("default");
-  const [selectedCollectionUuid, setSelectedCollectionUuid] = useState("");
+  const [selectedCollectionUuid, setSelectedCollectionUuid] = useState("1880f9eb-e274-4093-ac6b-8e7fa9a05a84");
   const [words, setWords] = useState([]);
   const [update, setUpdate] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -271,6 +271,8 @@ export default function Collections() {
 
   const onCollectionSelectChange = (event: any) => {
     setSelectedCollection(event.value);
+    setSelectedCollectionUuid(getCollectionUuidFromName(event.value).toString());
+    //handleViewCollection(event);
   };
 
   const onChangeCollectionName = (event: any) => {

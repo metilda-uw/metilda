@@ -28,15 +28,19 @@ import {
 } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
 import { Letter, Speaker } from "../types/types";
+import * as DEFAULT from "../constants/create";
 
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
+import { isTypeFlagSet } from "tslint";
 
 export interface AudioAnalysisProps {
   speakerIndex: number;
   speakers: Speaker[];
   firebase: any;
   files: any[];
+  maxPitch: number;
+  minPitch: number;
   addSpeaker: () => void;
   removeSpeaker: (speakerIndex: number) => void;
   setUploadId: (
@@ -56,6 +60,7 @@ export interface AudioAnalysisProps {
     pitch: number
   ) => void;
   parentCallBack: (selectedFolderName: string) => void;
+  updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
 }
 
 interface State {
@@ -66,8 +71,6 @@ interface State {
   isAudioImageLoaded: boolean;
   soundLength: number;
   selectionInterval: string;
-  maxPitch: number;
-  minPitch: number;
   imageUrl: string;
   audioUrl: string;
   audioEditVersion: number;
@@ -75,6 +78,8 @@ interface State {
   maxSelectX: number;
   minAudioX: number;
   maxAudioX: number;
+  minPitch: number;
+  maxPitch: number;
   minAudioTime: number;
   maxAudioTime: number;
   audioImgWidth: number;
@@ -99,49 +104,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
    * below were altered slightly, the bug went away. Likely it
    * was a result of a weird, undocumented edge case in that library.
    */
-  static SPEAKER_LIMIT(): number {
-    return 4;
-  }
-
-  static get MIN_IMAGE_XPERC(): number {
-    return 351.0 / 2800.0;
-  }
-
-  static get MAX_IMAGE_XPERC(): number {
-    return 2522.0 / 2800.0;
-  }
-
-  static get AUDIO_IMG_WIDTH(): number {
-    return 653;
-  }
-
-  static get AUDIO_IMG_HEIGHT(): number {
-    return 500;
-  }
-
-  static get DEFAULT_MIN_ANALYSIS_PITCH(): number {
-    return 75.0;
-  }
-
-  static get DEFAULT_MAX_ANALYSIS_PITCH(): number {
-    return 500.0;
-  }
-
-  static get DEFAULT_SYLLABLE_TEXT(): string {
-    return "";
-  }
-
-  static get DEFAULT_SEPARATOR_TEXT(): string {
-    return "";
-  }
-
-  static formatImageUrl(
-    uploadId: string,
-    minPitch?: number,
-    maxPitch?: number,
-    tmin?: number,
-    tmax?: number
-  ) {
+  static formatImageUrl(uploadId: string, minPitch?: number, maxPitch?: number, tmin?: number, tmax?: number) {
     let url = `/api/audio/${uploadId}.png/image`;
     const urlOptions = [];
 
@@ -176,47 +139,57 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     }
   }
 
+  static getDerivedStateFromProps(props, state) {
+    //alert("here")
+    if(state.minAudioTime === 0 && state.maxAudioTime === -1){
+      state.imageUrl = AudioAnalysis.formatImageUrl(
+        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
+    } else {
+      state.imageUrl = AudioAnalysis.formatImageUrl(
+        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch, state.minAudioTime, state.maxAudioTime);
+    }
+    state.minPitch = props.minPitch;
+    state.maxPitch = props.maxPitch;
+    return state;
+  }
+
   constructor(props: AudioAnalysisProps) {
     super(props);
 
     this.state = {
       selectedFolderName: "Uploads",
-      speakerName: "Speaker",
-      word: "Word",
-      wordTranslation: "Word Translation",
+      speakerName: this.props.speakers[this.props.speakerIndex].speakerName,
+      word: this.props.speakers[this.props.speakerIndex].word,
+      wordTranslation: this.props.speakers[this.props.speakerIndex].wordTranslation,
       showImgMenu: false,
       imgMenuX: -1,
       imgMenuY: -1,
       isAudioImageLoaded: false,
       soundLength: -1,
       selectionInterval: "Letter",
-      maxPitch: AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
-      minPitch: AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
       imageUrl: AudioAnalysis.formatImageUrl(
         this.getSpeaker().uploadId,
-        AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
-        AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH
-      ),
+        this.props.minPitch,
+        this.props.maxPitch),
       audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
       audioEditVersion: 0,
       minSelectX: -1,
       maxSelectX: -1,
-      minAudioX: AudioAnalysis.MIN_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
-      maxAudioX: AudioAnalysis.MAX_IMAGE_XPERC * AudioAnalysis.AUDIO_IMG_WIDTH,
+      minPitch: this.props.minPitch,
+      maxPitch: this.props.maxPitch,
+      minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
+      maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
       minAudioTime: 0.0,
       maxAudioTime: -1.0,
-      audioImgWidth:
-        (AudioAnalysis.MAX_IMAGE_XPERC - AudioAnalysis.MIN_IMAGE_XPERC) *
-        AudioAnalysis.AUDIO_IMG_WIDTH,
-      closeImgSelectionCallback: () => null,
-      selectionCallback: (t1, t2) => null,
+      audioImgWidth: (DEFAULT.MAX_IMAGE_XPERC - DEFAULT.MIN_IMAGE_XPERC)
+        * DEFAULT.AUDIO_IMG_WIDTH,
+      closeImgSelectionCallback: () => (null),
+      selectionCallback: (t1, t2) => (null),
     };
-
     this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
     this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
-    this.audioIntervalSelectionCanceled =
-      this.audioIntervalSelectionCanceled.bind(this);
+    this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
     this.applyPitchRange = this.applyPitchRange.bind(this);
     this.showAllClicked = this.showAllClicked.bind(this);
@@ -225,10 +198,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
     this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
     this.wordSplitClicked = this.wordSplitClicked.bind(this);
-    this.imageIntervalToTimeInterval =
-      this.imageIntervalToTimeInterval.bind(this);
-    this.getAudioConfigForSelection =
-      this.getAudioConfigForSelection.bind(this);
+    this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
+    this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
     this.manualPitchChange = this.manualPitchChange.bind(this);
     this.addPitch = this.addPitch.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -236,11 +207,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   getSpeaker = (): Speaker => {
     return this.props.speakers[this.props.speakerIndex];
-  };
+  }
 
   componentDidMount() {
     const uploadId = this.getSpeaker().uploadId;
-
     if (!uploadId) {
       return;
     }
@@ -249,22 +219,21 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const request: RequestInit = {
       method: "GET",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
-      },
+      }
     };
 
     const imageUrl = AudioAnalysis.formatImageUrl(
       uploadId,
-      this.state.minPitch,
-      this.state.maxPitch
-    );
+      this.props.minPitch,
+      this.props.maxPitch);
 
     const audioUrl = AudioAnalysis.formatAudioUrl(uploadId);
 
     fetch(`/api/audio/${uploadId}/duration`, request)
       .then((response) => response.json())
-      .then(function (data: any) {
+      .then(function(data: any) {
         controller.setState({
           imageUrl,
           audioUrl,
@@ -274,41 +243,31 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       });
   }
 
-  setUploadId = async (
-    uploadId: string,
-    uploadPath: string,
-    fileIndex: number,
-    fileType: string
-  ) => {
+  setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
     if (fileType !== "Folder") {
       const storageRef = this.props.firebase.uploadFile();
-      storageRef
-        .child(uploadPath)
-        .getDownloadURL()
-        .then(async (url: any) => {
-          // `url` is the download URL for file
-          const response = await fetch(url);
-          const responseBlob = await response.blob();
-          const formData = new FormData();
-          formData.append("file", responseBlob, uploadId);
-          const analysisResponse = await fetch(`/api/audio/download-file`, {
-            method: "POST",
-            body: formData,
-          });
-          this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
-
-          this.props.resetLetters(this.props.speakerIndex);
-        })
-        .catch(function (error: any) {
-          // return;
+      storageRef.child(uploadPath).getDownloadURL().then(async (url: any) => {
+        // `url` is the download URL for file
+        const response = await fetch(url);
+        const responseBlob = await response.blob();
+        const formData = new FormData();
+        formData.append("file", responseBlob, uploadId);
+        const analysisResponse = await fetch(`/api/audio/download-file`, {
+          method: "POST",
+          body: formData,
         });
+        this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
+        this.props.resetLetters(this.props.speakerIndex);
+      }).catch(function(error: any) {
+        // return;
+      });
     } else {
       await this.setState({
         selectedFolderName: uploadId,
       });
       this.props.parentCallBack(this.state.selectedFolderName);
     }
-  };
+  }
 
   getAudioConfigForSelection(leftX?: number, rightX?: number) {
     // Compute the new time scale
@@ -334,8 +293,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
   targetPitchSelected(index: number) {
     if (index !== -1) {
-      const letter =
-        this.props.speakers[this.props.speakerIndex].letters[index];
+      const letter = this.props.speakers[this.props.speakerIndex].letters[index];
       this.state.selectionCallback(letter.t0, letter.t1);
 
       const newAudioUrl = AudioAnalysis.formatAudioUrl(
@@ -368,15 +326,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
-  addPitch(
-    pitch: number,
-    letter: string,
-    ts: number[],
-    isManualPitch: boolean = false,
-    isWordSep: boolean = false
-  ) {
+  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false) {
     if (!isWordSep) {
-      if (pitch < this.state.minPitch || pitch > this.state.maxPitch) {
+      if (pitch < this.props.minPitch || pitch > this.props.maxPitch) {
         // the pitch outside the bounds of the window, omit it
         return;
       }
@@ -392,7 +344,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       t0: ts[0],
       t1: ts[1],
       pitch,
-      syllable: AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
+      syllable: DEFAULT.SYLLABLE_TEXT,
       isManualPitch,
       isWordSep,
     };
@@ -406,94 +358,69 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     rightX: number,
     manualPitch?: number,
     isWordSep: boolean = false,
-    tsOverride?: number[]
-  ) {
+    tsOverride?: number[]) {
     const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
 
     if (manualPitch !== undefined) {
-      this.addPitch(manualPitch, AudioAnalysis.DEFAULT_SYLLABLE_TEXT, ts, true);
+      this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
       return;
     }
 
     if (isWordSep) {
-      this.addPitch(-1, AudioAnalysis.DEFAULT_SEPARATOR_TEXT, ts, false, true);
+      this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
       return;
     }
 
-    fetch(
-      `/api/audio/${this.getSpeaker().uploadId}/pitch/avg` +
-        "?t0=" +
-        ts[0] +
-        "&t1=" +
-        ts[1] +
-        "&max-pitch=" +
-        this.state.maxPitch +
-        "&min-pitch=" +
-        this.state.minPitch,
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          // this.setState({activeWordIndex: 0});
-          // this.setState({words: new StaticWordSyallableData().getData(
-          //      parseFloat(this.props.match.params.numSyllables),
-          //      parseFloat(this.props.location.search.slice(-1)))});
-          // this.getPreviousRecordings();
-          // this.resetSamplePitch();
-          // this.resetSlider(this.state.activeWordIndex);
-          // this.toggleChanged("showRedDot", false);",
-        },
-      }
-    )
+    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
+      + "?t0=" + ts[0]
+      + "&t1=" + ts[1]
+      + "&max-pitch=" + this.props.maxPitch
+      + "&min-pitch=" + this.props.minPitch, {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+        // this.setState({activeWordIndex: 0});
+        // this.setState({words: new StaticWordSyallableData().getData(
+        //      parseFloat(this.props.match.params.numSyllables), 
+        //      parseFloat(this.props.location.search.slice(-1)))});
+        // this.getPreviousRecordings();
+        // this.resetSamplePitch();
+        // this.resetSlider(this.state.activeWordIndex);
+        // this.toggleChanged("showRedDot", false);",
+      },
+    })
       .then((response) => response.json())
-      .then((data) =>
-        this.addPitch(
-          data.avg_pitch,
-          AudioAnalysis.DEFAULT_SYLLABLE_TEXT,
-          ts,
-          false
-        )
+      .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
       );
   }
 
   pitchArtRangeClicked() {
-    const ts = this.imageIntervalToTimeInterval(
-      this.state.minSelectX,
-      this.state.maxSelectX
-    );
+    const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
 
-    fetch(
-      `/api/audio/${this.getSpeaker().uploadId}/pitch/range` +
-        "?max-pitch=" +
-        this.state.maxPitch +
-        "&min-pitch=" +
-        this.state.minPitch +
-        "&t0=" +
-        ts[0] +
-        "&t1=" +
-        ts[1],
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
+    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
+      + "?max-pitch="
+      + this.props.maxPitch
+      + "&min-pitch=" + this.props.minPitch
+      + "&t0=" + ts[0]
+      + "&t1=" + ts[1], {
+      method: "GET",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
       }
-    )
+    })
       .then((response) => response.json())
-      .then((data) =>
-        (data as PitchRangeDTO).pitches.map((item) =>
-          this.addPitch(item[1], AudioAnalysis.DEFAULT_SYLLABLE_TEXT, [
-            item[0],
-            item[0],
-          ])
-        )
+      .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
+        DEFAULT.SYLLABLE_TEXT,
+        [item[0], item[0]])),
       );
   }
 
   averagePitchArtClicked() {
-    this.imageIntervalSelected(this.state.minSelectX, this.state.maxSelectX);
+    this.imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX);
   }
 
   wordSplitClicked() {
@@ -501,8 +428,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       this.state.minSelectX,
       this.state.maxSelectX,
       undefined,
-      true
-    );
+      true);
   }
 
   manualPitchChange(index: number, newPitch: number) {
@@ -514,9 +440,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     let isValidNumber = false;
 
     while (!isValidNumber) {
-      const msg =
-        `Enter pitch value between ${this.state.minPitch.toFixed(2)}Hz ` +
-        `and ${this.state.maxPitch.toFixed(2)}Hz`;
+      const msg = `Enter pitch value between ${this.props.minPitch.toFixed(2)}Hz `
+        + `and ${this.props.maxPitch.toFixed(2)}Hz`;
 
       const manualPitchStr: string | null = prompt(msg);
 
@@ -526,14 +451,17 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return;
       }
 
-      if (
-        manualPitchStr.split("").filter((char) => char === ",").length === 1
-      ) {
+      if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
         try {
           const values = manualPitchStr.split(",");
           const t0: number = parseFloat(values[0]);
           const t1: number = parseFloat(values[1]);
-          this.imageIntervalSelected(-1, -1, undefined, undefined, [t0, t1]);
+          this.imageIntervalSelected(
+            -1,
+            -1,
+            undefined,
+            undefined,
+            [t0, t1]);
           return;
         } catch {
           // do nothing
@@ -549,14 +477,11 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         continue;
       }
 
-      isValidNumber = !(
-        manualPitch < this.state.minPitch || manualPitch > this.state.maxPitch
-      );
+      isValidNumber = !(manualPitch < this.props.minPitch || manualPitch > this.props.maxPitch);
       if (!isValidNumber) {
-        const errorMsg =
-          `${manualPitch}Hz is not between between ${this.state.minPitch.toFixed(
-            2
-          )}Hz ` + `and ${this.state.maxPitch.toFixed(2)}Hz`;
+        const errorMsg
+          = `${manualPitch}Hz is not between between ${this.props.minPitch.toFixed(2)}Hz `
+          + `and ${this.props.maxPitch.toFixed(2)}Hz`;
         NotificationManager.error(errorMsg);
       }
     }
@@ -564,14 +489,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      manualPitch
-    );
+      manualPitch);
   }
 
-  onAudioImageLoaded(
-    cancelCallback: () => void,
-    selectionCallback: (t1: number, t2: number) => void
-  ) {
+  onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
     this.setState({
       isAudioImageLoaded: true,
       closeImgSelectionCallback: cancelCallback,
@@ -597,39 +518,39 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   applyPitchRange(minPitch: number, maxPitch: number) {
+
     const newUrl = AudioAnalysis.formatImageUrl(
       this.getSpeaker().uploadId,
       minPitch,
       maxPitch,
       this.state.minAudioTime,
-      this.state.maxAudioTime
-    );
+      this.state.maxAudioTime);
 
     this.state.closeImgSelectionCallback();
 
     this.setState({
       imageUrl: newUrl,
       isAudioImageLoaded: false,
+      minPitch,
+      maxPitch,
       audioEditVersion: this.state.audioEditVersion + 1,
-      minPitch: minPitch || AudioAnalysis.DEFAULT_MIN_ANALYSIS_PITCH,
-      maxPitch: maxPitch || AudioAnalysis.DEFAULT_MAX_ANALYSIS_PITCH,
     });
+
+    this.props.updateAudioPitch(this.props.speakerIndex, minPitch, maxPitch);
   }
 
   showAllClicked() {
     const newUrl = AudioAnalysis.formatImageUrl(
       this.getSpeaker().uploadId,
-      this.state.minPitch,
-      this.state.maxPitch,
+      this.props.minPitch,
+      this.props.maxPitch,
       0,
-      this.state.soundLength
-    );
+      this.state.soundLength);
 
     const newAudioUrl = AudioAnalysis.formatAudioUrl(
       this.getSpeaker().uploadId,
       0,
-      this.state.soundLength
-    );
+      this.state.soundLength);
 
     this.state.closeImgSelectionCallback();
 
@@ -649,8 +570,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const u0 = x1 / dx;
     const u1 = x2 / dx;
 
-    const t0 = this.state.minAudioTime + u0 * dt;
-    const t1 = this.state.minAudioTime + u1 * dt;
+    const t0 = this.state.minAudioTime + (u0 * dt);
+    const t1 = this.state.minAudioTime + (u1 * dt);
     return [t0, t1];
   }
 
@@ -658,16 +579,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     // Compute the new time scale
     const config = this.getAudioConfigForSelection(
       this.state.minSelectX,
-      this.state.maxSelectX
-    );
+      this.state.maxSelectX);
 
     const newImageUrl = AudioAnalysis.formatImageUrl(
       this.getSpeaker().uploadId,
-      this.state.minPitch,
-      this.state.maxPitch,
+      this.props.minPitch,
+      this.props.maxPitch,
       config.minAudioTime,
-      config.maxAudioTime
-    );
+      config.maxAudioTime);
 
     this.state.closeImgSelectionCallback();
 
@@ -682,8 +601,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   renderSpeakerControl = () => {
-    const isLastSpeaker =
-      this.props.speakerIndex === this.props.speakers.length - 1;
+    const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
     const isFirstSpeaker = this.props.speakerIndex === 0;
 
     return (
@@ -691,27 +609,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         speakerIndex={this.props.speakerIndex}
         addSpeaker={this.props.addSpeaker}
         removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-        canAddSpeaker={
-          isLastSpeaker &&
-          this.props.speakerIndex < AudioAnalysis.SPEAKER_LIMIT() - 1
-        }
-        canRemoveSpeaker={!isFirstSpeaker}
-      />
+        canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
+        canRemoveSpeaker={!isFirstSpeaker} />
     );
-  };
+  }
 
   showImgMenu = (imgMenuX: number, imgMenuY: number) => {
     this.setState({ imgMenuX, imgMenuY });
-  };
+  }
 
   maybeRenderImgMenu = () => {
     if (this.state.imgMenuX !== -1 && this.state.imgMenuY !== -1) {
-      const isSelectionActive =
-        this.state.minSelectX !== -1 && this.state.maxSelectX !== -1;
+      const isSelectionActive = this.state.minSelectX !== -1
+        && this.state.maxSelectX !== -1;
 
-      const isAllShown =
-        this.state.minAudioTime === 0 &&
-        this.state.maxAudioTime === this.state.soundLength;
+      const isAllShown = this.state.minAudioTime === 0
+        && this.state.maxAudioTime === this.state.soundLength;
 
       return (
         <AudioAnalysisImageMenu
@@ -729,32 +642,41 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         />
       );
     }
-  };
+  }
 
   onSubmitSpeakerName = (event: any) => {
     event.preventDefault();
-    const { speakerName } = this.state;
-    const { word } = this.state;
-    const { wordTranslation } = this.state;
+    const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
     this.props.setSpeakerName(this.props.speakerIndex, speakerName);
     this.props.setWord(this.props.speakerIndex, word);
     this.props.setWordTranslation(this.props.speakerIndex, wordTranslation);
-  };
+  }
 
   onChange = (event: any) => {
-    console.log(event.target);
-    this.setState({ [event.target.name]: event.target.value });
-  };
+    if (event.target.name === "speakerName") {
+      this.props.setSpeakerName(this.props.speakerIndex, event.target.value);
+    } else if (event.target.name === "word") {
+      this.props.setWord(this.props.speakerIndex, event.target.value);
+    } else if (event.target.name === "wordTranslation") {
+      this.props.setWordTranslation(this.props.speakerIndex, event.target.value);
+    }
 
-  onChangeWord = (event: any) => {
     this.setState({ [event.target.name]: event.target.value });
   };
 
   render() {
     const uploadId = this.getSpeaker().uploadId;
-    const { speakerName } = this.state;
-    const { word } = this.state;
-    const { wordTranslation } = this.state;
+    const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
+
+    if (speakerName === undefined) {
+      this.props.setSpeakerName(this.props.speakerIndex, "Speaker");
+    }
+    if (word === undefined) {
+      this.props.setWord(this.props.speakerIndex, "Word");
+    }
+    if (wordTranslation === undefined) {
+      this.props.setWordTranslation(this.props.speakerIndex, "WordTranslation");
+    }
 
     const isInvalid = speakerName === "";
 
@@ -769,94 +691,42 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       <div className="AudioAnalysis">
         <div className="row">
           <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
-            <h6 className="metilda-control-header">
-              Speaker {this.props.speakerIndex + 1}
-            </h6>
-            <UploadAudio
-              initFileName={uploadId}
-              setUploadId={this.setUploadId}
-              userFiles={this.props.files}
-              firebase={this.props.firebase}
-            />
-            <PitchRange
-              initMinPitch={this.state.minPitch}
-              initMaxPitch={this.state.maxPitch}
-              applyPitchRange={this.applyPitchRange}
-            />
-            <form
-              className="set-speaker-name"
-              onSubmit={this.onSubmitSpeakerName}
-            >
-              <input
-                name="speakerName"
-                value={speakerName}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Speaker Name"
-              />
-              <input
-                name="word"
-                value={word}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Word"
-              />
-              <input
-                name="wordTranslation"
-                value={wordTranslation}
-                onChange={this.onChange}
-                type="text"
-                placeholder="Word Translation"
-              />
-
-              <button
-                disabled={isInvalid}
-                type="submit"
-                className="waves-effect waves-light btn globalbtn"
-              >
-                Save Details
-              </button>
-            </form>
-
+            <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
+            <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}
+              userFiles={this.props.files} firebase={this.props.firebase} />
+            <PitchRange initMinPitch={this.props.minPitch}
+              initMaxPitch={this.props.maxPitch}
+              applyPitchRange={this.applyPitchRange} />
             {this.renderSpeakerControl()}
           </div>
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
               {this.maybeRenderImgMenu()}
-              {uploadId ? (
-                <AudioImg
-                  key={this.state.audioEditVersion}
-                  uploadId={uploadId}
-                  speakerIndex={this.props.speakerIndex}
-                  src={this.state.imageUrl}
-                  ref="audioImage"
-                  imageWidth={AudioAnalysis.AUDIO_IMG_WIDTH}
-                  xminPerc={AudioAnalysis.MIN_IMAGE_XPERC}
-                  xmaxPerc={AudioAnalysis.MAX_IMAGE_XPERC}
-                  audioIntervalSelected={this.audioIntervalSelected}
-                  audioIntervalSelectionCanceled={
-                    this.audioIntervalSelectionCanceled
-                  }
-                  onAudioImageLoaded={this.onAudioImageLoaded}
-                  showImgMenu={this.showImgMenu}
-                  minAudioX={this.state.minAudioX}
-                  maxAudioX={this.state.maxAudioX}
-                  minAudioTime={this.state.minAudioTime}
-                  maxAudioTime={this.state.maxAudioTime}
-                />
-              ) : (
-                []
-              )}
+              {
+                uploadId ?
+                  <AudioImg
+                    key={this.state.audioEditVersion}
+                    uploadId={uploadId}
+                    speakerIndex={this.props.speakerIndex}
+                    src={this.state.imageUrl}
+                    ref="audioImage"
+                    imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                    xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+                    xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
+                    audioIntervalSelected={this.audioIntervalSelected}
+                    audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                    onAudioImageLoaded={this.onAudioImageLoaded}
+                    showImgMenu={this.showImgMenu}
+                    minAudioX={this.state.minAudioX}
+                    maxAudioX={this.state.maxAudioX}
+                    minAudioTime={this.state.minAudioTime}
+                    maxAudioTime={this.state.maxAudioTime} />
+                  : []
+              }
             </div>
-            {uploadId && (
-              <PlayerBar
-                key={this.state.audioUrl}
-                audioUrl={this.state.audioUrl}
-              />
-            )}
-            <TargetPitchBar
-              letters={this.props.speakers}
+            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+            <TargetPitchBar letters={this.props.speakers}
               files={this.props.files}
               minAudioX={this.state.minAudioX}
               maxAudioX={this.state.maxAudioX}
@@ -864,8 +734,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               maxAudioTime={this.state.maxAudioTime}
               targetPitchSelected={this.targetPitchSelected}
               speakerIndex={this.props.speakerIndex}
-              firebase={this.props.firebase}
-            />
+              firebase={this.props.firebase} />
           </div>
         </div>
       </div>
@@ -877,30 +746,18 @@ const mapStateToProps = (state: AppState) => ({
   speakers: state.audio.speakers,
 });
 
-const mapDispatchToProps = (
-  dispatch: ThunkDispatch<AppState, void, AudioAction>
-) => ({
+const mapDispatchToProps = (dispatch: ThunkDispatch<AppState, void, AudioAction>) => ({
   addSpeaker: () => dispatch(addSpeaker()),
-  removeSpeaker: (speakerIndex: number) =>
-    dispatch(removeSpeaker(speakerIndex)),
-  setSpeakerName: (speakerIndex: number, speakerName: string) =>
-    dispatch(setSpeakerName(speakerIndex, speakerName)),
-  setWord: (speakerIndex: number, word: string) =>
-    dispatch(setWord(speakerIndex, word)),
-  setWordTranslation: (speakerIndex: number, wordTranslation: string) =>
-    dispatch(setWordTranslation(speakerIndex, wordTranslation)),
-  setWordTime: (speakerIndex: number, time: number) =>
-    dispatch(setWordTime(speakerIndex, time)),
-  setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
-    dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
-  addLetter: (speakerIndex: number, newLetter: Letter) =>
-    dispatch(addLetter(speakerIndex, newLetter)),
+  removeSpeaker: (speakerIndex: number) => dispatch(removeSpeaker(speakerIndex)),
+  setSpeakerName: (speakerIndex: number, speakerName: string) => dispatch(setSpeakerName(speakerIndex, speakerName)),
+  setWord: (speakerIndex: number, word: string) => dispatch(setWord(speakerIndex, word)),
+  setWordTranslation: (speakerIndex: number, wordTranslation: string) => dispatch(setWordTranslation(speakerIndex, wordTranslation)),
+  setWordTime: (speakerIndex: number, time: number) => dispatch(setWordTime(speakerIndex, time)),
+  setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
+  addLetter: (speakerIndex: number, newLetter: Letter) => dispatch(addLetter(speakerIndex, newLetter)),
   resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
-  setLetterPitch: (
-    speakerIndex: number,
-    letterIndex: number,
-    newPitch: number
-  ) => dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
+  setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) =>
+    dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(AudioAnalysis);

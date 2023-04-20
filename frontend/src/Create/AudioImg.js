@@ -39,7 +39,9 @@ class AudioImg extends Component {
     }
 
     componentWillUnmount() {
-        this.state.imgObj.remove();
+        if(this.state.imgObj){
+            this.state.imgObj.remove();
+        }
     }
 
     audioImgId = () => {

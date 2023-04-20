@@ -121,6 +121,16 @@ CREATE SEQUENCE public.audio_audio_id_seq
 
 ALTER SEQUENCE public.audio_audio_id_seq OWNED BY public.audio.audio_id;
 
+--
+-- Name: audio_user; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.audio_user
+(
+    audio_id integer NOT NULL,
+    user_id character varying NOT NULL,
+    permission character varying
+);
 
 --
 -- Name: eaf; Type: TABLE; Schema: public; Owner: -
@@ -346,6 +356,14 @@ ALTER TABLE ONLY public.analysis
 
 
 --
+-- Name: audio audio_user_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audio_user
+    ADD CONSTRAINT audio_user_pkey PRIMARY KEY (audio_id, user_id);
+
+
+--
 -- Name: audio audio_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -439,6 +457,21 @@ ALTER TABLE ONLY public.analysis
 
 ALTER TABLE ONLY public.audio
     ADD CONSTRAINT audio_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+--
+-- Name: audio audio_user_audio_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audio_user
+    ADD CONSTRAINT audio_user_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES public.users(audio_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: audio audio_user_audio_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audio_user
+    ADD CONSTRAINT audio_user_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.users(user_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
