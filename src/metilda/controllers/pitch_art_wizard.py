@@ -176,7 +176,7 @@ def create_file():
 
         postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
         insert_values = (last_row_id, request.form['user_id'], "own")
-        connection.execute_insert_query(postgres_insert_audio_user, insert_values)
+        connection.execute_insert_query(postgres_insert_audio_user, insert_values, need_last_row_id=False)
 
         if request.form['file_type'] == 'Recording':
             postgres_insert_query = """ INSERT INTO recording_info (AUDIO_ID, NUMBER_OF_SYLLABLES, RECORDING_NAME) VALUES (%s,%s,%s) RETURNING AUDIO_ID"""
@@ -205,7 +205,7 @@ def create_folder():
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
         postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
         insert_values = (last_row_id, request.form['user_id'], "own")
-        connection.execute_insert_query(postgres_insert_audio_user, insert_values)
+        connection.execute_insert_query(postgres_insert_audio_user, insert_values, need_last_row_id=False)
 
     return jsonify({'result': last_row_id})
 
@@ -776,7 +776,7 @@ def drawSound(upload_id):
     if environ.get('FLASK_ENV') == "development":
         image_path = ("metilda/" + image)
     else:
-        image_path = ("src/metilda/" + image)
+        image_path = ("metilda/" + image)
 
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image_path)
@@ -814,7 +814,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     if environ.get('FLASK_ENV') == "development":
         image_path = ("metilda/" + image)
     else:
-        image_path = ("src/metilda/" + image)
+        image_path = ("metilda/" + image)
         
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image_path)
