@@ -1,0 +1,49 @@
+.metilda-conversions {
+    display: block; 
+    
+    .scale-conversion {
+        display: flex;
+        width: 75%;
+        flex-direction: column;
+        .from-scale {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            margin-right: 10px;
+            .from-scale-details{
+                display: flex;
+                width:75%;
+                flex-direction: row;
+                .from-scale-name{
+                    display: block; 
+                    width: 50%;
+                    flex: 1
+                }
+                .from-scale-value{
+                    flex: 1;
+                    width: 50%
+                }
+            }
+        }
+        .to-scale {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            margin-right: 10px;
+            .to-scale-details{
+                display: flex;
+                width: 75%;
+                flex-direction: row;
+                .to-scale-name{
+                    display: block; 
+                    width: 50%;
+                    flex: 1
+                }
+                .to-scale-value{
+                    flex: 1;
+                    width: 50%
+                }
+            }
+        }
+    }
+  }
