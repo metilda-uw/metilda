@@ -39,9 +39,18 @@ class Home extends React.Component {
           <li>Naatosi Fish (Community Linguist, Blackfeet Nation)</li>
           <li>James Randall (Musicologist, University of Montana)</li></p>
         
-          <p className="para">Research Assistants
-          <br/>Computer Science: <br/>
-          Linguistics:</p>
+          <p className="para">
+            <b>Research Assistants</b>
+            <br/>
+            <b>Computer Science:</b>
+            <li>Mitchell Lee</li>
+            <li>Jignasha Borad</li>
+            <li>Praveena Avula</li>
+            <li>Chris Lee</li>
+            <li>Sanjay Penmetsa</li>
+            <br/>
+            <b>Linguistics:</b>
+          </p>
         
         <p className="list">
           <b>Acknowledgements:</b>

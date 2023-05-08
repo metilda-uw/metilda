@@ -376,7 +376,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
             name="wordTranslate"
             onChange={(event) => { setWordTranslate(event.target.value) }}
             type="text"
-            placeholder="Word Translate"
+            placeholder="Word Translation"
             required
           />
           <div className="collectionRename-cancel-save">
