@@ -22,11 +22,15 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
   const [saveModalIsOpen, setSaveModalIsOpen] = useState(false);
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+  const [updateModalIsOpen, setUpdateModalIsOpen] = useState(false);
   const [createCollectionName, setCreateCollectionName] = useState("");
   const [createCollectionDescription, setCreateCollectionDescription] = useState("");
   const [collectionOptions, setCollectionOptions] = useState([]);
   const [updateOptions, setUpdateOptions] = useState(0);
   const selectRef = useRef(null);
+  const [speakerName, setSpeakerName] = useState(data.speakerName);
+  const [word, setWord] = useState(data.word);
+  const [wordTranslate, setWordTranslate] = useState(data.wordTranslate);
 
 
   const customStyles = {
@@ -85,6 +89,14 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   };
   const setDeleteModalIsOpenToFalse = () => {
     setDeleteModalIsOpen(false);
+  };
+
+  const setUpdateModalIsOpenToTrue = (event: any) => {
+    event.preventDefault();
+    setUpdateModalIsOpen(true);
+  };
+  const setUpdateModalIsOpenToFalse = () => {
+    setUpdateModalIsOpen(false);
   };
 
   const onChangeCollectionName = (event: any) => {
@@ -150,39 +162,45 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
     setSaveModalIsOpenToFalse();
     const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
-    firebase.firestore
-      .collection(collectionUuid)
-      .add({
-        word: analysis[0].word,
-        wordTranslation: analysis[0].wordTranslation,
-        speakerName: analysis[0].speakerName,
-        ...data,
-        speakers: analysis,
-        createdAt: timestamp.fromDate(new Date())
-      })
-      .then((docRef) => {
-        //console.log("Document written with ID: ", docRef.id);
-        saveThumbnail(collectionUuid + "/" + docRef.id);
-        NotificationManager.success(
-          "Pitch Art added to collection successfully!"
-        );
-      })
-      .catch((error) => {
-        console.error("Error adding document: ", error);
-        NotificationManager.error("Renaming collection failed!");
-      });
+    if (word === undefined || wordTranslate === undefined || speakerName === undefined) {
+      NotificationManager.error("Invalid Spearker Name or Word or Word Translation !!!");
+    }
+    else {
+      firebase.firestore
+        .collection(collectionUuid)
+        .add({
+          word: word,
+          wordTranslation: wordTranslate,
+          speakerName: speakerName,
+          ...data,
+          speakers: analysis,
+          createdAt: timestamp.fromDate(new Date())
+        })
+        .then((docRef) => {
+          //console.log("Document written with ID: ", docRef.id);
+          saveThumbnail(collectionUuid + "/" + docRef.id);
+          NotificationManager.success(
+            "Pitch Art added to collection successfully!"
+          );
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+          NotificationManager.error("Renaming collection failed!");
+        });
+    }
   };
 
   const handleUpdateToCollections = async (event: any) => {
     event.preventDefault();
+    setUpdateModalIsOpenToFalse();
 
     firebase.firestore
       .collection(params['type'])
       .doc(params['id'])
       .update({
-        word: analysis[0].word,
-        wordTranslation: analysis[0].wordTranslation,
-        speakerName: analysis[0].speakerName
+        word: word === undefined ? data.word : word,
+        wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
+        speakerName: speakerName === undefined ? data.speakerName : speakerName
       })
       .then(() => {
         //console.log("Document written with ID: ", docRef.id);
@@ -221,17 +239,62 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
       });
   };
   const renderSave = () => {
-    if (params['type']) {
+    if (params['type'] && params['type'] != "share") {
       return (<div className="page-create-save-collections">
         <form className="page-create-save-collections-form">
           <button
             className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
             type="submit"
             name="action"
-            onClick={handleUpdateToCollections}
+            onClick={setUpdateModalIsOpenToTrue}
           >
             Update PitchArt
           </button>
+          <Modal
+            isOpen={updateModalIsOpen}
+            style={customStyles}
+            appElement={document.getElementById("root" || undefined)}
+          >
+            <p> Enter the updated details:</p>
+            <input
+              className="CreateCollection"
+              name="speakerName"
+              onChange={(event) => { setSpeakerName(event.target.value) }}
+              type="text"
+              defaultValue={data.speakerName}
+              required
+            />
+            <input
+              className="CreateCollection"
+              name="word"
+              onChange={(event) => { setWord(event.target.value) }}
+              type="text"
+              defaultValue={data.word}
+              required
+            />
+            <input
+              className="CreateCollection"
+              name="wordTranslate"
+              onChange={(event) => { setWordTranslate(event.target.value) }}
+              type="text"
+              defaultValue={data.wordTranslation}
+              required
+            />
+            <div className="collectionRename-cancel-save">
+              <button
+                className="btn waves-light globalbtn"
+                onClick={setUpdateModalIsOpenToFalse}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn waves-light globalbtn"
+                onClick={handleUpdateToCollections}
+              >
+                Update
+              </button>
+            </div>
+          </Modal>
           <button
             className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
             type="submit"
@@ -291,6 +354,31 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
           appElement={document.getElementById("root" || undefined)}
         >
           <p> Do you want to save the Pitch Art to {selectedCollection} ?</p>
+          <p> Enter the following details:</p>
+          <input
+            className="CreateCollection"
+            name="speakerName"
+            onChange={(event) => { setSpeakerName(event.target.value) }}
+            type="text"
+            placeholder="Speaker Name"
+            required
+          />
+          <input
+            className="CreateCollection"
+            name="word"
+            onChange={(event) => { setWord(event.target.value) }}
+            type="text"
+            placeholder="Word"
+            required
+          />
+          <input
+            className="CreateCollection"
+            name="wordTranslate"
+            onChange={(event) => { setWordTranslate(event.target.value) }}
+            type="text"
+            placeholder="Word Translation"
+            required
+          />
           <div className="collectionRename-cancel-save">
             <button
               className="btn waves-light globalbtn"

@@ -62,7 +62,7 @@ class PitchArtContainer extends React.Component<Props> {
     applyTimeRange = (minTime: number, maxTime: number) => {
         this.props.updatePitchArtValue("maxTime", maxTime);
     }
-
+    
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
         if (isVerticallyCentered) {
             this.props.updatePitchArtValue("showPitchScale", false);

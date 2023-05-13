@@ -1,7 +1,6 @@
 .Acknowledgements {
   color: brown;
-  position: fixed;
-  text-align: center;
+  text-align: left;
   bottom: 20px;
   width: 100%;
 }
@@ -15,10 +14,22 @@ h3 {
   color: brown;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
 }
+
 p {
   text-align: center;
   letter-spacing: 1px;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
   padding: 0px 20px;
   color: brown;
+}
+
+.list {
+  text-align: left;
+  margin-left: 25px;
+  color: brown;
+}
+
+.para {
+  text-align: left;
+  margin-left: 25px;
 }
