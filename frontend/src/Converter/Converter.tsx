@@ -1,33 +1,70 @@
 import React, {useEffect, useState } from "react";
 import Header from "../Components/header/Header";
 import './Converter.scss';
+import { frequencyData } from './FrequencyData'
+import { ConverterHelper } from './ConverterHelper';
+import { callbackify } from "util";
 
 function Converter(){
+    const MIN_FREQUENCY = 16.35;
+    const MAX_FREQUENCY = 7902.13;
+    const MET_SCALE_TEXT = "steps from A4, A2";
     const [fromScaleName, setFromScaleName] = useState('Hz');
     const [toScaleName, setToScaleName] = useState('MeT');
-    const [fromScaleValue, setFromScaleValue] = useState(0);
-    const [toScaleValue, setToScaleValue] = useState(0);
+    const [fromScaleValue, setFromScaleValue] = useState(110);
+    const [toScaleValue, setToScaleValue] = useState(-96);
+    const [fromTimer, setFromTimer] = useState(null);
+    const [toTimer, setToTimer] = useState(null);
+    const [meTtext, setMetScaleText] = useState("Steps from A4 , A2");
+    const [noteText, setNoteText] = useState('');
 
     const scaleOptions = ['Hz', 'Semitones', 'Mel', 'MeT']; 
     
-    useEffect(() => {
-      // initialization of default values up on component mount
-      setFromScaleValue(110);
-      const tovalue = convertScales(110,'Hz','MeT');
-      setToScaleValue(tovalue);
-    }, []); 
-   
-    /** This function is called when FROM scale changes
+    /**
+     * Method to handle user input
+     * It waits till the user complete's entering input
+     * @param e input event
      */
-    const handleFromScaleChange = (e) => {
+    const onFromScaleValueChange = (e) => {
+      const eventData = e;
+      setFromScaleValue(e.target.value);
+      // console.log("fromScaleValue 1" + fromScaleValue);
+      // console.log("e.target.value" + e.target.value);
+
+      clearTimeout(fromTimer);
+      e.persist();
+      function callback(event){
+        handleFromScaleValueChange(event);
+      }
+
+      const newTimer = setTimeout(callback, 1000, e);
+
+      setFromTimer(newTimer);
+    }
+
+    const onToScaleValueChange = (e) => {
+      setToScaleValue(e.target.value)
+
+      clearTimeout(toTimer)
+      e.persist();
+      const newTimer = setTimeout((event) => {
+        handleToScaleValueChange(event);
+      }, 1000,e)
+
+      setToTimer(newTimer);
+    }
+   
+    /** This function is called when FROM scale name changes
+     */
+    const handleFromScaleNameChange = (e) => {
         setFromScaleName(e.target.value);
         const convertedValue = convertScales(toScaleValue,toScaleName,e.target.value); // Automatically convert "From" amount
         setFromScaleValue(convertedValue);
     };
 
-    /** This function is called when TO scale changes
+    /** This function is called when TO scale name changes
      */
-    const handleToScaleChange = (e) => {
+    const handleToScaleNameChange = (e) => {
         setToScaleName(e.target.value);
         const convertedValue = convertScales(fromScaleValue,fromScaleName,e.target.value); // Automatically convert "To" amount
         setToScaleValue(convertedValue);
@@ -37,6 +74,15 @@ function Converter(){
     /** This function is called when FROM scale VALUE changes
      */
     const handleFromScaleValueChange = (e) => {
+      console.log("In handleFromScaleValueChange");
+        if(fromScaleName == 'Hz' && toScaleName == 'MeT'){
+          if(e.target.value < MIN_FREQUENCY){
+            e.target.value = MIN_FREQUENCY;
+          }
+          if(e.target.value > MAX_FREQUENCY){
+            e.target.value = MAX_FREQUENCY;
+          }
+        }
         setFromScaleValue(e.target.value);
         const convertedValue = convertScales(e.target.value, fromScaleName, toScaleName); // Automatically convert "From" amount
         setToScaleValue(convertedValue);
@@ -45,6 +91,14 @@ function Converter(){
     /** This function is called when TO scale VALUE changes
      */
     const handleToScaleValueChange = (e) => {
+        if(toScaleName == 'Hz' && fromScaleName == 'MeT'){
+          if(e.target.value < MIN_FREQUENCY){
+            e.target.value = MIN_FREQUENCY;
+          }
+          if(e.target.value > MAX_FREQUENCY){
+            e.target.value = MAX_FREQUENCY;
+          }
+        }
         setToScaleValue(e.target.value);
         const convertedValue = convertScales(e.target.value, toScaleName, fromScaleName); // Automatically convert "To" amount
         setFromScaleValue(convertedValue);
@@ -61,63 +115,91 @@ function Converter(){
         if (fromScaleName === toScaleName) {
           return value;
         }
-        console.log("Fromvalue " + value);
-        console.log("toScaleName " + toScaleName);
-        console.log("fromScaleName " + fromScaleName);
-        
-        return ConversionFormulas[fromScaleName][toScaleName](value).toFixed(2);
+        setNoteText('');
+        setMetScaleText('');
+
+        if(fromScaleName == "Hz" && toScaleName == "MeT"){ // Hz to MeT Conversion
+            return updateMeTValueAndText(value, fromScaleName, toScaleName);
+        }else if(fromScaleName == "MeT" && toScaleName == "Hz"){ // MeT to Hz Conversion
+            return updateHzValue(value, fromScaleName, toScaleName);
+        }else { // To handle remaining conversions
+          return ConverterHelper.ConversionFormulas[fromScaleName][toScaleName](value).toFixed(2);
+        }
     };
 
-    /** These are formulas for different scale conversions */
-    const ConversionFormulas = {
-        Hz: {
-          Semitones: (value) => 12 * Math.log2(value/440),
-          Mel: (value) => 1127.01048 * Math.log10(value/700 +1),
-          MeT: (value) => {
-            console.log("In HZ scale");
-            return 48 * Math.log2(value/440);
-          }
-        },
-        Semitones: {
-          Hz: (value) => 440 * Math.pow(2,value/12),
-          Mel: (value) => {
-            const hzValue = 440 * Math.pow(2,value/12);
-            return 1127.01048 * Math.log10(hzValue/700 +1);
-            },
-          MeT: (value) => {
-            const hzValue = 440 * Math.pow(2,value/12);
-            return 48 * Math.log2(hzValue/440);
-          }
-        },
-        Mel: {
-          Hz: (value) => 700 * (Math.pow(10,value/1127.01048) - 1),
-          Semitones: (value) => {
-            const hzValue = 700 * (Math.pow(10,value/1127.01048) - 1);
-            return 12 * Math.log2(hzValue/440);
-          },
-          MeT: (value) => {
-            const hzValue = 700 * (Math.pow(10,value/1127.01048) - 1);
-            return 48 * Math.log2(hzValue/440);
-          }
-        },
-        MeT: {
-          Hz: (value) => {
-            console.log("In MeT Scale");
-            return 440 * Math.pow(Math.pow(2,1/48),value);},
-          Semitones: (value) => {
-            const hzValue = 440 * Math.pow(Math.pow(2,1/48),value);
-            return 12 * Math.log2(hzValue/440);
-          },
-          Mel: (value) => {
-            const hzValue = 440 * Math.pow(Math.pow(2,1/48),value);
-            return 1127.01048 * Math.log10(hzValue/700 +1);
-          }
-        }
-    }; 
-    //scale-converion style={{display: "flex", width: '75%',flexDirection:"column"}}
-    // from-scale style={{flex: "1",display: "flex", flexDirection: "row", marginRight: "10px"}}
-    // from-scale-details style = {{display:"flex", width:'75%', flexDirection: "row"}}
-    // from-scale-Name style={{display:"block", width:'50%', flex: "1"}}
+    /**
+     * Function convert HZ to MeT value
+     * @param frequency 
+     * @param fromScaleName 
+     * @param toScaleName 
+     * @returns 
+     */
+    const updateMeTValueAndText= (frequency, fromScaleName, toScaleName) => {
+      
+      // check if exact freqency value exists in frequency data
+      let freqIndex = ConverterHelper.findExactFrequency(frequencyData,frequency);
+      let noteName = null;
+      if(freqIndex != null){
+        noteName = frequencyData[freqIndex].note;
+        setMetScaleText("Steps from A4 , " + noteName);
+        return ConverterHelper.ConversionFormulas[fromScaleName][toScaleName](frequency).toFixed(2);
+      }
+
+      // handle case if exact frequency is not found
+
+      // TODO : if exact frequency is not found, display a text to user saying about the same.
+
+      let freqDataObject = ConverterHelper.findNearestFrequency(frequencyData,frequency);
+      setMetScaleText("Steps from A4, " + freqDataObject.note);
+      setNoteText("Note: The MeT value is based on nearest valid frequency i.e " + freqDataObject.frequency);
+
+      console.log(noteText);
+      return freqDataObject.MeTValue;
+    };
+
+    /**
+     * Function to convert Met Value to Hz value
+     * @param metValue 
+     * @param fromScaleName 
+     * @param toScaleName 
+     */
+    const updateHzValue = (metValue, fromScaleName, toScaleName) => {
+
+      // convert met value to frequency in Hz 
+      const frequency = ConverterHelper.ConversionFormulas[fromScaleName][toScaleName](metValue).toFixed(2);
+      
+      /**
+       *  check if exact freqency value exists in frequency data because , if frquency
+       * is found it means that there exist a valid met value.
+       * */ 
+      let freqIndex = ConverterHelper.findExactFrequency(frequencyData,frequency);
+
+      console.log("frequencyIndex  :::" + freqIndex);
+      if(freqIndex != null){
+        setMetScaleText("Steps from A4, " + frequencyData[freqIndex].note);
+        return frequency;
+      }
+
+      /**
+       * handle case if exact frequency is not found, then we need to find nearest valid 
+       * met value to find valid frequency in Hz 
+       * */ 
+
+      let freqDataObject = ConverterHelper.findNearestFrequency(frequencyData,frequency);
+      /**
+       * A text info for the user that meTScale note name is
+       * based on the nearest valid met value.
+       */
+      setMetScaleText("Steps from A4, " + freqDataObject.note);
+
+      /**
+       * A text info for the user thats the frequency which is returned is 
+       * based on nearest valid met value for the user entered met value.
+       * */ 
+      setNoteText("Note: The Hz value is based on nearest valid step of MeT Scale i.e " + freqDataObject.MeTValue);
+      return freqDataObject.frequency;
+
+    };
 
     return (
         <div className="metilda-conversions">
@@ -125,44 +207,65 @@ function Converter(){
             <div className="scale-conversion">
                 <div className="from-scale" >
                     <div className="from-scale-details">
-                      <select className="from-scale-name" value={fromScaleName} onChange={handleFromScaleChange}>
+                      <select className="from-scale-name" value={fromScaleName} onChange={handleFromScaleNameChange}>
                           {scaleOptions.map((scale) => (
                               <option key={scale} value={scale}>
                                   {scale}
                               </option>
                           ))}
                       </select>
-                      <input
-                          type="number"
+                      {(toScaleName == "MeT") && (fromScaleName == "Hz") && 
+                        <input type="number" min="16.35" max="7902.13" step="0.1"
                           className="from-scale-value"
                           value={fromScaleValue}
-                          onChange={handleFromScaleValueChange}
-                      />
+                          onChange={onFromScaleValueChange}
+                        />
+                      }
+                      {!((toScaleName == "MeT") && (fromScaleName == "Hz")) && 
+                        <input
+                            type="number"
+                            className="from-scale-value"
+                            value={fromScaleValue}
+                            onChange={onFromScaleValueChange}
+                        />
+                      }
                     </div>
                     <div>
-                      {(fromScaleName == "MeT") && <p> steps from A4 and A2</p>}
+                      {(fromScaleName == "MeT" && toScaleName == "Hz") && <p>{meTtext}</p>}
                     </div>     
                 </div>
                 <div className="to-scale" >
                     <div className="to-scale-details">
-                      <select className="to-scale-name" value={toScaleName} onChange={handleToScaleChange}>
+                      <select className="to-scale-name" value={toScaleName} onChange={handleToScaleNameChange}>
                           {scaleOptions.map((scale) => (
                               <option key={scale} value={scale}>
                                   {scale}
                               </option>
                           ))}
                       </select>
-                      <input
-                          type="number"
+                      {(fromScaleName == "MeT") && (toScaleName == "Hz") && 
+                        <input type="number" min="16.35" max="7902.13" step="0.1"
                           className="to-scale-value"
                           value={toScaleValue}
-                          onChange={handleToScaleValueChange}
-                      />
+                          onChange={onToScaleValueChange}
+                        />
+                      }
+                      {!((fromScaleName == "MeT") && (toScaleName == "Hz")) && 
+                        <input
+                            type="number"
+                            className="to-scale-value"
+                            value={toScaleValue}
+                            onChange={onToScaleValueChange}
+                        />
+                      }
                     </div>  
                     <div>
-                      {(toScaleName == "MeT") && <p> steps from A4 and A2</p>}
+                      {(toScaleName == "MeT" && fromScaleName == "Hz") && <p>{meTtext}</p>}
                     </div> 
                 </div>
+            </div>
+            <div className="user-note">
+                 {(noteText != '') &&  <p className="note-text">{noteText}</p>}
             </div>
         </div>    
     );
