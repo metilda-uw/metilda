@@ -28,7 +28,30 @@ import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./Pages/Collections";
 import LearnNew from "./Pages/LearnNew";
+import ContentManagement from "./CMS/ContentManagement";
+import Course from "./CMS/Course/Course";
+import Lessons from "./CMS/Course/Lessons";
+import Quiz from "./CMS/Course/Quiz";
+import Students from "./CMS/Course/Students";
+import Grades from "./CMS/Course/Grades";
+import Syllabus from "./CMS/Course/Syllabus";
+import Assignment from "./CMS/Course/Assignment";
+import StudentCourses from "./Student/StudentCourses";
+import StudentSyllabus from "./Student/StudentCourse/StudentSyllabus";
+import StudentLessons from "./Student/StudentCourse/StudentLessons";
+import StudentAssignment from "./Student/StudentCourse/StudentAssignment";
+import StudentQuiz from "./Student/StudentCourse/StudentQuiz";
+import StudentGrades from "./Student/StudentCourse/StudentGrades";
+import StudentCourse from "./Student/StudentCourse/StudentCourse";
+import Discussion from "./CMS/Course/Discussion";
 // import Word from "./Components/collections/Word";
+import { Topic } from "./CMS/Course/Discussion/Topic";
+import { CreatePost } from "./CMS/Course/Discussion/CreatePost";
+import { Post } from "./CMS/Course/Discussion/Post";
+import StudentDiscussion from "./Student/StudentCourse/StudentDiscussion";
+import { StudentTopic } from "./Student/StudentCourse/Discussion/StudentTopic";
+import { StudentCreatePost } from "./Student/StudentCourse/Discussion/StudentCreatePost";
+import { StudentPost } from "./Student/StudentCourse/Discussion/StudentPost";
 
 interface Props {
   firebase: any;
@@ -104,6 +127,32 @@ const App = () => (
         path="/learn/words/syllables/:numSyllables"
         component={WordSyllableReview}
       />
+
+      <Route exact path="/content-management" component={ContentManagement} />
+      <Route exact path="/content-management/course/:id" component={Course} />
+      <Route exact path="/content-management/course/:id/syllabus" component={Syllabus} />
+      <Route exact path="/content-management/course/:id/lessons" component={Lessons} />
+      <Route exact path="/content-management/course/:id/discussion" component={Discussion} />
+      <Route exact path="/content-management/course/:id/discussion/topic/:topic_id" component={Topic} />
+      <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/create" component={CreatePost} />
+      <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/post/:post_id" component={Post} />
+      <Route exact path="/content-management/course/:id/assignment" component={Assignment} />
+      <Route exact path="/content-management/course/:id/quiz" component={Quiz} />
+      <Route exact path="/content-management/course/:id/students" component={Students} />
+      <Route exact path="/content-management/course/:id/grades" component={Grades} />
+
+      <Route exact path="/student-view" component={StudentCourses} />
+      <Route exact path="/student-view/course/:id" component={StudentCourse} />
+      <Route exact path="/student-view/course/:id/syllabus" component={StudentSyllabus} />
+      <Route exact path="/student-view/course/:id/lessons" component={StudentLessons} />
+      <Route exact path="/student-view/course/:id/discussion" component={StudentDiscussion} />
+      <Route exact path="/student-view/course/:id/discussion/topic/:topic_id" component={StudentTopic} />
+      <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/create" component={StudentCreatePost} />
+      <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/post/:post_id" component={StudentPost} />
+      <Route exact path="/student-view/course/:id/assignment" component={StudentAssignment} />
+      <Route exact path="/student-view/course/:id/quiz" component={StudentQuiz} />
+      <Route exact path="/student-view/course/:id/grades" component={StudentGrades} />
+
     </div>
   </Router>
 );

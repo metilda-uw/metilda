@@ -29,6 +29,9 @@ app.json_encoder = CustomJSONEncoder
 
 import metilda.controllers.pitch_art_wizard
 import metilda.controllers.controller_firestore
+import metilda.controllers.ContentManagerController
+import metilda.controllers.StudentViewController
+import metilda.controllers.FileUtils
 
 @app.route('/')
 @app.route('/<path:path>')
