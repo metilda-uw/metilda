@@ -1,54 +1,130 @@
 .metilda-conversions {
-    display: block; 
-    
+    display: block;
+
     .scale-conversion {
         display: flex;
-        width: 75%;
+        width: 100%;
         flex-direction: column;
+        align-items: center;
+
         .from-scale {
-            flex: 1;
+            width: 65%;
             display: flex;
             flex-direction: row;
-            margin-right: 10px;
+            align-items: center;
+            margin-left: auto;
+
+            .from-label {
+                font-size: 16px;
+                color: brown;
+                margin-right: 10px;
+            }
+
             .from-scale-details{
                 display: flex;
-                width:75%;
+                width:400px;
                 flex-direction: row;
+                margin-right: 10px;
+                align-items: center;
+
                 .from-scale-name{
-                    display: block; 
-                    width: 50%;
-                    flex: 1
+                    display: block;
+                    width: 200px;
+                    text-align: center;
+                    background-color: #f25e68;
+                    padding: 5px;
                 }
+
                 .from-scale-value{
-                    flex: 1;
-                    width: 50%
+                    width: 100px;
+                    text-align: center;
+                    margin-left: 10px;
                 }
+
             }
+            .from-scale-unit{
+                width: 100px;
+            }
+
         }
+
         .to-scale {
-            flex: 1;
+            width: 65%;
             display: flex;
             flex-direction: row;
-            margin-right: 10px;
+            align-items: center;
+            margin-left: auto;
+
+            .to-label {
+                font-size: 16px;
+                color: brown;
+                margin-right: 10px;
+            }
+
             .to-scale-details{
                 display: flex;
-                width: 75%;
+                width:400px;
                 flex-direction: row;
+                align-items: center;
+                margin-left: 10px;
+                margin-right: 10px;
+
                 .to-scale-name{
-                    display: block; 
-                    width: 50%;
-                    flex: 1
+                    display: block;
+                    width: 200px;
+                    text-align: center;
+                    margin-left: 10px;
+                    background-color: #f25e68;
+                    padding: 5px;
                 }
+
                 .to-scale-value{
-                    flex: 1;
-                    width: 50%
+                    width: 100px;
+                    text-align: center;
+                    margin-left: 10px;
+                }
+
+                .to-scale-unit{
+                    width: 100px;
                 }
             }
         }
     }
+
     .user-note {
         .note-text {
-            text-align: left;
+            text-align: center; /*Set user note to center*/
         }
     }
-  }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .b {
+        color: brown;
+        margin-top: 50px;
+    }
+
+    .p {
+        text-align: center;
+        letter-spacing: 1px;
+        font-family: 'Trebuchet MS', Helvetica, sans-serif;
+        padding: 0px 20px;
+        color: brown;
+    }
+
+    .tips-p {
+        width: 70%;
+        flex-direction: column;
+        text-align: left;
+        align-items: center;
+        justify-content: center;
+        letter-spacing: 1px;
+        font-family: 'Trebuchet MS', Helvetica, sans-serif;
+        color: brown;
+    }
+
+}
