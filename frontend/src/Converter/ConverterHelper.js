@@ -6,7 +6,6 @@ export const ConverterHelper = {
           Semitones: (value) => 12 * Math.log2(value/440),
           Mel: (value) => 1127.01048 * Math.log10(value/700 +1),
           MeT: (value) => {
-            console.log("In HZ scale");
             return 48 * Math.log2(value/440);
           }
         },
@@ -34,7 +33,7 @@ export const ConverterHelper = {
         },
         MeT: {
           Hz: (value) => {
-            console.log("In MeT Scale");
+            
             return 440 * Math.pow(Math.pow(2,1/48),value);},
           Semitones: (value) => {
             const hzValue = 440 * Math.pow(Math.pow(2,1/48),value);
@@ -119,7 +118,6 @@ export const ConverterHelper = {
         console.log("upperFrequencyIndex " + upperFrequencyIndex);
 
 
-        // remove the code after wards
         if(lowerFrequencyIndex == -1 || upperFrequencyIndex == -1)
           return {"frequency":1,"MeTValue":1,"noteName": "No Note found"};
 
@@ -130,7 +128,6 @@ export const ConverterHelper = {
             data[upperFrequencyIndex].frequency,upperMeTScaleValue);
         
         // check nearest freq value from freMeT Values array and return frequency and MeTVale
-        // TO DO
 
         let closestFreq = freqMeTValuesArray[0].frequency;
         let closestMeT = freqMeTValuesArray[0].MeTValue;
@@ -142,15 +139,14 @@ export const ConverterHelper = {
                 index = i;
             }
         }
-        console.log("closestFreq " + closestFreq);
-        console.log("closestMeT " + closestMeT);
+
         let note= "";
         if(index == 0){
           note = data[lowerFrequencyIndex].note;
         }else {
           note = data[lowerFrequencyIndex].note +" "+ index + "/8";
         }
-        // console.log("Note Name " + data[lowerFrequencyIndex].note +" "+ index + "/8");
+        // return nearest frequency, MeT value and note
         return {"frequency":closestFreq.toFixed(2),"MeTValue":closestMeT.toFixed(2),"note": note};
 
       },

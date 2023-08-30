@@ -28,8 +28,6 @@ function Converter(){
     const onFromScaleValueChange = (e) => {
         const eventData = e;
         setFromScaleValue(e.target.value);
-        // console.log("fromScaleValue 1" + fromScaleValue);
-        // console.log("e.target.value" + e.target.value);
 
         clearTimeout(fromTimer);
         e.persist();
@@ -77,11 +75,11 @@ function Converter(){
         console.log("In handleFromScaleValueChange");
         if(fromScaleName == 'Hz' && toScaleName == 'MeT'){
             if(e.target.value < MIN_FREQUENCY){
-                const newValue = window.prompt(`The value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added prompt window for wrong input min value HZ
+                const newValue = window.confirm(`The value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added prompt window for wrong input min value HZ
                 e.target.value = MIN_FREQUENCY;
             }
             if(e.target.value > MAX_FREQUENCY){
-                const newValue = window.prompt(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added prompt window for wrong input max value HZ
+                const newValue = window.confirm(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added prompt window for wrong input max value HZ
                 e.target.value = MAX_FREQUENCY;
             }
         }
@@ -95,11 +93,11 @@ function Converter(){
     const handleToScaleValueChange = (e) => {
         if(toScaleName == 'Hz' && fromScaleName == 'MeT'){
             if(e.target.value < MIN_FREQUENCY){
-                const newValue = window.prompt(`Value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added window prompt for wrong input min value HZ
+                const newValue = window.confirm(`Value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added window prompt for wrong input min value HZ
                 e.target.value = MIN_FREQUENCY;
             }
             if(e.target.value > MAX_FREQUENCY){
-                const newValue = window.prompt(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added window prompt for wrong input max value HZ
+                const newValue = window.confirm(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added window prompt for wrong input max value HZ
                 e.target.value = MAX_FREQUENCY;
             }
         }
@@ -149,9 +147,7 @@ function Converter(){
             return ConverterHelper.ConversionFormulas[fromScaleName][toScaleName](frequency).toFixed(2);
         }
 
-        // handle case if exact frequency is not found
-
-        // TODO : if exact frequency is not found, display a text to user saying about the same.
+        // if exact frequency is not found, display a text to user saying about the same.
 
         let freqDataObject = ConverterHelper.findNearestFrequency(frequencyData,frequency);
         setMetScaleText("Steps from A4, " + freqDataObject.note);
