@@ -55,6 +55,8 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
       const fileRef = storageRef.child(nextProps.studentUid + "/Recordings/");
       const response = await fileRef.listAll();
       response.prefixes.forEach(async (folderRef: any) => {
+        // replace "folderRef.location.path.split("/")" with 
+        // ref._delegate._location.path_.split
         const recordingPath = folderRef.location.path.split("/");
         const recordingWordName = recordingPath[recordingPath.length - 1];
         const itemRefResponse = await folderRef.listAll();

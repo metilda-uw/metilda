@@ -121,7 +121,7 @@ export function deleteRecording(itemRef: any, firebase: any) {
     itemRef.delete().then((success: any) => {
       const formData = new FormData();
       formData.append("user_id", uid);
-      formData.append("file_path", itemRef.location.path);
+      formData.append("file_path", itemRef._delegate._location.path_);
       formData.append("file_type", "Recording");
       fetch(`/api/delete-recording`, {
         method: "POST",

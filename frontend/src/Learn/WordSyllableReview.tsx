@@ -20,6 +20,7 @@ import { spinner } from "../Utils/LoadingSpinner";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
+import {uploadRecording, deleteRecording} from "../Create/ImportUtils";
 import {
   createStyles,
   Theme,
@@ -279,7 +280,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
     });
   };
   handleOkDeleteRecordingModal = async () => {
-    // const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
+    const responseFromCloud = await deleteRecording(this.state.deleteRecordingItemRef, this.props.firebase);
     const updatedRecordings = this.state.previousRecordings.filter(
       (recording) => recording.itemRef !== this.state.deleteRecordingItemRef
     );
@@ -418,17 +419,17 @@ export class WordSyllableReview extends React.Component<Props, State> {
     this.setState({
       showRecordingModal: false,
     });
-    // const numberOfSyllables = this.props.match.params.numSyllables;
-    // const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
+    const numberOfSyllables = this.props.match.params.numSyllables;
+    const recordingWordName = this.state.words[this.state.activeWordIndex].uploadId;
     const controller = this;
     if (this.state.currentRecordingName !== "") {
-      // const updatedRecordingName = this.state.currentRecordingName;
+       const updatedRecordingName = this.state.currentRecordingName;
       try {
         controller.setState({
           isLoadingPitchResults: true,
         });
-        // const uploadResponse = await uploadRecording(this.state.recordingResult, updatedRecordingName,
-        //     numberOfSyllables, recordingWordName, this.props.firebase);
+         const uploadResponse = await uploadRecording(this.state.recordingResult, updatedRecordingName,
+             numberOfSyllables, recordingWordName, this.props.firebase);
         this.getPreviousRecordings();
       } catch (ex) {
         console.log(ex);
