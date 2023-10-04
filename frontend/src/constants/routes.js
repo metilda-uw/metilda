@@ -11,3 +11,4 @@ export const HISTORY = "/history";
 export const COLLECTIONS = "/collections";
 export const FEEDBACK = "/feedback";
 export const THANKYOU = "/thankyou";
+export const CONVERTER = "/converter";
