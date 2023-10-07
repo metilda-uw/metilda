@@ -7,6 +7,7 @@ import { AuthUserContext } from "../../Session";
 import Modal from 'react-modal'
 import Sidebar from "./Sidebar";
 import "./GeneralStyles.scss"
+import { verifyTeacherCourse } from "../AuthUtils";
 // import { useHistory } from "react-router-dom";
 
 function Course() {
@@ -30,6 +31,8 @@ function Course() {
     const [showUpdateModal, setShowUpdateModal] = useState(false)
     // const [showDeleteModal, setShowDeleteModal] = useState(false)
 
+    const [veri, setVeri] = useState(true)
+
     function resetStates() {
         setNewName(name)
         setNewLanguage(language)
@@ -40,6 +43,10 @@ function Course() {
 
     useEffect(() => {
         async function fetchData() {
+            await verifyTeacherCourse(user.email, courseId,setVeri)
+            if(!veri)
+                return
+
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
@@ -59,8 +66,8 @@ function Course() {
                     setNewLanguage(x.language)
                     setCredits(x.credits)
                     setNewCredits(x.credits)
-                    setAvailable(x.available)
-                    setNewAvailable(x.available)
+                    setAvailable(x.available?'1':'0')
+                    setNewAvailable(x.available?'1':'0')
                     setSchedule(x.schedule)
                     setNewSchedule(x.schedule)
                 })
@@ -70,7 +77,7 @@ function Course() {
             }
         }
         fetchData()
-    }, [user.email, courseId])
+    },[])
     
     Modal.setAppElement('.App')
 
@@ -141,7 +148,9 @@ function Course() {
     //     setShowDeleteModal(false)
     //     history.push('/content-management')
     // }
-
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
@@ -163,7 +172,7 @@ function Course() {
                             Credits: {credits}
                         </div>
                         <div>
-                            Available: {available==='loading'?'Loading...':(available?'Yes':'No')}
+                            Available: {available==='loading'?'Loading...':(available==='1'?'Yes':'No')}
                         </div>
                         <div>
                             Schedule: {schedule}
@@ -188,7 +197,7 @@ function Course() {
                                     <div>Course name: <input value={newName} onChange={(e) => setNewName(e.target.value)}></input></div>
                                     <div>Language: <input value={newLanguage} onChange={(e) => setNewLanguage(e.target.value)}></input></div>
                                     <div>Credits: <input value={newCredits} type='number' onChange={(e) => setNewCredits(e.target.value)}></input></div>
-                                    <div>Available: <input type='checkbox' checked={!!newAvailable} style={{ 'opacity': 100, 'pointerEvents': 'auto' }} onChange={(e) => setNewAvailable(e.target.checked?'1':'')}></input></div>
+                                    <div>Available: <input type='checkbox' checked={available==='1'?true:false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position':'unset' }} onChange={(e) => setNewAvailable(e.target.checked?'1':'0')}></input></div>
                                     <div>Schedule: <input value={newSchedule} onChange={(e) => setNewSchedule(e.target.value)}></input></div>
                                 </form>
                                 <div><button onClick={onUpdate}>Update</button></div>

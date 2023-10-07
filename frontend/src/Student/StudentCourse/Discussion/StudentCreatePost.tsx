@@ -34,7 +34,7 @@ export function StudentCreatePost() {
             + newDate.getUTCHours() + ':' + newDate.getUTCMinutes()+':'+newDate.getUTCSeconds())
 
         try {
-            await fetch('/cms/posts/create', {
+            await fetch('/student-view/posts/create', {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
@@ -49,6 +49,7 @@ export function StudentCreatePost() {
         history.push('/student-view/course/'+courseId+'/discussion/topic/'+topicId)
     }
     
+
     return (
         <div>
             <Header></Header>

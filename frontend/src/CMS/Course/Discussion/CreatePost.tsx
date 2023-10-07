@@ -48,7 +48,8 @@ export function CreatePost() {
 
         history.push('/content-management/course/'+courseId+'/discussion/topic/'+topicId)
     }
-    
+
+
     return (
         <div>
             <Header></Header>

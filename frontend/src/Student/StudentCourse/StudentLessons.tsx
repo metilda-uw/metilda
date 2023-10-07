@@ -7,15 +7,20 @@ import { AuthUserContext } from "../../Session";
 import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../CMS/Course/GeneralStyles.scss"
+import { verifyStudentCourse } from "../../CMS/AuthUtils";
 
 function StudentLessons() {
     const courseId=useParams()['id']
     const [lessonListString, setLessonListString] = useState('')
     const lessonList=useMemo(()=>lessonListString.split(';'),[lessonListString])
     const user = (useContext(AuthUserContext) as any)
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudentCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
             const formData = new FormData();
             formData.append('course', courseId);
             try {
@@ -35,8 +40,11 @@ function StudentLessons() {
             }
         }
         fetchData()
-    }, [lessonList])
-
+    }, [])
+    
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <div><Header></Header></div>

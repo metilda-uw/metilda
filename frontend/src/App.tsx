@@ -52,6 +52,11 @@ import StudentDiscussion from "./Student/StudentCourse/StudentDiscussion";
 import { StudentTopic } from "./Student/StudentCourse/Discussion/StudentTopic";
 import { StudentCreatePost } from "./Student/StudentCourse/Discussion/StudentCreatePost";
 import { StudentPost } from "./Student/StudentCourse/Discussion/StudentPost";
+import { CreateAssignment } from "./CMS/Course/Assignment/CreateAssignment";
+import { AssignmentDetail } from "./CMS/Course/Assignment/AssignmentDetail";
+import { UpdateAssignment } from "./CMS/Course/Assignment/UpdateAssignment";
+import StudentAssignmentDetail from "./Student/StudentCourse/Assignment/StudentAssignmentDetail";
+import StudentAssignmentSubmissionDetail from "./Student/StudentCourse/Assignment/StudentAssignmentSubmissionDetail";
 
 interface Props {
   firebase: any;
@@ -137,6 +142,9 @@ const App = () => (
       <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/create" component={CreatePost} />
       <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/post/:post_id" component={Post} />
       <Route exact path="/content-management/course/:id/assignment" component={Assignment} />
+      <Route exact path="/content-management/course/:id/assignment/create" component={CreateAssignment} />
+      <Route exact path="/content-management/course/:id/assignment/:assignment_id/update" component={UpdateAssignment} />
+      <Route exact path="/content-management/course/:id/assignment/detail/:assignment_id" component={AssignmentDetail} />
       <Route exact path="/content-management/course/:id/quiz" component={Quiz} />
       <Route exact path="/content-management/course/:id/students" component={Students} />
       <Route exact path="/content-management/course/:id/grades" component={Grades} />
@@ -150,6 +158,8 @@ const App = () => (
       <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/create" component={StudentCreatePost} />
       <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/post/:post_id" component={StudentPost} />
       <Route exact path="/student-view/course/:id/assignment" component={StudentAssignment} />
+      <Route exact path="/student-view/course/:id/assignment/detail/:assignment_id" component={StudentAssignmentDetail} />
+      <Route exact path="/student-view/course/:id/assignment/detail/:assignment_id/submission" component={StudentAssignmentSubmissionDetail} />
       <Route exact path="/student-view/course/:id/quiz" component={StudentQuiz} />
       <Route exact path="/student-view/course/:id/grades" component={StudentGrades} />
 

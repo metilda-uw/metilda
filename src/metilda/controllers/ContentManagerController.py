@@ -178,6 +178,11 @@ def create_topic():
 @app.route('/cms/topics', methods=["POST"])
 def read_topics():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select id,name,description,available,created_at from topics where course=%s'
         args = (request.form['course'],)
         result = connection.execute_select_query(query, args)
@@ -192,6 +197,11 @@ def read_topics():
 @app.route('/cms/topics/read', methods=["POST"])
 def read_topic():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select name,description,available,created_at from topics where id=%s'
         args = (request.form['topic'],)
         result = connection.execute_select_query(query, args)[0]
@@ -235,6 +245,11 @@ def delete_topic():
 @app.route('/cms/posts/create', methods=["POST"])
 def create_post():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'insert into posts(id,title,content,topic,author,created_at,updated_at) values(%s,%s,%s,%s,%s,%s,%s)'
         args = (str(uuid4()),request.form['title'],request.form['content'],request.form['topic'],
                 request.form['author'],request.form['created_at'],request.form['created_at'])
@@ -244,6 +259,11 @@ def create_post():
 @app.route('/cms/posts', methods=["POST"])
 def read_posts():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select id,title,content,author,created_at,updated_at from posts where topic=%s'
         args = (request.form['topic'],)
         result = connection.execute_select_query(query, args)
@@ -259,6 +279,11 @@ def read_posts():
 @app.route('/cms/posts/read', methods=["POST"])
 def read_post():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select title,content,author,created_at,updated_at from posts where id=%s'
         args = (request.form['post'],)
         result = connection.execute_select_query(query, args)[0]
@@ -273,6 +298,11 @@ def read_post():
 @app.route('/cms/posts/update', methods=["POST"])
 def update_post():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'update posts set title=%s,content=%s,updated_at=%s where id=%s'
         args = (request.form['title'],request.form['content'],request.form['updated_at'],request.form['post'])
         result = connection.execute_update_query(query, args)
@@ -281,6 +311,11 @@ def update_post():
 @app.route('/cms/posts/delete', methods=["POST"])
 def delete_post():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'delete from posts where id=%s'
         args=(request.form['post'],)
         result = connection.execute_update_query(query, args)
@@ -291,7 +326,12 @@ def delete_post():
 # -----------------------Reply------------------------------
 @app.route('/cms/replies/create', methods=["POST"])
 def create_reply():
-    with Postgres() as connection:    
+    with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'insert into replies(id,content,post,author,created_at) values(%s,%s,%s,%s,%s)'
         args = (str(uuid4()),request.form['content'],request.form['post'],request.form['author'],request.form['created_at'])
         connection.execute_insert_query(query, args, False)
@@ -304,6 +344,11 @@ def create_reply():
 @app.route('/cms/replies', methods=["POST"])
 def read_replies():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select id,content,author,created_at from replies where post=%s'
         args = (request.form['post'],)
         result = connection.execute_select_query(query, args)
@@ -317,6 +362,11 @@ def read_replies():
 @app.route('/cms/replies/read', methods=["POST"])
 def read_reply():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'select content,author,created_at from replies where id=%s'
         args = (request.form['reply'],)
         result = connection.execute_select_query(query, args)[0]
@@ -328,6 +378,11 @@ def read_reply():
 @app.route('/cms/replies/update', methods=["POST"])
 def update_reply():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'update replies set content=%s where id=%s'
         args = (request.form['content'],request.form['reply'])
         result = connection.execute_update_query(query, args)
@@ -336,6 +391,11 @@ def update_reply():
 @app.route('/cms/replies/delete', methods=["POST"])
 def delete_reply():
     with Postgres() as connection:
+        query = 'select user_role from user_role where user_id=%s and verified=true'
+        args = (request.form['user'],)
+        if not connection.execute_select_query(query, args):
+            return jsonify({}),403
+
         query = 'delete from replies where id=%s'
         args=(request.form['reply'],)
         result = connection.execute_update_query(query, args)

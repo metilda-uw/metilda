@@ -32,6 +32,9 @@ import metilda.controllers.controller_firestore
 import metilda.controllers.ContentManagerController
 import metilda.controllers.StudentViewController
 import metilda.controllers.FileUtils
+import metilda.controllers.teacher.AssignmentController
+import metilda.controllers.student.StudentAssignmentController
+import metilda.controllers.AuthUtils
 
 @app.route('/')
 @app.route('/<path:path>')

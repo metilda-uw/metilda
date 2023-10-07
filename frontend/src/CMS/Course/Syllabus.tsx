@@ -1,21 +1,23 @@
 import React, { createRef }from "react"
 import { useState, useContext, useEffect } from "react";
 import Header from "../../Components/header/Header";
-import { withAuthorization } from "../../Session";
+import { AuthUserContext, withAuthorization } from "../../Session";
 import Sidebar from "./Sidebar";
 import { Link, useParams } from "react-router-dom";
 import ReactFileReader from "react-file-reader";
-import { uploadFileWrapper } from "../Utils";
+import { getFile, uploadFileWrapper } from "./Utils";
 import FirebaseContext from "../../Firebase/context";
 import "./GeneralStyles.scss";
-import { onDownloadFiles } from "../Utils";
-import { getSyllabusFile } from "../Utils";
+import { onDownloadFiles } from "./Utils";
+import { verifyTeacherCourse } from "../AuthUtils";
 
 function Syllabus() {
     const firebase = useContext(FirebaseContext);
     const downloadRef = createRef<HTMLAnchorElement>();
     const [files, setFiles] = useState([]);
-    const courseId=useParams()['id']
+    const courseId = useParams()['id']
+    const user = (useContext(AuthUserContext) as any)
+    const [veri, setVeri] = useState(true)
 
     const uploadHandler = async (para_files: any) => {
         try {
@@ -23,13 +25,17 @@ function Syllabus() {
         } catch (ex) {
           console.log(ex);
         }
+        window.location.reload()
     }
 
     useEffect(() => {
-        getSyllabusFile(firebase,setFiles,courseId)
-    }, [files.length])
+        verifyTeacherCourse(user.email,courseId,setVeri)
+        getFile(firebase,setFiles,`/file/read/${courseId}/syllabus`)
+    },[])
 
-
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
@@ -43,7 +49,7 @@ function Syllabus() {
                     >
                         <button className="UploadFile waves-effect waves-light btn globalbtn">
                             <i className="material-icons right">cloud_upload</i>
-                            Upload Syllabus file
+                            Upload Syllabus File
                         </button>
                     </ReactFileReader>
 

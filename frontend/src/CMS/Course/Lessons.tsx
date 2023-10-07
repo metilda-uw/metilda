@@ -7,6 +7,7 @@ import { AuthUserContext } from "../../Session";
 import Modal from 'react-modal'
 import "./GeneralStyles.scss"
 import Sidebar from "./Sidebar";
+import { verifyTeacherCourse } from "../AuthUtils";
 
 function Lessons() {
     const courseId=useParams()['id']
@@ -16,9 +17,14 @@ function Lessons() {
     const [showModal, setShowModal] = useState(false)
     
     const [newName, setNewName] = useState('')
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyTeacherCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
+
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
@@ -39,7 +45,7 @@ function Lessons() {
             }
         }
         fetchData()
-    }, [user.email,courseId,lessonList])
+    },[])
 
     Modal.setAppElement('.App')
 
@@ -88,12 +94,15 @@ function Lessons() {
     function resetStates() {
         setNewName('')
     }
-
+    
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
 
                     <div className="info-list">

@@ -10,6 +10,7 @@ import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import draftToHtml from 'draftjs-to-html';
 import "../GeneralStyles.scss"
 import "./Discussion.scss"
+import { verifyStudentCourse } from "../../AuthUtils";
 
 
 export function Post() {
@@ -31,9 +32,13 @@ export function Post() {
 
     const [numPages, setNumPages] = useState(0)
     const [curPage, setCurPage] = useState(1)
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudentCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
             let formData = new FormData();
             formData.append('user', user.email);
             formData.append('post', postId);
@@ -83,7 +88,7 @@ export function Post() {
         if (user) {
             fetchData()
         }
-    }, [user,courseId,topicId,postId,replyListString])
+    },[])
 
     async function onSubmit() {
         const formData = new FormData();
@@ -110,13 +115,15 @@ export function Post() {
 
         window.location.reload()
     }
-
-
+    
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
                     <div>
                         <div className="post">

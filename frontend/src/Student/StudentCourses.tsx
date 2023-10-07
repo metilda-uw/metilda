@@ -4,16 +4,22 @@ import { Link } from "react-router-dom";
 import Header from "../Components/header/Header";
 import { withAuthorization } from "../Session";
 import { AuthUserContext } from "../Session";
+import { verifyStudent } from "../CMS/AuthUtils";
 
 function StudentCourses() {
     const [courseListString, setCourseListString] = useState('')
     const courseList=useMemo(()=>courseListString.split(';'),[courseListString])
     const user = (useContext(AuthUserContext) as any)
 
-    const [enrollCourse,setEnrollCOurse]=useState('')
+    const [enrollCourse, setEnrollCOurse] = useState('')
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudent(user.email,setVeri)
+            if(!veri)
+                return
+
             const formData = new FormData();
             formData.append('user', user.email);
             try {
@@ -31,7 +37,7 @@ function StudentCourses() {
             catch (e) {}
         }
         fetchData()
-    }, [user.email,courseList])
+    },[])
 
     async function onEnroll() {
         const formData = new FormData();
@@ -48,12 +54,14 @@ function StudentCourses() {
         window.location.reload()
     }
 
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div>
-                <div>Enroll a course:</div>
-                <div><input onChange={(e) => setEnrollCOurse(e.target.value)}></input></div>
+                <div>Enroll a course by course ID: <input style={{ 'width': 'auto', 'height':'auto'}} onChange={(e) => setEnrollCOurse(e.target.value)}></input></div>
                 <div><button onClick={onEnroll}>Enroll</button></div>
                 <div className="course-list">
                     <div>My courses:</div>

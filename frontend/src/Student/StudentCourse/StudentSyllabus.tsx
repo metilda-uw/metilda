@@ -8,21 +8,29 @@ import Modal from 'react-modal'
 import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import { FirebaseContext } from "../../Firebase";
-import { getSyllabusFile } from "../../CMS/Utils";
-import { onDownloadFiles } from "../../CMS/Utils";
+import { getFile} from "../../CMS/Course/Utils";
+import { onDownloadFiles } from "../../CMS/Course/Utils";
 import "../../CMS/Course/GeneralStyles.scss"
+import { verifyStudentCourse } from "../../CMS/AuthUtils";
 
 function StudentSyllabus() {
     const firebase = useContext(FirebaseContext);
     const downloadRef = createRef<HTMLAnchorElement>();
     const [files, setFiles] = useState([]);
-    const courseId=useParams()['id']
+    const courseId = useParams()['id']
+    const [veri, setVeri] = useState(true)
+    const user = (useContext(AuthUserContext) as any)
+
 
     useEffect(() => {
-        getSyllabusFile(firebase,setFiles,courseId)
-    }, [files.length])
+        verifyStudentCourse(user.email,courseId,setVeri)
+        getFile(firebase,setFiles,`/file/read/${courseId}/syllabus`)
+    },[])
 
 
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>

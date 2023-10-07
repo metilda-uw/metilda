@@ -9,6 +9,7 @@ import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss"
 import "./Discussion/Discussion.scss"
+import { verifyTeacherCourse } from "../AuthUtils";
 
 function Discussion() {
     const user = useContext(AuthUserContext) as any
@@ -18,18 +19,21 @@ function Discussion() {
     
     const [newName, setNewName] = useState('')
     const [newDescription, setNewDescription] = useState('')
-    // const [newAvailable, setNewAvailable] = useState('loading')
 
     const [showModal, setShowModal] = useState(false)
+    const [veri, setVeri] = useState(true)
 
     function resetStates() {
         setNewName('')
         setNewDescription('')
-        // setNewAvailable('loading')
     }
 
     useEffect(() => {
         async function fetchData() {
+            await verifyTeacherCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
+
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
@@ -51,7 +55,7 @@ function Discussion() {
             }
         }
         fetchData()
-    }, [user.email, courseId,topicListString])
+    },[])
     
     Modal.setAppElement('.App')
 
@@ -101,12 +105,15 @@ function Discussion() {
         resetStates()
         window.location.reload()
     }
-
+    
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
                     <div className="info-list">
                         <div>Topics:</div>
@@ -114,7 +121,6 @@ function Discussion() {
                             <div key={x.topic} className="topic">
                                 <div key={x.topic}><Link to={'/content-management/course/' + courseId + '/discussion/topic/' + x.topic}>{x.name}</Link></div>
                                 <div key={x.description} className="description">{x.description}</div>
-                                {/* <div key={x.available}>Available: {x.available?'Yes':'No'}</div> */}
                                 <div key={x.created_at} className="created-at">Created at: {new Date(x.created_at).toLocaleString()}</div>
                             </div>
                         )):null}
@@ -136,8 +142,6 @@ function Discussion() {
                             <form>
                                 <div>Topic name: <input onChange={(e) => setNewName(e.target.value)}></input></div>
                                 <div>Description: <input onChange={(e) => setNewDescription(e.target.value)}></input></div>
-                                {/* <div>Available: <input type='checkbox' checked={!!newAvailable} style={{ 'opacity': 100, 'pointerEvents': 'auto' }}
-                                    onChange={(e) => setNewAvailable(e.target.checked ? '1' : '')}></input></div> */}
                             </form>
                             <div><button onClick={onSubmit}>Create</button></div>
                             <button onClick={() => { setShowModal(false); resetStates() }}>Cancel</button>

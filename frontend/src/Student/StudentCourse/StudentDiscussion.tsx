@@ -8,20 +8,25 @@ import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../CMS/Course/GeneralStyles.scss"
 import "../../CMS/Course/Discussion/Discussion.scss"
+import { verifyStudentCourse } from "../../CMS/AuthUtils";
 
 function StudentDiscussion() {
     const user = useContext(AuthUserContext) as any
     const courseId = useParams()['id']
 
     const [topicListString, setTopicListString] = useState('')
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudentCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await fetch('/cms/topics', {
+                await fetch('/student-view/topics', {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
@@ -38,13 +43,16 @@ function StudentDiscussion() {
             }
         }
         fetchData()
-    }, [user.email, courseId,topicListString])
+    }, [])
     
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
                     <div className="info-list">
                         <div>Topics:</div>

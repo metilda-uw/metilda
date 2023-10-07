@@ -8,6 +8,7 @@ import Sidebar from "../StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../../CMS/Course/GeneralStyles.scss"
 import "../../../CMS/Course/Discussion/Discussion.scss"
+import { verifyStudentCourse } from "../../../CMS/AuthUtils";
 
 export function StudentTopic() {
     const postsPerPage = 10
@@ -20,14 +21,18 @@ export function StudentTopic() {
 
     const [numPages, setNumPages] = useState(0)
     const [curPage, setCurPage] = useState(1)
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudentCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('topic', topicId);
             try {
-                await fetch('/cms/posts', {
+                await fetch('/student-view/posts', {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
@@ -50,13 +55,16 @@ export function StudentTopic() {
         if (user) {
             fetchData()
         }
-    }, [user,courseId,topicId,postListString])
+    },[])
 
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
                     <div>
                         <div className="info-list">

@@ -8,6 +8,7 @@ import Sidebar from ".././Sidebar";
 import { useParams } from "react-router-dom";
 import "../GeneralStyles.scss"
 import "./Discussion.scss"
+import { verifyStudentCourse } from "../../AuthUtils";
 
 
 export function Topic() {
@@ -21,9 +22,13 @@ export function Topic() {
 
     const [numPages, setNumPages] = useState(0)
     const [curPage, setCurPage] = useState(1)
+    const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
+            await verifyStudentCourse(user.email,courseId,setVeri)
+            if(!veri)
+                return
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('topic', topicId);
@@ -51,13 +56,16 @@ export function Topic() {
         if (user) {
             fetchData()
         }
-    }, [user,courseId,topicId,postListString])
-
+    }, [])
+    
+    if (!veri) {
+        return <div>Authentication Error, please do not use URL for direct access.</div>
+    }
     return (
         <div>
             <Header></Header>
             <div className="main-layout">
-                <Sidebar courseId={useParams()['id']}></Sidebar>
+                <Sidebar courseId={courseId}></Sidebar>
                 <div className="main-view">
                     <div>
                         <div className="info-list">
