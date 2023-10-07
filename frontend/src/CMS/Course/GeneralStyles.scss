@@ -1,0 +1,84 @@
+.main-layout{
+    display: flex;
+}
+
+.main-view{
+    display: flex;
+    margin-left: 10px;
+}
+
+
+.sidebar{
+    background-color: rgb(150, 255, 255);
+    width: 200px;
+    flex-shrink: 0;
+}
+
+.sidebar-item{
+    display: block;
+    width: 200px;
+    justify-content: center;
+    margin: 10px 0px;
+    background-color: rgb(150, 255, 255);
+}
+
+.float-right{
+    position: absolute;
+    right: 10px;
+    float: right;
+    width: 150px;
+}
+
+.float-right>button{
+    width: 150px;
+}
+
+.info-list{
+    text-align: left;
+    gap: 50px 20px;
+    width: 100%;
+}
+
+.download-link{
+    color: rgb(111, 111, 255);
+    cursor: pointer;
+}
+
+button{
+    background-color: rgb(255, 255, 151);
+    border-radius: 20px;
+    border-color: rgb(255, 217, 147);
+    box-shadow: 0.5px 0.5px 0.5px grey;
+    text-wrap: nowrap
+}
+
+.public-DraftStyleDefault-ltr{
+    text-align: unset !important;
+}
+
+.react-file-reader{
+    display: inline;
+    width: min-content;
+}
+
+.react-file-reader-button{
+    display: inline;
+    width: min-content;
+}
+
+.centered{
+    width: 100%;
+}
+
+
+.assignment{
+    border: solid;
+    border-width: 25%;
+    border-color: lightgrey;
+}
+
+.block{
+    border: solid;
+    border-width: 25%;
+    border-color: lightgrey;
+}
