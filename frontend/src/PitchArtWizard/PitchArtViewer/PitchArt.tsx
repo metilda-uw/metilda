@@ -34,6 +34,7 @@ interface Props {
   speakers: Speaker[];
   firebase: any;
   data: any;
+  callBacks: any;
 }
 
 class PitchArt extends React.Component<Props> {
@@ -168,6 +169,7 @@ class PitchArt extends React.Component<Props> {
           analysis={this.props.speakers}
           saveThumbnail={this.saveThumbnail}
           data = {this.props.data}
+          callBacks = {this.props.callBacks}
         ></SaveAnalysisFirestore>
       </div>
     );

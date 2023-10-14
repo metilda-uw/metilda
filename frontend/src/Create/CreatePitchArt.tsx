@@ -61,6 +61,8 @@ interface State {
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
   };
+  isAChildVersion: boolean;
+  parentDocumentId: string;
 }
 
 class CreatePitchArt extends React.Component<
@@ -69,6 +71,7 @@ class CreatePitchArt extends React.Component<
 > {
 
   private pitchArtRef = createRef<any>();
+  private listenedDocIds = [];
 
   constructor(props: CreatePitchArtProps) {
     super(props);
@@ -97,22 +100,25 @@ class CreatePitchArt extends React.Component<
         showPerceptualScale: true,
         showPitchArtImageColor: true,
         showMetildaWatermark: false
-      }
+      },
+      isAChildVersion: false,
+      parentDocumentId: ''
     };
   }
 
   componentDidMount() {
     if (this.props.match.params.type) {
-      this.listenForData();
+      this.listenForData(this.props.match.params.type, this.props.match.params.id);
     } else {
       this.getUserFiles();
     }
   }
 
-  listenForData() {
-    const id = this.props.match.params.id ? this.props.match.params.id : "";
-
-    this.props.firebase.firestore.collection(this.props.match.params.type).doc(this.props.match.params.id)
+  listenForData(collectionId:string,docId:string) {
+   // const id = this.props.match.params.id ? this.props.match.params.id : "";
+    if(this.listenedDocIds.includes(docId)) return;
+    this.listenedDocIds.push(docId);
+    this.props.firebase.firestore.collection(collectionId).doc(docId)
       .onSnapshot((doc) => {
         if (doc.data()) {
           const newSpeakers = doc.data().speakers === undefined ? [{ uploadId: "" }] : doc.data().speakers;
@@ -167,7 +173,7 @@ class CreatePitchArt extends React.Component<
       ...this.state
     }).then((docRef) => {
       this.props.history.push({ pathname: `/pitchartwizard/share/${docRef.id}` });
-      this.listenForData();
+      this.listenForData("share",docRef.id);
       NotificationManager.success(
         "Page Sharing Started. The URL can be shared with other MeTILDA users."
       );
@@ -193,6 +199,11 @@ class CreatePitchArt extends React.Component<
     }
     this.props.history.push({ pathname: `/pitchartwizard` });
     window.location.reload();
+  }
+
+  loadPitchArtVersions = () =>{
+    console.log("Inside load pitch art versions");
+    
   }
 
   renderSpeakers = () => {
@@ -327,6 +338,7 @@ class CreatePitchArt extends React.Component<
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
+    const callbacks = {listenForData:this.listenForData.bind(this)};
     return (
       <div>
         <Header />
@@ -343,6 +355,13 @@ class CreatePitchArt extends React.Component<
             </button>
 
           </ReactFileReader>
+          <div className="pitchArt-version">
+            <button className="versions waves-effect waves-light btn globalbtn"
+            onClick={this.loadPitchArtVersions}>
+              <i className="material-icons right">history</i>
+              Versions
+            </button>
+          </div>
           <div>
             {this.renderPageOptions()}
           </div>
@@ -377,6 +396,7 @@ class CreatePitchArt extends React.Component<
                 pitchArt={this.state.pitchArt}
                 updatePitchArtValue={this.updatePitchArtValue}
                 data={this.state}
+                callBacks={callbacks}
               />
             </div>
           </div>

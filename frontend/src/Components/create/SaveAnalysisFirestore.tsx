@@ -2,19 +2,21 @@ import "./SaveAnalysisFirestore.scss"
 import React, { useContext, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import Select from "react-select";
 import { NotificationManager } from "react-notifications";
 
 import FirebaseContext from "../../Firebase/context";
 import Modal from "react-modal";
 import { render } from "enzyme";
+import  CreatePitchArt  from "../../Create/CreatePitchArt";
 
-export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data }) {
+export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks }) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
   const params = useParams();
+  const history = useHistory();
 
   const [availableCollections, setAvailableCollections] = useState([]);
   const [selectedCollection, setSelectedCollection] = useState("default");
@@ -31,6 +33,18 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   const [speakerName, setSpeakerName] = useState(data.speakerName);
   const [word, setWord] = useState(data.word);
   const [wordTranslate, setWordTranslate] = useState(data.wordTranslate);
+
+  const [savedDocId, setSavedDocId] = useState("");
+
+  const [parentDocumentId, setParentDocumentId] = useState("");
+
+  // TODO ::  update correct parent document ID when coming from collections page
+  // TODO ::  if parentDocumentId is undefined or "" , then the current pitch Art is a parent pitch art.
+  
+
+  const [isDocSaved, setIsDocSaved] = useState(false);
+  const [isSaveAsNewVersionModalOpen, setSaveAsNewVersionModalOpen]= useState(false);
+
 
 
   const customStyles = {
@@ -61,6 +75,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
       .catch((error) => {
         console.log(error);
       });
+      setParentDocumentId(data.parentDocumentId);
   }, [updateOptions]);
 
   const collectionSelectOnChange = (event) => {
@@ -97,6 +112,15 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   };
   const setUpdateModalIsOpenToFalse = () => {
     setUpdateModalIsOpen(false);
+  };
+
+  const setSaveAsNewVersionModalOpenToTrue  = (event: any) => {
+    event.preventDefault();
+    setSaveAsNewVersionModalOpen(true);
+  };
+
+  const setSaveAsNewVersionModalOpenToFalse = (event: any) => {
+    setSaveAsNewVersionModalOpen(false);
   };
 
   const onChangeCollectionName = (event: any) => {
@@ -179,6 +203,15 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
         .then((docRef) => {
           //console.log("Document written with ID: ", docRef.id);
           saveThumbnail(collectionUuid + "/" + docRef.id);
+         // history.push('/pitchartwizard/'+ collectionUuid + '/' + docRef.id);
+
+          if(params['type'] == null){
+            callBacks.listenForData(collectionUuid,docRef.id);
+          }
+          setIsDocSaved(true);
+          setSavedDocId(docRef.id);
+          setParentDocumentId(docRef.id);
+
           NotificationManager.success(
             "Pitch Art added to collection successfully!"
           );
@@ -193,18 +226,24 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   const handleUpdateToCollections = async (event: any) => {
     event.preventDefault();
     setUpdateModalIsOpenToFalse();
-
-    firebase.firestore
-      .collection(params['type'])
-      .doc(params['id'])
+    const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
+    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
+    // instead of params['type'] , use collectionID
+    firebase.firestore 
+      .collection(collectionId)
+      .doc(docId)
       .update({
+        ...data,
         word: word === undefined ? data.word : word,
         wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
-        speakerName: speakerName === undefined ? data.speakerName : speakerName
+        speakerName: speakerName === undefined ? data.speakerName : speakerName,
+        speakers: analysis,
+        createdAt: timestamp.fromDate(new Date())
       })
       .then(() => {
         //console.log("Document written with ID: ", docRef.id);
-        saveThumbnail(params['type'] + "/" + params['id']);
+        saveThumbnail(collectionId + "/" + docId);
+
         NotificationManager.success(
           "Pitch Art Updated Successfully!"
         );
@@ -218,13 +257,17 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
   const handleDeleteCollection = async (event: any) => {
     event.preventDefault();
 
+    // instead of params['type'] , use collectionID
+    const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
+    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
+
     firebase.firestore
-      .collection(params['type'])
-      .doc(params['id'])
+      .collection(collectionId)
+      .doc(docId)
       .delete()
       .then(() => {
         firebase.storage()
-          .child('thumbnails/' + params['type'] + "/" + params['id'])
+          .child('thumbnails/' + collectionId + "/" + docId)
           .delete()
           .catch((error) => {
             console.error("Error deleting thumbnail: ", error)
@@ -238,8 +281,62 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
         NotificationManager.error("Deleting Word from collection failed!");
       });
   };
+
+  const savePitchArtAsNewVersion = (event: any) =>{
+    event.preventDefault();
+    setSaveAsNewVersionModalOpenToFalse(false);
+    console.log("Inside savePitchArtAsNewVersion");
+
+    // instead of params['type'] , use collectionID
+    const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
+
+    let parentDocId;
+    if(params['type'] != null && params['type'] != 'share'){
+      if(data.isAChildVersion){
+        parentDocId = data.parentDocumentId;
+      }else{
+        parentDocId = params['id'];
+      }
+    }else {
+      parentDocId = parentDocumentId;
+    }
+
+
+    firebase.firestore
+    .collection(collectionId)
+    .add({
+          ...data,
+          isAChildVersion: true,
+          parentDocumentId: parentDocId,
+          word: word === undefined ? data.word : word,
+          wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
+          speakerName: speakerName === undefined ? data.speakerName : speakerName,
+          speakers: analysis,
+          createdAt: timestamp.fromDate(new Date())
+        })
+        .then((docRef) => {
+          //console.log("Document written with ID: ", docRef.id);
+          saveThumbnail(collectionId + "/" + docRef.id);
+          setIsDocSaved(true);
+          setSavedDocId(docRef.id);
+
+          if(params['type'] == null){
+            callBacks.listenForData(collectionId,docRef.id);
+          }
+          if(params['type'] != null && params['type'] != 'share')
+            history.push('/pitchartwizard/'+ collectionId + '/' + docRef.id);
+
+          NotificationManager.success(
+            "New version of pitch art saved successfully!"
+          );
+        })
+        .catch((error) => {
+          console.error("Error saving document: ", error);
+          NotificationManager.error("Renaming collection failed!");
+        });
+  }
   const renderSave = () => {
-    if (params['type'] && params['type'] != "share") {
+    if ((params['type'] && params['type'] != "share" || isDocSaved)) {
       return (<div className="page-create-save-collections">
         <form className="page-create-save-collections-form">
           <button
@@ -250,8 +347,16 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
           >
             Update PitchArt
           </button>
+          <button
+            className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
+            type="submit"
+            name="action"
+            onClick={setSaveAsNewVersionModalOpenToTrue}
+          >
+            Save As New Version
+          </button>
           <Modal
-            isOpen={updateModalIsOpen}
+            isOpen={updateModalIsOpen || isSaveAsNewVersionModalOpen}
             style={customStyles}
             appElement={document.getElementById("root" || undefined)}
           >
@@ -261,7 +366,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
               name="speakerName"
               onChange={(event) => { setSpeakerName(event.target.value) }}
               type="text"
-              defaultValue={data.speakerName}
+              defaultValue={data.speakerName != undefined ? data.speakerName : speakerName }
               required
             />
             <input
@@ -269,7 +374,7 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
               name="word"
               onChange={(event) => { setWord(event.target.value) }}
               type="text"
-              defaultValue={data.word}
+              defaultValue={data.word != undefined ? data.word : word}
               required
             />
             <input
@@ -277,19 +382,19 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data })
               name="wordTranslate"
               onChange={(event) => { setWordTranslate(event.target.value) }}
               type="text"
-              defaultValue={data.wordTranslation}
+              defaultValue={data.wordTranslation != undefined ? data.wordTranslation : wordTranslate}
               required
             />
             <div className="collectionRename-cancel-save">
               <button
                 className="btn waves-light globalbtn"
-                onClick={setUpdateModalIsOpenToFalse}
+                onClick={updateModalIsOpen ? setUpdateModalIsOpenToFalse : setSaveAsNewVersionModalOpenToFalse}
               >
                 Cancel
               </button>
               <button
                 className="btn waves-light globalbtn"
-                onClick={handleUpdateToCollections}
+                onClick={updateModalIsOpen ? handleUpdateToCollections : savePitchArtAsNewVersion}
               >
                 Update
               </button>
