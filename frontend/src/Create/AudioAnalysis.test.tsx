@@ -142,7 +142,9 @@ describe("AudioAnalysis", () => {
         });
         const instance = subject.instance();
         const mockConfig = {
-            audioUrl: "test_url"
+            audioUrl: "test_url",
+            minAudioTime: 0,
+            maxAudioTime: 6
         };
         const mockStub = sinon.stub(instance, "getAudioConfigForSelection").returns(mockConfig);
         subject.setState({maxSelectX: 10, minSelectX: 5});
@@ -160,7 +162,9 @@ describe("AudioAnalysis", () => {
         });
         const instance = subject.instance();
         const mockConfig = {
-            audioUrl: "test_url"
+            audioUrl: "test_url",
+            minAudioTime: 0,
+            maxAudioTime: 6
         };
         const mockStub = sinon.stub(instance, "getAudioConfigForSelection").returns(mockConfig);
         subject.setState({maxSelectX: 10, minSelectX: 5});

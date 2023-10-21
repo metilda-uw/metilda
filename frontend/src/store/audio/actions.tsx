@@ -164,12 +164,18 @@ export const addLetter =
     };
 
 export const removeLetter =
-  (speakerIndex: number, letterIndex: number): ActionReturn =>
+  (speakerIndex: number, letterIndex: number, letterIndexArray?:number[]): ActionReturn =>
     (dispatch: Dispatch, getState) => {
       const speakers = getState().audio.speakers;
       const letters = speakers[speakerIndex].letters;
+      let letterIndexesToRemove :number[] = [];
+      if(letterIndex != -1)
+        letterIndexesToRemove.push(letterIndex);
+      if(letterIndexArray != undefined && Array.isArray(letterIndexArray)){
+        letterIndexesToRemove = letterIndexesToRemove.concat(letterIndexArray);
+      }
 
-      const newLetters = letters.filter((_: any, i: number) => i !== letterIndex);
+      const newLetters = letters.filter((_: any, i: number) => !letterIndexesToRemove.includes(i));
       const newSpeakers = update(speakers, {
         [speakerIndex]: { letters: { $set: newLetters } },
       });

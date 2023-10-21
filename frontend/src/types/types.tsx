@@ -5,6 +5,8 @@ export interface Letter {
   syllable: string;
   isManualPitch: boolean;
   isWordSep: boolean;
+  isContour?:boolean;
+  contourGroupRange?:number[];
 }
 
 export interface Speaker {

@@ -53,7 +53,7 @@ export interface TargetPitchBarProps {
   maxAudioX: number;
   firebase: any;
   targetPitchSelected: (letterIndex: number) => void;
-  removeLetter: (speakerIndex: number, index: number) => void;
+  removeLetter: (speakerIndex: number, index: number, indices?:number[]) => void;
   resetLetters: (speakerIndex: number) => void;
   setUploadId: (
     speakerIndex: number,
@@ -85,6 +85,7 @@ interface State {
   showNewAnalysisModal: boolean;
   showExistingAnalysisModal: boolean;
   showEditSyllableModal: boolean;
+  showDeleteLetterModal:boolean;
   currentAnalysisName: string;
   currentSyllable: string;
   currentSyllableT0: number;
@@ -141,6 +142,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
       showNewAnalysisModal: false,
       showExistingAnalysisModal: false,
       showEditSyllableModal: false,
+      showDeleteLetterModal:false,
       currentAnalysisName: "",
       currentSyllable: "",
       currentSyllableT0: 0,
@@ -224,6 +226,25 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.props.removeLetter(this.props.speakerIndex, this.state.selectedIndex);
     this.setState({ selectedIndex: -1 });
     this.props.targetPitchSelected(-1);
+    this.handleCloseDeleteLetterModal();
+  }
+
+  removeGroupOfLettersEvent = () =>{
+    const letters = this.props.speakers[this.props.speakerIndex].letters;
+    const selectedletter = letters[this.state.selectedIndex];
+    const matchingIndices = letters.map((letter, index) =>{
+      if(letter.isContour){
+        const contourRange = letter.contourGroupRange;
+        return (contourRange[0] == selectedletter.contourGroupRange[0] && 
+        contourRange[1] == selectedletter.contourGroupRange[1])? index : null;
+      }
+      return null;
+    } ).filter((index) => index != null);
+    this.props.removeLetter(this.props.speakerIndex, -1, matchingIndices);
+    this.setState({ selectedIndex: -1 });
+    this.props.targetPitchSelected(-1);
+    this.handleCloseDeleteLetterModal();
+
   }
 
   setLetterSyllableEvent() {
@@ -336,6 +357,60 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.setState({
       showEditSyllableModal: true,
     });
+  };
+
+  removeSyllableEvent = () =>{
+    const letters = this.props.speakers[this.props.speakerIndex].letters;
+    const letter = letters[this.state.selectedIndex];
+    if(letter != null && letter.isContour){
+      this.setState({
+        showDeleteLetterModal: true,
+      });
+    }else{
+      this.removeLetterEvent();
+    }
+
+  }
+  handleCloseDeleteLetterModal= ()=>{
+    if(this.state.showDeleteLetterModal){
+      this.setState({
+        showDeleteLetterModal: false,
+      });
+    } 
+  }
+
+  removeLetterEventModal = () => {
+    const speaker = this.props.speakers[this.props.speakerIndex];
+    return (
+      <Dialog
+        fullWidth={true}
+        maxWidth="sm"
+        open={this.state.showDeleteLetterModal}
+        onClose={this.handleCloseDeleteLetterModal}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          onClose={this.handleCloseDeleteLetterModal}
+        >
+          Remove single syllable or group of syllables
+        </DialogTitle>
+        <DialogActions>
+          <button
+            className="single-syllable waves-effect waves-light btn globalbtn"
+            onClick={this.removeLetterEvent}
+          >
+            Single Syllable
+          </button>
+          <button
+            className="group-syllables waves-effect waves-light btn globalbtn"
+            onClick={this.removeGroupOfLettersEvent}
+          >
+            Group of Syllables
+          </button>
+        </DialogActions>
+      </Dialog>
+    );
   };
 
   handleCloseEditSyllableModal = () => {
@@ -684,6 +759,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         {this.saveNewAnalysisModal()}
         {this.saveExisitingAnalysisModal()}
         {this.editSyllableModal()}
+        {this.removeLetterEventModal()}
         <div className="metilda-control-container metilda-target-pitch-bar">
           <div className="metilda-audio-analysis-image-col-1">
             <span>Syllables</span>
@@ -738,7 +814,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               type="submit"
               name="action"
               disabled={this.state.selectedIndex === -1}
-              onClick={this.removeLetterEvent}
+              onClick={this.removeSyllableEvent}
             >
               Remove
             </button>
@@ -794,8 +870,8 @@ const mapStateToProps = (state: AppState) => ({
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<AppState, void, AudioAction>
 ) => ({
-  removeLetter: (speakerIndex: number, index: number) =>
-    dispatch(removeLetter(speakerIndex, index)),
+  removeLetter: (speakerIndex: number, index: number, indices?:number[]) =>
+    dispatch(removeLetter(speakerIndex, index, indices)),
   resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
   setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
     dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
