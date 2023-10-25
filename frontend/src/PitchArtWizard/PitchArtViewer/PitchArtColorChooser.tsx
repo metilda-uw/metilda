@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Speaker } from '../../types/types';
-import './PitchArtColorChooser.css';
+import './PitchArtColorChooser.scss';
 import { FormGroup, FormControlLabel, Checkbox, Dialog, DialogContent, DialogActions } from "@material-ui/core";
 import { createStyles, Theme, withStyles, WithStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
@@ -8,8 +8,6 @@ import CloseIcon from "@material-ui/icons/Close";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 import { AppState } from '../../store';
-// import { compose } from "recompose";
-// import { useState } from "react";
 import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import { setLineAndDotColor } from "../../store/audio/actions";
