@@ -561,11 +561,12 @@ export class PitchArtDrawingWindow extends React.Component<
     }
 
     const colors: { [key: number]: string } = {
-      0: "green",
-      1: "orange",
+      0: "gray",
+      1: "green",
       2: "blue",
-      3: "brown",
+      3: "purple",
       4: "red",
+      5: "orange"
     };
 
     return this.props.rawPitchValueLists.map((item: RawPitchValue[], index) => (
@@ -591,71 +592,12 @@ export class PitchArtDrawingWindow extends React.Component<
     speaker: Speaker,
     speakerIndex: number
   ): ColorScheme => {
-    if (!showArtDesign) {
-      const color = PitchArtLegend.SPEAKER_COLOR(speakerIndex);
-      return {
-        windowLineStrokeColor: "#497dba",
-        lineStrokeColor: color,
-        praatDotFillColor: color,
-        activePlayColor: "#e8e82e",
-        manualDotFillColor: "#af0008",
-      };
-    }
 
-    let lineStrokeColor = "black";
-    let praatDotFillColor = "black";
-
-    const numLetters = speaker.letters.length;
-    const pitches = speaker.letters.map((item) => item.pitch);
-    const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
-
-    // determine color scheme
-    switch (numLetters) {
-      case 2:
-        switch (maxPitchIndex) {
-          case 0:
-            lineStrokeColor = "#272264";
-            praatDotFillColor = "#0ba14a";
-            break;
-          case 1:
-            lineStrokeColor = "#71002b";
-            praatDotFillColor = "#2e3192";
-            break;
-        }
-        break;
-      case 3:
-        switch (maxPitchIndex) {
-          case 0:
-            lineStrokeColor = "#92278f";
-            praatDotFillColor = "#000000";
-            break;
-          case 1:
-            lineStrokeColor = "#056839";
-            praatDotFillColor = "#be72b0";
-            break;
-          case 2:
-          default:
-            lineStrokeColor = "#5b4a42";
-            praatDotFillColor = "#166e92";
-        }
-        break;
-      case 4:
-        switch (maxPitchIndex) {
-          case 0:
-            lineStrokeColor = "#f1592a";
-            praatDotFillColor = "#12a89d";
-            break;
-          case 1:
-            lineStrokeColor = "#283890";
-            praatDotFillColor = "#8cc63e";
-            break;
-          case 2:
-          default:
-            lineStrokeColor = "#9e1f62";
-            praatDotFillColor = "#f7941d";
-        }
-        break;
-    }
+    let lineStrokeColor = "gray";
+    let praatDotFillColor = "gray";
+    lineStrokeColor = speaker.lineColor !== undefined ? speaker.lineColor: PitchArtLegend.SPEAKER_COLOR(speakerIndex);
+    praatDotFillColor = speaker.dotColor !== undefined ? speaker.dotColor: PitchArtLegend.SPEAKER_COLOR(speakerIndex);
+    
 
     return {
       windowLineStrokeColor: lineStrokeColor,
@@ -766,11 +708,7 @@ export class PitchArtDrawingWindow extends React.Component<
               strokeWidth={
                 this.props.showPitchArtImageColor ? this.borderWidth : 0
               }
-              stroke={
-                this.props.showArtDesign && colorSchemes.length === 1
-                  ? colorSchemes[0].windowLineStrokeColor
-                  : "#497dba"
-              }
+              stroke={ colorSchemes[0].windowLineStrokeColor}
               onClick={() => this.imageBoundaryClicked(coordConverter)}
               onMouseEnter={() => this.setPointerEnabled(true)}
               onMouseLeave={() => this.setPointerEnabled(false)}

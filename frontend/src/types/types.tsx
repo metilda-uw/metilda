@@ -20,4 +20,6 @@ export interface Speaker {
   latestAnalysisId?: number;
   lastUploadedLetters?: Letter[];
   latestAnalysisName?: string;
+  lineColor?:string;
+  dotColor?:string;
 }

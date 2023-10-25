@@ -3,6 +3,7 @@ import { Speaker } from "../types/types";
 import moment from "moment";
 import "react-notifications/lib/notifications.css";
 import { NotificationManager } from "react-notifications";
+import { set } from "react-ga";
 
 export function importSpeakerFile(
   results: Result[],
@@ -526,4 +527,25 @@ export function DeleteViewPermission(
   }).then((response) => {
     console.log(response);
   });
+}
+
+
+export const chooseColor = (speakers, isLineColor) => {
+
+  const colors = ["gray","green","orange","blue","brown","red"];
+  let usedColors = new Set();
+  
+  let color = "black";
+
+  for(let i=0;i<speakers.length;i++){
+    const c = isLineColor ? speakers[i].lineColor : speakers[i].dotColor;
+    usedColors.add(c);
+  }
+
+  for(let i=0;i<colors.length;i++){
+    if(!usedColors.has(colors[i])) return colors[i];
+  }
+
+  return color;
+
 }

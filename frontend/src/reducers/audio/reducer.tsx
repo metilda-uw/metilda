@@ -3,7 +3,7 @@ import * as constants from "../../constants";
 import { AudioAnalysisState } from "../../store/audio/types";
 
 const defaultState: AudioAnalysisState = {
-  speakers: [{ uploadId: "", letters: [] }],
+  speakers: [{ uploadId: "", letters: [] , lineColor:"gray", dotColor:"gray"}],
 };
 
 const reducer: Reducer<AudioAnalysisState> = (
@@ -41,6 +41,8 @@ const reducer: Reducer<AudioAnalysisState> = (
       return { ...state, speakers: action.speakers };
     case constants.MANUAL_PITCH_ADJUST:
       return { ...state, speakers: action.speakers };
+    case constants.LINE_AND_DOT_COLOR:
+        return { ...state, speakers: action.speakers };
     default:
       return state;
   }

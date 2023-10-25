@@ -5,6 +5,9 @@ import * as constants from "../../constants";
 import { Letter, Speaker } from "../../types/types";
 import { AppState } from "../index";
 import { AudioAction } from "./types";
+import {
+  chooseColor
+} from "../../Create/ImportUtils";
 
 type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
 
@@ -20,7 +23,8 @@ export const replaceSpeakers = (speakers: Speaker[]):
 export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => {
   const speakers = getState().audio.speakers;
   const newSpeakers = update(speakers, {
-    $push: [{ uploadId: "", letters: [], speakerName: "Spearker", word: "Word", wordTranslation: "Word Translation" }],
+    $push: [{ uploadId: "", letters: [], speakerName: "Spearker", word: "Word", wordTranslation: "Word Translation" , lineColor:chooseColor(speakers,true),
+  dotColor:chooseColor(speakers,false)}],
   });
   dispatch({
     type: constants.ADD_SPEAKER,
@@ -47,7 +51,12 @@ export const setSpeaker =
     (dispatch: Dispatch, getState) => {
       const speakers = getState().audio.speakers;
       speaker.speakerName = "";
-
+      if(speaker.lineColor == undefined){
+        speaker.lineColor = chooseColor(speakers,true);
+      }
+      if(speaker.dotColor == undefined){
+        speaker.dotColor = chooseColor(speakers,false);
+      }
       const newSpeakers = update(speakers, { [speakerIndex]: { $set: speaker } });
 
       dispatch({
@@ -276,3 +285,21 @@ export const setLetterPitch =
         speakers: newSpeakers,
       });
     };
+
+export const setLineAndDotColor =
+  (speakerIndex: number, lineColor: string, dotColor:string): ActionReturn =>
+    (dispatch: Dispatch, getState) => {
+      const speakers = getState().audio.speakers;
+      const newSpeakers = update(speakers, {
+        [speakerIndex]: {
+          lineColor: { $set: lineColor },
+          dotColor: { $set: dotColor }
+        },
+      });
+
+      dispatch({
+        type: constants.LINE_AND_DOT_COLOR,
+        speakers: newSpeakers,
+      });
+    };
+
