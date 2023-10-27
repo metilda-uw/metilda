@@ -19,7 +19,13 @@ import ReactFileReader from "react-file-reader";
 import * as DEFAULT from "../constants/create";
 import { withRouter } from "react-router-dom";
 import { createRef } from "react";
+import ReactDOM from 'react-dom'
 import { NotificationManager } from "react-notifications";
+import {
+  setPitchArtDocId,
+  setPitchArtCollectionId
+} from "../store/pitchArt/pitchArtActions";
+import PitchArtVersionSelector from "./PitchArtVersionSelector";
 
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
@@ -33,6 +39,10 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
   replaceSpeakers: (speakers: Speaker[]) => void;
   firebase: any;
   match: any;
+  currentCollectionId: string;
+  currentDocumentId: string;
+  setPitchArtDocId:(Id:string) => void;
+  setPitchArtCollectionId:(Id:string) =>void;
 }
 
 interface State {
@@ -72,6 +82,17 @@ class CreatePitchArt extends React.Component<
 
   private pitchArtRef = createRef<any>();
   private listenedDocIds = [];
+  private customStyles = {
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
 
   constructor(props: CreatePitchArtProps) {
     super(props);
@@ -104,6 +125,8 @@ class CreatePitchArt extends React.Component<
       isAChildVersion: false,
       parentDocumentId: ''
     };
+    this.loadPitchArtVersions = this.loadPitchArtVersions.bind(this);
+    this.removeVersionsModal = this.removeVersionsModal.bind(this);
   }
 
   componentDidMount() {
@@ -128,6 +151,8 @@ class CreatePitchArt extends React.Component<
           this.props.replaceSpeakers(newSpeakers as Speaker[]);
           this.setState({ ...doc.data() },
             () => { this.getUserFiles(); });
+          this.props.setPitchArtDocId(docId);
+          this.props.setPitchArtCollectionId(collectionId);
         } else {
           this.setState({ owner: this.props.firebase.auth.currentUser.email });
           this.props.history.push({ pathname: "/pitchartwizard" });
@@ -203,6 +228,54 @@ class CreatePitchArt extends React.Component<
 
   loadPitchArtVersions = () =>{
     console.log("Inside load pitch art versions");
+
+    console.log(this.props.currentCollectionId);
+
+    let wordsInCollection;
+
+    this.props.firebase.firestore
+      .collection(this.props.currentCollectionId)
+      .get()
+      .then((querySnapshot) => {
+        if (querySnapshot.empty) {
+          // setWords([]);
+        } else {
+          // querySnapshot.forEach((doc) => {
+            //  creates an array of words in the collection
+            const wordsInCollection = querySnapshot.docs.map((doc) => ({
+              id: doc.id,
+              data: doc.data(),
+            }));
+            console.log("wordsCollection", wordsInCollection);
+           // const currentDoc = wordsInCollection.get()
+            const currentDocData = wordsInCollection.find((doc)=> doc.id === this.props.currentDocumentId);
+
+            console.log("currentDocData ::", currentDocData);
+
+            let currentDocVersions = [];
+
+            if(currentDocData != null){
+              currentDocVersions = wordsInCollection.filter((doc) => doc.data.parentDocumentId === currentDocData.data.parentDocumentId);
+              currentDocVersions.push(wordsInCollection.find((doc)=> doc.id === currentDocData.data.parentDocumentId));
+            }
+
+            console.log("currentDocVersions :: ", currentDocVersions);
+            this.renderVersionsModal(currentDocVersions);
+
+
+            
+            // console.log("arr ", arr);
+         // });
+        }
+        // setUpdate(false);
+      })
+      .then(() => {
+        // setIsLoading(false);
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
+      });
+
     
   }
 
@@ -333,6 +406,20 @@ class CreatePitchArt extends React.Component<
     }
   }
 
+  renderVersionsModal= (words) => {
+      const modal = document.querySelector('.version-overlay');
+      const pitchArtVersionSelector = <PitchArtVersionSelector words={words} removeVersionsModal={this.removeVersionsModal} 
+        collectionId={this.props.currentCollectionId} firebase={this.props.firebase}/>;
+
+      // Render the React component inside the modal
+      ReactDOM.render(pitchArtVersionSelector, modal);
+  }
+
+  removeVersionsModal = () =>{
+    const modal = document.querySelector('.version-overlay');
+    ReactDOM.unmountComponentAtNode(modal);
+  }
+
   render() {
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
@@ -362,6 +449,7 @@ class CreatePitchArt extends React.Component<
               Versions
             </button>
           </div>
+          <div className="version-overlay"></div>
           <div>
             {this.renderPageOptions()}
           </div>
@@ -408,6 +496,8 @@ class CreatePitchArt extends React.Component<
 
 const mapStateToProps = (state: AppState) => ({
   speakers: state.audio.speakers,
+  currentCollectionId: state.pitchArtDetails.collectionId,
+  currentDocumentId: state.pitchArtDetails.pitchArtDocId
 });
 
 const mapDispatchToProps = (
@@ -420,7 +510,9 @@ const mapDispatchToProps = (
   ) => dispatch(setLetterPitch(speakerIndex, letterIndex, newPitch)),
   replaceSpeakers: (
     speakers: Speaker[]
-  ) => dispatch(replaceSpeakers(speakers))
+  ) => dispatch(replaceSpeakers(speakers)),
+  setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
+  setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId))
 
 });
 

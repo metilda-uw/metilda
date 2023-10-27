@@ -1,0 +1,20 @@
+.word-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+    transition: transform 0.3s;
+  }
+  
+  .word-card {
+    flex: 0 0 100%; /* Each word card takes the full width */
+    opacity: 0;
+    display: none;
+    transition: opacity 0.3s;
+  }
+  
+  .word-card.active {
+    display: block;
+    opacity: 1;
+  }

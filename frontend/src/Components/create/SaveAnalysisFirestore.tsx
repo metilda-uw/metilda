@@ -1,6 +1,7 @@
 import "./SaveAnalysisFirestore.scss"
 import React, { useContext, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
+import { connect } from "react-redux";
 
 import { useParams, useHistory } from "react-router-dom";
 import Select from "react-select";
@@ -10,8 +11,17 @@ import FirebaseContext from "../../Firebase/context";
 import Modal from "react-modal";
 import { render } from "enzyme";
 import  CreatePitchArt  from "../../Create/CreatePitchArt";
+import { AppState } from "../../store";
+import { ThunkDispatch } from "redux-thunk";
+import { PitchArtDetailsAction } from "../../store/pitchArt/actionTypes";
+import {
+  setPitchArtDocId,
+  setPitchArtCollectionId
+} from "../../store/pitchArt/pitchArtActions";
+import { AudioAction } from "../../store/audio/types";
+// import { useDispatch } from 'react-redux';
 
-export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks }) {
+function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPitchArtDocId, setPitchArtCollectionId}) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
@@ -211,6 +221,10 @@ export default function SaveAnalysisFirestore({ analysis, saveThumbnail, data, c
           setIsDocSaved(true);
           setSavedDocId(docRef.id);
           setParentDocumentId(docRef.id);
+          // const dispatch = useDispatch();
+          // dispatch(setPitchArtDocId(docRef.id));
+          setPitchArtDocId(docRef.id);
+          setPitchArtCollectionId(collectionUuid);
 
           NotificationManager.success(
             "Pitch Art added to collection successfully!"
@@ -564,3 +578,17 @@ SaveAnalysisFirestore.propTypes = {
   saveThumbnail: PropTypes.func,
   data: PropTypes.any
 };
+
+const mapStateToProps = (state: AppState) => ({
+  currentCollectionId: state.pitchArtDetails.collectionId,
+  currentDocumentId: state.pitchArtDetails.pitchArtDocId
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<AppState, void, AudioAction>
+) => ({
+  setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
+  setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(SaveAnalysisFirestore);

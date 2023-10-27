@@ -5,19 +5,21 @@ import * as constants from "../../constants";
 
 import { AppState } from "../index";
 import { PitchArtDetailsAction } from "./actionTypes";
+import { AudioAction } from "../audio/types";
 
-type ActionReturn = ThunkAction<void, AppState, void, PitchArtDetailsAction>;
+type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
 
-export const setPitchArtDocId = (pitchArtDocId: String):
+export const setPitchArtDocId = (pitchArtDocId: string):
   ActionReturn => (dispatch: Dispatch) => {
-    const Id = pitchArtDocId;
+    console.log("inside setPitchArtDocId");
+    // const Id = pitchArtDocId;
     dispatch({
       type: constants.PITCHART_DOCUMENT_ID,
-      pitchArtDocId: Id,
+      pitchArtDocId: pitchArtDocId,
     });
 };
 
-export const setPitchArtCollectionId = (collectionId: String):
+export const setPitchArtCollectionId = (collectionId: string):
   ActionReturn => (dispatch: Dispatch) => {
     const Id = collectionId;
     dispatch({
