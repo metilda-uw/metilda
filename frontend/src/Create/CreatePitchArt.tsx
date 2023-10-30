@@ -137,6 +137,17 @@ class CreatePitchArt extends React.Component<
     }
   }
 
+  componentDidUpdate(prevProps) {
+    // Check for changes in the URL parameters
+    const { type: newType, id: newId } = this.props.match.params;
+    const { type: prevType, id: prevId } = prevProps.match.params;
+
+    if (newType !== prevType || newId !== prevId) {
+      // URL parameters have changed, trigger a reload
+      this.listenForData(newType, newId);
+    }
+  }
+
   listenForData(collectionId:string,docId:string) {
    // const id = this.props.match.params.id ? this.props.match.params.id : "";
     if(this.listenedDocIds.includes(docId)) return;
@@ -409,7 +420,7 @@ class CreatePitchArt extends React.Component<
   renderVersionsModal= (words) => {
       const modal = document.querySelector('.version-overlay');
       const pitchArtVersionSelector = <PitchArtVersionSelector words={words} removeVersionsModal={this.removeVersionsModal} 
-        collectionId={this.props.currentCollectionId} firebase={this.props.firebase}/>;
+        collectionId={this.props.currentCollectionId} firebase={this.props.firebase} history={this.props.history}/>;
 
       // Render the React component inside the modal
       ReactDOM.render(pitchArtVersionSelector, modal);

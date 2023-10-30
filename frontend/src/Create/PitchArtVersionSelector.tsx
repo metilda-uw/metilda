@@ -6,9 +6,8 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import WordCard from "../Components/collections/WordCard";
-import FirebaseContext from "../Firebase/context";
 import './PitchArtVersionSelector.scss'
 
 const PitchArtVersionSelector = (props) =>{
@@ -26,6 +25,7 @@ const PitchArtVersionSelector = (props) =>{
     // const firebase = useContext(FirebaseContext);
 
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
+    // const history = useHistory();
 
     const showNext = () => {
         setCurrentWordIndex((prevIndex) =>
@@ -80,10 +80,9 @@ const PitchArtVersionSelector = (props) =>{
         props.removeVersionsModal();
     }
     function loadVersion(){
-        // load the version
-
-        // close the overlay.
-        // props.removeVersionsModal();
+        props.removeVersionsModal();
+        
+        props.history.push({pathname:`/pitchartwizard/${props.collectionId}/${props.words[currentWordIndex].id}`});
     }
 
     return (
