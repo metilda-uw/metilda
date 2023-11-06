@@ -14,6 +14,10 @@ export default function WordCard(props) {
   const [url, setURL] = useState("");
 
   useEffect(() => {
+    if(props.url !== undefined) {
+      setURL(props.url);
+      return;
+    }
     const storageRef = firebase.storage.ref(
       "thumbnails/" + selectedCollectionUuid + "/" + word.id
     );
@@ -23,6 +27,8 @@ export default function WordCard(props) {
       //Do Nothing
     });
   });
+
+  console.log("URl of word " , props.url);
 
   return (
     <div className={props.classArgument != undefined ? props.classArgument + " col s6 m3" :"col s6 m3"}>
@@ -57,5 +63,6 @@ WordCard.propTypes = {
   selectedCollectionUuid: PropTypes.string,
   key: PropTypes.string,
   fb:PropTypes.object,
-  classArgument:PropTypes.string
+  classArgument:PropTypes.string,
+  url:PropTypes.string
 };

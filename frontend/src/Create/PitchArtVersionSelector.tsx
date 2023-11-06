@@ -9,23 +9,11 @@ import Typography from "@material-ui/core/Typography";
 import { Link, useHistory } from "react-router-dom";
 import WordCard from "../Components/collections/WordCard";
 import './PitchArtVersionSelector.scss'
+import WordSyllableCategories from "../Learn/WordSyllableCategories";
 
 const PitchArtVersionSelector = (props) =>{
-    // const customStyles = {
-    //     content: {
-    //       margin: 0,
-    //       top: "50%",
-    //       left: "50%",
-    //       right: "auto",
-    //       bottom: "auto",
-    //       marginRight: "-50%",
-    //       transform: "translate(-50%, -50%)",
-    //     },
-    // };
-    // const firebase = useContext(FirebaseContext);
 
     const [currentWordIndex, setCurrentWordIndex] = useState(0);
-    // const history = useHistory();
 
     const showNext = () => {
         setCurrentWordIndex((prevIndex) =>
@@ -86,64 +74,50 @@ const PitchArtVersionSelector = (props) =>{
     }
 
     return (
+        // {words = words.props.words;}
         <div className="version-selector">
-            {/* <Modal isOpen={true} style={customStyles}
-                appElement={document.getElementById("root" || undefined)}>
-                <h3> Load Pitch Art versions</h3>
-                <div className="collectionRename-cancel-save">
-                    <button
-                    className="btn waves-light globalbtn"
-                    onClick={onCancelClick}
-                    >
-                    Cancel
-                    </button>
-                    <button
-                    className="btn waves-light globalbtn"
-                    onClick={loadVersion}
-                    >
-                    Load version
-                    </button>
-                </div>
-            </Modal> */}
-
             <Dialog fullWidth={true} maxWidth="xs" open={true}
-                onClose={onCancelClick}aria-labelledby="form-dialog-title"> 
+            onClose={onCancelClick}aria-labelledby="form-dialog-title"> 
                 <DialogTitle onClose={onCancelClick} id="form-dialog-title">
-                    <p>Pitch Art Versions</p>
+                   {props.words.length != 0 && <p>Pitch Art Versions</p> } 
                 </DialogTitle>
                 <DialogContent>
-                <div className="row collections-view-wordcards">
-                    <ul className="word-list">
-                        {props.words.map((word, index) => (
-                        <li
-                            key={word.id}
-                            className={`word-card ${index === currentWordIndex ? 'active' : ''}`}
-                        >
-                            <WordCard
-                            word={word}
-                            selectedCollectionUuid={props.collectionId}
-                            key={word.id}
-                            fb={props.firebase}
-                            classArgument= {"card-tile"}
-                            />
-                        </li>
-                        ))}
-                    </ul>
-                    <div className="pagination">
-                        <button onClick={showPrevious}>Previous</button>
-                        <button onClick={showNext}>Next</button>
+                { (props.words.length != 0) ? ( 
+                    <div className="row collections-view-wordcards">
+                        <ul className="word-list">
+                            {props.words.map((word, index) => (
+                            <li
+                                key={word["id"]}
+                                className={`word-card ${index === currentWordIndex ? 'active' : ''}`}
+                            >
+                                <WordCard
+                                word={word}
+                                selectedCollectionUuid={props.collectionId}
+                                key={word["id"]}
+                                fb={props.firebase}
+                                classArgument= {"card-tile"}
+                                url={props.urls[word["id"]]}
+                                />
+                            </li>
+                            ))}
+                        </ul>
+                        <div className="pagination">
+                            <button className="waves-effect waves-light btn globalbtn" disabled={currentWordIndex === 0} onClick={showPrevious}>Previous</button>
+                            <button className="waves-effect waves-light btn globalbtn right" disabled={currentWordIndex === props.words.length-1} onClick={showNext}>Next</button>
+                        </div>
                     </div>
-                </div>
-                    
+                ):(
+                    <p>There are no pitch art versions</p>
+                )}
                 </DialogContent>
-                <DialogActions>
+                {props.words.length != 0 && <DialogActions>
                     <button className="SaveSyllable waves-effect waves-light btn globalbtn" onClick={loadVersion}>
                         <i className="material-icons right"></i>
-                        load pitch version
+                        load this version
                     </button>
-                </DialogActions>
+                </DialogActions>}
             </Dialog>
-
+        
         </div>
     );
 }

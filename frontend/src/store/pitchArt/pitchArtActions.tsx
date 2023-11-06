@@ -11,7 +11,7 @@ type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
 
 export const setPitchArtDocId = (pitchArtDocId: string):
   ActionReturn => (dispatch: Dispatch) => {
-    console.log("inside setPitchArtDocId");
+    // console.log("inside setPitchArtDocId");
     // const Id = pitchArtDocId;
     dispatch({
       type: constants.PITCHART_DOCUMENT_ID,
@@ -26,6 +26,22 @@ export const setPitchArtCollectionId = (collectionId: string):
       type: constants.PITCHART_COLLECTION_ID,
       collectionId: Id,
     });
+};
+
+export const setParentPitchArtDocumentData = (data:any):
+ActionReturn => (dispatch: Dispatch) => {
+  dispatch({
+    type: constants.PARENT_PITCHART_DOCUMENT_DATA,
+    parentPitchArtDocumentData: data,
+  });
+};
+
+export const setCurrentPitchArtDocumentData = (data:any):
+ActionReturn => (dispatch: Dispatch) => {
+  dispatch({
+    type: constants.CURRENT_PITCHART_DOCUMENT_DATA,
+    currentPitchArtDocumentData: data,
+  });
 };
 
 // TODO :: write one action for listened documents

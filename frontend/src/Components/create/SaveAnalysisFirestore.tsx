@@ -16,12 +16,17 @@ import { ThunkDispatch } from "redux-thunk";
 import { PitchArtDetailsAction } from "../../store/pitchArt/actionTypes";
 import {
   setPitchArtDocId,
-  setPitchArtCollectionId
+  setPitchArtCollectionId,
+  setParentPitchArtDocumentData,
+  setCurrentPitchArtDocumentData
 } from "../../store/pitchArt/pitchArtActions";
 import { AudioAction } from "../../store/audio/types";
+import { getModifiedFieldsofPitchArt , getUpdatedPitchArtData, getChildPitchArtVersions} from '../../Create/ImportUtils';
 // import { useDispatch } from 'react-redux';
 
-function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPitchArtDocId, setPitchArtCollectionId}) {
+function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,currentCollectionId,parentDocumentData,currentDocumentData, setPitchArtCollectionId,
+  setParentPitchArtDocumentData,
+  setCurrentPitchArtDocumentData}) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
@@ -35,6 +40,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
   const [saveModalIsOpen, setSaveModalIsOpen] = useState(false);
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
   const [updateModalIsOpen, setUpdateModalIsOpen] = useState(false);
+  const [deleteParentPitchArtModal, setDeleteParentPitchArtModalIsOpen] = useState(false);
   const [createCollectionName, setCreateCollectionName] = useState("");
   const [createCollectionDescription, setCreateCollectionDescription] = useState("");
   const [collectionOptions, setCollectionOptions] = useState([]);
@@ -106,6 +112,14 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
   };
   const setSaveModalIsOpenToFalse = () => {
     setSaveModalIsOpen(false);
+  };
+
+  const setDeleteParentPitchArtModalToTrue = (event: any) => {
+    // event && event.preventDefault();
+    setDeleteParentPitchArtModalIsOpen(true);
+  };
+  const setDeleteParentPitchArtModalToFalse = () => {
+    setDeleteParentPitchArtModalIsOpen(false);
   };
 
   const setDeleteModalIsOpenToTrue = (event: any) => {
@@ -223,8 +237,17 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
           setParentDocumentId(docRef.id);
           // const dispatch = useDispatch();
           // dispatch(setPitchArtDocId(docRef.id));
-          setPitchArtDocId(docRef.id);
+          // setPitchArtDocId(docRef.id);
           setPitchArtCollectionId(collectionUuid);
+          const parentData = {
+            word: word,
+            wordTranslation: wordTranslate,
+            speakerName: speakerName,
+            ...data,
+            speakers: analysis,
+            createdAt: timestamp.fromDate(new Date())
+          }
+          setParentPitchArtDocumentData({"id":docRef.id,"data":parentData});
 
           NotificationManager.success(
             "Pitch Art added to collection successfully!"
@@ -243,21 +266,26 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
     const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
     // instead of params['type'] , use collectionID
+    const workingData = {
+      ...data,
+      word: word === undefined ? data.word : word,
+      wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
+      speakerName: speakerName === undefined ? data.speakerName : speakerName,
+      speakers: analysis,
+      createdAt: timestamp.fromDate(new Date())
+    }
+    const updatedData = getUpdatedPitchArtData(parentDocumentData,currentDocumentData,workingData);
     firebase.firestore 
       .collection(collectionId)
       .doc(docId)
-      .update({
-        ...data,
-        word: word === undefined ? data.word : word,
-        wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
-        speakerName: speakerName === undefined ? data.speakerName : speakerName,
-        speakers: analysis,
-        createdAt: timestamp.fromDate(new Date())
-      })
+      .update(updatedData)
       .then(() => {
         //console.log("Document written with ID: ", docRef.id);
         saveThumbnail(collectionId + "/" + docId);
-
+        
+        if(updatedData && !updatedData.isAChildVersion){
+          setParentPitchArtDocumentData({"id":docId,"data":updatedData});
+        }
         NotificationManager.success(
           "Pitch Art Updated Successfully!"
         );
@@ -269,6 +297,11 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
   };
 
   const handleDeleteCollection = async (event: any) => {
+    if(currentDocumentData != null && !currentDocumentData["data"].isAChildVersion){
+      setDeleteModalIsOpenToFalse();
+      setDeleteParentPitchArtModalToTrue({});
+      return;
+    }
     event.preventDefault();
 
     // instead of params['type'] , use collectionID
@@ -280,7 +313,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
       .doc(docId)
       .delete()
       .then(() => {
-        firebase.storage()
+        firebase.storage.ref()
           .child('thumbnails/' + collectionId + "/" + docId)
           .delete()
           .catch((error) => {
@@ -289,12 +322,40 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
         NotificationManager.success(
           "Pitch Art Deleted Successfully!"
         );
+        alert("The page no longer exists");
+        window.location.reload();
       })
       .catch((error) => {
         console.error("Error Deleting document: ", error);
         NotificationManager.error("Deleting Word from collection failed!");
       });
   };
+
+  const handleParentPitchArtDeletion = async() =>{
+    setDeleteParentPitchArtModalToFalse();
+    const versions = await getChildPitchArtVersions(firebase,currentCollectionId, currentDocumentData["id"]);
+    const docIds = versions.map((doc) => {return doc['id'];});
+    docIds.push(currentDocumentData["id"]);
+    console.log("Doc IDs ::", docIds);
+
+    for (const docId of docIds) {
+      // Delete Firestore document
+      await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
+      
+      // Delete thumbnail in Firebase Storage
+      const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
+      await thumbnailRef.delete();
+      
+      // Add success message or other actions here
+      
+    }
+
+    // After deleting all documents, you can add any final actions here.
+    NotificationManager.success("Pitch Art Deleted Successfully ");
+    alert("page no longer exist");
+    window.location.reload();
+
+  }
 
   const savePitchArtAsNewVersion = (event: any) =>{
     event.preventDefault();
@@ -315,24 +376,52 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
       parentDocId = parentDocumentId;
     }
 
+    const currentData = {
+      ...data,
+      isAChildVersion: true,
+      parentDocumentId: parentDocId,
+      word: word === undefined ? data.word : word,
+      wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
+      speakerName: speakerName === undefined ? data.speakerName : speakerName,
+      speakers: analysis,
+      createdAt: timestamp.fromDate(new Date())
+    }
+    let modifiedData = currentData;
+    if(parentDocumentData != null)
+      modifiedData = getModifiedFieldsofPitchArt(parentDocumentData.data,currentData,parentDocumentData.id);
+    else if(currentDocumentData != null){
+      modifiedData = getModifiedFieldsofPitchArt(currentDocumentData.data,currentData,currentDocumentData.id);
+    }
+    // modifiedData.isAChildVersion = true;
+    // modifiedData.parentDocumentId = parentDocId,
+
+    console.log(modifiedData);
 
     firebase.firestore
     .collection(collectionId)
-    .add({
-          ...data,
-          isAChildVersion: true,
-          parentDocumentId: parentDocId,
-          word: word === undefined ? data.word : word,
-          wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
-          speakerName: speakerName === undefined ? data.speakerName : speakerName,
-          speakers: analysis,
-          createdAt: timestamp.fromDate(new Date())
-        })
+    .add(
+        // {
+        //   ...data,
+        //   isAChildVersion: true,
+        //   parentDocumentId: parentDocId,
+        //   word: word === undefined ? data.word : word,
+        //   wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
+        //   speakerName: speakerName === undefined ? data.speakerName : speakerName,
+        //   speakers: analysis,
+        //   createdAt: timestamp.fromDate(new Date())
+        // }
+        modifiedData
+        )
         .then((docRef) => {
           //console.log("Document written with ID: ", docRef.id);
           saveThumbnail(collectionId + "/" + docRef.id);
           setIsDocSaved(true);
           setSavedDocId(docRef.id);
+          if(parentDocumentData == null){
+            setParentPitchArtDocumentData({"id":currentDocumentData.id,"data":currentDocumentData.data});
+          }
+          setCurrentPitchArtDocumentData({"id":docRef.id,"data":modifiedData});
+          
 
           if(params['type'] == null){
             callBacks.listenForData(collectionId,docRef.id);
@@ -438,6 +527,27 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks, setPi
               <button
                 className="btn waves-light globalbtn"
                 onClick={handleDeleteCollection}
+              >
+                Delete
+              </button>
+            </div>
+          </Modal>
+          <Modal
+            isOpen={deleteParentPitchArtModal}
+            style={customStyles}
+            appElement={document.getElementById("root" || undefined)}
+          >
+            <p> Deleting original pitch art will delete all its versions</p>
+            <div className="collectionRename-cancel-save">
+              <button
+                className="btn waves-light globalbtn"
+                onClick={setDeleteParentPitchArtModalToFalse}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn waves-light globalbtn"
+                onClick={handleParentPitchArtDeletion}
               >
                 Delete
               </button>
@@ -581,14 +691,17 @@ SaveAnalysisFirestore.propTypes = {
 
 const mapStateToProps = (state: AppState) => ({
   currentCollectionId: state.pitchArtDetails.collectionId,
-  currentDocumentId: state.pitchArtDetails.pitchArtDocId
+  parentDocumentData: state.pitchArtDetails.parentPitchArtDocumentData,
+  currentDocumentData: state.pitchArtDetails.currentPitchArtDocumentData
 });
 
 const mapDispatchToProps = (
   dispatch: ThunkDispatch<AppState, void, AudioAction>
 ) => ({
-  setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
-  setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId))
+  // setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
+  setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId)),
+  setParentPitchArtDocumentData:(data:any) => dispatch(setParentPitchArtDocumentData(data)),
+  setCurrentPitchArtDocumentData:(data:any) => dispatch(setCurrentPitchArtDocumentData(data))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SaveAnalysisFirestore);

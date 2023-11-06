@@ -10,7 +10,9 @@ defaultState - defines a initial state for pitchArtDetailsState
 const defaultState: pitchArtDetailsState = {
   pitchArtDocId:null,
   collectionId:null,
-  listenedDocuments:[]
+  listenedDocuments:[],
+  parentPitchArtDocumentData:null,
+  currentPitchArtDocumentData:null
 };
 
 /**
@@ -30,6 +32,10 @@ const pitchArtDetailsReducer: Reducer<pitchArtDetailsState> = (
         return { ...state, collectionId: action.collectionId };
     case constants.LISTENED_DOCUMENT_IDS:
         return { ...state, listenedDocuments: action.listenedDocuments };
+    case constants.PARENT_PITCHART_DOCUMENT_DATA:
+        return {...state, parentPitchArtDocumentData: action.parentPitchArtDocumentData}
+    case constants.CURRENT_PITCHART_DOCUMENT_DATA:
+      return {...state, currentPitchArtDocumentData: action.currentPitchArtDocumentData}
     default:
         return state;
   }

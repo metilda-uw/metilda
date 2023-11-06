@@ -3,6 +3,7 @@ import { Speaker } from "../types/types";
 import moment from "moment";
 import "react-notifications/lib/notifications.css";
 import { NotificationManager } from "react-notifications";
+import { idText } from "typescript";
 
 export function importSpeakerFile(
   results: Result[],
@@ -484,6 +485,112 @@ export function MoveToFolder(
   });
   return filePromise;
 }
+/**
+ * While saving new pitch art version, this method creats an pitch art
+ * object which contains only fields whose values are different from 
+ * parent pitch art data.
+ * @param parentDocdata 
+ * @param currentData 
+ * @param parentDocId 
+ * @returns 
+ */
+export function getModifiedFieldsofPitchArt(parentDocdata:any,currentData:any,parentDocId:any){
+  
+  let modifiedData = {};
+  // JSON.stringify(obj1) === JSON.stringify(obj2) 
+  // const data = parentDocdata && parentDocdata.data;
+  for (const key in parentDocdata) {
+    if (parentDocdata.hasOwnProperty(key) && key != "childVersions") {
+      if (typeof parentDocdata[key] === 'object' && typeof currentData[key] === 'object') {
+        if(!(JSON.stringify(parentDocdata[key]) === JSON.stringify(currentData[key]))){
+          modifiedData[key] = currentData[key];
+        }
+      }else if (parentDocdata[key] !== currentData[key]) {
+        modifiedData[key] = currentData[key]
+      }
+    }
+  }
+  
+  modifiedData["parentDocumentId"] = parentDocId;
+  modifiedData["isAChildVersion"]= true;
+  return modifiedData;
+
+}
+
+/**
+ * when loading child version of pitch art, this method combines 
+ * parent pitch art data and child pitch art data to form
+ * complete pitch art as child version does not have complete data
+ * @param parentDocdata 
+ * @param currentData 
+ * @returns 
+ */
+export function createCommonPitchArtDocument(parentDocdata:any,currentData:any){
+  
+  if(parentDocdata == null || parentDocdata == undefined) return currentData;
+
+  let data = currentData;
+  
+  for (const key in parentDocdata) {
+    if (parentDocdata.hasOwnProperty(key) && currentData[key] === undefined && key != "childVersions") {
+      data[key] = parentDocdata[key];
+    }
+  }
+  return data;
+}
+
+export function getUpdatedPitchArtData(parentDocdata:any, previousData:any, currentData){
+ // if(parentDocdata == null || previousData == null) return currentData;
+  if(previousData && previousData.data.isAChildVersion && parentDocdata){
+    const data = getModifiedFieldsofPitchArt(parentDocdata.data,currentData,parentDocdata.id);
+    return data;
+  }else{
+    return currentData;
+  }
+
+}
+
+export function fillMissingFieldsInChildDoc(childDocData:any, parentDocData){
+  if(childDocData["data"].speakerName === undefined){
+    childDocData["data"].speakerName = parentDocData["data"].speakerName;
+  }
+  if(childDocData["data"].word === undefined){
+    childDocData["data"].word = parentDocData["data"].word;
+  }
+  if(childDocData["data"].wordTranslation === undefined){
+    childDocData["data"].wordTranslation = parentDocData["data"].wordTranslation;
+  }
+  return childDocData;
+}
+
+export async function getChildPitchArtVersions(firebase, collectionId, parentDocId) {
+  if (!firebase || !collectionId || !parentDocId) return [];
+
+  try {
+    const querySnapshot = await firebase.firestore.collection(collectionId).get();
+
+    if (querySnapshot.empty) {
+      return [];
+    }
+
+    const wordsInCollection = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      data: doc.data(),
+    }));
+
+    console.log("wordsCollection", wordsInCollection);
+
+    if (wordsInCollection.length !== 0 && parentDocId !== null) {
+      return wordsInCollection.filter((doc) => doc.data.parentDocumentId === parentDocId);
+    } else {
+      return [];
+    }
+  } catch (error) {
+    console.error("Error in getChildPitchArtVersions:", error);
+    throw error; // Re-throw the error to be caught by the caller if needed.
+  }
+}
+
 
 export function ShareFile(
   audioId: any,
