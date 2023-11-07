@@ -44,5 +44,13 @@ ActionReturn => (dispatch: Dispatch) => {
   });
 };
 
+export const setCurrentPitchArtVersions = (data:any):
+ActionReturn => (dispatch: Dispatch) => {
+  dispatch({
+    type: constants.CURRENT_PITCHART_VERSIONS,
+    currentPitchArtVersions: data,
+  });
+};
+
 // TODO :: write one action for listened documents
 

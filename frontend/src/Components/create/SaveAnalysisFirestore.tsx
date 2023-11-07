@@ -18,15 +18,20 @@ import {
   setPitchArtDocId,
   setPitchArtCollectionId,
   setParentPitchArtDocumentData,
-  setCurrentPitchArtDocumentData
+  setCurrentPitchArtDocumentData,
+  setCurrentPitchArtVersions
 } from "../../store/pitchArt/pitchArtActions";
 import { AudioAction } from "../../store/audio/types";
 import { getModifiedFieldsofPitchArt , getUpdatedPitchArtData, getChildPitchArtVersions} from '../../Create/ImportUtils';
+import * as constants from "../../constants";
 // import { useDispatch } from 'react-redux';
 
-function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,currentCollectionId,parentDocumentData,currentDocumentData, setPitchArtCollectionId,
+function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,currentCollectionId,parentDocumentData,currentDocumentData,
+  currentPitchArtVersions, 
+  setPitchArtCollectionId,
   setParentPitchArtDocumentData,
-  setCurrentPitchArtDocumentData}) {
+  setCurrentPitchArtDocumentData,
+  setCurrentPitchArtVersions}) {
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
@@ -286,6 +291,11 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         if(updatedData && !updatedData.isAChildVersion){
           setParentPitchArtDocumentData({"id":docId,"data":updatedData});
         }
+        if(updatedData && updatedData.isAChildVersion && currentPitchArtVersions && currentPitchArtVersions.length != 0){
+          currentPitchArtVersions = currentPitchArtVersions.filter((doc) => doc.id !== docId);
+          currentPitchArtVersions.push({"id":docId,"data":updatedData});
+          setCurrentPitchArtVersions(currentPitchArtVersions);
+        }
         NotificationManager.success(
           "Pitch Art Updated Successfully!"
         );
@@ -322,6 +332,10 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         NotificationManager.success(
           "Pitch Art Deleted Successfully!"
         );
+        if(currentPitchArtVersions && currentPitchArtVersions.length != 0){
+          currentPitchArtVersions = currentPitchArtVersions.filter((doc) => doc.id !== docId);
+          setCurrentPitchArtVersions(currentPitchArtVersions);
+        }
         alert("The page no longer exists");
         window.location.reload();
       })
@@ -357,10 +371,12 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
 
   }
 
-  const savePitchArtAsNewVersion = (event: any) =>{
+  const savePitchArtAsNewVersion = async(event: any) =>{
     event.preventDefault();
     setSaveAsNewVersionModalOpenToFalse(false);
     console.log("Inside savePitchArtAsNewVersion");
+
+    
 
     // instead of params['type'] , use collectionID
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
@@ -375,6 +391,26 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     }else {
       parentDocId = parentDocumentId;
     }
+    // **********************************TODO *****************************
+    // let childversions = currentPitchArtVersions;
+    // if(childversions && childversions.length == 0 && parentDocumentData){
+    //   childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"]);
+    // }
+    // if(childversions.length != 0){
+    //   if(childversions.length > 0){
+    //     childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
+    //     if(childversions.length >= constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
+    //       const docId = childversions[0]["id"];
+    //       await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
+      
+    //       // Delete thumbnail in Firebase Storage
+    //       const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
+    //       await thumbnailRef.delete();
+
+    //       childversions = childversions.filter((doc) => doc.id !== docId);
+    //     }
+    //   }
+    // }
 
     const currentData = {
       ...data,
@@ -400,16 +436,6 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     firebase.firestore
     .collection(collectionId)
     .add(
-        // {
-        //   ...data,
-        //   isAChildVersion: true,
-        //   parentDocumentId: parentDocId,
-        //   word: word === undefined ? data.word : word,
-        //   wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
-        //   speakerName: speakerName === undefined ? data.speakerName : speakerName,
-        //   speakers: analysis,
-        //   createdAt: timestamp.fromDate(new Date())
-        // }
         modifiedData
         )
         .then((docRef) => {
@@ -423,13 +449,42 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           setCurrentPitchArtDocumentData({"id":docRef.id,"data":modifiedData});
           
 
+      
+
+          // **********************************TODO *****************************
+          const deleteChild = async()=>{
+              let childversions = currentPitchArtVersions;
+              if(childversions && childversions.length == 0 && parentDocumentData){
+                childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"]);
+              }
+              if(childversions.length != 0){
+                if(childversions.length > 0){
+                  childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
+                  if(childversions.length >= constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
+                    const docId = childversions[0]["id"];
+                    await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
+                
+                    // Delete thumbnail in Firebase Storage
+                    const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
+                    await thumbnailRef.delete();
+          
+                    childversions = childversions.filter((doc) => doc.id !== docId);
+                  }
+                }
+              }
+        
+            childversions.push({"id":docRef.id,"data":modifiedData});
+            setCurrentPitchArtVersions(childversions);
+          };
+          deleteChild();
+           
           if(params['type'] == null){
             callBacks.listenForData(collectionId,docRef.id);
           }
           if(params['type'] != null && params['type'] != 'share')
             history.push('/pitchartwizard/'+ collectionId + '/' + docRef.id);
-
-          NotificationManager.success(
+            
+            NotificationManager.success(
             "New version of pitch art saved successfully!"
           );
         })
@@ -692,7 +747,8 @@ SaveAnalysisFirestore.propTypes = {
 const mapStateToProps = (state: AppState) => ({
   currentCollectionId: state.pitchArtDetails.collectionId,
   parentDocumentData: state.pitchArtDetails.parentPitchArtDocumentData,
-  currentDocumentData: state.pitchArtDetails.currentPitchArtDocumentData
+  currentDocumentData: state.pitchArtDetails.currentPitchArtDocumentData,
+  currentPitchArtVersions: state.pitchArtDetails.currentPitchArtVersions
 });
 
 const mapDispatchToProps = (
@@ -701,7 +757,8 @@ const mapDispatchToProps = (
   // setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
   setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId)),
   setParentPitchArtDocumentData:(data:any) => dispatch(setParentPitchArtDocumentData(data)),
-  setCurrentPitchArtDocumentData:(data:any) => dispatch(setCurrentPitchArtDocumentData(data))
+  setCurrentPitchArtDocumentData:(data:any) => dispatch(setCurrentPitchArtDocumentData(data)),
+  setCurrentPitchArtVersions:(data:any) => dispatch(setCurrentPitchArtVersions(data))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SaveAnalysisFirestore);

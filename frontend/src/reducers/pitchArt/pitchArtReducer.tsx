@@ -12,7 +12,8 @@ const defaultState: pitchArtDetailsState = {
   collectionId:null,
   listenedDocuments:[],
   parentPitchArtDocumentData:null,
-  currentPitchArtDocumentData:null
+  currentPitchArtDocumentData:null,
+  currentPitchArtVersions:[]
 };
 
 /**
@@ -36,6 +37,8 @@ const pitchArtDetailsReducer: Reducer<pitchArtDetailsState> = (
         return {...state, parentPitchArtDocumentData: action.parentPitchArtDocumentData}
     case constants.CURRENT_PITCHART_DOCUMENT_DATA:
       return {...state, currentPitchArtDocumentData: action.currentPitchArtDocumentData}
+    case constants.CURRENT_PITCHART_VERSIONS:
+      return {...state, currentPitchArtVersions: action.currentPitchArtVersions}
     default:
         return state;
   }

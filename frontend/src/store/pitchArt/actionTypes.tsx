@@ -7,6 +7,7 @@ export interface pitchArtDetailsState {
   listenedDocuments:String[]
   parentPitchArtDocumentData:any
   currentPitchArtDocumentData:any
+  currentPitchArtVersions:[]
 }
 
 export interface setPitchArtDocId extends Action {
@@ -34,9 +35,16 @@ export interface setCurrentPitchArtDocumentData extends Action{
   currentPitchArtDocumentData:any,
 }
 
+export interface setCurrentPitchArtVersions extends Action{
+  type: constants.CURRENT_PITCHART_VERSIONS
+  currentPitchArtVersions:[],
+}
+
 
 export type PitchArtDetailsAction =
   | setPitchArtDocId
   | setPitchArtCollectionId
   | setListenedDocuments
-  | setParentPitchArtDocumentData;
+  | setParentPitchArtDocumentData
+  | setCurrentPitchArtDocumentData
+  | setCurrentPitchArtVersions;
