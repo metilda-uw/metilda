@@ -12,6 +12,7 @@ import {
   setSpeaker,
   setUploadId,
 } from "../store/audio/actions";
+import $ from "jquery";
 import { AudioAction } from "../store/audio/types";
 import { Letter, Speaker } from "../types/types";
 import AudioLetter from "./AudioLetter";
@@ -39,6 +40,7 @@ import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
 import UpdateSyllable from "./UpdateSyllable";
+import './TargetPitchBar.scss';
 
 //import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
 
@@ -90,6 +92,8 @@ interface State {
   currentSyllable: string;
   currentSyllableT0: number;
   [key: string]: any;
+  isContourElementsSelectionActive:boolean;
+  selectedContourIndexes:number[];
 }
 
 interface PitchBarLetter extends Letter {
@@ -135,6 +139,12 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
 });
 
 export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
+  private metildaSyllableBarRef;
+  private selectionOverlay;
+  private isDragging;
+  private initialX;
+  private initialY;
+  private selectedContourElements;
   constructor(props: TargetPitchBarProps) {
     super(props);
     this.state = {
@@ -146,6 +156,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
       currentAnalysisName: "",
       currentSyllable: "",
       currentSyllableT0: 0,
+      isContourElementsSelectionActive:false,
+      selectedContourIndexes:[],
     };
     this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
@@ -154,6 +166,15 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.resetAllLettersEvent = this.resetAllLettersEvent.bind(this);
     this.setLetterSyllableEvent = this.setLetterSyllableEvent.bind(this);
     this.setLetterTimeEvent = this.setLetterTimeEvent.bind(this);
+    this.metildaSyllableBarRef = React.createRef();
+    this.selectionOverlay = React.createRef();
+    this.isDragging = false;
+    this.initialX = 0;
+    this.initialY = 0;
+    this.selectedContourElements = [];
+  }
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handleDocumentClick);
   }
 
   resetAllLettersEvent() {
@@ -361,6 +382,17 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
 
   removeSyllableEvent = () =>{
     const letters = this.props.speakers[this.props.speakerIndex].letters;
+    if(this.state.selectedContourIndexes.length > 0 && this.state.isContourElementsSelectionActive){
+    
+      this.props.removeLetter(this.props.speakerIndex, -1, this.state.selectedContourIndexes);
+      this.removeContourSelection();
+      this.setState({
+        isContourElementsSelectionActive:false,
+        selectedContourIndexes:[],
+      });
+      return;
+    }
+    
     const letter = letters[this.state.selectedIndex];
     if(letter != null && letter.isContour){
       this.setState({
@@ -750,6 +782,144 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     }
   };
 
+  handleMouseDown = (event) => {
+    event.preventDefault();
+    if (event.button === 0) {
+      const { metildaSyllableBarRef } = this;
+      const containerRect = this.metildaSyllableBarRef.current.getBoundingClientRect();
+
+      const initialX = event.clientX - containerRect.left;
+      const initialY = event.clientY - containerRect.top;
+
+
+      this.isDragging = true;
+      this.initialX = initialX;
+      this.initialY = initialY;
+
+      document.addEventListener('mousemove', this.handleMouseMove);
+      document.addEventListener('mouseup', this.handleMouseUp);
+      document.addEventListener('click', this.handleDocumentClick);
+    }
+  };
+  
+  handleDocumentClick = (event) => {
+    
+    if (this.state.isContourElementsSelectionActive) {
+      const { clientX, clientY } = event;
+      const containerRect = this.selectionOverlay.current.getBoundingClientRect();
+
+      // check if the click event is performed inside selection
+      if(clientX >= containerRect.left && clientX  <= containerRect.right 
+        && clientY >= containerRect.top && clientY <= containerRect.bottom){
+        return;
+      }
+      this.removeContourSelection();
+      document.removeEventListener('click', this.handleDocumentClick);
+      // Remove the selection
+      this.setState({
+        isContourElementsSelectionActive:false,
+        selectedContourIndexes:[],
+      });
+    }
+  };
+
+  handleMouseMove = (event) => {
+    if (this.isDragging) {
+      const initialX = this.initialX;
+      const initialY = this.initialY;
+      const { clientX, clientY } = event;
+     
+
+      const containerRect = this.metildaSyllableBarRef.current.getBoundingClientRect();
+      const currentX = clientX - containerRect.left;
+      const currentY = clientY - containerRect.top;
+
+      // Determine the selected area
+      const minX = Math.min(initialX, currentX);
+      const maxX = Math.max(initialX, currentX);
+      // const minY = Math.min(initialY, currentY);
+      // const maxY = Math.max(initialY, currentY);
+
+
+      const selectionOverlay = this.selectionOverlay.current;
+      if (selectionOverlay) {
+        selectionOverlay.classList.add('selection-highlight');
+        selectionOverlay.style.display = "block";
+        selectionOverlay.style.left = `${initialX + containerRect.left}px`;  // Set left position
+       // selectionOverlay.style.top = `${containerRect.top - scrollTop}px`;    // Set top position
+        selectionOverlay.style.width = `${Math.abs(currentX - initialX)}px`; // Set width 
+        selectionOverlay.style.height = `${containerRect.bottom - containerRect.top}px`; // Set height
+      }
+
+      let el = $(this.metildaSyllableBarRef.current);
+      const childElements =  el.children();
+      let selectedElements = [];
+      if(childElements.length != 0){
+        for(let i=0;i<childElements.length;i++){
+          if(childElements[i].classList.contains('selection')) continue;
+          const boundingRect = childElements[i].getBoundingClientRect();
+          const childLeft =  boundingRect.left - containerRect.left + (boundingRect.width/2);
+          const childRight = boundingRect.right - containerRect.left;
+          const isInsideX = childLeft <= maxX && childRight >= minX;
+          const isInsideY = boundingRect.top <= clientY && clientY <= boundingRect.bottom;
+          if(isInsideX && isInsideY) selectedElements.push(childElements[i]);
+        }
+      }
+    
+      if(selectedElements.length > 0){
+        const indexes = selectedElements.reduce((acc,element) =>{return acc.concat(element.id)},[]);
+        
+        const letters = this.props.speakers[this.props.speakerIndex].letters;
+        let allAreContour = true;
+        for (let i = 0; i < indexes.length; i++) {
+          const idx = indexes[i];
+          if (!letters[idx].isContour) {
+            allAreContour = false;
+            break;
+          }
+        }
+        if(allAreContour){
+          this.selectedContourElements = indexes;
+        }else{
+          this.selectedContourElements = [];
+        }
+      }else{
+        this.selectedContourElements = [];
+      }
+
+      console.log("this.selectedContourElements :: ", this.selectedContourElements);
+    }
+  };
+
+  handleMouseUp = (event) => {
+    event.stopPropagation();
+    event.preventDefault();
+    this.isDragging = false;
+    this.initialX = 0;
+    this.initialY = 0;
+    
+    if(this.selectedContourElements.length > 0){
+      this.selectedContourElements = this.selectedContourElements.map((ele) => parseInt(ele));
+      this.setState({
+        isContourElementsSelectionActive:true,
+        selectedContourIndexes:this.selectedContourElements,
+      });
+    }else{
+      this.removeContourSelection();
+    }
+    // Remove event listeners for mousemove and mouseup
+    document.removeEventListener('mousemove', this.handleMouseMove);
+    document.removeEventListener('mouseup', this.handleMouseUp);
+  };
+
+  removeContourSelection = () =>{
+    const selectionOverlay = this.selectionOverlay.current;
+      if (selectionOverlay) {
+        selectionOverlay.classList.remove('selection-highlight');
+        selectionOverlay.style.display = "none";
+      }
+  };
+
   render() {
     const controller = this;
     const letters = this.scaleIntervals();
@@ -764,7 +934,11 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
           <div className="metilda-audio-analysis-image-col-1">
             <span>Syllables</span>
           </div>
-          <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container">
+          <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container"
+            ref={this.metildaSyllableBarRef}
+            onMouseDown={this.handleMouseDown}
+            >
+            <div ref ={this.selectionOverlay} className="selection"></div>
             {letters.map(function (item, index) {
               if (!item.isShown) {
                 return;
@@ -773,6 +947,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               return (
                 <AudioLetter
                   key={index}
+                  index={index}
                   letter={item.syllable}
                   leftX={item.leftX}
                   rightX={item.rightX}
@@ -784,6 +959,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             })}
           </div>
         </div>
+        {/* <div ref ={this.selectionOverlay} className="selection"></div> */}
         <div className="TargetPitchBarElements">
           <div className="btn-group-analysis-controls">
             <button
@@ -813,7 +989,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light"
               type="submit"
               name="action"
-              disabled={this.state.selectedIndex === -1}
+              disabled={this.state.selectedIndex === -1 && !this.state.isContourElementsSelectionActive}
               onClick={this.removeSyllableEvent}
             >
               Remove
