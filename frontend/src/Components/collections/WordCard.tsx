@@ -28,6 +28,19 @@ export default function WordCard(props) {
     });
   });
 
+  let createdAtDate;
+
+  if(word["data"].createdAt){
+    const { seconds, nanoseconds } = word["data"].createdAt;
+
+  // Convert nanoseconds to milliseconds (1 second = 1,000,000,000 nanoseconds)
+  const milliseconds = Math.floor(nanoseconds / 1e6);
+
+  // Create a Date object using seconds and milliseconds
+  createdAtDate = new Date(seconds * 1000 + milliseconds);
+  }
+  
+
   console.log("URl of word " , props.url);
 
   return (
@@ -47,9 +60,9 @@ export default function WordCard(props) {
           {word["data"].letters && (
             <p>Syllables: {word["data"].letters.length}</p>
           )}
-          {word["data"].createdAt && (
+          {createdAtDate && (
             <div className="created-date">
-              Created: {word["data"].createdAt.toDate().toDateString()}
+              Created: {createdAtDate.toDateString()}
             </div>
           )}
         </div>

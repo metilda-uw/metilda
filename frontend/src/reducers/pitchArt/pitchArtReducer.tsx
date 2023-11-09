@@ -39,6 +39,8 @@ const pitchArtDetailsReducer: Reducer<pitchArtDetailsState> = (
       return {...state, currentPitchArtDocumentData: action.currentPitchArtDocumentData}
     case constants.CURRENT_PITCHART_VERSIONS:
       return {...state, currentPitchArtVersions: action.currentPitchArtVersions}
+    case constants.UPDATE_MULTIPLE_FIELDS:
+      return {...state, ...action.payload}
     default:
         return state;
   }

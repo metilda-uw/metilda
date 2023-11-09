@@ -563,7 +563,7 @@ export function fillMissingFieldsInChildDoc(childDocData:any, parentDocData){
   return childDocData;
 }
 
-export async function getChildPitchArtVersions(firebase, collectionId, parentDocId) {
+export async function getChildPitchArtVersions(firebase, collectionId, parentDocId, includeParentDoc) {
   if (!firebase || !collectionId || !parentDocId) return [];
 
   try {
@@ -581,7 +581,11 @@ export async function getChildPitchArtVersions(firebase, collectionId, parentDoc
     console.log("wordsCollection", wordsInCollection);
 
     if (wordsInCollection.length !== 0 && parentDocId !== null) {
-      return wordsInCollection.filter((doc) => doc.data.parentDocumentId === parentDocId);
+      const documents = wordsInCollection.filter((doc) => doc.data.parentDocumentId === parentDocId);
+      if(includeParentDoc){
+        documents.push(wordsInCollection.find((doc)=> doc.id === parentDocId));
+      }
+      return documents;
     } else {
       return [];
     }

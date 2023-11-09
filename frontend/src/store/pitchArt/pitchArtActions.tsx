@@ -52,5 +52,13 @@ ActionReturn => (dispatch: Dispatch) => {
   });
 };
 
+export const updatePitchArtDetails = (data:any):
+ActionReturn => (dispatch: Dispatch) => {
+  dispatch({
+    type: constants.UPDATE_MULTIPLE_FIELDS,
+    payload: data,
+  });
+};
+
 // TODO :: write one action for listened documents
 

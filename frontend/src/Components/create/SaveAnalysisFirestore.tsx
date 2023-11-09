@@ -219,13 +219,14 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       NotificationManager.error("Invalid Spearker Name or Word or Word Translation !!!");
     }
     else {
+      const copyOfData = JSON.parse(JSON.stringify(data));
       firebase.firestore
         .collection(collectionUuid)
         .add({
           word: word,
           wordTranslation: wordTranslate,
           speakerName: speakerName,
-          ...data,
+          ...copyOfData,
           speakers: analysis,
           createdAt: timestamp.fromDate(new Date())
         })
@@ -248,7 +249,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
             word: word,
             wordTranslation: wordTranslate,
             speakerName: speakerName,
-            ...data,
+            ...JSON.parse(JSON.stringify(data)),
             speakers: analysis,
             createdAt: timestamp.fromDate(new Date())
           }
@@ -271,8 +272,9 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
     const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
     // instead of params['type'] , use collectionID
+    const copyOfData = JSON.parse(JSON.stringify(data)); // deep copy
     const workingData = {
-      ...data,
+      ...copyOfData,
       word: word === undefined ? data.word : word,
       wordTranslation: wordTranslate === undefined ? data.wordTranslation : wordTranslate,
       speakerName: speakerName === undefined ? data.speakerName : speakerName,
@@ -347,7 +349,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
 
   const handleParentPitchArtDeletion = async() =>{
     setDeleteParentPitchArtModalToFalse();
-    const versions = await getChildPitchArtVersions(firebase,currentCollectionId, currentDocumentData["id"]);
+    const versions = await getChildPitchArtVersions(firebase,currentCollectionId, currentDocumentData["id"], false);
     const docIds = versions.map((doc) => {return doc['id'];});
     docIds.push(currentDocumentData["id"]);
     console.log("Doc IDs ::", docIds);
@@ -391,29 +393,10 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     }else {
       parentDocId = parentDocumentId;
     }
-    // **********************************TODO *****************************
-    // let childversions = currentPitchArtVersions;
-    // if(childversions && childversions.length == 0 && parentDocumentData){
-    //   childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"]);
-    // }
-    // if(childversions.length != 0){
-    //   if(childversions.length > 0){
-    //     childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
-    //     if(childversions.length >= constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
-    //       const docId = childversions[0]["id"];
-    //       await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
-      
-    //       // Delete thumbnail in Firebase Storage
-    //       const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
-    //       await thumbnailRef.delete();
 
-    //       childversions = childversions.filter((doc) => doc.id !== docId);
-    //     }
-    //   }
-    // }
-
+    const copyOfData = JSON.parse(JSON.stringify(data)); // deep copy
     const currentData = {
-      ...data,
+      ...copyOfData,
       isAChildVersion: true,
       parentDocumentId: parentDocId,
       word: word === undefined ? data.word : word,
@@ -428,70 +411,62 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     else if(currentDocumentData != null){
       modifiedData = getModifiedFieldsofPitchArt(currentDocumentData.data,currentData,currentDocumentData.id);
     }
-    // modifiedData.isAChildVersion = true;
-    // modifiedData.parentDocumentId = parentDocId,
-
     console.log(modifiedData);
 
-    firebase.firestore
-    .collection(collectionId)
-    .add(
-        modifiedData
-        )
-        .then((docRef) => {
-          //console.log("Document written with ID: ", docRef.id);
-          saveThumbnail(collectionId + "/" + docRef.id);
-          setIsDocSaved(true);
-          setSavedDocId(docRef.id);
-          if(parentDocumentData == null){
-            setParentPitchArtDocumentData({"id":currentDocumentData.id,"data":currentDocumentData.data});
-          }
-          setCurrentPitchArtDocumentData({"id":docRef.id,"data":modifiedData});
-          
+    try {
+      const docRef = await firebase.firestore.collection(collectionId).add(modifiedData);
+      //console.log("Document written with ID: ", docRef.id);
+    
+      saveThumbnail(collectionId + "/" + docRef.id);
+      setIsDocSaved(true);
+      setSavedDocId(docRef.id);
+    
+      if (parentDocumentData == null) {
+        setParentPitchArtDocumentData({ "id": currentDocumentData.id, "data": currentDocumentData.data });
+      }
+    
+      // setCurrentPitchArtDocumentData({ "id": docRef.id, "data": modifiedData });
 
-      
-
-          // **********************************TODO *****************************
-          const deleteChild = async()=>{
-              let childversions = currentPitchArtVersions;
-              if(childversions && childversions.length == 0 && parentDocumentData){
-                childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"]);
-              }
-              if(childversions.length != 0){
-                if(childversions.length > 0){
-                  childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
-                  if(childversions.length >= constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
-                    const docId = childversions[0]["id"];
-                    await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
-                
-                    // Delete thumbnail in Firebase Storage
-                    const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
-                    await thumbnailRef.delete();
-          
-                    childversions = childversions.filter((doc) => doc.id !== docId);
-                  }
-                }
-              }
+      // **********************************TODO *****************************
+      let childversions = currentPitchArtVersions;
+      if(childversions && childversions.length == 0 && parentDocumentData){
+        childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"], false);
+      }else{
+        childversions.push({ "id": docRef.id, "data": modifiedData });
+      }
+      if(childversions.length != 0){
+        if(childversions.length > 0){
+          childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
+          if(childversions.length > constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
+            const docId = childversions[0]["id"];
+            await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
         
-            childversions.push({"id":docRef.id,"data":modifiedData});
-            setCurrentPitchArtVersions(childversions);
-          };
-          deleteChild();
-           
-          if(params['type'] == null){
-            callBacks.listenForData(collectionId,docRef.id);
+            // Delete thumbnail in Firebase Storage
+            const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
+            await thumbnailRef.delete();
+
+            childversions = childversions.filter((doc) => doc.id !== docId);
           }
-          if(params['type'] != null && params['type'] != 'share')
-            history.push('/pitchartwizard/'+ collectionId + '/' + docRef.id);
-            
-            NotificationManager.success(
-            "New version of pitch art saved successfully!"
-          );
-        })
-        .catch((error) => {
-          console.error("Error saving document: ", error);
-          NotificationManager.error("Renaming collection failed!");
-        });
+        }
+      }
+    
+      
+      setCurrentPitchArtVersions(childversions);
+    
+      if (params['type'] != null && params['type'] != 'share') {
+        history.push('/pitchartwizard/' + collectionId + '/' + docRef.id);
+      }
+
+      if (params['type'] == null) {
+        await callBacks.listenForData(collectionId, docRef.id);
+      }
+    
+      NotificationManager.success("New version of pitch art saved successfully!");
+
+    } catch (error) {
+      console.error("Error saving document: ", error);
+      NotificationManager.error("Renaming collection failed!");
+    }
   }
   const renderSave = () => {
     if ((params['type'] && params['type'] != "share" || isDocSaved)) {

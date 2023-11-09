@@ -40,6 +40,11 @@ export interface setCurrentPitchArtVersions extends Action{
   currentPitchArtVersions:[],
 }
 
+export interface updatePitchArtDetails extends Action{
+  type: constants.UPDATE_MULTIPLE_FIELDS
+  payload:any,
+}
+
 
 export type PitchArtDetailsAction =
   | setPitchArtDocId
@@ -47,4 +52,5 @@ export type PitchArtDetailsAction =
   | setListenedDocuments
   | setParentPitchArtDocumentData
   | setCurrentPitchArtDocumentData
-  | setCurrentPitchArtVersions;
+  | setCurrentPitchArtVersions
+  | updatePitchArtDetails;
