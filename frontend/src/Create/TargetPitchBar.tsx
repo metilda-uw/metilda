@@ -425,20 +425,20 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
           id="alert-dialog-title"
           onClose={this.handleCloseDeleteLetterModal}
         >
-          Remove single syllable or group of syllables
+          Remove single pulse or group of pulses
         </DialogTitle>
         <DialogActions>
           <button
             className="single-syllable waves-effect waves-light btn globalbtn"
             onClick={this.removeLetterEvent}
           >
-            Single Syllable
+            Single pulse
           </button>
           <button
             className="group-syllables waves-effect waves-light btn globalbtn"
             onClick={this.removeGroupOfLettersEvent}
           >
-            Group of Syllables
+            Group of pulses
           </button>
         </DialogActions>
       </Dialog>

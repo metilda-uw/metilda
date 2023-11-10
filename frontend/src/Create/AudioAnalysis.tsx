@@ -613,17 +613,32 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
+  completeZoomOut = ()=>{
+    if(this.state.imageUrlStack.length === 0) return;
+    while(this.state.imageUrlStack.length > 1){
+      this.state.imageUrlStack.pop();
+    }
+    this.showAllClicked();
+  }
+
   renderSpeakerControl = () => {
     const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
     const isFirstSpeaker = this.props.speakerIndex === 0;
 
     return (
-      <SpeakerControl
-        speakerIndex={this.props.speakerIndex}
-        addSpeaker={this.props.addSpeaker}
-        removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-        canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
-        canRemoveSpeaker={!isFirstSpeaker} />
+      <>
+        <SpeakerControl
+          speakerIndex={this.props.speakerIndex}
+          addSpeaker={this.props.addSpeaker}
+          removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
+          canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
+          canRemoveSpeaker={!isFirstSpeaker} />
+        <button className="complete-zoomout waves-effect waves-light btn globalbtn" 
+          disabled={this.state.imageUrlStack.length === 0}
+          onClick={this.completeZoomOut}>
+          Complete Zoom Out
+        </button>
+      </>
     );
   }
 
