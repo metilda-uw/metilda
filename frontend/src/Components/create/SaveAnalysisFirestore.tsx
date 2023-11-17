@@ -19,7 +19,8 @@ import {
   setPitchArtCollectionId,
   setParentPitchArtDocumentData,
   setCurrentPitchArtDocumentData,
-  setCurrentPitchArtVersions
+  setCurrentPitchArtVersions,
+  setListenedDocuments,
 } from "../../store/pitchArt/pitchArtActions";
 import { AudioAction } from "../../store/audio/types";
 import { getModifiedFieldsofPitchArt , getUpdatedPitchArtData, getChildPitchArtVersions} from '../../Create/ImportUtils';
@@ -27,11 +28,13 @@ import * as constants from "../../constants";
 // import { useDispatch } from 'react-redux';
 
 function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,currentCollectionId,parentDocumentData,currentDocumentData,
+  listenedDocuments,
   currentPitchArtVersions, 
   setPitchArtCollectionId,
   setParentPitchArtDocumentData,
   setCurrentPitchArtDocumentData,
-  setCurrentPitchArtVersions}) {
+  setCurrentPitchArtVersions,
+  setListenedDocuments}) {   
   const firebase = useContext(FirebaseContext);
   const timestamp = firebase.timestamp;
 
@@ -223,10 +226,10 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       firebase.firestore
         .collection(collectionUuid)
         .add({
+          ...copyOfData,
           word: word,
           wordTranslation: wordTranslate,
           speakerName: speakerName,
-          ...copyOfData,
           speakers: analysis,
           createdAt: timestamp.fromDate(new Date())
         })
@@ -235,7 +238,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           saveThumbnail(collectionUuid + "/" + docRef.id);
          // history.push('/pitchartwizard/'+ collectionUuid + '/' + docRef.id);
 
-          if(params['type'] == null){
+          if(params['type'] == null || params['type'] === 'share'){
             callBacks.listenForData(collectionUuid,docRef.id);
           }
           setIsDocSaved(true);
@@ -438,6 +441,12 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         if(childversions.length > 0){
           childversions.sort((a, b) => a.data.createdAt - b.data.createdAt);
           if(childversions.length > constants.MAXIMUM_PITCH_ART_VERSIONS_ALLOWED){
+            const doc = listenedDocuments.find((doc) => doc.id === childversions[0]["id"]);
+            if(doc){
+              doc.unsubscribe();
+              const docs = listenedDocuments.filter((doc) => doc.id !== childversions[0]["id"]);
+              setListenedDocuments(docs);
+            }
             const docId = childversions[0]["id"];
             await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
         
@@ -453,11 +462,11 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       
       setCurrentPitchArtVersions(childversions);
     
-      if (params['type'] != null && params['type'] != 'share') {
+      if (params['type'] != null && params['type'] !== 'share') {
         history.push('/pitchartwizard/' + collectionId + '/' + docRef.id);
       }
 
-      if (params['type'] == null) {
+      if (params['type'] == null || params['type'] === 'share') {
         await callBacks.listenForData(collectionId, docRef.id);
       }
     
@@ -499,7 +508,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
               name="speakerName"
               onChange={(event) => { setSpeakerName(event.target.value) }}
               type="text"
-              defaultValue={data.speakerName != undefined ? data.speakerName : speakerName }
+              defaultValue={currentDocumentData && currentDocumentData["data"].speakerName != undefined ?  currentDocumentData["data"].speakerName : speakerName }
               required
             />
             <input
@@ -507,7 +516,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
               name="word"
               onChange={(event) => { setWord(event.target.value) }}
               type="text"
-              defaultValue={data.word != undefined ? data.word : word}
+              defaultValue={currentDocumentData && currentDocumentData["data"].word != undefined ?  currentDocumentData["data"].word : word}
               required
             />
             <input
@@ -515,7 +524,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
               name="wordTranslate"
               onChange={(event) => { setWordTranslate(event.target.value) }}
               type="text"
-              defaultValue={data.wordTranslation != undefined ? data.wordTranslation : wordTranslate}
+              defaultValue={currentDocumentData && currentDocumentData["data"].wordTranslation != undefined ? currentDocumentData["data"].wordTranslation : wordTranslate}
               required
             />
             <div className="collectionRename-cancel-save">
@@ -723,7 +732,8 @@ const mapStateToProps = (state: AppState) => ({
   currentCollectionId: state.pitchArtDetails.collectionId,
   parentDocumentData: state.pitchArtDetails.parentPitchArtDocumentData,
   currentDocumentData: state.pitchArtDetails.currentPitchArtDocumentData,
-  currentPitchArtVersions: state.pitchArtDetails.currentPitchArtVersions
+  currentPitchArtVersions: state.pitchArtDetails.currentPitchArtVersions,
+  listenedDocuments:state.pitchArtDetails.listenedDocuments
 });
 
 const mapDispatchToProps = (
@@ -733,7 +743,8 @@ const mapDispatchToProps = (
   setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId)),
   setParentPitchArtDocumentData:(data:any) => dispatch(setParentPitchArtDocumentData(data)),
   setCurrentPitchArtDocumentData:(data:any) => dispatch(setCurrentPitchArtDocumentData(data)),
-  setCurrentPitchArtVersions:(data:any) => dispatch(setCurrentPitchArtVersions(data))
+  setCurrentPitchArtVersions:(data:any) => dispatch(setCurrentPitchArtVersions(data)),
+  setListenedDocuments:(data:any) => dispatch(setListenedDocuments(data)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SaveAnalysisFirestore);

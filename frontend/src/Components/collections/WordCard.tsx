@@ -12,10 +12,12 @@ export default function WordCard(props) {
   firebase = firebase != null ? firebase : props.fb; 
   const timestamp = firebase.timestamp;
   const [url, setURL] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if(props.url !== undefined) {
       setURL(props.url);
+      setLoading(false);
       return;
     }
     const storageRef = firebase.storage.ref(
@@ -23,6 +25,7 @@ export default function WordCard(props) {
     );
     storageRef.getDownloadURL().then((url) => {
       setURL(url);
+      setLoading(false);
     }).catch((error) => {
       //Do Nothing
     });
@@ -30,7 +33,7 @@ export default function WordCard(props) {
 
   let createdAtDate;
 
-  if(word["data"].createdAt){
+  if(word["data"] && word["data"].createdAt){
     const { seconds, nanoseconds } = word["data"].createdAt;
 
   // Convert nanoseconds to milliseconds (1 second = 1,000,000,000 nanoseconds)
@@ -48,7 +51,10 @@ export default function WordCard(props) {
       <div className="card">
         <span className="card-title">{word["data"].word}</span>
         <div className="card-image">
-          <img src={url} alt="word thumbnail" />
+          {loading && (<div className="loading-spinner-container">
+            <div className="loading-spinner"></div>
+          </div>)}
+          {!loading && url && (<img src={url} alt="word thumbnail" />)}
         </div>
         <div className="card-content">
           {word["data"].speakerName && (

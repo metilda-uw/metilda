@@ -13,19 +13,19 @@ import WordSyllableCategories from "../Learn/WordSyllableCategories";
 
 const PitchArtVersionSelector = (props) =>{
 
-    const [currentWordIndex, setCurrentWordIndex] = useState(0);
+    // const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
-    const showNext = () => {
-        setCurrentWordIndex((prevIndex) =>
-            prevIndex < props.words.length - 1 ? prevIndex + 1 : prevIndex
-        );
-    };
+    // const showNext = () => {
+    //     setCurrentWordIndex((prevIndex) =>
+    //         prevIndex < props.words.length - 1 ? prevIndex + 1 : prevIndex
+    //     );
+    // };
 
-    const showPrevious = () => {
-        setCurrentWordIndex((prevIndex) =>
-            prevIndex > 0 ? prevIndex - 1 : prevIndex
-        );
-    };
+    // const showPrevious = () => {
+    //     setCurrentWordIndex((prevIndex) =>
+    //         prevIndex > 0 ? prevIndex - 1 : prevIndex
+    //     );
+    // };
     const styles = (theme: Theme) =>
         createStyles({
             root: {
@@ -67,59 +67,104 @@ const PitchArtVersionSelector = (props) =>{
     function onCancelClick(){
         props.removeVersionsModal();
     }
-    function loadVersion(){
+    const loadVersion =(index) =>{
         props.removeVersionsModal();
         
-        props.history.push({pathname:`/pitchartwizard/${props.collectionId}/${props.words[currentWordIndex].id}`});
+        const selectedWord = selectedWords[index];
+        if(props.params["type"] == null || props.params["type"] == 'share'){
+            props.setCurrentPitchArtData(selectedWord["data"],selectedWord.id,props.collectionId);
+        }else{
+            props.history.push({pathname:`/pitchartwizard/${props.collectionId}/${selectedWord.id}`});
+        }
+       
     }
+
+    const word1 = props.words.length > 0 ? props.words[0] : null;
+    const word2 = props.words.length > 1 ? props.words[1] : word1;
+    const [selectedIds, setSelectedIds] = useState([word1?.id, word2?.id]);
+    const [selectedWords, setSelectedWords] = useState([word1, word2]);
+
+    const handleDropdownChange = (index, selectedId) => {
+        const newSelectedIds = [...selectedIds];
+        newSelectedIds[index] = selectedId;
+        setSelectedIds(newSelectedIds);
+        if(selectedId != selectedWords[index].id){
+           const selectedWord =  props.words.find((word) =>{
+                return word.id === selectedId;
+            });
+            const newSelectedWords = [...selectedWords];
+            newSelectedWords[index] = selectedWord;
+            setSelectedWords(newSelectedWords);
+        }
+        
+    };
 
     return (
         // {words = words.props.words;}
         <div className="version-selector">
-            <Dialog fullWidth={true} maxWidth="xs" open={true}
+            <Dialog fullWidth={true} maxWidth="md" open={true}
             onClose={onCancelClick}aria-labelledby="form-dialog-title"> 
                 <DialogTitle onClose={onCancelClick} id="form-dialog-title">
                    {props.words.length != 0 && <p>Pitch Art Versions</p> } 
                 </DialogTitle>
                 <DialogContent>
                 { (props.words.length != 0) ? ( 
-                    <div className="row collections-view-wordcards">
-                        <ul className="word-list">
-                            {props.words.map((word, index) => (
-                            <li
-                                key={word["id"]}
-                                className={`word-card ${index === currentWordIndex ? 'active' : ''}`}
-                            >
-                                <WordCard
-                                word={word}
-                                selectedCollectionUuid={props.collectionId}
-                                key={word["id"]}
-                                fb={props.firebase}
-                                classArgument= {"card-tile"}
-                                url={props.urls[word["id"]]}
-                                />
-                            </li>
-                            ))}
-                        </ul>
-                        <div className="pagination">
+                    <div className="row version-word-cards">
+                        {[0, 1].map((sectionIndex) => (
+                            <div key={sectionIndex} className={`comparison-section section-${sectionIndex}`}>
+                                <div className="dropdown-container">
+                                    <label className="select-label" htmlFor={`dropdown-${sectionIndex}`}>Select Pitch Art for comparision</label>
+                                    <select
+                                    id={`dropdown-${sectionIndex}`}
+                                    className = "select-id"
+                                    value={selectedIds[sectionIndex] ? selectedIds[sectionIndex]: ''}
+                                    onChange={(e) => handleDropdownChange(sectionIndex, e.target.value)}
+                                    >
+                                    <option value="" disabled>Select a word</option>
+                                    {props.words.map((word) => (
+                                        <option key={word.id} value={word.id}>
+                                        {word["data"].speakerName}
+                                        </option>
+                                    ))}
+                                    </select>
+                                </div>
+
+                                <div className="word-comparison">
+                                    <WordCard
+                                        word={selectedWords[sectionIndex]}
+                                        selectedCollectionUuid={props.collectionId}
+                                        key={selectedWords[sectionIndex]["id"]}
+                                        fb={props.firebase}
+                                        classArgument= {"card-tile"}
+                                        url={props.urls[selectedWords[sectionIndex]["id"]]}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                        {/* <div className="pagination">
                             <button className="waves-effect waves-light btn globalbtn" disabled={currentWordIndex === 0} onClick={showPrevious}>Previous</button>
                             <button className="waves-effect waves-light btn globalbtn right" disabled={currentWordIndex === props.words.length-1} onClick={showNext}>Next</button>
-                        </div>
+                        </div> */}
                     </div>
                 ):(
                     <p>There are no pitch art versions</p>
                 )}
                 </DialogContent>
-                {props.words.length != 0 && <DialogActions>
-                    <button className="SaveSyllable waves-effect waves-light btn globalbtn" onClick={loadVersion}>
-                        <i className="material-icons right"></i>
-                        load this version
-                    </button>
-                </DialogActions>}
+                {props.words.length !== 0 &&
+                    <DialogActions  className="selected-index-action">
+                        {[0,1].map((index) => (
+                            <button key = {`load-version-${index}`} className="load-version waves-effect waves-light btn globalbtn" onClick={() =>loadVersion(index)}>
+                            <i className="material-icons"></i>
+                            load this version
+                            </button>
+                        ))}
+                        
+                    </DialogActions>
+                }
             </Dialog>
         
         </div>
     );
 }
 
-export default PitchArtVersionSelector
+export default PitchArtVersionSelector;

@@ -4,7 +4,7 @@ import * as constants from "../../constants";
 export interface pitchArtDetailsState {
   pitchArtDocId:String,
   collectionId:String,
-  listenedDocuments:String[]
+  listenedDocuments:[]
   parentPitchArtDocumentData:any
   currentPitchArtDocumentData:any
   currentPitchArtVersions:[]
@@ -22,7 +22,7 @@ export interface setPitchArtCollectionId extends Action {
 
 export interface setListenedDocuments extends Action {
     type: constants.LISTENED_DOCUMENT_IDS
-    listenedDocuments:String[],
+    listenedDocuments:[],
 }
 
 export interface setParentPitchArtDocumentData extends Action{

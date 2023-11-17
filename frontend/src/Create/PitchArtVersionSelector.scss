@@ -18,3 +18,43 @@
     display: block;
     opacity: 1;
   }
+
+
+  .version-word-cards {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .comparison-section{
+    width: 50%;
+    height: 100%;
+  }
+  
+  .dropdown-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin: 0 10px;
+  }
+  
+  .word-comparison {
+    flex-grow: 1; /* Allow the WordCard to expand and fill available space */
+  }
+  .select-label{
+    text-align: center;
+    margin-bottom: 5px;
+    position:relative;
+  }
+  
+  .select-id{
+    display: block;
+  }
+  .select-id option[selected] {
+    background-color: #e0e0e0; 
+  }
+
+  .selected-index-action{
+    display: flex;
+    justify-content: space-around !important;
+    margin-bottom: 10px;
+  }

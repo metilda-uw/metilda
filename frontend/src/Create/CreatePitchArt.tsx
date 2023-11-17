@@ -28,11 +28,13 @@ import {
   setCurrentPitchArtDocumentData,
   setCurrentPitchArtVersions,
   updatePitchArtDetails,
+  setListenedDocuments
 } from "../store/pitchArt/pitchArtActions";
 import PitchArtVersionSelector from "./PitchArtVersionSelector";
 import {createCommonPitchArtDocument} from '../Create/ImportUtils';
 import {getChildPitchArtVersions} from '../Create/ImportUtils';
 import { CURRENT_PITCHART_DOCUMENT_DATA } from "../constants";
+import { timeStamp } from "console";
 
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
@@ -51,12 +53,14 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
   parentPitchArtDocumentData:any;
   currentPitchArtDocumentData:any;
   currentChildPitchArtVersions:any
+  listenedDocuments:[];
  // setPitchArtDocId:(Id:string) => void;
   setPitchArtCollectionId:(Id:string) =>void;
   setParentPitchArtDocumentData:(data:any) =>void;
   setCurrentPitchArtDocumentData:(data:any) => void;
   setCurrentPitchArtVersions:(data:any) => void;
   updatePitchArtDetails:(data:any) => void;
+  setListenedDocuments:(data:any) => void;
 }
 
 interface State {
@@ -96,7 +100,6 @@ class CreatePitchArt extends React.Component<
 > {
 
   private pitchArtRef = createRef<any>();
-  private listenedDocIds = [];
   private customStyles = {
     content: {
       margin: 0,
@@ -183,10 +186,8 @@ class CreatePitchArt extends React.Component<
    if(collectionId == undefined ) return;
    if(docId == undefined) return;
 
-    // if(this.listenedDocIds.includes(docId)) return;
-    // this.listenedDocIds.push(docId);
     const self = this;
-    this.props.firebase.firestore.collection(collectionId).doc(docId)
+    const unsubscribe = this.props.firebase.firestore.collection(collectionId).doc(docId)
       .onSnapshot((doc) => {
         if (doc.data()) {
           const currentDocData = doc.data();
@@ -210,10 +211,14 @@ class CreatePitchArt extends React.Component<
               self.setCurrentPitchArtData(currentDocData,docId, collectionId);
              }
           }else{
-            self.props.updatePitchArtDetails({
-              parentPitchArtDocumentData:{"id":docId, "data":JSON.parse(JSON.stringify(currentDocData))},
-              currentPitchArtVersions:[]
-            });
+            if(collectionId != 'share'){
+              self.props.updatePitchArtDetails({
+                parentPitchArtDocumentData:{"id":docId, "data":JSON.parse(JSON.stringify(currentDocData))},
+                currentPitchArtVersions:[],
+                listenedDocuments:[]
+              });
+            }
+            
             // self.props.setCurrentPitchArtVersions([]);
             // self.props.setParentPitchArtDocumentData(null);
             self.setCurrentPitchArtData(currentDocData,docId, collectionId);
@@ -221,11 +226,23 @@ class CreatePitchArt extends React.Component<
         } else {
           self.setState({ owner: self.props.firebase.auth.currentUser.email });
           self.props.history.push({ pathname: "/pitchartwizard" });
-          self.props.setCurrentPitchArtVersions([]);
+          self.props.updatePitchArtDetails({
+            currentPitchArtVersions:[],
+            listenedDocuments:[]
+          })
+          // self.props.setCurrentPitchArtVersions([]);
           // alert("The page no longer exists");
           // window.location.reload();
         }
       });
+      if(docId && unsubscribe){
+        let newList = [];
+        newList = [...this.props.listenedDocuments];
+        newList.push({"id":docId,"unsubscribe":unsubscribe});
+        this.props.setListenedDocuments(newList);
+        console.log("unsubscribe"+ unsubscribe);
+      }
+      
   }
 
   loadParentPitchArtData = async (parentDocId:string, collectionId: string, currentPitchArtData: any, currentDocId:string) =>{
@@ -294,10 +311,12 @@ class CreatePitchArt extends React.Component<
       () => { this.getUserFiles(); });
     
     // this.props.setPitchArtDocId(currentDocId);
-    this.props.updatePitchArtDetails({
-      collectionId:collectionId,
-      currentPitchArtDocumentData:{"id":currentDocId,"data":currentPitchArtUpdatedData}
-    });
+    if(collectionId != 'share'){
+      this.props.updatePitchArtDetails({
+        collectionId:collectionId,
+        currentPitchArtDocumentData:{"id":currentDocId,"data":currentPitchArtUpdatedData}
+      });
+    }
     // this.props.setPitchArtCollectionId(collectionId);
     // this.props.setCurrentPitchArtDocumentData({"id":currentDocId,"data":currentPitchArtUpdatedData});
   
@@ -378,10 +397,11 @@ class CreatePitchArt extends React.Component<
     console.log("current data", this.props.currentPitchArtDocumentData);
     console.log("parent data", this.props.parentPitchArtDocumentData);
 
-    if(this.props.currentPitchArtDocumentData["id"] != null){
+    let documents = [];
+    if(this.props.currentPitchArtDocumentData && this.props.currentPitchArtDocumentData["id"] != null){
       const currentDocData = this.props.currentPitchArtDocumentData;
       const parentDocId = currentDocData["data"].isAChildVersion ? currentDocData["data"].parentDocumentId : currentDocData["id"];
-      let documents = [];
+      
       if(this.props.currentChildPitchArtVersions.length == 0){
         documents = await getChildPitchArtVersions(this.props.firebase,this.props.currentCollectionId,parentDocId,true);
       }else{
@@ -393,6 +413,10 @@ class CreatePitchArt extends React.Component<
         // if(parentDocId != currentDocData["id"] && this.props.parentPitchArtDocumentData){
         //   documents = [...documents, this.props.parentPitchArtDocumentData];
         // }
+      }
+      if(documents.length == 0){
+        this.renderVersionsModal([],[]);
+        return;
       }
       
       const DocIds = documents.map((doc) => {return doc['id'];});
@@ -634,7 +658,9 @@ class CreatePitchArt extends React.Component<
 
       const modal = document.querySelector('.version-overlay');
       const pitchArtVersionSelector = <PitchArtVersionSelector words={words} removeVersionsModal={this.removeVersionsModal} 
-        urls={urls} collectionId={this.props.currentCollectionId} firebase={this.props.firebase} history={this.props.history}/>;
+        urls={urls} collectionId={this.props.currentCollectionId} firebase={this.props.firebase} history={this.props.history}
+        params={this.props.match.params}
+        setCurrentPitchArtData= {this.setCurrentPitchArtData}/>;
 
       // Render the React component inside the modal
       ReactDOM.render(pitchArtVersionSelector, modal);
@@ -724,7 +750,8 @@ const mapStateToProps = (state: AppState) => ({
   currentCollectionId: state.pitchArtDetails.collectionId,
   parentPitchArtDocumentData: state.pitchArtDetails.parentPitchArtDocumentData,
   currentPitchArtDocumentData: state.pitchArtDetails.currentPitchArtDocumentData,
-  currentChildPitchArtVersions:state.pitchArtDetails.currentPitchArtVersions
+  currentChildPitchArtVersions:state.pitchArtDetails.currentPitchArtVersions,
+  listenedDocuments:state.pitchArtDetails.listenedDocuments
 });
 
 const mapDispatchToProps = (
@@ -743,7 +770,8 @@ const mapDispatchToProps = (
   setParentPitchArtDocumentData:(data:any) => dispatch(setParentPitchArtDocumentData(data)),
   setCurrentPitchArtDocumentData:(data:any) => dispatch(setCurrentPitchArtDocumentData(data)),
   setCurrentPitchArtVersions:(data:any) => dispatch(setCurrentPitchArtVersions(data)),
-  updatePitchArtDetails:(data:any) => dispatch(updatePitchArtDetails(data))
+  updatePitchArtDetails:(data:any) => dispatch(updatePitchArtDetails(data)),
+  setListenedDocuments:(data:any) => dispatch(setListenedDocuments(data))
 });
 
 const authCondition = (authUser: any) => !!authUser;

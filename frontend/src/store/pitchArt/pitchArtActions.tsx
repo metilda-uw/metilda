@@ -60,5 +60,11 @@ ActionReturn => (dispatch: Dispatch) => {
   });
 };
 
-// TODO :: write one action for listened documents
+export const setListenedDocuments = (data:any):
+ActionReturn => (dispatch: Dispatch) => {
+  dispatch({
+    type: constants.LISTENED_DOCUMENT_IDS,
+    listenedDocuments: data,
+  });
+};
 
