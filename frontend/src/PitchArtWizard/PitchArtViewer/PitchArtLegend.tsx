@@ -2,9 +2,11 @@ import * as React from "react";
 import {Speaker} from "../../types/types";
 import "./PitchArtLegend.css";
 import PitchArtColorChooser from "./PitchArtColorChooser";
+import {getLineColors, getDotColors} from '../../Designs/pitchArtDesigns';
 
 export interface PitchArtLegendProps {
     speakers: Speaker[];
+    firebase: any
 }
 
 export interface State {
@@ -22,7 +24,11 @@ export default class PitchArtLegend extends React.Component<PitchArtLegendProps,
         this.speakerIndex = -1;
     }
     static SPEAKER_COLOR(speakerIndex: number): string {
-        const colors = ["gray","green", "blue", "purple", "red", "orange"];
+        let colors = ["gray","green", "blue", "purple", "red", "orange"];
+        const colorsMap = getLineColors();
+        if(colorsMap){
+            colors = colorsMap && Array.from(colorsMap.keys());
+        }
         return colors[speakerIndex % colors.length];
     }
 
@@ -56,6 +62,7 @@ export default class PitchArtLegend extends React.Component<PitchArtLegendProps,
                         isColorChangeDialogOpen={this.state.isColorChangeDialogOpen} 
                         handleClose={this.closeColorChangeDailog}
                         currentSpeakerIndex = {this.speakerIndex}
+                        firebase = {this.props.firebase}
                     /> 
                 }
                 <div className="top-label">
@@ -64,15 +71,8 @@ export default class PitchArtLegend extends React.Component<PitchArtLegendProps,
                 <div className="pitch-art-legend-col-container">
                     <div className="pitch-art-legend-col">
                         {
-                            this.props.speakers.slice(0, 2).map(
+                            this.props.speakers.slice(0, 4).map(
                                 (item, speakerIndex) => this.renderSpeaker(item, speakerIndex)
-                            )
-                        }
-                    </div>
-                    <div className="pitch-art-legend-col">
-                        {
-                            this.props.speakers.slice(2).map(
-                                (item, speakerIndex) => this.renderSpeaker(item, speakerIndex + 2)
                             )
                         }
                     </div>

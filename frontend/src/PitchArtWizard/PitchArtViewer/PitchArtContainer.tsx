@@ -165,7 +165,7 @@ class PitchArtContainer extends React.Component<Props> {
                             />
                         </div>
                         {
-                           <PitchArtLegend speakers={this.props.speakers} />
+                           <PitchArtLegend speakers={this.props.speakers} firebase={this.props.firebase}/>
                         }
                     </div>
                 </div>

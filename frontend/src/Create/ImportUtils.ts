@@ -4,6 +4,7 @@ import moment from "moment";
 import "react-notifications/lib/notifications.css";
 import { NotificationManager } from "react-notifications";
 import { set } from "react-ga";
+import {getLineColors, getDotColors} from '../Designs/pitchArtDesigns';
 
 export function importSpeakerFile(
   results: Result[],
@@ -532,10 +533,18 @@ export function DeleteViewPermission(
 
 export const chooseColor = (speakers, isLineColor) => {
 
-  const colors = ["gray","green","orange","blue","brown","red"];
+  let colors = ["gray","green","orange","blue","brown","red"];
+  if(isLineColor){
+    const colorMap = getLineColors();
+    colors = Array.from(colorMap.keys());
+  }else{
+    const colorMap = getDotColors();
+    colors = Array.from(colorMap.keys());
+  }
+
   let usedColors = new Set();
   
-  let color = "black";
+  let color = "#000000";
 
   for(let i=0;i<speakers.length;i++){
     const c = isLineColor ? speakers[i].lineColor : speakers[i].dotColor;

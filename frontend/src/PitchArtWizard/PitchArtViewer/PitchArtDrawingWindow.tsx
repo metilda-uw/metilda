@@ -182,8 +182,8 @@ export class PitchArtDrawingWindow extends React.Component<
 
     this.graphWidth = 5;
     this.borderWidth = 15;
-    this.smallCircleRadius = 4;
-    this.largeCircleRadius = 10;
+    this.smallCircleRadius = 16;
+    this.largeCircleRadius = 18;
     this.circleStrokeWidth = 10;
     this.accentedCircleRadius = 30;
     this.pitchArtSoundLengthSeconds = 0.2;
@@ -561,12 +561,13 @@ export class PitchArtDrawingWindow extends React.Component<
     }
 
     const colors: { [key: number]: string } = {
-      0: "gray",
-      1: "green",
-      2: "blue",
-      3: "purple",
-      4: "red",
-      5: "orange"
+      0: "#272264",
+      1: "#71002b",
+      2: "#92278f",
+      3: "#5b4a42",
+      4: "#f1592a",
+      5: "#283890",
+      6: "#a01f62"
     };
 
     return this.props.rawPitchValueLists.map((item: RawPitchValue[], index) => (
@@ -593,8 +594,8 @@ export class PitchArtDrawingWindow extends React.Component<
     speakerIndex: number
   ): ColorScheme => {
 
-    let lineStrokeColor = "gray";
-    let praatDotFillColor = "gray";
+    let lineStrokeColor = "#272264";
+    let praatDotFillColor = "#0ba14a";
     lineStrokeColor = speaker.lineColor !== undefined ? speaker.lineColor: PitchArtLegend.SPEAKER_COLOR(speakerIndex);
     praatDotFillColor = speaker.dotColor !== undefined ? speaker.dotColor: PitchArtLegend.SPEAKER_COLOR(speakerIndex);
     
