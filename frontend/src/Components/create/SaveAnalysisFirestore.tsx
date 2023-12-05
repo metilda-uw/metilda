@@ -234,19 +234,16 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           createdAt: timestamp.fromDate(new Date())
         })
         .then((docRef) => {
-          //console.log("Document written with ID: ", docRef.id);
+          
           saveThumbnail(collectionUuid + "/" + docRef.id);
-         // history.push('/pitchartwizard/'+ collectionUuid + '/' + docRef.id);
-
+         
           if(params['type'] == null || params['type'] === 'share'){
             callBacks.listenForData(collectionUuid,docRef.id);
           }
           setIsDocSaved(true);
           setSavedDocId(docRef.id);
           setParentDocumentId(docRef.id);
-          // const dispatch = useDispatch();
-          // dispatch(setPitchArtDocId(docRef.id));
-          // setPitchArtDocId(docRef.id);
+          
           setPitchArtCollectionId(collectionUuid);
           const parentData = {
             word: word,
@@ -268,13 +265,17 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         });
     }
   };
-
+  
+/**
+ * This method updates currebnt document with new details.
+ * @param event 
+ */
   const handleUpdateToCollections = async (event: any) => {
     event.preventDefault();
     setUpdateModalIsOpenToFalse();
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
     const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
-    // instead of params['type'] , use collectionID
+   
     const copyOfData = JSON.parse(JSON.stringify(data)); // deep copy
     const workingData = {
       ...copyOfData,
@@ -290,7 +291,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       .doc(docId)
       .update(updatedData)
       .then(() => {
-        //console.log("Document written with ID: ", docRef.id);
+        
         saveThumbnail(collectionId + "/" + docId);
         
         if(updatedData && !updatedData.isAChildVersion){
@@ -310,7 +311,11 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         NotificationManager.error("Updating collection failed!");
       });
   };
-
+/**
+ * This method deleted single pitch art document.
+ * @param event 
+ * @returns 
+ */
   const handleDeleteCollection = async (event: any) => {
     if(currentDocumentData != null && !currentDocumentData["data"].isAChildVersion){
       setDeleteModalIsOpenToFalse();
@@ -349,13 +354,14 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         NotificationManager.error("Deleting Word from collection failed!");
       });
   };
-
+/**
+ * This method deletes a original document along with its all child versions
+ */
   const handleParentPitchArtDeletion = async() =>{
     setDeleteParentPitchArtModalToFalse();
     const versions = await getChildPitchArtVersions(firebase,currentCollectionId, currentDocumentData["id"], false);
     const docIds = versions.map((doc) => {return doc['id'];});
     docIds.push(currentDocumentData["id"]);
-    console.log("Doc IDs ::", docIds);
 
     for (const docId of docIds) {
       // Delete Firestore document
@@ -365,8 +371,6 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
       await thumbnailRef.delete();
       
-      // Add success message or other actions here
-      
     }
 
     // After deleting all documents, you can add any final actions here.
@@ -375,15 +379,14 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     window.location.reload();
 
   }
-
+  /** This method is used to save new version of current document.
+   *  All restricts max versions for each document.
+   * @param event 
+   */
   const savePitchArtAsNewVersion = async(event: any) =>{
     event.preventDefault();
     setSaveAsNewVersionModalOpenToFalse(false);
-    console.log("Inside savePitchArtAsNewVersion");
 
-    
-
-    // instead of params['type'] , use collectionID
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
 
     let parentDocId;
@@ -427,10 +430,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       if (parentDocumentData == null) {
         setParentPitchArtDocumentData({ "id": currentDocumentData.id, "data": currentDocumentData.data });
       }
-    
-      // setCurrentPitchArtDocumentData({ "id": docRef.id, "data": modifiedData });
-
-      // **********************************TODO *****************************
+      // get existing child versions
       let childversions = currentPitchArtVersions;
       if(childversions && childversions.length == 0 && parentDocumentData){
         childversions = await getChildPitchArtVersions(firebase,currentCollectionId,parentDocumentData["id"], false);
@@ -447,6 +447,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
               const docs = listenedDocuments.filter((doc) => doc.id !== childversions[0]["id"]);
               setListenedDocuments(docs);
             }
+            // delete the extra child documents above permited limit
             const docId = childversions[0]["id"];
             await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
         
@@ -459,7 +460,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         }
       }
     
-      
+      // update global state of list of child versions related to current document
       setCurrentPitchArtVersions(childversions);
     
       if (params['type'] != null && params['type'] !== 'share') {
