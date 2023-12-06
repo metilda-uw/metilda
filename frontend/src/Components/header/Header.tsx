@@ -132,6 +132,9 @@ class Header extends Component<HeaderProps, State> {
                 <Link to="/manage-users">Manage Users</Link>
               </li>
             )}
+            <li className="nav-menu-item right">
+                <Link to="/notifications">Notifications</Link>
+              </li>
           </ul>
         </nav>
       </div>

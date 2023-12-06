@@ -1,0 +1,47 @@
+.notifications {
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    height: 100vh; /* 100% of the viewport height */
+    overflow: hidden;
+  }
+  
+  .notifications-component {
+    display: flex;
+    flex: 1; /* Take up the remaining space vertically */
+  }
+  
+  .sidebar {
+    width: 200px;
+    background: #f0f0f0;
+    padding: 10px;
+  }
+  
+  .sidebar h2 {
+    margin-bottom: 10px;
+  }
+  
+  .sidebar button {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 5px;
+    background: #ee6e73;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .sidebar button:hover {
+    background: #bbb;
+  }
+  
+  .notifications-content {
+    flex: 1;
+    padding: 10px;
+  }
+  
+  .notifications-content h2 {
+    margin-bottom: 10px;
+  }
+  .inbox-content{
+    max-height: calc(100vh - 130px);
+    overflow-y: auto;
+  }

@@ -31,6 +31,7 @@ import Converter from "./Converter/Converter";
 import LearnNew from "./Pages/LearnNew";
 import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
+import NotificationsComponent from "./Notifications/Notifications";
 // import Word from "./Components/collections/Word";
 
 interface Props {
@@ -111,6 +112,7 @@ const App = () => (
         path="/learn/words/syllables/:numSyllables"
         component={WordSyllableReview}
       />
+      <Route path="/notifications" component={NotificationsComponent}/>
     </div>
   </Router>
 );
