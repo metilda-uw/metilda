@@ -180,7 +180,7 @@ export class PitchArtDrawingWindow extends React.Component<
     this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
     this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
-    this.graphWidth = 5;
+    this.graphWidth = 10;
     this.borderWidth = 15;
     this.smallCircleRadius = 16;
     this.largeCircleRadius = 18;
