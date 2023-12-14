@@ -2,6 +2,8 @@
 import React, { Component, useState } from "react";
 import Header from "../Components/header/Header";
 import './Notifications.scss';
+import InboxMessages from "./InboxMessages";
+import SentMessagesComponent from "./SentMessages";
 
 
 const NotificationsComponent = () =>{
@@ -22,48 +24,14 @@ const NotificationsComponent = () =>{
         );
     };
 
-    const renderInboxMessages = () =>{
-        const list = ["hi","hlo","bye","sry","happy", "sad", "life","hi","hlo","bye","sry","happy", "sad", "life"];
-      
-        return (
-            <div className="inbox-content">
-                <table>
-                    <tr>
-                        <th>Message</th>
-                        <th>View</th>
-                        <th>delete</th>
-                    </tr>
-                    {list && list.map((msg) =>{
-                        return (<tr>
-                            <td>{msg}</td>
-                            <td>View</td>
-                            <td>Delete</td>
-                        </tr>
-                        )
-                    })
-                    }
-                </table>
-                
-            </div>
-        )
-
-    }
-    const renderSentMessages = () =>{
-        return (
-            <div>
-                <p>Sent messages</p>
-            </div>
-        )
-
-    }
       
     const Content = ({ selectedOption }) => {
         return (
           <div className="notifications-content">
-            <h2>{selectedOption.toUpperCase()}</h2>
+            {/* <h2>{selectedOption.toUpperCase()}</h2> */}
             {/* Render content based on the selected option */}
-            {selectedOption === "inbox" && renderInboxMessages()}
-            {selectedOption === "sent" && renderSentMessages()}
+            {selectedOption === "inbox" && <InboxMessages/>}
+            {selectedOption === "sent" && <SentMessagesComponent/>}
           </div>
         );
       };
