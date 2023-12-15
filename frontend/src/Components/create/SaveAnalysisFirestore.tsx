@@ -362,16 +362,23 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     const versions = await getChildPitchArtVersions(firebase,currentCollectionId, currentDocumentData["id"], false);
     const docIds = versions.map((doc) => {return doc['id'];});
     docIds.push(currentDocumentData["id"]);
+    const batch = firebase.firestore.batch();
 
     for (const docId of docIds) {
       // Delete Firestore document
-      await firebase.firestore.collection(currentCollectionId).doc(docId).delete();
+
+     const docRef = firebase.firestore.collection(currentCollectionId).doc(docId);
+
+     // Add delete operation to the batch
+     batch.delete(docRef);
       
       // Delete thumbnail in Firebase Storage
       const thumbnailRef = firebase.storage.ref().child(`thumbnails/${currentCollectionId}/${docId}`);
       await thumbnailRef.delete();
       
     }
+
+    await batch.commit();
 
     // After deleting all documents, you can add any final actions here.
     NotificationManager.success("Pitch Art Deleted Successfully ");
