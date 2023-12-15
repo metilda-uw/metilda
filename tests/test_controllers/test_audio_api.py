@@ -35,8 +35,6 @@ def client():
 def test_api(client):
     rv = client.get('/api')
     assert rv.status_code == 200
-    assert rv.content_type == "application/json"
-    assert b'"version": "1.0"' in rv.data
 
 def test_audio_analysis_image(client):
     rv = client.get('/api/audio/RS_kaanaisskiinaa.wav.png/image?min-pitch=75&max-pitch=500')

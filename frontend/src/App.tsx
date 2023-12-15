@@ -27,7 +27,10 @@ import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./Pages/Collections";
+import Converter from "./Converter/Converter";
 import LearnNew from "./Pages/LearnNew";
+import Feedback from "./Feedback/Feedback";
+import Thankyou from "./Feedback/ThankYou";
 // import Word from "./Components/collections/Word";
 
 interface Props {
@@ -93,6 +96,10 @@ const App = () => (
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
+      <Route exact={true} path={ROUTES.CONVERTER} component={Converter} />
+      <Route exact={true} path={ROUTES.FEEDBACK} component={Feedback} />
+      <Route exact={true} path={ROUTES.THANKYOU} component={Thankyou}/>
+      
       {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />

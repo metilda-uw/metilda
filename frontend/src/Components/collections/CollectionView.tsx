@@ -7,6 +7,8 @@ import WordCard from "./WordCard";
 
 import FirebaseContext from "../../Firebase/context";
 
+import {fillMissingFieldsInChildDoc} from '../../Create/ImportUtils';
+
 export default function CollectionView({
   words,
   selectedCollection,
@@ -35,7 +37,7 @@ export default function CollectionView({
     setFilter(newFilter);
   };
 
-  const filteredWords = inputWords
+  let filteredWords = inputWords
     ? inputWords.filter((word) => {
         switch (filter) {
           case "all":
@@ -53,7 +55,33 @@ export default function CollectionView({
         }
       })
     : null;
+  
+    const filterWordsBasedOnVersion = () =>{
+      const parentDocs = filteredWords.filter((word) =>{ return !word["data"].isAChildVersion});
+      console.log("filtered words :: ", filteredWords);
+      
+      const result = [];
 
+      parentDocs.forEach((parentDoc) => {
+        
+        // Filter objects by parent ID
+        const childVersions = filteredWords.filter((word) =>  word["data"].parentDocumentId === parentDoc["id"]);
+
+        // Sort filtered objects by createdAt in descending order
+        childVersions.sort((a, b) => b["data"].createdAt - a["data"].createdAt);
+
+        // Store the most recently created object for the parent ID
+        if (childVersions.length > 0) {
+          result.push(fillMissingFieldsInChildDoc(childVersions[0], parentDoc));
+        }else{
+          result.push(parentDoc);
+        }
+      });
+
+      console.log("result words :: ", result);
+      return result;
+  }
+  filteredWords = filterWordsBasedOnVersion();
   return (
     <div className="page-collections-view">
       <div className="page-collections-view-filter">

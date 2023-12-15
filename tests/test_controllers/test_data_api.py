@@ -236,7 +236,7 @@ def test_data_api_get_collections(client):
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
     result = {'result': 
-                [[1,"b3dd3d7b-3909-40f3-8000-f5471c1775cf","default","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
+                [[33,"1880f9eb-e274-4093-ac6b-8e7fa9a05a84","default","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
     assert result == json.loads(rv.data)
 
 @pytest.mark.skip
@@ -504,7 +504,7 @@ def test_data_api_collections_delete(client):
 
 def test_data_api_collections_update(client):
     rv = client.put(
-        '/api/collections/1', data = {
+        '/api/collections/33', data = {
         'collection_name': "test2"
         })
     assert rv.status_code == 200
@@ -517,7 +517,7 @@ def test_data_api_collections_update(client):
     assert rv.status_code == 200
     assert rv.content_type == "application/json"
     result = {'result': 
-                [[1,"b3dd3d7b-3909-40f3-8000-f5471c1775cf","test2","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
+                [[33,"1880f9eb-e274-4093-ac6b-8e7fa9a05a84","test2","metilda.uw@gmail.com","Tue, 04 Oct 2022 21:17:11 GMT","description"]]}
     assert result == json.loads(rv.data)
 
 

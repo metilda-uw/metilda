@@ -463,7 +463,7 @@ ALTER TABLE ONLY public.audio
 --
 
 ALTER TABLE ONLY public.audio_user
-    ADD CONSTRAINT audio_user_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES public.users(audio_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT audio_user_audio_id_fkey FOREIGN KEY (audio_id) REFERENCES public.audio(audio_id) MATCH SIMPLE ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

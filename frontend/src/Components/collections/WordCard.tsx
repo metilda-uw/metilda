@@ -1,30 +1,60 @@
 import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
+import './WordCard.scss';
 
 import FirebaseContext from "../../Firebase/context";
 
-export default function WordCard({ word, selectedCollectionUuid }) {
-  const firebase = useContext(FirebaseContext);
+
+export default function WordCard(props) {
+  const word = props.word;
+  const selectedCollectionUuid = props.selectedCollectionUuid;
+  let firebase = useContext(FirebaseContext);
+  firebase = firebase != null ? firebase : props.fb; 
   const timestamp = firebase.timestamp;
   const [url, setURL] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if(props.url !== undefined) {
+      setURL(props.url);
+      setLoading(false);
+      return;
+    }
     const storageRef = firebase.storage.ref(
       "thumbnails/" + selectedCollectionUuid + "/" + word.id
     );
     storageRef.getDownloadURL().then((url) => {
       setURL(url);
+      setLoading(false);
     }).catch((error) => {
       //Do Nothing
     });
   });
 
+  let createdAtDate;
+
+  if(word["data"] && word["data"].createdAt){
+    const { seconds, nanoseconds } = word["data"].createdAt;
+
+  // Convert nanoseconds to milliseconds (1 second = 1,000,000,000 nanoseconds)
+  const milliseconds = Math.floor(nanoseconds / 1e6);
+
+  // Create a Date object using seconds and milliseconds
+  createdAtDate = new Date(seconds * 1000 + milliseconds);
+  }
+  
+
+  console.log("URl of word " , props.url);
+
   return (
-    <div className="col s6 m3">
+    <div className={props.classArgument != undefined ? props.classArgument + " col s6 m3" :"col s6 m3"}>
       <div className="card">
         <span className="card-title">{word["data"].word}</span>
         <div className="card-image">
-          <img src={url} alt="word thumbnail" />
+          {loading && (<div className="loading-spinner-container">
+            <div className="loading-spinner"></div>
+          </div>)}
+          {!loading && url && (<img src={url} alt="word thumbnail" />)}
         </div>
         <div className="card-content">
           {word["data"].speakerName && (
@@ -36,9 +66,9 @@ export default function WordCard({ word, selectedCollectionUuid }) {
           {word["data"].letters && (
             <p>Syllables: {word["data"].letters.length}</p>
           )}
-          {word["data"].createdAt && (
+          {createdAtDate && (
             <div className="created-date">
-              Created: {word["data"].createdAt.toDate().toDateString()}
+              Created: {createdAtDate.toDateString()}
             </div>
           )}
         </div>
@@ -50,4 +80,8 @@ export default function WordCard({ word, selectedCollectionUuid }) {
 WordCard.propTypes = {
   word: PropTypes.object,
   selectedCollectionUuid: PropTypes.string,
+  key: PropTypes.string,
+  fb:PropTypes.object,
+  classArgument:PropTypes.string,
+  url:PropTypes.string
 };

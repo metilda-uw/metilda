@@ -5,6 +5,8 @@ export interface Letter {
   syllable: string;
   isManualPitch: boolean;
   isWordSep: boolean;
+  isContour?:boolean;
+  contourGroupRange?:number[];
 }
 
 export interface Speaker {
@@ -18,4 +20,6 @@ export interface Speaker {
   latestAnalysisId?: number;
   lastUploadedLetters?: Letter[];
   latestAnalysisName?: string;
+  lineColor?:string;
+  dotColor?:string;
 }
