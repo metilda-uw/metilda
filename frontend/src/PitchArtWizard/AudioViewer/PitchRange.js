@@ -17,12 +17,31 @@ class PitchRange extends Component {
     this.submitMaxPitch = this.submitMaxPitch.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+  componentDidUpdate(prevProps) {
+
+    if (this.props.initMinPitch !== prevProps.initMinPitch || this.props.initMaxPitch !== prevProps.initMaxPitch) {
+      this.setState({
+        minPitch: null,
+        maxPitch: null,
+        errors: [],
+        isMinDirty: false,
+        isMaxDirty: false,
+      });
+    }
+  }
 
   submitMaxPitch(event) {
     if (this.state.errors.length > 0) {
       return;
     }
 
+    this.setState({
+      minPitch: null,
+      maxPitch: null,
+      errors: [],
+      isMinDirty: false,
+      isMaxDirty: false,
+    });
     this.props.applyPitchRange(
       parseFloat(this.minPitchRef.current.value),
       parseFloat(this.maxPitchRef.current.value)

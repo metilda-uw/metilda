@@ -1,6 +1,7 @@
 import { Action } from "redux";
 import * as constants from "../../constants";
 import { Letter, Speaker } from "../../types/types";
+import {PitchArtDetailsAction} from "../pitchArt/actionTypes";
 
 export interface AudioAnalysisState {
   speakers: Speaker[];
@@ -101,4 +102,6 @@ export type AudioAction =
   | SetActiveLetter
   | ManualPitchAdjust
   | ReplaceSpeakers
-  | setLineAndDotColor;
+  | setLineAndDotColor
+  | PitchArtDetailsAction;
+

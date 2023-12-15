@@ -22,6 +22,7 @@ interface Props {
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     updatePitchArtValue: (inputName: string, inputValue: any) => void;
     data: any;
+    callBacks:any
 }
 
 class PitchArtContainer extends React.Component<Props> {
@@ -191,7 +192,8 @@ class PitchArtContainer extends React.Component<Props> {
                         showMetildaWatermark={this.props.pitchArt.showMetildaWatermark}
                         speakers={this.props.speakers}
                         firebase={this.props.firebase}
-                        data={this.props.data} />
+                        data={this.props.data}
+                        callBacks={this.props.callBacks} />
                 </div>
             </div>
         );

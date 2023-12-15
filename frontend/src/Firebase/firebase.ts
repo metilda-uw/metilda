@@ -64,6 +64,9 @@ class Firebase {
   }
 
   updateSharedPage = (state, type, pageId) => {
+    if(type !== "share") return;
+    console.log("*****************************");
+    console.log("TYPE", type);
     const ref = firebase.firestore().collection(type).doc(pageId);
 
     return ref.update({
@@ -77,6 +80,9 @@ class Firebase {
   }
 
   updateSharedPageSpeakers = (speakers, type, pageId) => {
+    if(type !== "share") return;
+    console.log("*****************************");
+    console.log("TYPE", type);
     const ref = firebase.firestore().collection(type).doc(pageId);
 
     return ref.update({
