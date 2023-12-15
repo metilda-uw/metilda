@@ -18,6 +18,7 @@ export interface AudioAnalysisImageMenuProps {
     imgMenuY: number;
     isSelectionActive: boolean;
     isAllShown: boolean;
+    isSoundLengthLarge: boolean;
     splitWord: () => void;
     intervalSelected: () => void;
     newManualPitch: () => void;
@@ -64,8 +65,8 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                                 <span className="AudioAnalysisImageMenu-label">Split</span>
                             </div>
                         </Slice>
-                        <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.intervalSelected)}
-                               disabled={!this.props.isSelectionActive}
+                        <Slice onSelect={() => maybeDo(!(this.props.isSelectionActive && this.props.isSoundLengthLarge), this.props.intervalSelected)}
+                               disabled={!(this.props.isSelectionActive && this.props.isSoundLengthLarge)}
                                backgroundColor="lightgrey"
                                className="AudioAnalysisImageMenu-option-zoom">
                             <div className="menu-icon-top-right">

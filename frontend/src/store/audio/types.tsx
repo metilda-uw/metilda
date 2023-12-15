@@ -81,6 +81,10 @@ export interface ManualPitchAdjust extends Action {
   type: constants.MANUAL_PITCH_ADJUST;
   speakers: Speaker[];
 }
+export interface setLineAndDotColor extends Action {
+  type: constants.LINE_AND_DOT_COLOR;
+  speakers: Speaker[];
+}
 
 export type AudioAction =
   | AddSpeaker
@@ -98,4 +102,6 @@ export type AudioAction =
   | SetActiveLetter
   | ManualPitchAdjust
   | ReplaceSpeakers
+  | setLineAndDotColor
   | PitchArtDetailsAction;
+

@@ -3,7 +3,12 @@ import { Speaker } from "../types/types";
 import moment from "moment";
 import "react-notifications/lib/notifications.css";
 import { NotificationManager } from "react-notifications";
+
 import { idText } from "typescript";
+
+import { set } from "react-ga";
+import {getLineColors, getDotColors} from '../Designs/pitchArtDesigns';
+
 
 export function importSpeakerFile(
   results: Result[],
@@ -637,4 +642,33 @@ export function DeleteViewPermission(
   }).then((response) => {
     console.log(response);
   });
+}
+
+
+export const chooseColor = (speakers, isLineColor) => {
+
+  let colors = ["gray","green","orange","blue","brown","red"];
+  if(isLineColor){
+    const colorMap = getLineColors();
+    colors = Array.from(colorMap.keys());
+  }else{
+    const colorMap = getDotColors();
+    colors = Array.from(colorMap.keys());
+  }
+
+  let usedColors = new Set();
+  
+  let color = "#000000";
+
+  for(let i=0;i<speakers.length;i++){
+    const c = isLineColor ? speakers[i].lineColor : speakers[i].dotColor;
+    usedColors.add(c);
+  }
+
+  for(let i=0;i<colors.length;i++){
+    if(!usedColors.has(colors[i])) return colors[i];
+  }
+
+  return color;
+
 }
