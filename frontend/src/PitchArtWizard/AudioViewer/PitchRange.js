@@ -71,7 +71,7 @@ class PitchRange extends Component {
     this.validateInput();
 
     const name = event.target.name;
-    console.log("name of the event is " + name);
+    // console.log("name of the event is " + name);
     let num = parseFloat(event.target.value);
 
     if (isNaN(num) || num <= 0) {
