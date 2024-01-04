@@ -28,8 +28,36 @@ p {
   margin-left: 25px;
   color: brown;
 }
+.subList {
+  text-align: left;
+  margin-left: 30px;
+  color: brown; 
+  margin-top: unset;
+  display:list-item;
+  margin-bottom:unset;
+}
 
+ 
 .para {
   text-align: left;
   margin-left: 25px;
+}
+
+.subList li {
+  position: relative;
+  padding-left: 25px; /* Adjust the padding as needed */
+}
+
+.subList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%); /* making it go upwards */
+  width: 5px; /* Adjust the size of the circle */
+  height: 5px; /* Adjust the size of the circle */
+  border: 2px solid brown; /* Adjust the border color and thickness */
+  border-radius: 50%;
+  box-sizing: border-box;
+  background-color: transparent; /* Make the circle hollow */
 }
