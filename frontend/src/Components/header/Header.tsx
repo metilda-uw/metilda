@@ -122,6 +122,12 @@ class Header extends Component<HeaderProps, State> {
               {/* update this to documentation and change page link too  */}
            
             </li>
+            <li className="nav-menu-item">
+              <Link to="/converter">Converter</Link>
+            </li>
+            <li className="nav-menu-item">
+              <Link to="/feedback">Feedback</Link>
+            </li>
             {this.state.isAdmin && (
               <li className="nav-menu-item">
                 <Link to="/manage-users">Manage Users</Link>

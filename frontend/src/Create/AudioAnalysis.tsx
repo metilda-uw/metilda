@@ -73,6 +73,7 @@ interface State {
   selectionInterval: string;
   imageUrl: string;
   audioUrl: string;
+  imageUrlStack: string[];
   audioEditVersion: number;
   minSelectX: number;
   maxSelectX: number;
@@ -172,6 +173,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         this.props.minPitch,
         this.props.maxPitch),
       audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
+      imageUrlStack:[],
       audioEditVersion: 0,
       minSelectX: -1,
       maxSelectX: -1,
@@ -326,7 +328,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
-  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false) {
+  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false, isContour: boolean = false,pitchRange:number[] = null) {
     if (!isWordSep) {
       if (pitch < this.props.minPitch || pitch > this.props.maxPitch) {
         // the pitch outside the bounds of the window, omit it
@@ -340,14 +342,18 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
     }
 
-    const newLetter = {
+    const newLetter:Letter = {
       t0: ts[0],
       t1: ts[1],
       pitch,
       syllable: DEFAULT.SYLLABLE_TEXT,
       isManualPitch,
       isWordSep,
+      isContour
     };
+    if(isContour && pitchRange != null){
+      newLetter.contourGroupRange = pitchRange;
+    }
 
     this.props.addLetter(this.props.speakerIndex, newLetter);
     this.state.closeImgSelectionCallback();
@@ -413,7 +419,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       .then((response) => response.json())
       .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
         DEFAULT.SYLLABLE_TEXT,
-        [item[0], item[0]])),
+        [item[0], item[0]],false, false, true,ts)),
       );
   }
 
@@ -540,17 +546,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   showAllClicked() {
-    const newUrl = AudioAnalysis.formatImageUrl(
-      this.getSpeaker().uploadId,
-      this.props.minPitch,
-      this.props.maxPitch,
-      0,
-      this.state.soundLength);
+
+    const newUrl = this.state.imageUrlStack.pop();
+
+
+    const urlObj = new URL(newUrl, window.location.origin);
+
+    const tmin = parseFloat(urlObj.searchParams.get('tmin'));
+    const tmax = parseFloat(urlObj.searchParams.get('tmax'));
+
+    console.log('tmin:', tmin); 
+    console.log('tmax:', tmax); 
 
     const newAudioUrl = AudioAnalysis.formatAudioUrl(
       this.getSpeaker().uploadId,
-      0,
-      this.state.soundLength);
+      tmin,
+      tmax);
 
     this.state.closeImgSelectionCallback();
 
@@ -559,8 +570,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       audioUrl: newAudioUrl,
       isAudioImageLoaded: false,
       audioEditVersion: this.state.audioEditVersion + 1,
-      minAudioTime: 0,
-      maxAudioTime: this.state.soundLength,
+      minAudioTime: tmin,
+      maxAudioTime: tmax,
     });
   }
 
@@ -589,6 +600,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       config.maxAudioTime);
 
     this.state.closeImgSelectionCallback();
+    
+    this.state.imageUrlStack.push(this.state.imageUrl);
 
     this.setState({
       imageUrl: newImageUrl,
@@ -600,17 +613,32 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
+  completeZoomOut = ()=>{
+    if(this.state.imageUrlStack.length === 0) return;
+    while(this.state.imageUrlStack.length > 1){
+      this.state.imageUrlStack.pop();
+    }
+    this.showAllClicked();
+  }
+
   renderSpeakerControl = () => {
     const isLastSpeaker = this.props.speakerIndex === this.props.speakers.length - 1;
     const isFirstSpeaker = this.props.speakerIndex === 0;
 
     return (
-      <SpeakerControl
-        speakerIndex={this.props.speakerIndex}
-        addSpeaker={this.props.addSpeaker}
-        removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
-        canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
-        canRemoveSpeaker={!isFirstSpeaker} />
+      <>
+        <SpeakerControl
+          speakerIndex={this.props.speakerIndex}
+          addSpeaker={this.props.addSpeaker}
+          removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
+          canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
+          canRemoveSpeaker={!isFirstSpeaker} />
+        <button className="complete-zoomout waves-effect waves-light btn globalbtn" 
+          disabled={this.state.imageUrlStack.length === 0}
+          onClick={this.completeZoomOut}>
+          Complete Zoom Out
+        </button>
+      </>
     );
   }
 
@@ -625,6 +653,13 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
       const isAllShown = this.state.minAudioTime === 0
         && this.state.maxAudioTime === this.state.soundLength;
+      
+      const config = this.getAudioConfigForSelection(
+          this.state.minSelectX,
+          this.state.maxSelectX);
+      
+      const isSoundLengthLarge = (config.maxAudioTime - config.minAudioTime > 0.05);
+
 
       return (
         <AudioAnalysisImageMenu
@@ -638,6 +673,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           newAvgPitch={this.averagePitchArtClicked}
           newRangePitch={this.pitchArtRangeClicked}
           showAllAudio={this.showAllClicked}
+          isSoundLengthLarge= {isSoundLengthLarge}
           onClick={() => this.showImgMenu(-1, -1)}
         />
       );

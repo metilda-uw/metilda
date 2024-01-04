@@ -18,11 +18,30 @@ class TimeRange extends Component {
     this.handleInputChange = this.handleInputChange.bind(this);
   }
 
+  componentDidUpdate(prevProps) {
+
+    if (this.props.initMinTime !== prevProps.initMinTime || this.props.initMaxTime !== prevProps.initMaxTime) {
+      this.setState({
+        minTime: null,
+        maxTime: null,
+        errors: [],
+        isMinDirty: false,
+        isMaxDirty: false,
+      });
+    }
+  }
+
   submitMaxTime(event) {
     if (this.state.errors.length > 0) {
       return;
     }
-
+    this.setState({
+      minTime: null,
+      maxTime: null,
+      errors: [],
+      isMinDirty: false,
+      isMaxDirty: false,
+    });
     this.props.applyTimeRange(0, parseFloat(this.maxTimeRef.current.value));
   }
 
