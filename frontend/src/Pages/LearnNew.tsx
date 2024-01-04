@@ -21,10 +21,10 @@ import {
 import Recorder from "recorder-js";
 
 export default function LearnNew() {
-  // const {collection,id} = useParams();
   const params = useParams();
   const collection = params['type'];
   const id = params['id'];
+
   const firebase = useContext(FirebaseContext);
   const [showPrevPitchValueLists, setShowPrevPitchValueLists] = useState(false);
   const [userPitchValueLists, setUserPitchValueLlists] = useState([]);

@@ -5,14 +5,16 @@
 
   // 1:1.91 Video Aspect Ratio
   padding-top: 52.35%;
-
+  margin-left: 5%;
+  margin-right: 5%;
+  margin-bottom: 5%;
 }
 
 .demo-vid {
   position: absolute;
   top: 0;
-  right:25%;
-  width: 50%;
-  height: 50%;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
 }
