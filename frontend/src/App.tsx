@@ -100,14 +100,11 @@ const App = () => (
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
-<<<<<<< HEAD
       <Route exact={true} path={ROUTES.DOCUMENTATION} component={DocumentationContent} />
-=======
       <Route exact={true} path={ROUTES.CONVERTER} component={Converter} />
       <Route exact={true} path={ROUTES.FEEDBACK} component={Feedback} />
       <Route exact={true} path={ROUTES.THANKYOU} component={Thankyou}/>
       
->>>>>>> d4a981bc0a7e659c129b84af0bbc9146ade90e67
       {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
