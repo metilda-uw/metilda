@@ -1,3 +1,4 @@
+import { ContactSupportOutlined } from "@material-ui/icons";
 import "./PitchRange.css";
 
 import React, { Component } from "react";
@@ -66,6 +67,7 @@ class PitchRange extends Component {
   };
 
   handleInputChange(event) {
+    console.log("before validating the input ");
     this.validateInput();
 
     const name = event.target.name;
@@ -89,6 +91,7 @@ class PitchRange extends Component {
   }
 
   enterPressed = (event) => {
+    console.log("loggint he event which is " + event);
     if (event.key === "Enter") {
       this.submitMaxPitch(event);
     }

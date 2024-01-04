@@ -134,7 +134,7 @@ class CreatePitchArt extends React.Component<
         showVerticallyCentered: false,
         showPitchArtLines: true,
         showLargeCircles: true,
-        showTimeNormalization: false,
+        showTimeNormalization: true,
         showPitchScale: false,
         showPerceptualScale: true,
         showPitchArtImageColor: true,
@@ -318,7 +318,10 @@ class CreatePitchArt extends React.Component<
     this.setState((prevState) => {
       const state = prevState;
       state.pitchRange[index].minPitch = minPitch;
+      console.log("min pitch " + minPitch);
       state.pitchRange[index].maxPitch = maxPitch;
+      console.log("max pitch " + maxPitch);
+      // update in the pitch art too 
       if (this.props.match.params.type !== undefined) {
         this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
       }
