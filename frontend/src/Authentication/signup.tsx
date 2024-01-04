@@ -5,6 +5,7 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import Select from "react-select";
 import ReactGA from "react-ga";
+import TermsOfUseContent  from "./terms_of_use_content";
 
 export interface Props {
   firebase: any;
@@ -171,8 +172,9 @@ class SignUpFormBase extends React.Component<Props, State> {
     };
     const Checkbox = (props: any) => <input type="checkbox" {...props} />;
     const TermsOfUseLink = () => (
+      
       <Link to={ROUTES.TERMS_OF_USE} target="_blank" className="terms_of_use_Link">
-        terms of use
+            terms of use
       </Link>
     );
 
@@ -247,8 +249,8 @@ class SignUpFormBase extends React.Component<Props, State> {
             onChange={this.handleCheckboxChange}
             required
           />
-          <span>
-            By clicking the checkbox, you agree to the {<TermsOfUseLink />} *
+          <span  >
+            By clicking the checkbox, you agree to the {<TermsOfUseLink/>} *
           </span>
         </label>
         <button type="submit" className="signup_Submit globalbtn">
