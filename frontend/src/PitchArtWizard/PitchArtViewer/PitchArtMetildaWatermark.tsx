@@ -2,6 +2,7 @@ import * as React from "react";
 import { Layer, Text } from "react-konva";
 import { PitchArtWindowConfig } from "./types";
 import PitchArtCoordConverter from "./PitchArtCoordConverter";
+import moment from 'moment';
 
 interface Props {
   type: string;
@@ -42,34 +43,47 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
   };
 
   renderWatermarkOption2 = (width, height, xStart, yStart) => {
-    const text = [];
+    let date = moment().format("DD.MM.YYYY");
+    console.log(date);
+    const text = "Made with MeTILDA " + date; 
+    console.log(text);
+    // let text = ["Made with MeTILDA ",date]; 
     let offset = 0;
-    for (let y = yStart; y < height; y += 20) {
-      for (let x = xStart; x < width; x += 66) {
-        if (offset === 1) {
-          x += 3;
-        }
-        text.push(
-          <Text
-            key={x.toString() + y.toString() + "_wm"}
-            x={x}
-            y={y}
+    // for (let y = yStart; y < height; y += 20) {
+    //   for (let x = xStart; x < width; x += 66) {
+    //     if (offset === 1) {
+    //       x += 3;
+    //     }
+    //     text.push(
+    //       <Text
+    //         key={x.toString() + y.toString() + "_wm"}
+    //         x={x}
+    //         y={y}
+    //         fontFamily={"Trebuchet MS"}
+    //         fontSize={this.props.fontSize}
+    //         text="MeTILDA"
+    //         opacity={0.15}
+    //       />
+    //     );
+    //   }
+    //   if (offset === 0) {
+    //     offset = 1;
+    //   } else if (offset === 1) {
+    //     offset = 0;
+    //   }
+    // }
+    console.log("width is "+ width, "height is " + height, "xstart is "+ xStart, "ytart is " + yStart);
+    return (
+      <Layer offsetX={-380} offsetY={-440}>
+        <Text
+          
+            x ={xStart}
+            y = {yStart}
             fontFamily={"Trebuchet MS"}
             fontSize={this.props.fontSize}
-            text="MeTILDA"
+            text = {text}  
             opacity={0.15}
-          />
-        );
-      }
-      if (offset === 0) {
-        offset = 1;
-      } else if (offset === 1) {
-        offset = 0;
-      }
-    }
-    return (
-      <Layer offsetX={-5} offsetY={-5}>
-        {text}
+        />
       </Layer>
     );
   };

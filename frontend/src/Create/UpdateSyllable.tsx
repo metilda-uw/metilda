@@ -132,45 +132,7 @@ render() {
             required/>
           </div>
           </div>
-          <div className="row">
-            <div className="col s4">
-              <p>Start Time:</p>
-              </div>
-              <div className="col s4">
-                <input 
-                className="syllableStartTime" 
-                name="currentT0" 
-                value={this.state.currentT0.toString()}
-                onChange={this.onChange}
-                type="number" 
-                placeholder={"Set start time."}
-                step="0.01"
-                required/>  
-              </div>
-              <div className="col s4">
-                <FormGroup>
-                  <FormControlLabel control={
-                    <Checkbox defaultChecked onChange={this.handleChange} color="default"/>
-                  } label="Lock Ratio" />
-                </FormGroup>
-              </div>
-            </div>
-          <div className="row">
-            <div className="col s4">
-              <p>End Time: </p>
-              </div>
-            <div className="col s4">
-              <input 
-              className="syllableEndTime" 
-              name="currentT1" 
-              value={(this.state.currentT1.toString())}
-              onChange={this.onChange}
-              type="number" 
-              placeholder={"Set end time."}
-              step="0.01"
-              required/>
-            </div>
-          </div>
+          
           
         </DialogContent>
         <DialogActions>
