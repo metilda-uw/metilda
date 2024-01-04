@@ -29,6 +29,9 @@ import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./Pages/Collections";
 import Converter from "./Converter/Converter";
 import LearnNew from "./Pages/LearnNew";
+
+import TermsOfUseContent from "./Authentication/terms_of_use_content";
+import DocumentationContent from "./Authentication/Documentation";
 import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
 // import Word from "./Components/collections/Word";
@@ -91,15 +94,20 @@ const App = () => (
         path={ROUTES.PASSWORD_FORGET}
         component={passwordForget}
       />
+      <Route path={ROUTES.TERMS_OF_USE} component={TermsOfUseContent}/>
       <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
       <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
+<<<<<<< HEAD
+      <Route exact={true} path={ROUTES.DOCUMENTATION} component={DocumentationContent} />
+=======
       <Route exact={true} path={ROUTES.CONVERTER} component={Converter} />
       <Route exact={true} path={ROUTES.FEEDBACK} component={Feedback} />
       <Route exact={true} path={ROUTES.THANKYOU} component={Thankyou}/>
       
+>>>>>>> d4a981bc0a7e659c129b84af0bbc9146ade90e67
       {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />
