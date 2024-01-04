@@ -70,25 +70,26 @@ class Header extends Component<HeaderProps, State> {
       <div>
         <nav className="nav">
           <ul className="nav-menu">
-         
+            <li className="nav-menu-item">
+              <Link to="/">About</Link>
+            </li>
             <li className="nav-menu-item">
               <Link to="/home">Home</Link>
             </li>
             <li className="nav-menu-item">
-              <Link to="/pitchartwizard">Create Pitch Art</Link>
+              <Link to="/collections">Collections</Link>
             </li>
-           
             <li className="nav-menu-item">
               <a>Explore</a>
               <Submenu
                 navLinks={[
                   {
-                    name: "Learn",
-                    link: "/learn/words/syllables",
+                    name: "Create",
+                    link: "/pitchartwizard",
                   },
                   {
-                    name: "Collections",
-                    link: "/collections",
+                    name: "Learn",
+                    link: "/learn/words/syllables",
                   },
                   {
                     name: "PELDA",
@@ -119,8 +120,6 @@ class Header extends Component<HeaderProps, State> {
                   },
                 ]}
               />
-              {/* update this to documentation and change page link too  */}
-           
             </li>
             <li className="nav-menu-item">
               <Link to="/converter">Converter</Link>
@@ -133,9 +132,6 @@ class Header extends Component<HeaderProps, State> {
                 <Link to="/manage-users">Manage Users</Link>
               </li>
             )}
-             <li className="nav-menu-item">
-              <Link to="/documentation">Documentation</Link>
-            </li>
           </ul>
         </nav>
       </div>

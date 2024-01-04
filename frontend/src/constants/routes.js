@@ -9,7 +9,6 @@ export const TERMS_OF_USE = "/terms-of-use";
 export const MY_FILES = "/my-files";
 export const HISTORY = "/history";
 export const COLLECTIONS = "/collections";
-export const DOCUMENTATION = "/documentation";
 export const FEEDBACK = "/feedback";
 export const THANKYOU = "/thankyou";
 export const CONVERTER = "/converter";
