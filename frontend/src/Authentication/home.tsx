@@ -37,65 +37,29 @@ class Home extends React.Component {
           <li>Mizuki Miyashita (Linguist, University of Montana)</li>
           <li>Min Chen (Computer Scientist, University of Washington)</li>
           <li>Naatosi Fish (Community Linguist, Blackfeet Nation)</li>
-          <li>James Randall (Musicologist, University of Montana)</li>
-          <li> Research Assistants ( see acknowledgements )</li></p>
-          
-         
-
-         <p className="para">
-          <b>Acknowledgements:</b> <br/>
-          We would like to thank the following individuals and groups:
+          <li>James Randall (Musicologist, University of Montana)</li></p>
         
-            <li>Blackfoot speakers: the late Chief Earl Old Person, Mr. Rod Scout, and Ms. Natalie Creighton. The recordings used for the development were originally provided for the Blackfoot Linguistics Study at the University of Montana.
-            </li>
-             <li>Kaylene Big Knife for the graphic design of Pitch Art </li>
+          <p className="para">
+            <b>Research Assistants</b>
+            <br/>
+            <b>Computer Science:</b>
+            <li>Mitchell Lee</li>
+            <li>Jignasha Borad</li>
+            <li>Praveena Avula</li>
+            <li>Chris Lee</li>
+            <li>Sanjay Penmetsa</li>
+            <br/>
+            <b>Linguistics:</b>
+          </p>
+        
+        <p className="list">
+          <b>Acknowledgements:</b>
+          <li>Blackfoot speakers: the late Chief Earl Old Person, Mr. Rod Scout, and Ms. Natalie Creighton. The recordings used for the development were originally provided for the Blackfoot Linguistics Study at the University of Montana.
+</li>
           <li>Students in LING 491 Audio Data Processing (Fall 2022) for testing the tool.
-          </li>
-          <li >
-              Audience at the conferences:
-              <ul className="subList" >
-                <li >
-                Society for the Study of the Indigenous Languages of the Americas (SSILA) Summer Meeting
-                </li>
-                <li>
-                   Montana-Alberta Conference on Linguistics (mACOL) 2020
-                </li>
-                <li>
-                   Annual Meeting of Linguistic Society of America (LSA) 2021
-                </li>
-                <li>
-                   West Coast Conference on Formal Linguistics (WCCFL) 2021
-                </li>
-              </ul>
-          </li>
-          <li>
-          University of Washington-Bothell( Computer Science):
-          <ul className="subList" >
-              <li>Mitchell Lee</li>
-              <li>Jignasha Borad</li>
-              <li>Praveena Avula</li>
-              <li>Chris Lee</li>
-              <li>Sanjay Penmetsa</li>
-            </ul>
-          </li>
-          <li>
-          University of Montana (Linguistics):
-          <ul className="subList" >
-              <li>Shay Sullivan(2022)</li>
-              <li>Bethany Tafoya(2023)</li>
-              <li>Meaghan Toomey(2023)</li>
-            </ul>
-          </li>
-          <li>
-          The MeTILDA project is supported by:
-           <ul className="subList">
-              <li >The National Science Foundation Dynamic Language Infrastructure (BCS-2109437; BCS-2109654)</li>
-              <li>Linguistics Program at the University of Montana</li>
-              <li>Computer Science at the University of Washington - Bothell. </li>
-            </ul>
-          </li>
+</li>
+          <li>Audience at the conferences (list them)</li>
         </p>
-        
         {/* TODO: Add citation for MeTILDA */}
       </div>
     );
