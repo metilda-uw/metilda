@@ -110,7 +110,7 @@ const TermsOfUseContent = () => {
       <section className="section">
         <h2>Changes</h2>
         <p>
-        We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is material you will need to agree to the new terms before using the website again. What constitutes a material change will be determined at our sole discretion. 
+        We reserve the right, at our sole discretion, to modify or replace these Terms at any time. If a revision is substantial  you will need to agree to the new terms before using the website again. What constitutes a material change will be determined at our sole discretion. 
         </p>
       </section>
       </div>
