@@ -322,7 +322,10 @@ function Converter(){
                 <p className="tips-p">Mel: The mel scale (after the word melody) is a perceptual scale of pitches
                     judged by listeners to be equal in distance from one another.
                 </p>
-                <p className="tips-p">MeT:</p>
+                <p className="tips-p">MeT: The MeT scale is a perceptual scale developed by adopting and extending the equal temperament scale in western music. 
+                The MeT scale enables the visualization of pitch data by aligning pitch data (in Hz) to a repeating series of 12 notes that form an octave.
+                 This allows users to focus on the melody or contour of the word, while disregarding the speakers’ actual pitch ranges, 
+                 which can vary due to age, gender, or other physical factors.</p>
                 </body>
             </div>
         </div>
