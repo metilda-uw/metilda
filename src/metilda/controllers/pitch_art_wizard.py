@@ -815,7 +815,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     if environ.get('FLASK_ENV') == "development":
         image_path = ("metilda/" + image)
     else:
-        image_path = ("metilda/" + image)
+        image_path = ("src/metilda/" + image)
         
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image_path)
