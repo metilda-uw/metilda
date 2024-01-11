@@ -743,6 +743,7 @@ def getOrCreateWords():
 def drawSound(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     
+    print("*** scripts path ****", praat._scripts_dir)
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
     res = output.split()  # Split output into an array
