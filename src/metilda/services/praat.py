@@ -6,7 +6,7 @@ import os
 from os import environ
 
 # Locations of required files - path needs to change based on whether you are working locally or deploying to Heroku
-if environ.get('FLASK_ENV') == "development":
+if environ.get('FLASK_ENV') == "development" or environ.get('FLASK_ENV') is None:
    #relative to metilda
    _images_dir = "images/"
    #relative to src
