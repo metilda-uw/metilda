@@ -427,7 +427,18 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
       .then((response) => response.json())
       .then((data) =>
         this.setState({
-          files: data.result.map((item: any) => item),
+          files: data.result.map((item: any) => {
+            return {
+              index: item[0],
+              name: item[1],
+              path: item[2],
+              size: item[3],
+              type: item[4],
+              created: item[5],
+              updated: item[6],
+              user: item[7]
+            };
+          }),
         })
       );
   };

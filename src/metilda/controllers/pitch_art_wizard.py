@@ -743,6 +743,7 @@ def getOrCreateWords():
 def drawSound(upload_id):
     sound_path = os.path.join(app.config["SOUNDS"], upload_id)
     
+    print("*** scripts path ****", praat._scripts_dir)
     script = praat._scripts_dir + "getBounds"
     output = praat.runScript(script, [upload_id, praat._sounds_dir])
     res = output.split()  # Split output into an array
@@ -776,7 +777,7 @@ def drawSound(upload_id):
     if environ.get('FLASK_ENV') == "development":
         image_path = ("metilda/" + image)
     else:
-        image_path = ("metilda/" + image)
+        image_path = ("src/metilda/" + image)
 
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image_path)
@@ -814,7 +815,7 @@ def drawSoundWithTime(sound, startTime, endTime):
     if environ.get('FLASK_ENV') == "development":
         image_path = ("metilda/" + image)
     else:
-        image_path = ("metilda/" + image)
+        image_path = ("src/metilda/" + image)
         
     # If image does not exist, run script
     app.logger.info("Draw Image with time: " + image_path)
