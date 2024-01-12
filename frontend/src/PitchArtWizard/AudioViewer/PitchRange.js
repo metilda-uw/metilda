@@ -1,3 +1,4 @@
+import { ContactSupportOutlined } from "@material-ui/icons";
 import "./PitchRange.css";
 
 import React, { Component } from "react";
@@ -17,12 +18,31 @@ class PitchRange extends Component {
     this.submitMaxPitch = this.submitMaxPitch.bind(this);
     this.handleInputChange = this.handleInputChange.bind(this);
   }
+  componentDidUpdate(prevProps) {
+
+    if (this.props.initMinPitch !== prevProps.initMinPitch || this.props.initMaxPitch !== prevProps.initMaxPitch) {
+      this.setState({
+        minPitch: null,
+        maxPitch: null,
+        errors: [],
+        isMinDirty: false,
+        isMaxDirty: false,
+      });
+    }
+  }
 
   submitMaxPitch(event) {
     if (this.state.errors.length > 0) {
       return;
     }
 
+    this.setState({
+      minPitch: null,
+      maxPitch: null,
+      errors: [],
+      isMinDirty: false,
+      isMaxDirty: false,
+    });
     this.props.applyPitchRange(
       parseFloat(this.minPitchRef.current.value),
       parseFloat(this.maxPitchRef.current.value)
@@ -47,9 +67,13 @@ class PitchRange extends Component {
   };
 
   handleInputChange(event) {
+    console.log("before validating the input ");
     this.validateInput();
 
     const name = event.target.name;
+
+    // console.log("name of the event is " + name);
+
     let num = parseFloat(event.target.value);
 
     if (isNaN(num) || num <= 0) {
@@ -67,6 +91,7 @@ class PitchRange extends Component {
   }
 
   enterPressed = (event) => {
+    console.log("loggint he event which is " + event);
     if (event.key === "Enter") {
       this.submitMaxPitch(event);
     }

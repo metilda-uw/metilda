@@ -1,0 +1,184 @@
+  .pitchart-dialog-content {
+    min-height: 400px;
+    max-height: 400px;
+  }
+  .color-chooser {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; }
+  
+  .line-color, .dot-color {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
+    justify-content: flex-start; }
+  
+  .line-color-text, .dot-color-text {
+    margin: 0;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: left;
+    width: max-content; }
+  
+  // .line-color-dropdown, .dot-color-dropdown {
+  //   width: 200px;
+  //   padding: 10px;
+  //   border: 1px solid #ccc;
+  //   border-radius: 5px;
+  //   font-size: 16px;
+  //   display: block; }
+
+  //   .line-color-dropdown option {
+  //     padding-left: 30px; /* Adjust the padding as needed */
+  //   }
+    
+  //   .line-color-dropdown option::before {
+  //     content: '';
+  //     width: 20px;
+  //     height: 20px;
+  //     display: inline-block;
+  //     margin-right: 10px;
+  //     // background-image: linear-gradient(to right, attr(data-color), attr(data-color));
+  //   }
+    
+    .color-nav-bar{
+      background-color: #ee6e73;
+    }
+    .color-tab{
+      color: #ffffff !important;
+    }
+
+    .active-tab{
+      border: 2px solid #ccc;
+      background-color: #dc6569 !important;
+    }
+    .active-tab:focus{
+      border: 2px solid #ccc;
+      background-color: #dc6569 !important;
+    }
+
+    .design-container {
+      display: flex;
+      flex-wrap: wrap ;
+      justify-content: flex-start; /* Ensure left alignment */
+      align-items: flex-start;
+     // overflow-y: scroll;
+    }
+    
+    .design-row {
+      display: flex;
+      margin-bottom: 10px; /* Adjust spacing between rows */
+    }
+    
+    .design-item {
+      margin-right: 10px; /* Adjust spacing between designs */
+    }
+    
+    .design-item img {
+      text-align: left;
+      // max-width: 32%; /* Make images fill the container */
+      max-width: 250px;
+      max-height: 250px;
+    }
+
+    .design-item img {
+      transition: border 0.3s ease, background-color 0.3s ease;
+    }
+    
+    // /* Hover effect to give visual feedback */
+    .design-item:hover {
+      cursor: pointer;
+      border: 2px solid #ee6e73;
+    }
+
+    .design-selected{
+      border: 2px solid #ee6e73; /* Yellow border, adjust as needed */
+      background-color: #ffffff;
+    }
+    .spinner-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100%; /* Adjust if necessary */
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: auto;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+  /** Custom drop downs  */
+    .custom-line-dropdown, .custom-dot-dropdown{
+      position: relative;
+      display: inline-block;
+      min-width: 200px;
+    }
+
+    .line-dropdown-header, .dot-dropdown-header {
+      cursor: pointer;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .arrow {
+      margin-left: 10px;
+    }
+
+    .line-dropdown-options, .dot-dropdown-options {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      display: none;
+      background-color: #fff;
+      border: 1px solid #ccc;
+      border-top: none;
+      border-radius: 0 0 4px 4px;
+      z-index: 9999;
+    }
+    .custom-line-dropdown, .custom-dot-dropdown{
+      .open {
+        display: block;
+      }
+    }
+    
+
+    .line-dropdown-option, .dot-dropdown-option{
+      padding: 5px 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between
+    }
+
+    .line-dropdown-option:hover {
+      background-color: #f0f0f0;
+    }
+    .dot-dropdown-option:hover {
+      background-color: #f0f0f0;
+    }
+    .line-color-square,.dot-color-square{
+      min-width: 10px;
+      min-height: 5px;
+    }
+   .checkmark {
+    color: #000;
+  }
+
+

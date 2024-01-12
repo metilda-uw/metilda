@@ -32,6 +32,9 @@ import LearnNew from "./Pages/LearnNew";
 import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
 import NotificationsComponent from "./Notifications/Notifications";
+
+import TermsOfUseContent from "./Authentication/terms_of_use_content";
+import DocumentationContent from "./Authentication/Documentation";
 // import Word from "./Components/collections/Word";
 
 interface Props {
@@ -92,6 +95,7 @@ const App = () => (
         path={ROUTES.PASSWORD_FORGET}
         component={passwordForget}
       />
+      <Route path={ROUTES.TERMS_OF_USE} component={TermsOfUseContent}/>
       <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
       <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
@@ -101,6 +105,7 @@ const App = () => (
       <Route exact={true} path={ROUTES.FEEDBACK} component={Feedback} />
       <Route exact={true} path={ROUTES.THANKYOU} component={Thankyou}/>
       
+      <Route exact={true} path={ROUTES.DOCUMENTATION} component={DocumentationContent} />
       {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
       <Route path="/home" component={Home} />

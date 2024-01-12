@@ -1,0 +1,16 @@
+.selection-highlight {
+    background-color: rgba(38,166,154, 0.3); /* Blue with 30% opacity */
+    position: absolute;
+    z-index: 9999; /* Ensure it's on top of other elements */
+    pointer-events: none; /* Allows interaction with elements below the overlay */
+  }
+  
+  /* Apply the selection highlight class when dragging */
+  .dragging .selection-highlight {
+    display: block;
+  }
+  
+  /* Initially hide the selection highlight */
+  .selection {
+    display: none;
+  }
