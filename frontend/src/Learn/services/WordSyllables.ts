@@ -26,3 +26,13 @@ const getWordsBySyllableCount = async (numSyllables?: number, accentIndex?: numb
 };
 
 export default { getWordsBySyllableCount };
+
+const getWordById = async (id) => {
+    let getUrl: string = baseUrl+"/byId?pitchart=" + id;
+
+    const response: AxiosResponse<any> = await axios.get(getUrl);
+
+    return response.data;
+};
+
+export { getWordById };
