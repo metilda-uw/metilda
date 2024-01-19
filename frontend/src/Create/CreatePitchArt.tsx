@@ -36,6 +36,8 @@ import {getChildPitchArtVersions} from '../Create/ImportUtils';
 import { CURRENT_PITCHART_DOCUMENT_DATA } from "../constants";
 import { timeStamp } from "console";
 
+
+
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
   history: any;
@@ -537,6 +539,7 @@ class CreatePitchArt extends React.Component<
       return (
         <button className="page-options waves-effect waves-light btn globalbtn"
           onClick={this.deleteSharedPage}>
+          
           <i className="material-icons right">person_add</i>
           {this.isOwner()
             ? "Stop Sharing"
@@ -548,11 +551,17 @@ class CreatePitchArt extends React.Component<
       //No Options
     } else {
       return (
+        <div>
+
+       
         <button className="page-options waves-effect waves-light btn globalbtn"
           onClick={this.createSharedPage}>
+          <i className="material-icons left">info</i>
           <i className="material-icons right">person_add</i>
           {"Share Page"}
         </button>
+        <p className = "page-options-tooltiptext"> to share file with other MeTILDA users</p>
+        </div>
       );
     }
   }
@@ -585,12 +594,16 @@ class CreatePitchArt extends React.Component<
     ReactDOM.unmountComponentAtNode(modal);
   }
 
+
+  
+
   render() {
     const { isLoading } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
     const callbacks = {listenForData:this.listenForData.bind(this)};
+    
     return (
       <div>
         <Header />
@@ -602,17 +615,24 @@ class CreatePitchArt extends React.Component<
             handleFiles={this.fileSelected}
           >
             <button className="UploadFile waves-effect waves-light btn globalbtn">
-              <i className="material-icons right">cloud_upload</i>
+            <i className="material-icons left">info</i>
+            <i className="material-icons right">cloud_upload</i>
               Upload File to cloud
             </button>
+            <p className="upload-tooltiptext"> to upload file from your laptop to MeTILDA</p>   
 
           </ReactFileReader>
           <div className="pitchArt-version">
+
             <button className="versions waves-effect waves-light btn globalbtn"
             onClick={this.loadPitchArtVersions}>
+          
+              <i className="material-icons left">info</i>
               <i className="material-icons right">history</i>
+
               Versions
-            </button>
+               </button>
+            <p className="version-tooltiptext"> to view different versions created in this session</p>   
           </div>
           <div className="version-overlay"></div>
           <div>
