@@ -738,6 +738,55 @@ def getOrCreateWords():
 
         return jsonify({"isSuccessful": True, 'word': word_id, 'creator': body["creator"], 'numSyllables': len(body["letters"])})
 
+
+@app.route('/api/words/byId', methods=["GET"])
+def getWordById():
+    req_method = flask.request.method
+
+    upload_id = request.args.get('pitchart')
+
+    with Postgres() as connection:
+
+        word_retrieval_query = """ SELECT * FROM word"""
+
+        word_retrieval_query += " WHERE id = %s"
+        query_results = connection.execute_select_query(word_retrieval_query, (str(upload_id),))
+
+        response = {"isSuccessful": True, "data": []}
+
+        for res in query_results:
+            letters_retrieval_query = """ SELECT * FROM letter WHERE word_id = %s ORDER BY order_index"""
+            letters = []
+            letters_query_results = connection.execute_select_query(letters_retrieval_query, (str(res[0]),))
+
+            for row in letters_query_results:
+                letters.append(
+                    {
+                        "syllable": row[1],
+                        "t0": row[3],
+                        "t1": row[4],
+                        "pitch": row[5],
+                        "isManualPitch": row[6],
+                        "isWordSep": row[7]
+                    }
+                )
+
+            response["data"].append(
+                {
+                    "uploadId": res[0],
+                    "creator": res[1],
+                    "numSyllables": res[2],
+                    "accentIndex": res[3],
+                    "minPitch": res[4],
+                    "maxPitch": res[5],
+                    "imagePath": res[6],
+                    "letters": letters
+                }
+            )
+
+    return jsonify(response)
+
+
 #PELDA 
 @app.route('/draw-sound/<string:upload_id>.png/image', methods=["GET"])
 def drawSound(upload_id):
