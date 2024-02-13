@@ -112,15 +112,23 @@ def student_answer_quiz_question():
         result = connection.execute_select_query(query, args)[0]
         if datetime.strptime(result[0][5:-4],'%d %b %Y %H:%M:%S') < datetime.utcnow():
             return jsonify({}) 
+        
+        query = 'select max_trials from quiz_questions where id=%s'
+        args = (request.form['question'],)
+        max_trials=connection.execute_select_query(query, args)
 
-        query = 'select * from quiz_answers where question=%s and student=%s'
+        query = 'select trial from quiz_answers where question=%s and student=%s'
         args = (request.form['question'],request.form['user'])
         result=connection.execute_select_query(query, args)
+
+        if max_trials and result:
+            if max_trials[0][0]<=result[0][0]:
+                return jsonify({})
 
         if request.form['answer']=='speech':
             if result:
                 query = 'update quiz_answers set time=%s,grade=%s,trial=%s where question=%s and student=%s'
-                args = (request.form['time'],0.0,request.form['trial'],request.form['question'],request.form['user'])
+                args = (request.form['time'],0.0,result[0][0]+1,request.form['question'],request.form['user'])
                 connection.execute_update_query(query, args)
             else:
                 query = 'insert into quiz_answers(quiz,question,student,answer,time,grade,max_grade,trial) values(%s,%s,%s,%s,%s,%s,%s,%s)'

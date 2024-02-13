@@ -193,7 +193,6 @@ function QuizQuestion() {
         formData.append('max_grade', maxGrade.toString());
         formData.append('answer', 'speech');
         formData.append('time', new Date().toUTCString());
-        formData.append('trial',trial.toString())
         try {
             await fetch('/student-view/quiz/question/answer', {
                 method: "POST",

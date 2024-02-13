@@ -48,7 +48,7 @@ function Quiz() {
     const [choiceD, setChoiceD] = useState('')
     const [solution, setSolution] = useState('')
     const [questionMaxGrade, setQuestionMaxGrade] = useState(0.0)
-    const [type, setType] = useState('')
+    const [type, setType] = useState('text')
     const [maxTrials, setMaxTrials] = useState(1)
     const [uploadFiles, setUploadFiles] = useState();
     const [fileName, setfileName] = useState('')

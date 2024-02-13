@@ -75,7 +75,7 @@ export default function BlockCollectionView({
         {/* <ul> */}
           {filteredWords.map((word: {}) => (
             <div key={word["id"]}>
-              <div className="word-card">
+              <div className="lesson-word-card">
                 <label htmlFor={word["id"]}>
                   <BlockWordCard
                       word={word}

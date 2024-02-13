@@ -1,6 +1,7 @@
 from flask import request, jsonify
 from metilda import app
 from uuid import uuid4
+from datetime import datetime,timezone
 
 import sys
 import os
@@ -105,7 +106,7 @@ def student_create_submission():
     with Postgres() as connection:
         id=str(uuid4())
         query = 'insert into assignment_submissions(id,assignment,user_id,time,content,grade,max_grade) values(%s,%s,%s,%s,%s,%s,%s)'
-        args = (id,request.form['assignment'],request.form['user'],request.form['time'],
+        args = (id,request.form['assignment'],request.form['user'],datetime.now(timezone.utc),
                 request.form['content'],-1.0,request.form['max_grade'])
         connection.execute_insert_query(query, args, False)
 
@@ -115,7 +116,7 @@ def student_create_submission():
 def student_update_submission():
     with Postgres() as connection:
         query = 'update assignment_submissions set content=%s,time=%s,grade=%s,comment=%s where user_id=%s and assignment=%s'
-        args = (request.form['content'],request.form['time'],-1.0,'',request.form['user'],request.form['assignment'])
+        args = (request.form['content'],datetime.now(timezone.utc),-1.0,'',request.form['user'],request.form['assignment'])
         connection.execute_update_query(query, args)
 
     return jsonify({})

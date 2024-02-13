@@ -28,9 +28,9 @@ def student_grades():
             res['assignments']=[]
 
         query = 'select tb1.quiz,tb1.name,sum(tb1.grade),tb1.max_grade,weight,tb1.deadline from \
-                    (select quiz,name,grade,quiz.max_grade,weight,deadline from quiz join quiz_answers on quiz.id=quiz_answers.quiz where student=%s) as tb1 \
+                    (select quiz,name,grade,quiz.max_grade,weight,deadline from quiz join quiz_answers on quiz.id=quiz_answers.quiz where student=%s and course=%s) as tb1 \
                     group by tb1.quiz,tb1.name,tb1.max_grade,weight,tb1.deadline'
-        args = (request.form['user'],)
+        args = (request.form['user'],request.form['course'])
         result = connection.execute_select_query(query, args)
         if result:
             for i in range(len(result)):

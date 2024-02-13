@@ -159,9 +159,9 @@ export function UpdateAssignment() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <form onSubmit={onSubmit}>
+                    <div className="info-list">
                         {loaded ?
-                        <div className="info-list">
+                            <form onSubmit={onSubmit}>
                             <div><b>Title:</b> <input value={title} className="new-title" onChange={(e)=>setTitle(e.target.value)} required maxLength={30}></input></div>
                             <Editor
                                 initialContentState={content}
@@ -198,9 +198,10 @@ export function UpdateAssignment() {
                             <div><b>Max Grades:</b> <input type="number" value={maxGrade} style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e) => setMaxGrade(+e.target.value)} required max={1000000} min={0.01} step={0.01}></input></div>
                             <div><b>Weight:</b> <input type="number" value={weight} style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e)=>setWeight(+e.target.value)} required max={1} min={0} step={0.0001}></input></div>
                             <div><button type="submit" className='btn waves-light globalbtn'>Update</button></div>
-                        </div>
+                        </form>
                         : null}
-                    </form>
+                
+                    </div>
                 </div>
             </div>
         </div>

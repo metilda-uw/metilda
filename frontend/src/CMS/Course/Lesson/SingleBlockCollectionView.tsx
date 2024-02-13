@@ -24,7 +24,7 @@ export default function SingleBlockCollectionView({
         {/* <ul> */}
           {filteredWords.map((word: {}) => (
             <div key={word["id"]} style={{ 'margin': 'auto' }}>
-              <div className="word-card">
+              <div className="lesson-word-card">
                 <Link
                   to={`/pitchartwizard/${selectedCollectionUuid}/${word["id"]}`}
                   key={word["id"]}

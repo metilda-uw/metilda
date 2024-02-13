@@ -118,7 +118,6 @@ export function StudentAssignment() {
         formData.append('content', JSON.stringify(subContent))
         formData.append('assignment', assignmentId)
         formData.append('max_grade', maxGrade.toString())
-        formData.append('time', new Date().toUTCString())
         if (prevTime) {
             try {
                 await fetch('/student-view/assignment/submission/update', {
