@@ -663,7 +663,7 @@ export function Lesson() {
                                                         <Draggable isDragDisabled={status !== 'edit'} key={block.id} draggableId={block.id} index={index}>
                                                             {(provided) => (
                                                                 <div className="lesson-block" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                                    <div style={{ 'textAlign': 'center' }}><img src={fileSrcDict[block.id]} alt="Loading"></img></div>
+                                                                    <div style={{ 'textAlign': 'center' }}><img src={fileSrcDict[block.id]} alt="Loading" className="responsive"></img></div>
                                                                     {status === 'edit' || status === 'edit-block' ?
                                                                         <div>
                                                                             <button key={block.id} name={block.id} className='btn waves-light globalbtn' disabled={status === 'edit-block'} onClick={(e) => onDeleteFile(index, e)}>Delete</button>
