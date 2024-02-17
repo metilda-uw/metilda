@@ -11,8 +11,6 @@ interface HeaderProps {
 interface State {
   anchorEl: any;
   isAdmin: boolean;
-  isModerator: boolean;
-  isUser: boolean;
 }
 class Header extends Component<HeaderProps, State> {
   constructor(props: HeaderProps) {
@@ -21,8 +19,6 @@ class Header extends Component<HeaderProps, State> {
     this.state = {
       anchorEl: null,
       isAdmin: false,
-      isModerator: false,
-      isUser: false
     };
   }
 
@@ -44,47 +40,6 @@ class Header extends Component<HeaderProps, State> {
         isAdmin: true,
       });
     }
-
-    
-    const response_moderator = await fetch(
-      `/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Teacher",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body_moderator = await response_moderator.json();
-    if (body_moderator.result != null && body_moderator.result.length > 0) {
-      this.setState({
-        isModerator: true,
-      });
-    }
-
-    const response_user = await fetch(
-      `/api/get-user-roles/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Student",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body_user = await response_user.json();
-    if (body_user.result != null && body_user.result[0][0]==='Student') {
-      this.setState({
-        isUser: true,
-      });
-    }
-
-    let node = document.getElementById('course-system-link')
-    if(node)
-      node.style.setProperty('pointer-events', 'unset')
   }
 
   handleClick = (event: any) => {
@@ -178,13 +133,7 @@ class Header extends Component<HeaderProps, State> {
                 <Link to="/manage-users">Manage Users</Link>
               </li>
             )}
-            <li className="nav-menu-item">
-              <Link id={'course-system-link'} to={
-                this.state.isUser ? "/student-view" :
-                  this.state.isModerator ? "/content-management" :''
-              } style={{ 'pointerEvents': 'none' }}>Courses System</Link>
-            </li>
-            <li className="nav-menu-item">
+             <li className="nav-menu-item">
               <Link to="/documentation">Documentation</Link>
             </li>
           </ul>

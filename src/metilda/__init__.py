@@ -29,18 +29,6 @@ app.json_encoder = CustomJSONEncoder
 
 import metilda.controllers.pitch_art_wizard
 import metilda.controllers.controller_firestore
-import metilda.controllers.ContentManagerController
-import metilda.controllers.StudentViewController
-import metilda.controllers.FileUtils
-import metilda.controllers.teacher.AssignmentController
-import metilda.controllers.teacher.GradesController
-import metilda.controllers.teacher.LessonsController
-import metilda.controllers.teacher.QuizController
-import metilda.controllers.student.StudentAssignmentController
-import metilda.controllers.student.StudentGradesController
-import metilda.controllers.student.StudentLessonsController
-import metilda.controllers.student.StudentQuizController
-import metilda.controllers.AuthUtils
 
 @app.route('/')
 @app.route('/<path:path>')
