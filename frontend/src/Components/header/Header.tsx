@@ -4,6 +4,9 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withAuthorization } from "../../Session";
 import Submenu from "./DropdownComponent";
+import SendMessagePopUp from "../../Notifications/SendMessagePopUp";
+import ReactDOM from 'react-dom';
+import {getUsers} from '../../Notifications/NotificationsUtils';
 
 interface HeaderProps {
   firebase: any;
@@ -64,6 +67,25 @@ class Header extends Component<HeaderProps, State> {
   onChange = (event: any) => {
     // location.href = event.value;
   };
+
+  renderSendMessageOverlay = async () =>{
+    console.log("Inside send msg overlay");
+
+    const users = await getUsers() as any;
+    console.log("users data in ", users);
+    const usersData = users.map((user) =>{ return {value:user.id , label: user.name}});
+
+    const appSelector = document.querySelector('.App');
+    const sendMessagePopUp = <SendMessagePopUp usersData = {usersData} firebase={this.props.firebase}></SendMessagePopUp>;
+
+    // Render the React component inside the modal
+    const container = document.createElement('div');
+    appSelector.appendChild(container);
+    
+    // Render the SendMessagePopUp component into the container element
+    ReactDOM.render(sendMessagePopUp, container);
+    
+  }
 
   render() {
     return (
@@ -134,7 +156,22 @@ class Header extends Component<HeaderProps, State> {
               </li>
             )}
             <li className="nav-menu-item right">
-                <Link to="/notifications">Notifications</Link>
+                {/* <Link to="/notifications">Notifications</Link> */}
+                <a>Notifications</a>
+                <Submenu
+                  navLinks={[
+                    {
+                      name: "Messages",
+                      link: "/notifications",
+                    },
+                    {
+                      name: "Send Message",
+                      isALink:false,
+                      isAButton:true,
+                      method:this.renderSendMessageOverlay
+                    }
+                  ]}
+                />
               </li>
              <li className="nav-menu-item">
               <Link to="/documentation">Documentation</Link>

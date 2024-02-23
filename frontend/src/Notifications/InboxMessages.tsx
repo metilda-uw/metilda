@@ -16,6 +16,7 @@ import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import * as constants from "../constants";
 
 const styles = (theme: Theme) =>
         createStyles({
@@ -62,6 +63,7 @@ const InboxMessages = () =>{
     const [selectedMessagesIds, setselectedMessagesIds] = useState([]);
     const [isShowMessageModalopen, setIsShowMessageModalopen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(-1);
+    const [paginationIndexes, setPaginationIndexes] = useState({low:0,high:constants.MAXIMUM_MESSAGES_PER_PAGE});
   
 
     const onToggleSelect = (id) => {
@@ -201,14 +203,34 @@ const InboxMessages = () =>{
   
       };
   
-      const openDisplayMessageModal = (index) => {
-        setSelectedRow(index);
-        setIsShowMessageModalopen(true);
-      }
-  
-      const closeDisplayMessageModal = () =>{
-        setIsShowMessageModalopen(false);
-      }
+    const openDisplayMessageModal = (index) => {
+    setSelectedRow(index);
+    setIsShowMessageModalopen(true);
+    }
+
+    const closeDisplayMessageModal = () =>{
+    setIsShowMessageModalopen(false);
+    }
+
+    const onPaginationPrevClick = () => {
+
+        const messagesAllowed = constants.MAXIMUM_MESSAGES_PER_PAGE;
+        const highIndex = paginationIndexes.low;
+        const lowIndex = paginationIndexes.low-messagesAllowed < 0 ? 0 : paginationIndexes.low-messagesAllowed;
+
+        setPaginationIndexes({low:lowIndex, high:highIndex});
+
+    }
+
+    const onPaginationNextClick = () => {
+        const messagesAllowed = constants.MAXIMUM_MESSAGES_PER_PAGE;
+        const lowIndex = paginationIndexes.high;
+        const highIndex = paginationIndexes.high+messagesAllowed > MessagesReceived.length ? MessagesReceived.length : paginationIndexes.high+messagesAllowed;
+
+        setPaginationIndexes({low:lowIndex, high:highIndex});
+
+    }
+
   
     return (
         <div className="inbox-content">
@@ -228,7 +250,7 @@ const InboxMessages = () =>{
                         </tr>
                     </thead>
                     <tbody>
-                        {MessagesReceived && MessagesReceived.map((msg, index) => (
+                        {MessagesReceived && MessagesReceived.filter((msg, index) => index >= paginationIndexes.low && index < paginationIndexes.high).map((msg, index) => (
                             <React.Fragment key={msg.id}>
                                { msg.Message != undefined && 
                                     <tr >
@@ -249,9 +271,13 @@ const InboxMessages = () =>{
                                 }
                             </React.Fragment>
                         ))}
+                        
                     </tbody>
                     
                 </table>
+
+                <button className="prev waves-effect waves-light btn globalbtn left" disabled= {paginationIndexes.low == 0} onClick={onPaginationPrevClick}>Prev</button>
+                <button className="next waves-effect waves-light btn globalbtn right" disabled = {paginationIndexes.high == MessagesReceived.length} onClick={onPaginationNextClick}>Next</button>
             </>}
             
         </div>

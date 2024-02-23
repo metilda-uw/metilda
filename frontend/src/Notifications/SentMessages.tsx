@@ -17,7 +17,9 @@ import FirebaseContext from "../Firebase/context";
 import './SentMessages.scss';
 import { NotificationManager } from "react-notifications";
 import Select from 'react-select'
-import {getUsers} from './NotificationsUtils';
+import CreatableSelect from 'react-select/creatable';
+import {getUsers, saveMessagesToDatabase} from './NotificationsUtils';
+import * as constants from "../constants";
 
 
 
@@ -64,16 +66,20 @@ const SentMessagesComponent = () =>{
     const firebase = useContext(FirebaseContext);
     const timestamp = firebase.timestamp;
     const [users, setUsers] = useState([]);
-    const [isSendMeassageModalOpen, setSendMeassageModalOpen] = useState(false);
+    const [isSendMessageModalOpen, setSendMessageModalOpen] = useState(false);
     const [areMessagesLoaded, setAreMessagesLoaded] =useState(false);
     const [message, setMessage] = useState("");
     const [selectedUser, setSelectedUser] = useState("");
+    const [selectedUsers, setSelectedUsers] = useState([]);
     const [messagesSent , setMessagesSent] = useState([]);
+    const [maxRecieversAlert, displayMaxRecieversAlert] = useState(false);
     
     const [isShowMessageModalopen, setIsShowMessageModalopen] = useState(false);
     const [isAttachLinkModalOpen, setIsAttachLinkModalOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(-1);
     const [selectedMessagesIds, setselectedMessagesIds] = useState([]);
+
+    const [isSendMailModalopen, setSendMailModalopen] = useState(false);
  
    
  
@@ -116,20 +122,6 @@ const SentMessagesComponent = () =>{
         }
     };
     },[])
-
-    
-
-    const sendMessage = async () =>{
-      setSendMeassageModalOpen(true);
-      if(users.length == 0){
-        const users = await getUsers() as any;
-        console.log("users data in ", users);
-        const userData = users.map((user) =>{ return {value:user.id , label: user.name}})
-        setUsers(userData);
-      }
-
-      
-    };
 
     const getMessages = async () =>{
       try {
@@ -199,80 +191,219 @@ const SentMessagesComponent = () =>{
       }
     }
 
-    
+    const openSendMessageModal = async () =>{
+      setSendMessageModalOpen(true);
+      if(users.length == 0){
+        const users = await getUsers() as any;
+        console.log("users data in ", users);
+        const userData = users.map((user) =>{ return {value:user.id , label: user.name}})
+        setUsers(userData);
+      }
+      
+    };
 
-    const closeSendMessageModal = () =>{
-        setSendMeassageModalOpen(false);
+    const openSendEmailModal = async() =>{
+      setSendMailModalopen(true);
+      if(users.length == 0){
+        const users = await getUsers() as any;
+        console.log("users data in ", users);
+        const userData = users.map((user) =>{ return {value:user.id, label: user.name}})
+        setUsers(userData);
+      }
+
     }
 
-    const onSendMesageClick = async () =>{
-        console.log("message :: " + message);
+    const closeSendMessageModal = () =>{
+      setMessage("");
+      setSelectedUsers([] as any);
+      setSendMessageModalOpen(false);
+    }
 
-        setSendMeassageModalOpen(false);
+    const closeSendEmailModal = () =>{
+      setMessage("");
+      setSelectedUsers([] as any);
+      setSendMailModalopen(false);
+    }
 
-        if(!message || !selectedUser){
+    const onSendEmailClick = async() =>{
 
-          return;
-        }
-        
+      console.log(users.filter((user) => user.value == firebase.auth.currentUser.email));
 
-        const recipientDoc = await firebase.firestore.collection('Messages').doc(selectedUser).get();
+      if(!message || selectedUsers.length == 0){
+        return;
+      }
+      if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+        displayMaxRecieversAlert(true);
+        return;
+      }
 
-        if (!recipientDoc.exists) {
-          // If the recipient user does not exist, create a new user with "sent" and "received" collections
-          await firebase.firestore.collection('Messages').doc(selectedUser).set({
-          });
-        }
-        let newMsg = message;
-        
-        // Store the message in the "sent" collection of the sender
-        await firebase.firestore.collection('Messages').doc(selectedUser).collection('Received').add({
-          Message: newMsg,
-          timestamp: timestamp.fromDate(new Date()),
-          From: firebase.auth.currentUser.email,
-          isRead:false
-        });
+      closeSendEmailModal();
 
-        const sentDoc = await firebase.firestore.collection('Messages').doc(firebase.auth.currentUser.email).get();
+      // const receiver= "metilda.uw@gmail.com"
+      const receivers = selectedUsers.map((user) => user.value);
+      const currentUser = users.find((user) => user.value == firebase.auth.currentUser.email);
 
-        if (!sentDoc.exists) {
-          // If the recipient user does not exist, create a new user with "sent" and "received" collections
-          await firebase.firestore.collection('Messages').doc(firebase.auth.currentUser.email).set({
-          });
+      const name = currentUser != undefined ? currentUser.label : 'MeTILDA User';
+      const subject = "Message from "+ name + " : DO NOT REPLY"
 
-        }
+      const formData = new FormData();
+      formData.append("receivers", receivers.join(','));
+      formData.append("message", message);
+      formData.append("subject", subject);
 
-        await firebase.firestore.collection('Messages').doc(firebase.auth.currentUser.email).collection('Sent').add({
-          Message: newMsg,
-          timestamp: timestamp.fromDate(new Date()),
-          to: selectedUser
-        });
-        
-        const newMessages = [{
-          Message: newMsg,
-          timestamp: timestamp.fromDate(new Date()),
-          to: selectedUser
-        }, ...messagesSent];
-        
+      const response = await fetch(`/api/send-email`, {
+        method: "POST",
+        headers: {
+            Accept: "application/json"
+        },
+        body: formData
+      });
+      const body = await response.json();
+      console.log("response from email", body);
+      if(body && body.isMessageSent){
+        console.log("email sent");
+        // await saveMessagesToDatabase();
+
+        const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
+        const messages =   await saveMessagesToDatabase(data);
+        const newMessages = [...messages, ...messagesSent];
+
         const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
         setMessagesSent(sortedMessagesSent);
 
-
         setMessage("");
-        setSelectedUser("");
+        setSelectedUsers([] as any);
 
         NotificationManager.success(
           "Message sent successfully"
-      );
+        );
 
-        console.log('Message sent successfully!');
+      }else{
+        console.log("error occured");
+      }
+
     }
+
+    const onSendMessageClick = async()=>{
+
+        if(!message || selectedUsers.length == 0){
+          return;
+        }
+        if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+          displayMaxRecieversAlert(true);
+          return;
+        }
+        setSendMessageModalOpen(false);
+
+        
+        try{
+        const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
+        const messages =   await saveMessagesToDatabase(data);
+        const newMessages = [...messages, ...messagesSent];
+
+        const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
+        setMessagesSent(sortedMessagesSent);
+
+        setMessage("");
+        setSelectedUsers([] as any);
+
+          NotificationManager.success(
+            "Message sent successfully"
+          );
+        }catch(e){
+          NotificationManager.error('Messages sending failed');
+        }
+    }
+
+    // const saveMessagesToDatabase = async()=>{
+    //   // Create a batch
+    //   try{
+    //     const batch = firebase.firestore.batch();
+    //     let newMessages = messagesSent;
+
+    //     for (const user of selectedUsers) {
+    //       if (user && typeof user === 'object' && user !== null) {
+              
+    //           const userEmail = user && (user as any).value;
+
+    //           let newMsg = message;
+
+    //           // Store the message in the "sent" collection of the sender
+    //           const receivedRef = firebase.firestore.collection('Messages').doc(userEmail).collection('Received').doc();
+    //           batch.set(receivedRef, {
+    //             Message: newMsg,
+    //             timestamp: timestamp.fromDate(new Date()),
+    //             From: firebase.auth.currentUser.email,
+    //             isRead: false
+    //           });
+
+    //           const sentCollectionRef = firebase.firestore.collection('Messages').doc(firebase.auth.currentUser.email).collection('Sent');
+
+    //           // Create a new document reference within the batch
+    //           const newDocRef = sentCollectionRef.doc();
+
+    //           // console.log("newDocRef :::", newDocRef);
+
+    //           // Add set operation to the batch for the current selected user
+    //           batch.set(newDocRef, {
+    //             Message: newMsg,
+    //             timestamp: timestamp.fromDate(new Date()),
+    //             to: userEmail 
+    //           });
+
+    //           newMessages = [{
+    //             Message: newMsg,
+    //             id: newDocRef.id,
+    //             timestamp: timestamp.fromDate(new Date()),
+    //             to: userEmail
+    //           }, ...newMessages]
+    //       }
+          
+    //     }
+    //     // Commit the batch
+    //     await batch.commit();
+
+    //     const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
+    //     setMessagesSent(sortedMessagesSent);
+
+    //     setMessage("");
+    //     setSelectedUsers([] as any);
+
+
+    //   }catch(e){
+    //     NotificationManager.error('Messages sending failed');
+    //   }
+    // }
+
+
+
+    
+
     const handleMessageChange = (event) => {
         setMessage(event.target.innerHTML);
     };
 
     const handleUserChange = (event) =>{
-        setSelectedUser(event.value);
+      console.log("event",event);
+
+      if(event == null) {
+        setSelectedUsers([]);
+        return;
+    }
+
+    setSelectedUsers(event);
+
+      if(event.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+        displayMaxRecieversAlert(true);
+      }else{
+        displayMaxRecieversAlert(false);
+      }
+    }
+
+    const handleOptionCreation = (event) => {
+      console.log(event);
+      const newOption = {value : event , label:event}
+      setSelectedUsers([...selectedUsers, newOption]);
     }
 
 
@@ -287,7 +418,7 @@ const SentMessagesComponent = () =>{
       }
       
       let newMsg = message;
-      newMsg += '&nbsp <a href="' + link + '" target="_blank">' + linkText + '</a>';
+      newMsg += ' <a href="' + link + '" target="_blank">' + linkText + '</a>';
       setMessage(newMsg);
       closeAttachLinkModal();
     }
@@ -348,28 +479,40 @@ const SentMessagesComponent = () =>{
           <Dialog
             fullWidth={true}
             maxWidth="sm"
-            open={isSendMeassageModalOpen}
-            onClose={closeSendMessageModal}
+            open={isSendMessageModalOpen || isSendMailModalopen}
+            onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
             aria-labelledby="form-dialog-title"
             className="send-msg-modal"
           >
             <DialogTitle
               id="alert-dialog-title"
-              onClose={closeSendMessageModal}
+              onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
             >
-              <p className="dialog-title">Send Message</p>
+              <p className="dialog-title">{isSendMessageModalOpen ? "Send Message" :"Send Email"}</p>
             </DialogTitle>
             <DialogContent>
+                {maxRecieversAlert && <p> The maximum number of recipients allowed is {constants.MAXIMUN_RECIPIENTS_ALLOWED}.</p>}
                 <div className="send-msg-modal-content">
                   {users.length == 0 ? <p> Loading</p>:
                   <>
                     <div className="users-dropdown">
                       <label htmlFor="user-list" className="select-label">Select User:</label>
-                      
-                      <Select className="users-list"
-                        value={users.find((user) => user.value === selectedUser)}
-                        onChange={handleUserChange}
-                       options={users} isSearchable/>
+                      {isSendMessageModalOpen ? 
+                          <Select className="users-list"
+                          // value={users.find((user) => user.value === selectedUser)}
+                          onChange={handleUserChange}
+                          options={users} isSearchable
+                          isMulti={true}/>
+                          :
+                            <CreatableSelect className="users-list"
+                            isClearable
+                            onChange={handleUserChange}
+                            onCreateOption={handleOptionCreation}
+                            options={users}
+                            isMulti={true}
+                            value={selectedUsers}
+                          />
+                      }
 
                     </div>
                     
@@ -388,12 +531,21 @@ const SentMessagesComponent = () =>{
                 
             </DialogContent>
             <DialogActions>
-              <button
-                className="sendMsg waves-effect waves-light btn globalbtn"
-                onClick={onSendMesageClick}
-              >
-                Send
-              </button>
+              {isSendMessageModalOpen ? 
+                <button
+                  className="sendMsg waves-effect waves-light btn globalbtn"
+                  onClick={onSendMessageClick}
+                >
+                  Send Message
+                </button>
+                :
+                <button
+                  className="sendMsg waves-effect waves-light btn globalbtn"
+                  onClick={onSendEmailClick}
+                >
+                  Send Email
+                </button>
+              }
             </DialogActions>
           </Dialog>
         );
@@ -448,7 +600,8 @@ const SentMessagesComponent = () =>{
               <>
                 <div>
                   <button key="delete-msg" className="delete-msgs waves-effect waves-light btn globalbtn left" onClick={onDeleteMessages}>Delete Messages</button>
-                  <button className="send-msg waves-effect waves-light btn globalbtn right" onClick={sendMessage}>Send Message</button>
+                  <button className="send-msg waves-effect waves-light btn globalbtn right" onClick={openSendMessageModal}>Send Message</button>
+                  <button className="send-email waves-effect waves-light btn globalbtn right" onClick={openSendEmailModal}> Send Email</button>
                 </div>
                 <div className="inbox-content">
                   <table>

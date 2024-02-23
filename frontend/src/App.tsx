@@ -117,7 +117,7 @@ const App = () => (
         path="/learn/words/syllables/:numSyllables"
         component={WordSyllableReview}
       />
-      <Route path="/notifications" component={NotificationsComponent}/>
+      <Route path={ROUTES.NOTIFICATIONS} component={NotificationsComponent}/>
     </div>
   </Router>
 );

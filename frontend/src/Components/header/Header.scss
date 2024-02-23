@@ -97,6 +97,17 @@ $submenu-width: 180px;
   text-transform: none;
   position: absolute;
   background-color: #e96d71;
+  
+  .nav-submenu-button{
+    background-color: #e96d71;
+    padding: 15px;
+    border: 0px;
+    text-align: left;
+    &:hover {
+      background: rgba(#000, 0.1);
+      //display: block;
+    }
+  }
 }
 
 .nav-submenu-item {
@@ -104,4 +115,5 @@ $submenu-width: 180px;
     background: rgba(#000, 0.1);
     //display: block;
   }
+
 }

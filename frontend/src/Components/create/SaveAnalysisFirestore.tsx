@@ -273,8 +273,10 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
   const handleUpdateToCollections = async (event: any) => {
     event.preventDefault();
     setUpdateModalIsOpenToFalse();
+
+    // get current collectionID and current document(pictart) id.
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
-    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
+    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: currentDocumentData.id;
    
     const copyOfData = JSON.parse(JSON.stringify(data)); // deep copy
     const workingData = {
@@ -324,9 +326,9 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     }
     event.preventDefault();
 
-    // instead of params['type'] , use collectionID
+    // get current collectionID and current document(pictart) id.
     const collectionId = params['type'] != null && params['type'] != 'share' ? params['type'] : getCollectionUuidFromName(selectedCollection);
-    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: savedDocId;
+    const docId = params['type'] != null && params['type'] != 'share' ? params['id']: currentDocumentData.id;;
 
     firebase.firestore
       .collection(collectionId)
