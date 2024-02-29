@@ -1,0 +1,24 @@
+\babel@toc {english}{}
+\contentsline {chapter}{\numberline {1}metilda package}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Subpackages}{1}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}metilda.controllers package}{1}{subsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1.1}Submodules}{1}{subsubsection.1.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1.2}metilda.controllers.Postgres module}{1}{subsubsection.1.1.1.2}%
+\contentsline {subsubsection}{\numberline {1.1.1.3}metilda.controllers.controller\_firestore module}{1}{subsubsection.1.1.1.3}%
+\contentsline {subsubsection}{\numberline {1.1.1.4}metilda.controllers.pitch\_art\_wizard module}{1}{subsubsection.1.1.1.4}%
+\contentsline {subsubsection}{\numberline {1.1.1.5}metilda.controllers.tempCodeRunnerFile module}{58}{subsubsection.1.1.1.5}%
+\contentsline {subsubsection}{\numberline {1.1.1.6}Module contents}{58}{subsubsection.1.1.1.6}%
+\contentsline {subsection}{\numberline {1.1.2}metilda.services package}{58}{subsection.1.1.2}%
+\contentsline {subsubsection}{\numberline {1.1.2.1}Submodules}{58}{subsubsection.1.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.1.2.2}metilda.services.audio\_analysis module}{58}{subsubsection.1.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.1.2.3}metilda.services.file\_io module}{59}{subsubsection.1.1.2.3}%
+\contentsline {subsubsection}{\numberline {1.1.2.4}metilda.services.praat module}{59}{subsubsection.1.1.2.4}%
+\contentsline {subsubsection}{\numberline {1.1.2.5}metilda.services.utils module}{59}{subsubsection.1.1.2.5}%
+\contentsline {subsubsection}{\numberline {1.1.2.6}Module contents}{59}{subsubsection.1.1.2.6}%
+\contentsline {section}{\numberline {1.2}Submodules}{59}{section.1.2}%
+\contentsline {section}{\numberline {1.3}metilda.debug module}{59}{section.1.3}%
+\contentsline {section}{\numberline {1.4}metilda.default module}{59}{section.1.4}%
+\contentsline {section}{\numberline {1.5}metilda.local\_server module}{59}{section.1.5}%
+\contentsline {section}{\numberline {1.6}metilda.main module}{59}{section.1.6}%
+\contentsline {section}{\numberline {1.7}Module contents}{59}{section.1.7}%
+\contentsline {chapter}{Python Module Index}{61}{section*.145}%

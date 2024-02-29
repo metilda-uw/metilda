@@ -1,0 +1,168 @@
+\indexentry{module@\spxentry{module}!metilda.controllers.Postgres@\spxentry{metilda.controllers.Postgres}|hyperpage}{1}
+\indexentry{metilda.controllers.Postgres@\spxentry{metilda.controllers.Postgres}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{Postgres (class in metilda.controllers.Postgres)@\spxentry{Postgres}\spxextra{class in metilda.controllers.Postgres}|hyperpage}{1}
+\indexentry{execute\_insert\_query() (metilda.controllers.Postgres.Postgres method)@\spxentry{execute\_insert\_query()}\spxextra{metilda.controllers.Postgres.Postgres method}|hyperpage}{1}
+\indexentry{execute\_select\_query() (metilda.controllers.Postgres.Postgres method)@\spxentry{execute\_select\_query()}\spxextra{metilda.controllers.Postgres.Postgres method}|hyperpage}{1}
+\indexentry{execute\_update\_query() (metilda.controllers.Postgres.Postgres method)@\spxentry{execute\_update\_query()}\spxextra{metilda.controllers.Postgres.Postgres method}|hyperpage}{1}
+\indexentry{module@\spxentry{module}!metilda.controllers.controller\_firestore@\spxentry{metilda.controllers.controller\_firestore}|hyperpage}{1}
+\indexentry{metilda.controllers.controller\_firestore@\spxentry{metilda.controllers.controller\_firestore}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{getOrCreate\_Collections() (in module metilda.controllers.controller\_firestore)@\spxentry{getOrCreate\_Collections()}\spxextra{in module metilda.controllers.controller\_firestore}|hyperpage}{1}
+\indexentry{module@\spxentry{module}!metilda.controllers.pitch\_art\_wizard@\spxentry{metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{metilda.controllers.pitch\_art\_wizard@\spxentry{metilda.controllers.pitch\_art\_wizard}!module@\spxentry{module}|hyperpage}{1}
+\indexentry{add\_new\_user\_from\_admin() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{add\_new\_user\_from\_admin()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{all\_audio\_pitches() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{all\_audio\_pitches()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{all\_upload\_pitches() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{all\_upload\_pitches()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{allowed\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{allowed\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{annotationTimeSelection() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{annotationTimeSelection()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{api() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{api()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{audio() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{audio()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{audio\_analysis\_image() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{audio\_analysis\_image()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{1}
+\indexentry{authorize\_user() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{authorize\_user()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{2}
+\indexentry{available\_files() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{available\_files()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{2}
+\indexentry{avg\_pitch() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{avg\_pitch()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{2}
+\indexentry{beta() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{beta()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{2}
+\indexentry{binomial() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{binomial()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{2}
+\indexentry{chisquare() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{chisquare()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{4}
+\indexentry{choice() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{choice()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{5}
+\indexentry{countVoicedFrames() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{countVoicedFrames()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_analysis() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_analysis()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_db\_user() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_db\_user()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_eaf() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_eaf()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_folder() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_folder()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_image() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_image()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_user\_research\_language() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_user\_research\_language()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{create\_user\_research\_role() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{create\_user\_research\_role()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{delete\_eaf\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_eaf\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{6}
+\indexentry{delete\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_folder() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_folder()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_image() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_image()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_previous\_user\_research\_language() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_previous\_user\_research\_language()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_previous\_user\_roles() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_previous\_user\_roles()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_recording() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_recording()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_shared\_user() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_shared\_user()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{delete\_user() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{delete\_user()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{dirichlet() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{dirichlet()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{7}
+\indexentry{download\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{download\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{8}
+\indexentry{drawSound() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{drawSound()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{8}
+\indexentry{drawSoundWithTime() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{drawSoundWithTime()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{8}
+\indexentry{exponential() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{exponential()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{8}
+\indexentry{f() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{f()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{9}
+\indexentry{formantCountAtFrame() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{formantCountAtFrame()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{10}
+\indexentry{formantFrameCount() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{formantFrameCount()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{10}
+\indexentry{formantValueAtTime() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{formantValueAtTime()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{10}
+\indexentry{gamma() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{gamma()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{10}
+\indexentry{geometric() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{geometric()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{11}
+\indexentry{getBounds() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{getBounds()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{12}
+\indexentry{getEnergy() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{getEnergy()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{12}
+\indexentry{getOrCreateWords() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{getOrCreateWords()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{12}
+\indexentry{get\_admin() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_admin()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{12}
+\indexentry{get\_all\_images() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_all\_images()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{12}
+\indexentry{get\_analyses\_for\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_analyses\_for\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_analyses\_for\_image() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_analyses\_for\_image()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_analysis\_file\_path() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_analysis\_file\_path()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_eaf\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_eaf\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_eaf\_file\_path() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_eaf\_file\_path()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_eafs\_for\_files() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_eafs\_for\_files()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_files\_and\_folders() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_files\_and\_folders()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_image\_for\_analysis() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_image\_for\_analysis()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_shared\_users() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_shared\_users()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_state() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_state()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{13}
+\indexentry{get\_student\_recordings() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_student\_recordings()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{14}
+\indexentry{get\_user\_research\_language() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_user\_research\_language()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{14}
+\indexentry{get\_user\_roles() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_user\_roles()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{14}
+\indexentry{get\_users() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{get\_users()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{14}
+\indexentry{gumbel() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{gumbel()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{14}
+\indexentry{harmonicityGetMax() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{harmonicityGetMax()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{16}
+\indexentry{harmonicityGetMin() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{harmonicityGetMin()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{16}
+\indexentry{harmonicityValueAtTime() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{harmonicityValueAtTime()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{16}
+\indexentry{hypergeometric() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{hypergeometric()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{16}
+\indexentry{insert\_image\_analysis\_ids() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{insert\_image\_analysis\_ids()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{17}
+\indexentry{intensityBounds() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{intensityBounds()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{17}
+\indexentry{laplace() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{laplace()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{17}
+\indexentry{logistic() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{logistic()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{18}
+\indexentry{lognormal() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{lognormal()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{20}
+\indexentry{logseries() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{logseries()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{22}
+\indexentry{modifyPitchOrImageDetails() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{modifyPitchOrImageDetails()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{23}
+\indexentry{move\_to\_folder() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{move\_to\_folder()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{23}
+\indexentry{multinomial() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{multinomial()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{23}
+\indexentry{multivariate\_normal() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{multivariate\_normal()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{24}
+\indexentry{negative\_binomial() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{negative\_binomial()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{26}
+\indexentry{noncentral\_chisquare() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{noncentral\_chisquare()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{27}
+\indexentry{noncentral\_f() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{noncentral\_f()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{28}
+\indexentry{normal() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{normal()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{30}
+\indexentry{pareto() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pareto()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{31}
+\indexentry{permutation() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{permutation()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{33}
+\indexentry{pitchValueAtTime() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pitchValueAtTime()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{pitchValueInFrame() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pitchValueInFrame()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{pointProcessGetJitter() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pointProcessGetJitter()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{pointProcessGetNumPeriods() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pointProcessGetNumPeriods()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{pointProcessGetNumPoints() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{pointProcessGetNumPoints()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{poisson() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{poisson()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{34}
+\indexentry{power() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{power()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{35}
+\indexentry{rand() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{rand()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{36}
+\indexentry{randint() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{randint()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{37}
+\indexentry{randn() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{randn()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{38}
+\indexentry{random() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{random()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{40}
+\indexentry{random\_integers() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{random\_integers()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{40}
+\indexentry{random\_sample() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{random\_sample()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{41}
+\indexentry{rayleigh() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{rayleigh()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{42}
+\indexentry{set\_state() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{set\_state()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{43}
+\indexentry{share\_file() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{share\_file()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{44}
+\indexentry{shuffle() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{shuffle()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{44}
+\indexentry{sound\_length() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{sound\_length()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{44}
+\indexentry{spectrumFrequencyBounds() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{spectrumFrequencyBounds()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{45}
+\indexentry{standard\_cauchy() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{standard\_cauchy()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{45}
+\indexentry{standard\_exponential() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{standard\_exponential()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{46}
+\indexentry{standard\_gamma() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{standard\_gamma()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{46}
+\indexentry{standard\_normal() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{standard\_normal()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{47}
+\indexentry{standard\_t() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{standard\_t()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{48}
+\indexentry{triangular() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{triangular()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{50}
+\indexentry{uniform() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{uniform()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{51}
+\indexentry{update\_analysis() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{update\_analysis()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{53}
+\indexentry{update\_db\_user() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{update\_db\_user()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{53}
+\indexentry{update\_user\_from\_admin() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{update\_user\_from\_admin()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{53}
+\indexentry{vonmises() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{vonmises()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{53}
+\indexentry{wald() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{wald()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{54}
+\indexentry{weibull() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{weibull()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{55}
+\indexentry{zipf() (in module metilda.controllers.pitch\_art\_wizard)@\spxentry{zipf()}\spxextra{in module metilda.controllers.pitch\_art\_wizard}|hyperpage}{56}
+\indexentry{module@\spxentry{module}!metilda.controllers@\spxentry{metilda.controllers}|hyperpage}{58}
+\indexentry{metilda.controllers@\spxentry{metilda.controllers}!module@\spxentry{module}|hyperpage}{58}
+\indexentry{module@\spxentry{module}!metilda.services.audio\_analysis@\spxentry{metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{metilda.services.audio\_analysis@\spxentry{metilda.services.audio\_analysis}!module@\spxentry{module}|hyperpage}{58}
+\indexentry{audio\_analysis\_image() (in module metilda.services.audio\_analysis)@\spxentry{audio\_analysis\_image()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{draw\_pitch() (in module metilda.services.audio\_analysis)@\spxentry{draw\_pitch()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{draw\_spectrogram() (in module metilda.services.audio\_analysis)@\spxentry{draw\_spectrogram()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{get\_all\_pitches() (in module metilda.services.audio\_analysis)@\spxentry{get\_all\_pitches()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{get\_audio() (in module metilda.services.audio\_analysis)@\spxentry{get\_audio()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{get\_avg\_pitch() (in module metilda.services.audio\_analysis)@\spxentry{get\_avg\_pitch()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{get\_pitches\_in\_range() (in module metilda.services.audio\_analysis)@\spxentry{get\_pitches\_in\_range()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{get\_sound\_length() (in module metilda.services.audio\_analysis)@\spxentry{get\_sound\_length()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{test() (in module metilda.services.audio\_analysis)@\spxentry{test()}\spxextra{in module metilda.services.audio\_analysis}|hyperpage}{58}
+\indexentry{module@\spxentry{module}!metilda.services.file\_io@\spxentry{metilda.services.file\_io}|hyperpage}{59}
+\indexentry{metilda.services.file\_io@\spxentry{metilda.services.file\_io}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{available\_files() (in module metilda.services.file\_io)@\spxentry{available\_files()}\spxextra{in module metilda.services.file\_io}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.services.praat@\spxentry{metilda.services.praat}|hyperpage}{59}
+\indexentry{metilda.services.praat@\spxentry{metilda.services.praat}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{runScript() (in module metilda.services.praat)@\spxentry{runScript()}\spxextra{in module metilda.services.praat}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.services.utils@\spxentry{metilda.services.utils}|hyperpage}{59}
+\indexentry{metilda.services.utils@\spxentry{metilda.services.utils}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{deleteCachedImages() (in module metilda.services.utils)@\spxentry{deleteCachedImages()}\spxextra{in module metilda.services.utils}|hyperpage}{59}
+\indexentry{fileType() (in module metilda.services.utils)@\spxentry{fileType()}\spxextra{in module metilda.services.utils}|hyperpage}{59}
+\indexentry{isSound() (in module metilda.services.utils)@\spxentry{isSound()}\spxextra{in module metilda.services.utils}|hyperpage}{59}
+\indexentry{resizeImage() (in module metilda.services.utils)@\spxentry{resizeImage()}\spxextra{in module metilda.services.utils}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.services@\spxentry{metilda.services}|hyperpage}{59}
+\indexentry{metilda.services@\spxentry{metilda.services}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.debug@\spxentry{metilda.debug}|hyperpage}{59}
+\indexentry{metilda.debug@\spxentry{metilda.debug}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.default@\spxentry{metilda.default}|hyperpage}{59}
+\indexentry{metilda.default@\spxentry{metilda.default}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda.main@\spxentry{metilda.main}|hyperpage}{59}
+\indexentry{metilda.main@\spxentry{metilda.main}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{module@\spxentry{module}!metilda@\spxentry{metilda}|hyperpage}{59}
+\indexentry{metilda@\spxentry{metilda}!module@\spxentry{module}|hyperpage}{59}
+\indexentry{CustomJSONEncoder (class in metilda)@\spxentry{CustomJSONEncoder}\spxextra{class in metilda}|hyperpage}{59}
+\indexentry{default() (metilda.CustomJSONEncoder method)@\spxentry{default()}\spxextra{metilda.CustomJSONEncoder method}|hyperpage}{59}
+\indexentry{get\_app() (in module metilda)@\spxentry{get\_app()}\spxextra{in module metilda}|hyperpage}{59}
+\indexentry{react\_app() (in module metilda)@\spxentry{react\_app()}\spxextra{in module metilda}|hyperpage}{59}

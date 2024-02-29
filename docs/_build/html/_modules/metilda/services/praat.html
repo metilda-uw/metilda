@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metilda.services.praat &mdash; MeTILDA 1.0.0v documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js?v=838d9f6d"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            MeTILDA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../metilda.controllers.html">metilda.controllers package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../metilda.services.html">metilda.services package</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">MeTILDA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+          <li class="breadcrumb-item"><a href="../../metilda.html">metilda</a></li>
+      <li class="breadcrumb-item active">metilda.services.praat</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for metilda.services.praat</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">metilda</span> <span class="kn">import</span> <span class="n">app</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="c1">#from flask import Flask</span>
+<span class="c1">#from flask_cors import CORS</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">os</span> <span class="kn">import</span> <span class="n">environ</span>
+
+<span class="c1"># Locations of required files - path needs to change based on whether you are working locally or deploying to Heroku</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;**** FLASK_ENV Variable ****** &quot;</span><span class="p">,</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;FLASK_ENV&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;development&quot;</span><span class="p">:</span>
+   <span class="c1">#relative to metilda</span>
+   <span class="n">_images_dir</span> <span class="o">=</span> <span class="s2">&quot;images/&quot;</span>
+   <span class="c1">#relative to src</span>
+   <span class="n">_scripts_dir</span> <span class="o">=</span> <span class="s2">&quot;metilda/scripts/&quot;</span>
+   <span class="n">_sounds_dir</span> <span class="o">=</span> <span class="s2">&quot;sounds/&quot;</span>
+   <span class="n">_eaf_dir</span> <span class="o">=</span> <span class="s2">&quot;metilda/eaf/&quot;</span>
+   <span class="n">_linkElanPraat_dir</span> <span class="o">=</span> <span class="s2">&quot;combined/&quot;</span>   
+<span class="k">else</span><span class="p">:</span>
+   <span class="n">_images_dir</span> <span class="o">=</span> <span class="s2">&quot;images/&quot;</span>
+   <span class="n">_scripts_dir</span> <span class="o">=</span> <span class="s2">&quot;src/metilda/scripts/&quot;</span>
+   <span class="n">_sounds_dir</span> <span class="o">=</span> <span class="s2">&quot;sounds/&quot;</span>
+   <span class="n">_eaf_dir</span> <span class="o">=</span> <span class="s2">&quot;src/metilda/eaf/&quot;</span>
+   <span class="n">_linkElanPraat_dir</span> <span class="o">=</span> <span class="s2">&quot;combined/&quot;</span>
+
+<span class="c1"># Run script &#39;scriptName&#39; with the provided parameters</span>
+<div class="viewcode-block" id="runScript"><a class="viewcode-back" href="../../../metilda.services.html#metilda.services.praat.runScript">[docs]</a><span class="k">def</span> <span class="nf">runScript</span><span class="p">(</span><span class="n">scriptName</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Praat - Execute Script: &quot;</span> <span class="o">+</span> <span class="n">scriptName</span><span class="p">)</span>
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;With args: &quot;</span><span class="p">)</span>
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   
+   <span class="n">praatExec</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;praat_nogui&quot;</span><span class="p">,</span> <span class="s2">&quot;--run&quot;</span><span class="p">,</span> <span class="s2">&quot;--no-pref-files&quot;</span><span class="p">,</span> <span class="n">scriptName</span><span class="p">];</span>
+   <span class="n">praatExec</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="n">praatExec</span><span class="p">);</span>
+   
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Praat - Executed Script: &quot;</span> <span class="o">+</span> <span class="n">scriptName</span><span class="p">)</span>
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;With output: &quot;</span><span class="p">)</span>
+   <span class="n">app</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+   <span class="k">return</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span></div>
+
+<span class="c1"># Create flask app</span>
+<span class="c1">#app = Flask(__name__, static_url_path=&quot;&quot;)</span>
+
+<span class="c1"># Add CORS headers to allow cross-origin requests</span>
+<span class="c1">#CORS(app)</span>
+
+<span class="c1">#Import views</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Dr Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
