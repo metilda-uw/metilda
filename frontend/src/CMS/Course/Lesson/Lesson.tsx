@@ -280,6 +280,8 @@ export function Lesson() {
     }
 
     async function onCreateFile(fileType) {
+        if (!uploadFiles)
+            return
         let blockId=''
         let formData = new FormData();
         formData.append('user', user.email);
