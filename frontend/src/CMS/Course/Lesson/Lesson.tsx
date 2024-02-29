@@ -385,6 +385,8 @@ export function Lesson() {
 
 
     async function onUpdateFile(index, e) {
+        if (!uploadFiles)
+            return
         let blockId = e.target.name
         let response = await fetch(
             `/cms/lesson/block/file/read/${courseId}/lesson-block/${blockId}`,
