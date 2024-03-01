@@ -164,21 +164,73 @@
   right: 40px;
 }
 
+.upload-tooltiptext {
+  display: none;
+  position: absolute;
+  top: 8%;
+  right: 9%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1; }
+
+ .UploadFile:hover + .upload-tooltiptext {
+   display: block;
+   background-color: #f0f0f0;
+  color: red; }
+
 .page-options {
   position: fixed;
   right: 40px;
-  min-width: 200px;
+  min-width: 235px;
   margin-top: 100px;
   //padding: 20px;
 }
 
+.page-options-tooltiptext {
+  display: none;
+  position: absolute;
+  top: 8%;
+  right: 9%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1; }
+
+ .page-options:hover + .page-options-tooltiptext {
+   display: block;
+   background-color: #f0f0f0;
+  color: red; }
 .versions {
   position: fixed;
   right: 40px;
-  min-width: 200px;
+  min-width: 235px;
   margin-top: 50px;
+  
 }
 
+.version-tooltiptext {
+  display: none;
+  position: absolute;
+  top: 8%;
+  right: 9%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1; }
+
+ .versions:hover + .version-tooltiptext {
+   display: block;
+   background-color: #f0f0f0;
+  color: red; }
+
+  
 .StopShare {
   position: fixed;
   right: 40px;

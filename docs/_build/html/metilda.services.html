@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>metilda.services package &mdash; MeTILDA 1.0.0v documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="_static/jquery.js?v=5d32c60e"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=838d9f6d"></script>
+        <script src="_static/doctools.js?v=888ff710"></script>
+        <script src="_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="metilda.controllers package" href="metilda.controllers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            MeTILDA
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="metilda.controllers.html">metilda.controllers package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">metilda.services package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metilda.services.audio_analysis">metilda.services.audio_analysis module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.audio_analysis_image"><code class="docutils literal notranslate"><span class="pre">audio_analysis_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.draw_pitch"><code class="docutils literal notranslate"><span class="pre">draw_pitch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.draw_spectrogram"><code class="docutils literal notranslate"><span class="pre">draw_spectrogram()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.get_all_pitches"><code class="docutils literal notranslate"><span class="pre">get_all_pitches()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.get_audio"><code class="docutils literal notranslate"><span class="pre">get_audio()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.get_avg_pitch"><code class="docutils literal notranslate"><span class="pre">get_avg_pitch()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.get_pitches_in_range"><code class="docutils literal notranslate"><span class="pre">get_pitches_in_range()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.get_sound_length"><code class="docutils literal notranslate"><span class="pre">get_sound_length()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.audio_analysis.test"><code class="docutils literal notranslate"><span class="pre">test()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metilda.services.file_io">metilda.services.file_io module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.file_io.available_files"><code class="docutils literal notranslate"><span class="pre">available_files()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metilda.services.praat">metilda.services.praat module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.praat.runScript"><code class="docutils literal notranslate"><span class="pre">runScript()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metilda.services.utils">metilda.services.utils module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.utils.deleteCachedImages"><code class="docutils literal notranslate"><span class="pre">deleteCachedImages()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.utils.fileType"><code class="docutils literal notranslate"><span class="pre">fileType()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.utils.isSound"><code class="docutils literal notranslate"><span class="pre">isSound()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#metilda.services.utils.resizeImage"><code class="docutils literal notranslate"><span class="pre">resizeImage()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-metilda.services">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">MeTILDA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">metilda.services package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/metilda.services.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="metilda-services-package">
+<h1>metilda.services package<a class="headerlink" href="#metilda-services-package" title="Permalink to this heading"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading"></a></h2>
+</section>
+<section id="module-metilda.services.audio_analysis">
+<span id="metilda-services-audio-analysis-module"></span><h2>metilda.services.audio_analysis module<a class="headerlink" href="#module-metilda.services.audio_analysis" title="Permalink to this heading"></a></h2>
+<p>Contains utilities for audio analysis. Some of the visualization functions are
+based on examples from the parselmouth-praat library:
+<a class="reference external" href="https://github.com/YannickJadoul/Parselmouth">https://github.com/YannickJadoul/Parselmouth</a></p>
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.audio_analysis_image">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">audio_analysis_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#audio_analysis_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.audio_analysis_image" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.draw_pitch">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">draw_pitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pitch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pitch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#draw_pitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.draw_pitch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.draw_spectrogram">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">draw_spectrogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrogram</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dynamic_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">70</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#draw_spectrogram"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.draw_spectrogram" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.get_all_pitches">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">get_all_pitches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#get_all_pitches"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.get_all_pitches" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.get_audio">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">get_audio</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#get_audio"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.get_audio" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.get_avg_pitch">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">get_avg_pitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">time_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pitch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#get_avg_pitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.get_avg_pitch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.get_pitches_in_range">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">get_pitches_in_range</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tmin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">snd_pitch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#get_pitches_in_range"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.get_pitches_in_range" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.get_sound_length">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">get_sound_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#get_sound_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.get_sound_length" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.audio_analysis.test">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.audio_analysis.</span></span><span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">upload_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/audio_analysis.html#test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.audio_analysis.test" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-metilda.services.file_io">
+<span id="metilda-services-file-io-module"></span><h2>metilda.services.file_io module<a class="headerlink" href="#module-metilda.services.file_io" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.file_io.available_files">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.file_io.</span></span><span class="sig-name descname"><span class="pre">available_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dir</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/file_io.html#available_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.file_io.available_files" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-metilda.services.praat">
+<span id="metilda-services-praat-module"></span><h2>metilda.services.praat module<a class="headerlink" href="#module-metilda.services.praat" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.praat.runScript">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.praat.</span></span><span class="sig-name descname"><span class="pre">runScript</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scriptName</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/praat.html#runScript"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.praat.runScript" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-metilda.services.utils">
+<span id="metilda-services-utils-module"></span><h2>metilda.services.utils module<a class="headerlink" href="#module-metilda.services.utils" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.utils.deleteCachedImages">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.utils.</span></span><span class="sig-name descname"><span class="pre">deleteCachedImages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prefix</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/utils.html#deleteCachedImages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.utils.deleteCachedImages" title="Permalink to this definition"></a></dt>
+<dd><p>Delete cached images starting with prefix</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.utils.fileType">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.utils.</span></span><span class="sig-name descname"><span class="pre">fileType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/utils.html#fileType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.utils.fileType" title="Permalink to this definition"></a></dt>
+<dd><p>Return file extension</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.utils.isSound">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.utils.</span></span><span class="sig-name descname"><span class="pre">isSound</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fileName</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/utils.html#isSound"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.utils.isSound" title="Permalink to this definition"></a></dt>
+<dd><p>Checks if fileName has a valid sound file extension</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="metilda.services.utils.resizeImage">
+<span class="sig-prename descclassname"><span class="pre">metilda.services.utils.</span></span><span class="sig-name descname"><span class="pre">resizeImage</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/metilda/services/utils.html#resizeImage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#metilda.services.utils.resizeImage" title="Permalink to this definition"></a></dt>
+<dd><p>Down-scaling the image to 500x500 pixels</p>
+</dd></dl>
+
+</section>
+<section id="module-metilda.services">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-metilda.services" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="metilda.controllers.html" class="btn btn-neutral float-left" title="metilda.controllers package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Dr Chen.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
