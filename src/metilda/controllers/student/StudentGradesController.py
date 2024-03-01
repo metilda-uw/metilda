@@ -137,7 +137,7 @@ def student_grades_stats():
 
         for i in range(len(result)):
             if datetime.strptime(result[i][3][5:-4],'%d %b %Y %H:%M:%S') > datetime.utcnow():
-                result[i]=(result[i][0],0,-1.0,result[i][2],result[i][3],)
+                result[i]=(result[i][0],0,result[i][2],result[i][3],)
 
         sums={}
         graded={}
