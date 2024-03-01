@@ -43,7 +43,7 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
   };
 
   renderWatermarkOption2 = (width, height, xStart, yStart) => {
-    let date = moment().format("DD.MM.YYYY");
+    let date = moment().format("MM DD YYYY");
     console.log(date);
     const text = "Made with MeTILDA " + date; 
     console.log(text);
@@ -74,7 +74,7 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
     // }
     console.log("width is "+ width, "height is " + height, "xstart is "+ xStart, "ytart is " + yStart);
     return (
-      <Layer offsetX={-380} offsetY={-440}>
+      <Layer offsetX={-340} offsetY={-425}>
         <Text
           
             x ={xStart}
