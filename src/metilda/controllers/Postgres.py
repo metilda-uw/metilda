@@ -6,10 +6,12 @@ import psycopg2.extras
 import os
 
 class Postgres(object):
+    """ Class that contains the details of Postgres database """ 
     def __init__(self):
         self.connection = None
         self.cursor = None
     
+    """ ___enter__ method  """
     def __enter__(self):
         app = metilda.get_app()
         DATABASE_URL = os.environ['DATABASE_URL']
