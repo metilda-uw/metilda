@@ -24,7 +24,9 @@ export type UPDATE_MULTIPLE_FIELDS = typeof UPDATE_MULTIPLE_FIELDS;
 
 export const MAXIMUM_PITCH_ART_VERSIONS_ALLOWED = 3;
 export const MAXIMUN_RECIPIENTS_ALLOWED = 3;
-export const MAXIMUM_MESSAGES_PER_PAGE = 1;
+export const MAXIMUM_MESSAGES_PER_PAGE = 5;
+export const SEND_MSG_TOOLTIP_CONTENT="This tab lets users send messages to other users within the MeTILDA application using its built-in communication system.";
+export const SEND_EMAIL_TOOLTIP_CONTENT="This tab enables users to send emails. If the recipient is not a user of MeTILDA, users can enter their email address to send messages."
 
 
 export const SET_WORD = "SET_WORD";

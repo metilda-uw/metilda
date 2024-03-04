@@ -22,11 +22,13 @@
         }
         
         .tab-button.active {
-            background-color: #ccc;
+            background-color: #ee6e73;
+            border: 2px solid #555252;
+            border-radius: 3px;
         }
         
         .tab-content {
-            // padding: 20px;
+            padding: 20px;
             border: 1px solid #ccc;
         }
         .users-dropdown{
@@ -63,6 +65,17 @@
             margin-top: 10px;
             max-width: fit-content;
         }
+    }
+
+}
+
+.MuiTooltip-popper{
+    .tooltip-content{
+        font-size:14px;
+        color:#fff;
+        text-align:left;
+        font-family:Arial;
+        line-height:16px;
     }
 
 }

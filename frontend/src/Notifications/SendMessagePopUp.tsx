@@ -15,9 +15,11 @@ import MuiDialogTitle from "@material-ui/core/DialogTitle";
 import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
+import InfoIcon from '@material-ui/icons/InfoRounded';
 import * as constants from "../constants";
-import Select from 'react-select'
+import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
+import Tooltip from '@material-ui/core/Tooltip';
 import './SendMessagePopUp.scss';
 import {saveMessagesToDatabase} from './NotificationsUtils';
 
@@ -72,6 +74,8 @@ const SendMessagePopUp = (props) => {
     const users = props && props.usersData;
     const firebase = props.firebase;
     const timestamp = firebase.timestamp;
+
+    let tooltipContent = activeTab == 0 ? constants.SEND_MSG_TOOLTIP_CONTENT : constants.SEND_EMAIL_TOOLTIP_CONTENT;
 
     const attachLinkModal = () =>{
         return (
@@ -203,7 +207,9 @@ const SendMessagePopUp = (props) => {
     const handleTabChange = (index) => {
         setMessage("");
         setSelectedUsers([] as any);
+        tooltipContent = index == 0 ? constants.SEND_MSG_TOOLTIP_CONTENT : constants.SEND_EMAIL_TOOLTIP_CONTENT;
         setActiveTab(index);
+
     };
 
     const handleUserChange = (event) =>{
@@ -269,6 +275,14 @@ const SendMessagePopUp = (props) => {
             <DialogContent>
                 
                 {maxRecieversAlert && <p> The maximum number of recipients allowed is {constants.MAXIMUN_RECIPIENTS_ALLOWED}.</p>}
+                <div className="Info-tooltip-container">
+                  <Tooltip className="Info-tooltip right" title={<p className="tooltip-content">{tooltipContent}</p>}
+                    placement="top" arrow>
+                    <IconButton>
+                      <InfoIcon />
+                    </IconButton>
+                  </Tooltip>
+                </div>
                 <div className="send-msg-modal-content">
                     <div className="tab-container">
                         {tabs.map((tab, index) => (
@@ -304,9 +318,10 @@ const SendMessagePopUp = (props) => {
                         onBlur={handleMessageChange}
                         />
                         
-                        <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
+                        
                     </div>   
                   }
+                  <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
                 </div>
             </DialogContent>
             <DialogActions>

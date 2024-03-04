@@ -7,14 +7,22 @@ import Submenu from "./DropdownComponent";
 import SendMessagePopUp from "../../Notifications/SendMessagePopUp";
 import ReactDOM from 'react-dom';
 import {getUsers} from '../../Notifications/NotificationsUtils';
+// import Badge from '@mui/material-next/Badge';
+import Badge from '@material-ui/core/Badge';
+import MailIcon from '@material-ui/icons/Mail'
+
+
+interface State {
+  anchorEl: any;
+  isAdmin: boolean;
+  numberOfNewMessages: number;
+  isMessagesLoaded:boolean;
+}
 
 interface HeaderProps {
   firebase: any;
 }
-interface State {
-  anchorEl: any;
-  isAdmin: boolean;
-}
+
 class Header extends Component<HeaderProps, State> {
   constructor(props: HeaderProps) {
     super(props);
@@ -22,6 +30,8 @@ class Header extends Component<HeaderProps, State> {
     this.state = {
       anchorEl: null,
       isAdmin: false,
+      numberOfNewMessages:0,
+      isMessagesLoaded: false
     };
   }
 
@@ -38,11 +48,48 @@ class Header extends Component<HeaderProps, State> {
       }
     );
     const body = await response.json();
+    console.log("call wnt");
     if (body.result != null && body.result.length > 0) {
       this.setState({
         isAdmin: true,
       });
     }
+    let noOfUnReadMessages = 0;
+    try {
+        const currentUser = this.props.firebase.auth.currentUser && this.props.firebase.auth.currentUser.email;
+        if(currentUser == null || currentUser == undefined) return;
+      
+        const receivedCollection =  await this.props.firebase.firestore.collection('Messages').doc(currentUser).collection('Received');
+  
+        // Get data from the "sent" subcollection of current user.
+        const unsubscribe = receivedCollection.onSnapshot((snapshot) => {
+            const receivedMessages = snapshot.docs.map((doc) => {
+                const newObj = {...doc.data(), id: doc.id};
+                return newObj
+            });
+
+            noOfUnReadMessages = receivedMessages.reduce((unreadMesages, msg) => { 
+              if(!msg.isRead){
+                return unreadMesages + 1;
+              }else{
+                return unreadMesages;
+              }
+            }, 0);
+
+            console.log("noOfUnReadMessages ", noOfUnReadMessages);
+
+            this.setState({
+              numberOfNewMessages : noOfUnReadMessages,
+              isMessagesLoaded:true
+            })
+        });
+        
+        return unsubscribe;
+    }catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+
   }
 
   handleClick = (event: any) => {
@@ -157,7 +204,14 @@ class Header extends Component<HeaderProps, State> {
             )}
             <li className="nav-menu-item right">
                 {/* <Link to="/notifications">Notifications</Link> */}
-                <a>Notifications</a>
+                <a>Notifications {this.state.isMessagesLoaded && 
+                <Badge badgeContent={this.state.numberOfNewMessages}
+                  color="primary"
+                  className="notification-badge">
+                  <MailIcon color="action" />
+                </Badge>
+
+                }</a>
                 <Submenu
                   navLinks={[
                     {

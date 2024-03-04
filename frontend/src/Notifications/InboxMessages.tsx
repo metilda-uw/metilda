@@ -204,12 +204,17 @@ const InboxMessages = () =>{
       };
   
     const openDisplayMessageModal = (index) => {
-    setSelectedRow(index);
-    setIsShowMessageModalopen(true);
+        setSelectedRow(index);
+        setIsShowMessageModalopen(true);
     }
 
-    const closeDisplayMessageModal = () =>{
-    setIsShowMessageModalopen(false);
+    const closeDisplayMessageModal = async() =>{
+        console.log("meessage: ", MessagesReceived[selectedRow]);
+        const id =  MessagesReceived[selectedRow].id;
+        const currentUser = firebase.auth.currentUser && firebase.auth.currentUser.email;
+        const updatedData = {...MessagesReceived[selectedRow], isRead:true};
+        setIsShowMessageModalopen(false);
+        await firebase.firestore.collection('Messages').doc(currentUser).collection('Received').doc(id).update(updatedData)
     }
 
     const onPaginationPrevClick = () => {
@@ -229,6 +234,18 @@ const InboxMessages = () =>{
 
         setPaginationIndexes({low:lowIndex, high:highIndex});
 
+    }
+    const parseAndSplitHTML = (htmlContent) => {  
+        const parser = new DOMParser();
+        const parsedDocument = parser.parseFromString(htmlContent, 'text/html');
+        const textContent = parsedDocument.body.textContent || '';
+        const words = textContent.trim().split(/\s+/);
+        return words;
+    }
+    
+    const formatMessage = (msg) =>{
+    const words = parseAndSplitHTML(msg);
+    return words.length > 3  ? words.slice(0, 3).join(' ').concat(" ...") : words.join(' ');
     }
 
   
@@ -264,8 +281,9 @@ const InboxMessages = () =>{
                                         </td>
                                         <td>{msg.timestamp.toDate().toLocaleDateString()}</td>
                                         <td>{msg.From}</td>
-                                        <td className="message" onClick={() => openDisplayMessageModal(index)}>
-                                            <div dangerouslySetInnerHTML={{ __html: msg.Message }} />
+                                        <td className={!msg.isRead ? "message read" : "message"} onClick={() => openDisplayMessageModal(index)}>
+                                            {/* <div dangerouslySetInnerHTML={{ __html: msg.Message }} /> */}
+                                            <div>{formatMessage(msg.Message)}</div>
                                         </td>
                                     </tr>
                                 }
@@ -277,7 +295,7 @@ const InboxMessages = () =>{
                 </table>
 
                 <button className="prev waves-effect waves-light btn globalbtn left" disabled= {paginationIndexes.low == 0} onClick={onPaginationPrevClick}>Prev</button>
-                <button className="next waves-effect waves-light btn globalbtn right" disabled = {paginationIndexes.high == MessagesReceived.length} onClick={onPaginationNextClick}>Next</button>
+                <button className="next waves-effect waves-light btn globalbtn right" disabled = {paginationIndexes.high >= MessagesReceived.length} onClick={onPaginationNextClick}>Next</button>
             </>}
             
         </div>

@@ -20,6 +20,8 @@ import Select from 'react-select'
 import CreatableSelect from 'react-select/creatable';
 import {getUsers, saveMessagesToDatabase} from './NotificationsUtils';
 import * as constants from "../constants";
+import SendMessagePopUp from './SendMessagePopUp';
+import ReactDOM from "react-dom";
 
 
 
@@ -78,8 +80,11 @@ const SentMessagesComponent = () =>{
     const [isAttachLinkModalOpen, setIsAttachLinkModalOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState(-1);
     const [selectedMessagesIds, setselectedMessagesIds] = useState([]);
+    const [paginationIndexes, setPaginationIndexes] = useState({low:0,high:constants.MAXIMUM_MESSAGES_PER_PAGE});
 
     const [isSendMailModalopen, setSendMailModalopen] = useState(false);
+
+
  
    
  
@@ -192,128 +197,139 @@ const SentMessagesComponent = () =>{
     }
 
     const openSendMessageModal = async () =>{
-      setSendMessageModalOpen(true);
+      // setSendMessageModalOpen(true);
+      let usersData = users;
       if(users.length == 0){
         const users = await getUsers() as any;
         console.log("users data in ", users);
-        const userData = users.map((user) =>{ return {value:user.id , label: user.name}})
-        setUsers(userData);
+        usersData = users.map((user) =>{ return {value:user.id , label: user.name}})
+        setUsers(usersData);  
       }
+      const sendMessagePopUp = <SendMessagePopUp usersData = {usersData} firebase={firebase}></SendMessagePopUp>;
+      const appSelector = document.querySelector('.App');
+      // Render the React component inside the modal
+      const container = document.createElement('div');
+      appSelector.appendChild(container);
+      
+      // Render the SendMessagePopUp component into the container element
+      ReactDOM.render(sendMessagePopUp, container);
       
     };
 
-    const openSendEmailModal = async() =>{
-      setSendMailModalopen(true);
-      if(users.length == 0){
-        const users = await getUsers() as any;
-        console.log("users data in ", users);
-        const userData = users.map((user) =>{ return {value:user.id, label: user.name}})
-        setUsers(userData);
-      }
+    // const closeSendMessageModal = () =>{
+    //   setMessage("");
+    //   setSelectedUsers([] as any);
+    //   setSendMessageModalOpen(false);
+    // }
 
-    }
+    // const openSendEmailModal = async() =>{
+    //   setSendMailModalopen(true);
+    //   if(users.length == 0){
+    //     const users = await getUsers() as any;
+    //     console.log("users data in ", users);
+    //     const userData = users.map((user) =>{ return {value:user.id, label: user.name}})
+    //     setUsers(userData);
+    //   }
 
-    const closeSendMessageModal = () =>{
-      setMessage("");
-      setSelectedUsers([] as any);
-      setSendMessageModalOpen(false);
-    }
+    // }
 
-    const closeSendEmailModal = () =>{
-      setMessage("");
-      setSelectedUsers([] as any);
-      setSendMailModalopen(false);
-    }
+    
 
-    const onSendEmailClick = async() =>{
+    // const closeSendEmailModal = () =>{
+    //   setMessage("");
+    //   setSelectedUsers([] as any);
+    //   setSendMailModalopen(false);
+    // }
 
-      console.log(users.filter((user) => user.value == firebase.auth.currentUser.email));
+    // const onSendEmailClick = async() =>{
 
-      if(!message || selectedUsers.length == 0){
-        return;
-      }
-      if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
-        displayMaxRecieversAlert(true);
-        return;
-      }
+    //   console.log(users.filter((user) => user.value == firebase.auth.currentUser.email));
 
-      closeSendEmailModal();
+    //   if(!message || selectedUsers.length == 0){
+    //     return;
+    //   }
+    //   if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+    //     displayMaxRecieversAlert(true);
+    //     return;
+    //   }
 
-      // const receiver= "metilda.uw@gmail.com"
-      const receivers = selectedUsers.map((user) => user.value);
-      const currentUser = users.find((user) => user.value == firebase.auth.currentUser.email);
+    //   closeSendEmailModal();
 
-      const name = currentUser != undefined ? currentUser.label : 'MeTILDA User';
-      const subject = "Message from "+ name + " : DO NOT REPLY"
+    //   // const receiver= "metilda.uw@gmail.com"
+    //   const receivers = selectedUsers.map((user) => user.value);
+    //   const currentUser = users.find((user) => user.value == firebase.auth.currentUser.email);
 
-      const formData = new FormData();
-      formData.append("receivers", receivers.join(','));
-      formData.append("message", message);
-      formData.append("subject", subject);
+    //   const name = currentUser != undefined ? currentUser.label : 'MeTILDA User';
+    //   const subject = "Message from "+ name + " : DO NOT REPLY"
 
-      const response = await fetch(`/api/send-email`, {
-        method: "POST",
-        headers: {
-            Accept: "application/json"
-        },
-        body: formData
-      });
-      const body = await response.json();
-      console.log("response from email", body);
-      if(body && body.isMessageSent){
-        console.log("email sent");
-        // await saveMessagesToDatabase();
+    //   const formData = new FormData();
+    //   formData.append("receivers", receivers.join(','));
+    //   formData.append("message", message);
+    //   formData.append("subject", subject);
 
-        const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
-        const messages =   await saveMessagesToDatabase(data);
-        const newMessages = [...messages, ...messagesSent];
+    //   const response = await fetch(`/api/send-email`, {
+    //     method: "POST",
+    //     headers: {
+    //         Accept: "application/json"
+    //     },
+    //     body: formData
+    //   });
+    //   const body = await response.json();
+    //   console.log("response from email", body);
+    //   if(body && body.isMessageSent){
+    //     console.log("email sent");
+    //     // await saveMessagesToDatabase();
 
-        const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
-        setMessagesSent(sortedMessagesSent);
+    //     const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
+    //     const messages =   await saveMessagesToDatabase(data);
+    //     const newMessages = [...messages, ...messagesSent];
 
-        setMessage("");
-        setSelectedUsers([] as any);
+    //     const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
+    //     setMessagesSent(sortedMessagesSent);
 
-        NotificationManager.success(
-          "Message sent successfully"
-        );
+    //     setMessage("");
+    //     setSelectedUsers([] as any);
 
-      }else{
-        console.log("error occured");
-      }
+    //     NotificationManager.success(
+    //       "Message sent successfully"
+    //     );
 
-    }
+    //   }else{
+    //     console.log("error occured");
+    //   }
 
-    const onSendMessageClick = async()=>{
+    // }
 
-        if(!message || selectedUsers.length == 0){
-          return;
-        }
-        if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
-          displayMaxRecieversAlert(true);
-          return;
-        }
-        setSendMessageModalOpen(false);
+    // const onSendMessageClick = async()=>{
+
+    //     if(!message || selectedUsers.length == 0){
+    //       return;
+    //     }
+    //     if(selectedUsers.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+    //       displayMaxRecieversAlert(true);
+    //       return;
+    //     }
+    //     setSendMessageModalOpen(false);
 
         
-        try{
-        const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
-        const messages =   await saveMessagesToDatabase(data);
-        const newMessages = [...messages, ...messagesSent];
+    //     try{
+    //     const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
+    //     const messages =   await saveMessagesToDatabase(data);
+    //     const newMessages = [...messages, ...messagesSent];
 
-        const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
-        setMessagesSent(sortedMessagesSent);
+    //     const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
+    //     setMessagesSent(sortedMessagesSent);
 
-        setMessage("");
-        setSelectedUsers([] as any);
+    //     setMessage("");
+    //     setSelectedUsers([] as any);
 
-          NotificationManager.success(
-            "Message sent successfully"
-          );
-        }catch(e){
-          NotificationManager.error('Messages sending failed');
-        }
-    }
+    //       NotificationManager.success(
+    //         "Message sent successfully"
+    //       );
+    //     }catch(e){
+    //       NotificationManager.error('Messages sending failed');
+    //     }
+    // }
 
     // const saveMessagesToDatabase = async()=>{
     //   // Create a batch
@@ -379,177 +395,177 @@ const SentMessagesComponent = () =>{
 
     
 
-    const handleMessageChange = (event) => {
-        setMessage(event.target.innerHTML);
-    };
+    // const handleMessageChange = (event) => {
+    //     setMessage(event.target.innerHTML);
+    // };
 
-    const handleUserChange = (event) =>{
-      console.log("event",event);
+    // const handleUserChange = (event) =>{
+    //   console.log("event",event);
 
-      if(event == null) {
-        setSelectedUsers([]);
-        return;
-    }
+    //   if(event == null) {
+    //     setSelectedUsers([]);
+    //     return;
+    // }
 
-    setSelectedUsers(event);
+    // setSelectedUsers(event);
 
-      if(event.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
-        displayMaxRecieversAlert(true);
-      }else{
-        displayMaxRecieversAlert(false);
-      }
-    }
+    //   if(event.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
+    //     displayMaxRecieversAlert(true);
+    //   }else{
+    //     displayMaxRecieversAlert(false);
+    //   }
+    // }
 
-    const handleOptionCreation = (event) => {
-      console.log(event);
-      const newOption = {value : event , label:event}
-      setSelectedUsers([...selectedUsers, newOption]);
-    }
+    // const handleOptionCreation = (event) => {
+    //   console.log(event);
+    //   const newOption = {value : event , label:event}
+    //   setSelectedUsers([...selectedUsers, newOption]);
+    // }
 
 
-    const handleAttachLink = (data) =>{
+    // const handleAttachLink = (data) =>{
 
-      const linkText = data.linkText ? data.linkText : "link";
-      const link = data.link;
+    //   const linkText = data.linkText ? data.linkText : "link";
+    //   const link = data.link;
 
-      if(!link){
-        closeAttachLinkModal();
-        return;
-      }
+    //   if(!link){
+    //     closeAttachLinkModal();
+    //     return;
+    //   }
       
-      let newMsg = message;
-      newMsg += ' <a href="' + link + '" target="_blank">' + linkText + '</a>';
-      setMessage(newMsg);
-      closeAttachLinkModal();
-    }
+    //   let newMsg = message;
+    //   newMsg += ' <a href="' + link + '" target="_blank">' + linkText + '</a>';
+    //   setMessage(newMsg);
+    //   closeAttachLinkModal();
+    // }
 
-    const attachLinkModal = () =>{
-      return (
-        <Dialog
-            fullWidth={true}
-            maxWidth="sm"
-            open={isAttachLinkModalOpen}
-            onClose={closeAttachLinkModal}
-            aria-labelledby="form-dialog-title"
-            className="attach-link-modal"
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              onClose={closeAttachLinkModal}
-            >
-              <p className="dialog-title">Send Message</p>
-            </DialogTitle>
-            <DialogContent className="attach-link-content">
-              <div>
-                <label className="text">Text to Display: </label>
-                <input id="link-text" type="text" defaultValue=""/>
-              </div>
+    // const attachLinkModal = () =>{
+    //   return (
+    //     <Dialog
+    //         fullWidth={true}
+    //         maxWidth="sm"
+    //         open={isAttachLinkModalOpen}
+    //         onClose={closeAttachLinkModal}
+    //         aria-labelledby="form-dialog-title"
+    //         className="attach-link-modal"
+    //       >
+    //         <DialogTitle
+    //           id="alert-dialog-title"
+    //           onClose={closeAttachLinkModal}
+    //         >
+    //           <p className="dialog-title">Send Message</p>
+    //         </DialogTitle>
+    //         <DialogContent className="attach-link-content">
+    //           <div>
+    //             <label className="text">Text to Display: </label>
+    //             <input id="link-text" type="text" defaultValue=""/>
+    //           </div>
 
-              <div>
-                <label className="link">Link: </label>
-                <input id="link" type="text" defaultValue="" />
-              </div>
-            </DialogContent>
-            <DialogActions>
-              <button
-                className="add-link waves-effect waves-light btn globalbtn"
-                onClick={()=>{
-                  const linkText = (document.getElementById('link-text') as HTMLInputElement).value;
-                  const link = (document.getElementById('link') as HTMLInputElement).value;
-                  handleAttachLink({ linkText, link });
-                 }}
-              >
-                Add Link
-              </button>
-            </DialogActions>
-        </Dialog>
-      );
-    }
+    //           <div>
+    //             <label className="link">Link: </label>
+    //             <input id="link" type="text" defaultValue="" />
+    //           </div>
+    //         </DialogContent>
+    //         <DialogActions>
+    //           <button
+    //             className="add-link waves-effect waves-light btn globalbtn"
+    //             onClick={()=>{
+    //               const linkText = (document.getElementById('link-text') as HTMLInputElement).value;
+    //               const link = (document.getElementById('link') as HTMLInputElement).value;
+    //               handleAttachLink({ linkText, link });
+    //              }}
+    //           >
+    //             Add Link
+    //           </button>
+    //         </DialogActions>
+    //     </Dialog>
+    //   );
+    // }
 
-    const showAttachLinkModal = () =>{
-      setIsAttachLinkModalOpen(true);
-    }
+    // const showAttachLinkModal = () =>{
+    //   setIsAttachLinkModalOpen(true);
+    // }
 
-    const closeAttachLinkModal = () =>{
-      setIsAttachLinkModalOpen(false);
-    }
+    // const closeAttachLinkModal = () =>{
+    //   setIsAttachLinkModalOpen(false);
+    // }
 
-    const sendMessageModal = () => {
-        return (
-          <Dialog
-            fullWidth={true}
-            maxWidth="sm"
-            open={isSendMessageModalOpen || isSendMailModalopen}
-            onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
-            aria-labelledby="form-dialog-title"
-            className="send-msg-modal"
-          >
-            <DialogTitle
-              id="alert-dialog-title"
-              onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
-            >
-              <p className="dialog-title">{isSendMessageModalOpen ? "Send Message" :"Send Email"}</p>
-            </DialogTitle>
-            <DialogContent>
-                {maxRecieversAlert && <p> The maximum number of recipients allowed is {constants.MAXIMUN_RECIPIENTS_ALLOWED}.</p>}
-                <div className="send-msg-modal-content">
-                  {users.length == 0 ? <p> Loading</p>:
-                  <>
-                    <div className="users-dropdown">
-                      <label htmlFor="user-list" className="select-label">Select User:</label>
-                      {isSendMessageModalOpen ? 
-                          <Select className="users-list"
-                          // value={users.find((user) => user.value === selectedUser)}
-                          onChange={handleUserChange}
-                          options={users} isSearchable
-                          isMulti={true}/>
-                          :
-                            <CreatableSelect className="users-list"
-                            isClearable
-                            onChange={handleUserChange}
-                            onCreateOption={handleOptionCreation}
-                            options={users}
-                            isMulti={true}
-                            value={selectedUsers}
-                          />
-                      }
+    // const sendMessageModal = () => {
+    //     return (
+    //       <Dialog
+    //         fullWidth={true}
+    //         maxWidth="sm"
+    //         open={isSendMessageModalOpen || isSendMailModalopen}
+    //         onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
+    //         aria-labelledby="form-dialog-title"
+    //         className="send-msg-modal"
+    //       >
+    //         <DialogTitle
+    //           id="alert-dialog-title"
+    //           onClose={isSendMessageModalOpen? closeSendMessageModal : closeSendEmailModal}
+    //         >
+    //           <p className="dialog-title">{isSendMessageModalOpen ? "Send Message" :"Send Email"}</p>
+    //         </DialogTitle>
+    //         <DialogContent>
+    //             {maxRecieversAlert && <p> The maximum number of recipients allowed is {constants.MAXIMUN_RECIPIENTS_ALLOWED}.</p>}
+    //             <div className="send-msg-modal-content">
+    //               {users.length == 0 ? <p> Loading</p>:
+    //               <>
+    //                 <div className="users-dropdown">
+    //                   <label htmlFor="user-list" className="select-label">Select User:</label>
+    //                   {isSendMessageModalOpen ? 
+    //                       <Select className="users-list"
+    //                       // value={users.find((user) => user.value === selectedUser)}
+    //                       onChange={handleUserChange}
+    //                       options={users} isSearchable
+    //                       isMulti={true}/>
+    //                       :
+    //                         <CreatableSelect className="users-list"
+    //                         isClearable
+    //                         onChange={handleUserChange}
+    //                         onCreateOption={handleOptionCreation}
+    //                         options={users}
+    //                         isMulti={true}
+    //                         value={selectedUsers}
+    //                       />
+    //                   }
 
-                    </div>
+    //                 </div>
                     
-                    <div
-                      className="message-content"
-                      contentEditable
-                      dangerouslySetInnerHTML={{ __html: message }}
-                      onBlur={handleMessageChange}
-                    />
+    //                 <div
+    //                   className="message-content"
+    //                   contentEditable
+    //                   dangerouslySetInnerHTML={{ __html: message }}
+    //                   onBlur={handleMessageChange}
+    //                 />
                     
-                    <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
-                  </>   
-                  }
-                </div>
+    //                 <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
+    //               </>   
+    //               }
+    //             </div>
                 
                 
-            </DialogContent>
-            <DialogActions>
-              {isSendMessageModalOpen ? 
-                <button
-                  className="sendMsg waves-effect waves-light btn globalbtn"
-                  onClick={onSendMessageClick}
-                >
-                  Send Message
-                </button>
-                :
-                <button
-                  className="sendMsg waves-effect waves-light btn globalbtn"
-                  onClick={onSendEmailClick}
-                >
-                  Send Email
-                </button>
-              }
-            </DialogActions>
-          </Dialog>
-        );
-    };
+    //         </DialogContent>
+    //         <DialogActions>
+    //           {isSendMessageModalOpen ? 
+    //             <button
+    //               className="sendMsg waves-effect waves-light btn globalbtn"
+    //               onClick={onSendMessageClick}
+    //             >
+    //               Send Message
+    //             </button>
+    //             :
+    //             <button
+    //               className="sendMsg waves-effect waves-light btn globalbtn"
+    //               onClick={onSendEmailClick}
+    //             >
+    //               Send Email
+    //             </button>
+    //           }
+    //         </DialogActions>
+    //       </Dialog>
+    //     );
+    // };
 
     const displayMessageModal = () =>{
       if(selectedRow < 0 || selectedRow >= messagesSent.length) return;
@@ -590,18 +606,51 @@ const SentMessagesComponent = () =>{
       setIsShowMessageModalopen(false);
     }
 
-    return (
+    const onPaginationPrevClick = () => {
+
+      const messagesAllowed = constants.MAXIMUM_MESSAGES_PER_PAGE;
+      const highIndex = paginationIndexes.low;
+      const lowIndex = paginationIndexes.low-messagesAllowed < 0 ? 0 : paginationIndexes.low-messagesAllowed;
+
+      setPaginationIndexes({low:lowIndex, high:highIndex});
+    }
+
+  const onPaginationNextClick = () => {
+      const messagesAllowed = constants.MAXIMUM_MESSAGES_PER_PAGE;
+      const lowIndex = paginationIndexes.high;
+      const highIndex = paginationIndexes.high+messagesAllowed > messagesSent.length ? messagesSent.length : paginationIndexes.high+messagesAllowed;
+
+      // console.log("lowIndex : "+ lowIndex);
+      // console.log("highIndex : "+ highIndex);
+      // console.log("*********************************");
+      setPaginationIndexes({low:lowIndex, high:highIndex});
+
+  }
+
+  const parseAndSplitHTML = (htmlContent) => {  
+    const parser = new DOMParser();
+    const parsedDocument = parser.parseFromString(htmlContent, 'text/html');
+    const textContent = parsedDocument.body.textContent || '';
+    const words = textContent.trim().split(/\s+/);
+    return words;
+  }
+
+  const formatMessage = (msg) =>{
+    const words = parseAndSplitHTML(msg);
+    return words.length > 3  ? words.slice(0, 3).join(' ').concat(" ...") : words.join(' ');
+  }
+  return (
           <div className="sent-content">
-            {sendMessageModal()}
+            {/* {sendMessageModal()} */}
             {displayMessageModal()}
-            {attachLinkModal()}
+            {/* {attachLinkModal()} */}
             <h3>Messages Sent</h3>
             {!areMessagesLoaded ? <h6>Loading</h6> : 
               <>
                 <div>
                   <button key="delete-msg" className="delete-msgs waves-effect waves-light btn globalbtn left" onClick={onDeleteMessages}>Delete Messages</button>
                   <button className="send-msg waves-effect waves-light btn globalbtn right" onClick={openSendMessageModal}>Send Message</button>
-                  <button className="send-email waves-effect waves-light btn globalbtn right" onClick={openSendEmailModal}> Send Email</button>
+                  {/* <button className="send-email waves-effect waves-light btn globalbtn right" onClick={openSendEmailModal}> Send Email</button> */}
                 </div>
                 <div className="inbox-content">
                   <table>
@@ -614,7 +663,7 @@ const SentMessagesComponent = () =>{
                       </tr>
                     </thead>
                     <tbody>
-                      {messagesSent && messagesSent.map((msg, index) => (
+                      {messagesSent && messagesSent.filter((msg, index) => index >= paginationIndexes.low && index < paginationIndexes.high).map((msg, index) => (
                             <React.Fragment key={msg.id}>    
                               { msg.Message != undefined &&  <tr >
                                     <td className="checkbox">
@@ -628,7 +677,8 @@ const SentMessagesComponent = () =>{
                                     <td>{msg.timestamp.toDate().toLocaleDateString()}</td>
                                     <td>{msg.to}</td>
                                     <td className="message" onClick={() => openDisplayMessageModal(index)}>
-                                        <div dangerouslySetInnerHTML={{ __html: msg.Message }} />
+                                        {/* <div dangerouslySetInnerHTML={{ __html: msg.Message }} /> */}
+                                        <div>{formatMessage(msg.Message)}</div>
                                     </td>
                             
                                 </tr>
@@ -637,6 +687,8 @@ const SentMessagesComponent = () =>{
                             ))}
                     </tbody>
                   </table>
+                  <button className="prev waves-effect waves-light btn globalbtn left" disabled= {paginationIndexes.low == 0} onClick={onPaginationPrevClick}>Prev</button>
+                  <button className="next waves-effect waves-light btn globalbtn right" disabled = {paginationIndexes.high >= messagesSent.length} onClick={onPaginationNextClick}>Next</button>
                 </div>
               </>
             }
