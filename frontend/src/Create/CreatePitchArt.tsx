@@ -35,6 +35,9 @@ import {createCommonPitchArtDocument} from '../Create/ImportUtils';
 import {getChildPitchArtVersions} from '../Create/ImportUtils';
 import { CURRENT_PITCHART_DOCUMENT_DATA } from "../constants";
 import { timeStamp } from "console";
+import { AppActions } from "../store/appActions";
+import * as constants from "../constants";
+import {canUserVisitCreatePitchArtpPage} from './ImportUtils';
 
 interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State> {
   speakers: Speaker[];
@@ -54,7 +57,7 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
   currentPitchArtDocumentData:any;
   currentChildPitchArtVersions:any
   listenedDocuments:[];
- // setPitchArtDocId:(Id:string) => void;
+  currentUserRole:string;
   setPitchArtCollectionId:(Id:string) =>void;
   setParentPitchArtDocumentData:(data:any) =>void;
   setCurrentPitchArtDocumentData:(data:any) => void;
@@ -162,8 +165,12 @@ class CreatePitchArt extends React.Component<
       this.getUserFiles();
     }
   }
-
   componentDidUpdate(prevProps) {
+
+    if(this.props.currentUserRole != null && !canUserVisitCreatePitchArtpPage(this.props.currentUserRole)){
+      this.props.history.push('/home');
+      return;
+    }
     // Check for changes in the URL parameters
     const { type: newType, id: newId } = this.props.match.params;
     const { type: prevType, id: prevId } = prevProps.match.params;
@@ -226,7 +233,6 @@ class CreatePitchArt extends React.Component<
         newList = [...this.props.listenedDocuments];
         newList.push({"id":docId,"unsubscribe":unsubscribe});
         this.props.setListenedDocuments(newList);
-        console.log("unsubscribe"+ unsubscribe);
       }
       
   }
@@ -665,11 +671,12 @@ const mapStateToProps = (state: AppState) => ({
   parentPitchArtDocumentData: state.pitchArtDetails.parentPitchArtDocumentData,
   currentPitchArtDocumentData: state.pitchArtDetails.currentPitchArtDocumentData,
   currentChildPitchArtVersions:state.pitchArtDetails.currentPitchArtVersions,
-  listenedDocuments:state.pitchArtDetails.listenedDocuments
+  listenedDocuments:state.pitchArtDetails.listenedDocuments,
+  currentUserRole:state.userDetails.currentUserRole,
 });
 
 const mapDispatchToProps = (
-  dispatch: ThunkDispatch<AppState, void, AudioAction>
+  dispatch: ThunkDispatch<AppState, void, AppActions>
 ) => ({
   setLetterPitch: (
     speakerIndex: number,

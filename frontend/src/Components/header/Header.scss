@@ -81,6 +81,18 @@ $submenu-width: 180px;
   &:hover {
     background-color: rgb(216, 94, 94);
   }
+
+  .Info-tooltip{
+      color: #494848;
+  }
+  .disabled-link{
+    
+    pointer-events: none; /* Prevent clicking */
+    color: #1e1d1d; /* Change the color to indicate it's disabled */
+    text-decoration: none; /* Remove underline */
+    opacity: 0.6; /* Optionally reduce opacity to visually indicate disabled state */
+    
+  }
 }
 
 .nav-menu-item:hover {

@@ -25,6 +25,7 @@ import {
 import { AudioAction } from "../../store/audio/types";
 import { getModifiedFieldsofPitchArt , getUpdatedPitchArtData, getChildPitchArtVersions} from '../../Create/ImportUtils';
 import * as constants from "../../constants";
+import { AppActions } from "../../store/appActions";
 // import { useDispatch } from 'react-redux';
 
 function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,currentCollectionId,parentDocumentData,currentDocumentData,
@@ -62,8 +63,6 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
 
   const [parentDocumentId, setParentDocumentId] = useState("");
 
-  // TODO ::  update correct parent document ID when coming from collections page
-  // TODO ::  if parentDocumentId is undefined or "" , then the current pitch Art is a parent pitch art.
   
 
   const [isDocSaved, setIsDocSaved] = useState(false);
@@ -747,7 +746,7 @@ const mapStateToProps = (state: AppState) => ({
 });
 
 const mapDispatchToProps = (
-  dispatch: ThunkDispatch<AppState, void, AudioAction>
+  dispatch: ThunkDispatch<AppState, void, AppActions>
 ) => ({
   // setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
   setPitchArtCollectionId:(collectionId:string) => dispatch(setPitchArtCollectionId(collectionId)),

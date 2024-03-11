@@ -9,7 +9,15 @@ import ReactDOM from 'react-dom';
 import {getUsers} from '../../Notifications/NotificationsUtils';
 // import Badge from '@mui/material-next/Badge';
 import Badge from '@material-ui/core/Badge';
-import MailIcon from '@material-ui/icons/Mail'
+import MailIcon from '@material-ui/icons/Mail';
+// import { AppState } from "../../store
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "../../store/appActions";
+import { setCurrentUserRole } from "../../store/userDetails/actions";
+import { connect } from "react-redux";
+import { AppState } from "../../store";
+import * as constants from "../../constants";
+import Tooltip from '@material-ui/core/Tooltip';
 
 
 interface State {
@@ -17,10 +25,13 @@ interface State {
   isAdmin: boolean;
   numberOfNewMessages: number;
   isMessagesLoaded:boolean;
+  dispalyCreatePitchArtTab:boolean;
 }
 
 interface HeaderProps {
   firebase: any;
+  currentUserRole:string;
+  setCurrentUserRole:(role:string) =>void;
 }
 
 class Header extends Component<HeaderProps, State> {
@@ -31,8 +42,10 @@ class Header extends Component<HeaderProps, State> {
       anchorEl: null,
       isAdmin: false,
       numberOfNewMessages:0,
-      isMessagesLoaded: false
+      isMessagesLoaded: false,
+      dispalyCreatePitchArtTab:false,
     };
+   // console.log(props.currentUserRole + " user role");
   }
 
   async componentDidMount() {
@@ -48,11 +61,17 @@ class Header extends Component<HeaderProps, State> {
       }
     );
     const body = await response.json();
-    console.log("call wnt");
+    // console.log("call wnt");
     if (body.result != null && body.result.length > 0) {
       this.setState({
         isAdmin: true,
+        dispalyCreatePitchArtTab:true,
       });
+      if(this.props.currentUserRole == null){
+        this.props.setCurrentUserRole(constants.ADMIN_ROLE);
+      }
+    }else{
+      await this.getCurrentUserRole();
     }
     let noOfUnReadMessages = 0;
     try {
@@ -76,8 +95,6 @@ class Header extends Component<HeaderProps, State> {
               }
             }, 0);
 
-            console.log("noOfUnReadMessages ", noOfUnReadMessages);
-
             this.setState({
               numberOfNewMessages : noOfUnReadMessages,
               isMessagesLoaded:true
@@ -90,7 +107,36 @@ class Header extends Component<HeaderProps, State> {
         throw error;
     }
 
-  }
+  };
+
+  getCurrentUserRole = async() =>{
+    let userRole = null;
+    if(this.props.currentUserRole == null){
+      const response = await fetch(`/api/get-user-roles/${this.props.firebase.auth.currentUser.email}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+              "Content-Type": "application/json",
+            },
+          }
+      );
+      const body = await response.json();
+      if(body && body.result && body.result.length > 0 && body.result[0][0]){
+        console.log(body.result[0][0] + " cur user role");
+        userRole = body.result[0][0];
+        this.props.setCurrentUserRole(userRole);
+      }
+    }
+    userRole = this.props.currentUserRole;
+    // console.log("from constants ", constants.ADMIN_ROLE);
+    if(userRole === constants.ADMIN_ROLE || userRole === constants.TEACHER_ROLE || userRole === constants.RESEARCHER_ROLE){
+      this.setState({
+        dispalyCreatePitchArtTab:true
+      })
+    }
+    
+  };
 
   handleClick = (event: any) => {
     this.setState({ anchorEl: event.currentTarget });
@@ -144,9 +190,17 @@ class Header extends Component<HeaderProps, State> {
               <Link to="/home">Home</Link>
             </li>
             <li className="nav-menu-item">
-              <Link to="/pitchartwizard">Create Pitch Art</Link>
+              {/* {this.state.dispalyCreatePitchArtTab ? */}
+                <Link to="/pitchartwizard" className={this.state.dispalyCreatePitchArtTab ? "" : "disabled-link"}>
+                  Create Pitch Art
+                </Link>
+              {/* :
+              <Tooltip className="Info-tooltip right" title={<p className="tooltip-content">{constants.CREATE_PITCH_ART_PAGE_TOOLTIP}</p>}
+                    placement="bottom" arrow>
+                    <span className="name">Create Pitch Art</span>
+                  </Tooltip>
+              } */}
             </li>
-           
             <li className="nav-menu-item">
               <a>Explore</a>
               <Submenu
@@ -236,5 +290,20 @@ class Header extends Component<HeaderProps, State> {
     );
   }
 }
+
+const mapStateToProps = (state: AppState) => ({
+  currentUserRole: state.userDetails.currentUserRole
+  
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<AppState, void, AppActions>
+) => ({
+  setCurrentUserRole:(role:string) => dispatch(setCurrentUserRole(role)),
+ 
+});
 const condition = (authUser: any) => !!authUser;
-export default withAuthorization(condition)(Header as any);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withAuthorization(condition)(Header as any));
