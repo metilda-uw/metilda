@@ -137,7 +137,8 @@ const InboxMessages = () =>{
             return unsubscribe; 
             
           } else {
-            
+            setMessagesReceived([]);
+            setAreMessagesLoaded(true);
             console.log('User not found');
             return null;
           }
@@ -279,8 +280,8 @@ const InboxMessages = () =>{
                                                 checked={isRowSelected(msg.id)}
                                             />
                                         </td>
-                                        <td>{msg.timestamp.toDate().toLocaleDateString()}</td>
-                                        <td>{msg.From}</td>
+                                        <td className={!msg.isRead ? "read" : ""}>{msg.timestamp.toDate().toLocaleDateString()}</td>
+                                        <td className={!msg.isRead ? "read" : ""}>{msg.From}</td>
                                         <td className={!msg.isRead ? "message read" : "message"} onClick={() => openDisplayMessageModal(index)}>
                                             {/* <div dangerouslySetInnerHTML={{ __html: msg.Message }} /> */}
                                             <div>{formatMessage(msg.Message)}</div>

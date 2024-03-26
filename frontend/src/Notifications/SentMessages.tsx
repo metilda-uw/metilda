@@ -160,6 +160,8 @@ const SentMessagesComponent = () =>{
         return unsubscribe;
      
         } else {
+          setMessagesSent([]);
+          setAreMessagesLoaded(true);
           console.log('User not found');
           return null;
         }

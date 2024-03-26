@@ -55,6 +55,13 @@ export const saveMessagesToDatabase = async(data) =>{
 
           let newMsg = message;
 
+          // Create document references if they do not exist
+          const senderDocRef = firebase.firestore.collection('Messages').doc(firebase.auth.currentUser.email);
+          const receiverDocRef = firebase.firestore.collection('Messages').doc(userEmail);
+
+          batch.set(senderDocRef, {}, { merge: true }); // Ensure sender document exists
+          batch.set(receiverDocRef, {}, { merge: true }); // Ensure receiver document exists
+
           // Store the message in the "sent" collection of the sender
           const receivedRef = firebase.firestore.collection('Messages').doc(userEmail).collection('Received').doc();
           batch.set(receivedRef, {
