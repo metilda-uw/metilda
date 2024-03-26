@@ -28,6 +28,7 @@ app.config["CERTIFICATES"] = os.path.join(os.path.dirname(__file__), "certificat
 app.json_encoder = CustomJSONEncoder
 
 import metilda.controllers.pitch_art_wizard
+import metilda.controllers.mail
 import metilda.controllers.controller_firestore
 
 @app.route('/')

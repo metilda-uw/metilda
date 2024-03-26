@@ -1,0 +1,32 @@
+.inbox-content {
+    max-height: calc(100vh - 130px);
+    overflow-y: auto; 
+}
+
+
+.inbox-content{
+    input[type="checkbox"] {
+        position: relative;
+        opacity: 1;
+        display: block;
+        pointer-events: all;
+    
+    }
+
+    .checkbox{
+        width:10%;
+    }
+    .message{
+        cursor: pointer;
+    }
+    .read{
+        font-weight: bold;
+    }
+
+}
+
+.show-message-modal{
+    .dialog-title{
+        text-align: center;
+    }
+}

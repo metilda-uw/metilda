@@ -102,6 +102,6 @@ export type AudioAction =
   | SetActiveLetter
   | ManualPitchAdjust
   | ReplaceSpeakers
-  | setLineAndDotColor
-  | PitchArtDetailsAction;
+  | setLineAndDotColor;
+  // | PitchArtDetailsAction;
 

@@ -8,6 +8,7 @@ import { idText } from "typescript";
 
 import { set } from "react-ga";
 import {getLineColors, getDotColors} from '../Designs/pitchArtDesigns';
+import * as constants from "../constants";
 
 
 export function importSpeakerFile(
@@ -671,4 +672,11 @@ export const chooseColor = (speakers, isLineColor) => {
 
   return color;
 
+}
+
+export const canUserVisitCreatePitchArtpPage = (currentUserRole) => {
+  if(currentUserRole === constants.ADMIN_ROLE || currentUserRole === constants.TEACHER_ROLE || currentUserRole === constants.RESEARCHER_ROLE){
+    return true;
+  }
+  return false;
 }

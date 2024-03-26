@@ -31,13 +31,22 @@ import Converter from "./Converter/Converter";
 import LearnNew from "./Pages/LearnNew";
 import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
+import NotificationsComponent from "./Notifications/Notifications";
 
 import TermsOfUseContent from "./Authentication/terms_of_use_content";
 import DocumentationContent from "./Authentication/Documentation";
 // import Word from "./Components/collections/Word";
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "./store/appActions";
+import { setCurrentUserRole } from "./store/userDetails/actions";
+import { connect } from "react-redux";
+import { AppState } from "./store";
+import * as constants from "./constants";
 
 interface Props {
   firebase: any;
+  currentUserRole:string;
+  setCurrentUserRole:(role:string) =>void;
 }
 
 interface State {
@@ -116,8 +125,23 @@ const App = () => (
         path="/learn/words/syllables/:numSyllables"
         component={WordSyllableReview}
       />
+      <Route path={ROUTES.NOTIFICATIONS} component={NotificationsComponent}/>
     </div>
   </Router>
 );
 
-export default withAuthentication(App as any);
+const mapStateToProps = (state: AppState) => ({
+  currentUserRole: state.userDetails.currentUserRole
+  
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<AppState, void, AppActions>
+) => ({
+  setCurrentUserRole:(role:string) => dispatch(setCurrentUserRole(role)),
+ 
+});
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withAuthentication(App as any));
