@@ -8,8 +8,9 @@ import { AudioAction } from "./types";
 import {
   chooseColor
 } from "../../Create/ImportUtils";
+import { AppActions } from "../appActions";
 
-type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
+type ActionReturn = ThunkAction<void, AppState, void, AppActions>;
 
 export const replaceSpeakers = (speakers: Speaker[]):
   ActionReturn => (dispatch: Dispatch) => {

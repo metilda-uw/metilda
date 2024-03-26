@@ -1,0 +1,81 @@
+
+.send-msg-modal{
+    display: flex;
+    flex-direction: column;
+
+    .dialog-title{
+        text-align: center;
+    }
+    .send-msg-modal-content{
+        .tab-container {
+            display: flex;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .tab-button {
+            background-color: #f2f2f2;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .tab-button.active {
+            background-color: #ee6e73;
+            border: 2px solid #555252;
+            border-radius: 3px;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        .users-dropdown{
+            display: flex;
+            margin-bottom: 10px;
+            flex-direction: row;
+            justify-content: flex-start;
+            align-items: center;
+    
+            .select-label{
+                font-size: medium;
+                margin-right: 10px;
+                position: absolute;
+            }
+            .users-list{
+                position: relative;
+                display: block;
+                width: 75%;
+                left:25%;
+            }
+    
+        }
+        .message-content{
+            // width: 300px;
+            min-height: 100px;
+            border: 1px solid #ccc;
+            padding: 5px;
+
+            a {
+                cursor: pointer;
+            }
+        }
+        .attach-link{
+            margin-top: 10px;
+            max-width: fit-content;
+        }
+    }
+
+}
+
+.MuiTooltip-popper{
+    .tooltip-content{
+        font-size:14px;
+        color:#fff;
+        text-align:left;
+        font-family:Arial;
+        line-height:16px;
+    }
+
+}

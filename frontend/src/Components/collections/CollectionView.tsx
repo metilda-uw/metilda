@@ -8,11 +8,19 @@ import WordCard from "./WordCard";
 import FirebaseContext from "../../Firebase/context";
 
 import {fillMissingFieldsInChildDoc} from '../../Create/ImportUtils';
+import { connect } from "react-redux";
+import { AppState } from "../../store";
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "../../store/appActions";
+import { setCurrentUserRole } from "../../store/userDetails/actions";
+import * as constants from "../../constants";
+import {canUserVisitCreatePitchArtpPage} from '../../Create/ImportUtils';
 
-export default function CollectionView({
+function CollectionView({
   words,
   selectedCollection,
   selectedCollectionUuid,
+  currentUserRole,
 }) {
   const firebase = useContext(FirebaseContext);
 
@@ -105,6 +113,7 @@ export default function CollectionView({
       <div className="row collections-view-wordcards">
         <ul>
           {filteredWords.map((word: {}) => (
+            canUserVisitCreatePitchArtpPage(currentUserRole) ?
             <Link
               to={`/pitchartwizard/${selectedCollectionUuid}/${word["id"]}`}
               key={word["id"]}
@@ -115,6 +124,12 @@ export default function CollectionView({
                 key={word["id"]}
               ></WordCard>
             </Link>
+            :
+            <WordCard
+                word={word}
+                selectedCollectionUuid={selectedCollectionUuid}
+                key={word["id"]}
+              ></WordCard>
           ))}
         </ul>
       </div>
@@ -126,4 +141,15 @@ CollectionView.propTypes = {
   words: PropTypes.array,
   selectedCollection: PropTypes.string,
   selectedCollectionUuid: PropTypes.string,
+  currentUserRole: PropTypes.string,
 };
+const mapStateToProps = (state: AppState) => ({
+  currentUserRole: state.userDetails.currentUserRole,
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<AppState, void, AppActions>
+) => ({
+  setCurrentUserRole:(role:string) => dispatch(setCurrentUserRole(role)),
+});
+export default connect(mapStateToProps, mapDispatchToProps)(CollectionView);

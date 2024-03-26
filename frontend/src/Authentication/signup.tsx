@@ -6,6 +6,58 @@ import * as ROUTES from "../constants/routes";
 import Select from "react-select";
 import ReactGA from "react-ga";
 import TermsOfUseContent  from "./terms_of_use_content";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import {
+  createStyles,
+  Theme,
+  withStyles,
+  WithStyles,
+} from "@material-ui/core/styles";
+import MuiDialogTitle from "@material-ui/core/DialogTitle";
+import Typography from "@material-ui/core/Typography";
+import IconButton from "@material-ui/core/IconButton";
+import CloseIcon from "@material-ui/icons/Close";
+import { NotificationManager } from "react-notifications";
+
+const styles = (theme: Theme) =>
+        createStyles({
+            root: {
+            margin: 0,
+            padding: theme.spacing(2),
+            },
+            closeButton: {
+            position: "absolute",
+            right: theme.spacing(1),
+            top: theme.spacing(1),
+            color: theme.palette.grey[500],
+            },
+});
+
+interface DialogTitleProps extends WithStyles<typeof styles> {
+    id: string;
+    children: React.ReactNode;
+    onClose: () => void;
+}
+
+const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
+    const { children, classes, onClose, ...other } = props;
+    return (
+    <MuiDialogTitle disableTypography className={classes.root} {...other}>
+        <Typography variant="h6">{children}</Typography>
+        {onClose ? (
+        <IconButton
+            aria-label="close"
+            className={classes.closeButton}
+            onClick={onClose}
+        >
+            <CloseIcon />
+        </IconButton>
+        ) : null}
+    </MuiDialogTitle>
+    );
+});
 
 export interface Props {
   firebase: any;
@@ -37,18 +89,96 @@ const INITIAL_STATE = {
   role: [],
   uid: "",
   languageOfResearch: [],
-  checked: false
+  checked: false,
+  isEmailConfirmationModalOpen:false,
+  verificationCode:""
 };
 
 class SignUpFormBase extends React.Component<Props, State> {
+  code;
   constructor(props: any) {
     super(props);
-
+    this.code = -1;
     this.state = { ...INITIAL_STATE };
+  }
+
+  
+
+  emailConfirmationModal = () => {
+    return (
+      <Dialog
+        fullWidth={true}
+        maxWidth="sm"
+        open={this.state.isEmailConfirmationModalOpen}
+        onClose={this.closeEmailConfirmationModal}
+        aria-labelledby="form-dialog-title"
+        className="send-msg-modal"
+      >
+        <DialogTitle
+          id="alert-dialog-title"
+          onClose={this.closeEmailConfirmationModal}
+        >
+          <p className="dialog-title">Send Message</p>
+        </DialogTitle>
+        <DialogContent>
+            <h3>Enter code here</h3>
+            <input 
+              type="text" 
+              pattern="[0-9]" 
+              title="Please enter digits only"
+              maxLength={6} 
+              value={this.state.verificationCode}  // Bind the value of the input field to the state variable
+              onChange={this.handleInputChange}  // Handle input changes
+            />
+        </DialogContent>
+        <DialogActions>
+          <button
+            className="sendMsg waves-effect waves-light btn globalbtn"
+            onClick={this.compareVerficationCode}
+          >
+            Send
+          </button>
+        </DialogActions>
+      </Dialog>
+    );
+ };
+
+  closeEmailConfirmationModal = () =>{
+
+    this.setState({isEmailConfirmationModalOpen: false});
+
+  }
+
+  handleInputChange = (e) =>{
+    this.setState({verificationCode: e.target.value});
+
+  }
+
+  compareVerficationCode = (e) =>{
+    if(this.code == -1){
+      // handle case of invalid email address
+      this.setState({isEmailConfirmationModalOpen: false, verificationCode: ""});
+      NotificationManager.error('Your Email address is not valid');
+      return;
+    }
+
+    // account verified
+    if(this.code == this.state.verificationCode){
+      this.setState({isEmailConfirmationModalOpen: false, verificationCode: ""});
+      NotificationManager.success('Email verification is successful');
+      this.onSubmit(e);
+    }else{
+      this.setState({isEmailConfirmationModalOpen: false,verificationCode: ""});
+      NotificationManager.error('Email verification failed');
+    }
+    this.code = -1;
+
   }
 
   onSubmit = async (event: any) => {
     event.preventDefault();
+
+    console.log("in on submit , account verified");
     const { username, email, passwordOne, institution } = this.state;
     try {
         const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
@@ -107,6 +237,39 @@ class SignUpFormBase extends React.Component<Props, State> {
       } catch (ex) {
         console.log(ex);
       }
+  }
+
+
+  verifyEmail = async (event) =>{
+
+    event.preventDefault();
+    const { username, email} = this.state;
+    console.log("user name ", username);
+    console.log("email ", email);
+
+    const userEmail = email;
+   
+    const receiver= userEmail;
+    const formData = new FormData();
+    formData.append("receiver", receiver);
+    formData.append("message", "Please verify your Email:");
+    formData.append("subject", "Email verification");
+
+    const response = await fetch(`/api/verify-email`, {
+      method: "POST",
+      headers: {
+          Accept: "application/json"
+      },
+      body: formData
+    });
+    const body = await response.json();
+    console.log("response from email", body);
+
+    if(body)
+      this.code = body.verificationCode;
+
+    this.setState({ isEmailConfirmationModalOpen: true })
+
   }
 
   onChange = (event: any) => {
@@ -179,7 +342,9 @@ class SignUpFormBase extends React.Component<Props, State> {
     );
 
     return (
-      <form onSubmit={this.onSubmit} className="SignUpForm">
+      <>
+        {this.emailConfirmationModal()}
+        <form onSubmit={this.verifyEmail} className="SignUpForm">
         <input
           className="username"
           name="username"
@@ -260,6 +425,7 @@ class SignUpFormBase extends React.Component<Props, State> {
            Fields marked with * are mandatory
         </span>
       </form>
+      </>
     );
   }
 }

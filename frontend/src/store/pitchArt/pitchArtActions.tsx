@@ -6,8 +6,9 @@ import * as constants from "../../constants";
 import { AppState } from "../index";
 import { PitchArtDetailsAction } from "./actionTypes";
 import { AudioAction } from "../audio/types";
+import { AppActions } from "../appActions";
 
-type ActionReturn = ThunkAction<void, AppState, void, AudioAction>;
+type ActionReturn = ThunkAction<void, AppState, void, AppActions>;
 
 export const setPitchArtDocId = (pitchArtDocId: string):
   ActionReturn => (dispatch: Dispatch) => {

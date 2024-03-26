@@ -1,15 +1,23 @@
 import React, { Component } from "react";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
+import { AppState } from "../store";
+import { ThunkDispatch } from "redux-thunk";
+import { AppActions } from "../store/appActions";
+import { setCurrentUserRole } from "../store/userDetails/actions";
+import { connect } from "react-redux";
 
 interface Props {
   firebase: any;
   history: any;
+  currentUserRole:string;
+  setCurrentUserRole:(role:string) =>void;
 }
 
 class SignOut extends Component<Props> {
 
   displayLoginPage = () => {
+    this.props.setCurrentUserRole(null);
     this.props.history.push(ROUTES.SIGN_IN);
   }
 
@@ -26,4 +34,19 @@ class SignOut extends Component<Props> {
   }
 }
 
-export default withFirebase(SignOut as any);
+const mapStateToProps = (state: AppState) => ({
+  currentUserRole: state.userDetails.currentUserRole
+  
+});
+
+const mapDispatchToProps = (
+  dispatch: ThunkDispatch<AppState, void, AppActions>
+) => ({
+  setCurrentUserRole:(role:string) => dispatch(setCurrentUserRole(role)),
+ 
+});
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withFirebase(SignOut as any));
