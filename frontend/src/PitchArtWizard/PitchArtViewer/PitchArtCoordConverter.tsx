@@ -40,18 +40,19 @@ class PitchArtCoordConverter {
 
     let timePerc;
 
-    if (this.pitchValues.length < 1) {
+    if (this.pitchValues.length <= 1) {
       timePerc = 0.0;
     } else if (this.isTimeNormalized) {
       const timeIndex = this.pitchValues.map((item) => item.t0).indexOf(time);
       timePerc = timeIndex / (this.pitchValues.length - 1);
     } else {
-      // const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
+      const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
       // Update totalDuration to be the time set in the windowConfig
-      const totalDuration = this.config.tMax - this.config.tMin;
-      // word starts at 0 - timePerc = (time - this.pitchValues[0].t0) / totalDuration;
+      // const totalDuration = this.config.tMax - this.config.tMin;
+      // word starts at 0 -
+       timePerc = (time - this.pitchValues[0].t0) / totalDuration;
       // adjust timePerc so Pitch Art matches exact timing in recording
-      timePerc = time / totalDuration;
+      // timePerc = time / totalDuration;
     }
 
     const pointDx = timePerc * this.config.innerWidth;
@@ -74,26 +75,26 @@ class PitchArtCoordConverter {
     }
   }
 
-  // returns location for tick marks for drawing time axis
-  horzValueRange(
-    minValue: number,
-    maxValue: number,
-    numSteps?: number
-  ): number[] {
-    let numTickMarks: number;
-    const dStep = maxValue - minValue;
+  // // returns location for tick marks for drawing time axis
+  // horzValueRange(
+  //   minValue: number,
+  //   maxValue: number,
+  //   numSteps?: number
+  // ): number[] {
+  //   let numTickMarks: number;
+  //   const dStep = maxValue - minValue;
 
-    if (!numSteps) {
-      numTickMarks = maxValue * 4;
-    } else {
-      numTickMarks = dStep / numSteps;
-    }
-    const scale = scaleLinear()
-      .domain([this.config.tMin, this.config.tMax])
-      .range([this.config.innerWidth + this.config.x0, this.config.x0])
-      .nice();
-    return scale.ticks(numTickMarks);
-  }
+  //   if (!numSteps) {
+  //     numTickMarks = maxValue * 4;
+  //   } else {
+  //     numTickMarks = dStep / numSteps;
+  //   }
+  //   const scale = scaleLinear()
+  //     .domain([this.config.tMin, this.config.tMax])
+  //     .range([this.config.innerWidth + this.config.x0, this.config.x0])
+  //     .nice();
+  //   return scale.ticks(numTickMarks);
+  // }
 
   vertValueRange(
     minValue: number,

@@ -204,8 +204,8 @@ export default function LearnNew() {
                   height={600}
                   minPitch={75}
                   maxPitch={500}
-                  minTime={0}
-                  maxTime={2.0}
+                  // minTime={0}
+                  // maxTime={2.0}
                   fileName={word["uploadId"]}
                   setLetterPitch={(x, y, z) => null}
                   showAccentPitch={true}

@@ -46,8 +46,8 @@ export interface PitchArtDrawingWindowProps {
   height: number;
   minPitch: number;
   maxPitch: number;
-  minTime: number;
-  maxTime: number;
+  // minTime: number;
+  // maxTime: number;
   fileName: string;
   setLetterPitch: (
     speakerIndex: number,
@@ -173,14 +173,14 @@ export class PitchArtDrawingWindow extends React.Component<
     this.setPointerEnabled = this.setPointerEnabled.bind(this);
 
     this.innerWidth = this.props.width * 0.75;
-    this.innerHeight = this.props.height * 0.8;
+    this.innerHeight = this.props.height * 0.9;// changed from 0.8 to 0.9
     this.pointDx0 = (this.props.width - this.innerWidth) / 2.0;
     this.pointDy0 = (this.props.height - this.innerHeight) / 2.0;
 
     this.innerBorderX0 = (this.props.width - this.props.width * 0.999) / 2.0;
     this.innerBorderY0 = (this.props.height - this.props.height * 0.999) / 2.0;
 
-    this.graphWidth = 10;
+    this.graphWidth = 5; // what is this variable doing? 
     this.borderWidth = 15;
     this.smallCircleRadius = 16;
     this.largeCircleRadius = 18;
@@ -663,8 +663,8 @@ export class PitchArtDrawingWindow extends React.Component<
       x0: this.pointDx0,
       dMin: this.props.minPitch,
       dMax: this.props.maxPitch,
-      tMin: this.props.minTime,
-      tMax: this.props.maxTime,
+      // tMin: this.props.minTime,
+      // tMax: this.props.maxTime,
     };
 
     const colorSchemes = this.props.speakers.map((item, index) =>

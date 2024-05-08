@@ -78,8 +78,8 @@ interface State {
   pitchArt: {
     minPitch: number;
     maxPitch: number;
-    minTime: number;
-    maxTime: number;
+    // minTime: number;
+    // maxTime: number;
     showAccentPitch: boolean;
     showSyllableText: boolean;
     showVerticallyCentered: boolean;
@@ -129,14 +129,14 @@ class CreatePitchArt extends React.Component<
       pitchArt: {
         minPitch: DEFAULT.MIN_ANALYSIS_PITCH,
         maxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
-        minTime: DEFAULT.MIN_ANALYSIS_TIME,
-        maxTime: DEFAULT.MAX_ANALYSIS_TIME,
+        // minTime: DEFAULT.MIN_ANALYSIS_TIME,
+        // maxTime: DEFAULT.MAX_ANALYSIS_TIME,
         showAccentPitch: false,
         showSyllableText: false,
         showVerticallyCentered: false,
         showPitchArtLines: true,
         showLargeCircles: true,
-        showTimeNormalization: true,
+        showTimeNormalization: false,
         showPitchScale: false,
         showPerceptualScale: true,
         showPitchArtImageColor: true,

@@ -857,8 +857,8 @@ export class WordSyllableReview extends React.Component<Props, State> {
                     height={600}
                     minPitch={this.state.minPitch}
                     maxPitch={this.state.maxPitch}
-                    minTime={0}
-                    maxTime={2.0}
+                    // minTime={0}
+                    // maxTime={2.0}
                     fileName={
                       this.state.words[this.state.activeWordIndex].uploadId
                     }

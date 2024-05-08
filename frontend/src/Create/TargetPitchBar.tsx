@@ -457,16 +457,16 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     });
   };
 
-  downloadAnalysis = () => {
-    const speaker = this.props.speakers[this.props.speakerIndex];
-    const metildaWord = {
-      uploadId: speaker.uploadId,
-      letters: speaker.letters,
-    } as Speaker;
-    const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
-    const fileName = `Speaker${this.props.speakerIndex + 1}_${timeStamp}.json`;
-    fileDownload(JSON.stringify(metildaWord, null, 2), fileName);
-  };
+  // downloadAnalysis = () => {
+  //   const speaker = this.props.speakers[this.props.speakerIndex];
+  //   const metildaWord = {
+  //     uploadId: speaker.uploadId,
+  //     letters: speaker.letters,
+  //   } as Speaker;
+  //   const timeStamp = moment().format("MM-DD-YYYY_hh_mm_ss");
+  //   const fileName = `Speaker${this.props.speakerIndex + 1}_${timeStamp}.json`;
+  //   fileDownload(JSON.stringify(metildaWord, null, 2), fileName);
+  // };
 
   saveAnalysis = async () => {
     ReactGA.event({
@@ -1022,7 +1022,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             >
               Save
             </button>
-            <button
+            {/* <button
               className="TargetPitchBar-download-analysis btn globalbtn waves-effect waves-light"
               type="submit"
               name="action"
@@ -1030,7 +1030,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               onClick={this.downloadAnalysis}
             >
               Download
-            </button>
+            </button> */}
             {/* <SaveAnalysisFireStore analysis={speaker} /> */}
           </div>
         </div>

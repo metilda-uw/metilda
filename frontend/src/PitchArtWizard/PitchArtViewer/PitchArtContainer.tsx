@@ -15,8 +15,8 @@ interface Props {
     height: number;
     minPitch?: number;
     maxPitch?: number;
-    minTime?: number;
-    maxTime?: number;
+    // minTime?: number;
+    // maxTime?: number;
     uploadId: string;
     pitchArt: any;
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
@@ -60,9 +60,10 @@ class PitchArtContainer extends React.Component<Props> {
         this.props.updatePitchArtValue("maxPitch", maxPitch);
     }
 
-    applyTimeRange = (minTime: number, maxTime: number) => {
-        this.props.updatePitchArtValue("maxTime", maxTime);
-    }
+    // where is this function being used ? 
+    // applyTimeRange = (minTime: number, maxTime: number) => {
+    //     this.props.updatePitchArtValue("maxTime", maxTime);
+    // }
     
     onVerticallyCenterClick = (isVerticallyCentered: boolean) => {
         if (isVerticallyCentered) {
@@ -79,9 +80,9 @@ class PitchArtContainer extends React.Component<Props> {
                         <PitchRange initMinPitch={this.props.pitchArt.minPitch}
                             initMaxPitch={this.props.pitchArt.maxPitch}
                             applyPitchRange={this.applyPitchRange} />
-                        <TimeRange initMinTime={this.props.pitchArt.minTime}
+                        {/* <TimeRange initMinTime={this.props.pitchArt.minTime}
                             initMaxTime={this.props.pitchArt.maxTime}
-                            applyTimeRange={this.applyTimeRange} />
+                            applyTimeRange={this.applyTimeRange} /> */}
                         <div className="row metilda-pitch-art-container-control-toggle-list">
                             <PitchArtToggle
                                 label="Accent Symbol"
@@ -176,8 +177,8 @@ class PitchArtContainer extends React.Component<Props> {
                         height={this.props.height}
                         minPitch={this.props.pitchArt.minPitch}
                         maxPitch={this.props.pitchArt.maxPitch}
-                        minTime={this.props.pitchArt.minTime}
-                        maxTime={this.props.pitchArt.maxTime}
+                        // minTime={this.props.pitchArt.minTime}
+                        // maxTime={this.props.pitchArt.maxTime}
                         uploadId={this.props.uploadId}
                         setLetterPitch={this.props.setLetterPitch}
                         showAccentPitch={this.props.pitchArt.showAccentPitch}

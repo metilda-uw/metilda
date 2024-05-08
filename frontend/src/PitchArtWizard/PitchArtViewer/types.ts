@@ -11,8 +11,8 @@ export interface PitchArtWindowConfig {
     x0: number;     // the initial x-value where data is plotted at
     dMin: number;   // the initial value of the domain data
     dMax: number;   // the final value of the domain data
-    tMin: number;   // the minimum value of the time domain
-    tMax: number;   // the maximum value of the time domain
+    // tMin: number;   // the minimum value of the time domain
+    // tMax: number;   // the maximum value of the time domain
 }
 
 export interface PitchRangeDTO {

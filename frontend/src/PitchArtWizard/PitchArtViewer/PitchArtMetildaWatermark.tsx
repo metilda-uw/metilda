@@ -116,12 +116,12 @@ export default class PitchArtMetildaWatermark extends React.Component<Props> {
         width = this.props.windowConfig.innerWidth * 1.2;
         height = this.props.windowConfig.innerHeight * 1.2;
       } else {
-        xStart = coordConverter.horzIndexToRectCoords(
-          this.props.windowConfig.tMin
-        );
-        yStart = coordConverter.vertValueToRectCoords(
-          this.props.windowConfig.dMax
-        );
+        // xStart = coordConverter.horzIndexToRectCoords(
+        //   this.props.windowConfig.tMin
+        // );
+        // yStart = coordConverter.vertValueToRectCoords(
+        //   this.props.windowConfig.dMax
+        // );
         width = this.props.windowConfig.innerWidth * 1.2;
         height = this.props.windowConfig.innerHeight * 1.1;
       }
