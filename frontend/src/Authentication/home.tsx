@@ -9,7 +9,7 @@ class Home extends React.Component {
       <div className="Home">
         <Header />
         <br />
-        <h3>Welcome to MeTILDA</h3>
+        <h1>Welcome to MeTILDA</h1>
         <p className="para">
           <b>
             Melodic Transcription in Language Documentation and Application
@@ -39,8 +39,6 @@ class Home extends React.Component {
           <li>Naatosi Fish (Community Linguist, Blackfeet Nation)</li>
           <li>James Randall (Musicologist, University of Montana)</li>
           <li> Research Assistants ( see acknowledgements )</li></p>
-          
-         
 
          <p className="para">
           <b>Acknowledgements:</b> <br/>

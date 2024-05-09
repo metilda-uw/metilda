@@ -33,6 +33,7 @@ import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
 import NotificationsComponent from "./Notifications/Notifications";
 
+const LazyTermsOfUseContent = React.lazy(() => import('./Authentication/terms_of_use_content'));
 import TermsOfUseContent from "./Authentication/terms_of_use_content";
 import DocumentationContent from "./Authentication/Documentation";
 // import Word from "./Components/collections/Word";
@@ -54,42 +55,43 @@ interface State {
 }
 
 const history = createBrowserHistory();
-ReactGA.initialize("UA-157894331-1");
-history.listen((location) => {
-  ReactGA.set({ page: location.pathname }); // Update the user's current page
-  ReactGA.pageview(location.pathname); // Record a pageview for the given page
-});
 
-const latencyPerformanceCallback = (list: any) => {
-  list.getEntries().forEach((entry: any) => {
-    ReactGA.timing({
-      category: "Load Performace",
-      variable: "Server Latency",
-      value: entry.responseStart - entry.requestStart,
-    });
-  });
-};
-const renderingPerformanceCallback = (list: any) => {
-  list.getEntries().forEach((entry: any) => {
-    if (entry.name.includes("App")) {
-      ReactGA.timing({
-        category: "App Render Performace",
-        variable: entry.name,
-        value: entry.duration,
-      });
-    }
-  });
-};
+// ReactGA.initialize("UA-157894331-1");
+// history.listen((location) => {
+//   ReactGA.set({ page: location.pathname }); // Update the user's current page
+//   ReactGA.pageview(location.pathname); // Record a pageview for the given page
+// });
 
-const latencyPerformanceObserver = new PerformanceObserver(
-  latencyPerformanceCallback
-);
-latencyPerformanceObserver.observe({ entryTypes: ["navigation"] });
+// const latencyPerformanceCallback = (list: any) => {
+//   list.getEntries().forEach((entry: any) => {
+//     ReactGA.timing({
+//       category: "Load Performace",
+//       variable: "Server Latency",
+//       value: entry.responseStart - entry.requestStart,
+//     });
+//   });
+// };
+// const renderingPerformanceCallback = (list: any) => {
+//   list.getEntries().forEach((entry: any) => {
+//     if (entry.name.includes("App")) {
+//       ReactGA.timing({
+//         category: "App Render Performace",
+//         variable: entry.name,
+//         value: entry.duration,
+//       });
+//     }
+//   });
+// };
 
-const renderingPerformanceObserver = new PerformanceObserver(
-  renderingPerformanceCallback
-);
-renderingPerformanceObserver.observe({ entryTypes: ["mark", "measure"] });
+// const latencyPerformanceObserver = new PerformanceObserver(
+//   latencyPerformanceCallback
+// );
+// latencyPerformanceObserver.observe({ entryTypes: ["navigation"] });
+
+// const renderingPerformanceObserver = new PerformanceObserver(
+//   renderingPerformanceCallback
+// );
+// renderingPerformanceObserver.observe({ entryTypes: ["mark", "measure"] });
 
 const App = () => (
   <Router history={history}>
