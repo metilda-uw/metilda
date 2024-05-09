@@ -116,6 +116,39 @@ label{
     margin-top: 8px;
 }
 
-.globalbtn{
-    color: #000000;
+// .globalbtn{
+//     color: #000000;
+// }
+
+h1{
+  color: #b93636;
+  font-size: 3rem;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
 }
+h2{
+  // color: #b93636;
+  font-size: 1.8rem !important ;
+}
+
+h3{
+  color: #b93636;
+  font-size: 1.1rem !important
+}
+
+
+
+ul {
+  list-style-type: disc !important;
+}
+
+ul > li {
+  list-style-type: disc !important;
+}
+// section{
+//   color: brown;
+//   font-size: 1.1rem; 
+//   font-family: "Trebuchet MS", Helvetica, sans-serif;
+//   padding:0.5rem;
+//   text-align: left;
+//   margin-left: 25px;
+// }

@@ -120,5 +120,5 @@ const TermsOfUseContent = () => {
   
 
 export default TermsOfUseContent;
-export {TermsOfUseContent};
+// export {TermsOfUseContent};
 
