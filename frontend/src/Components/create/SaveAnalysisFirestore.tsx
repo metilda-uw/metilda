@@ -101,6 +101,15 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
       setParentDocumentId(data.parentDocumentId);
   }, [updateOptions]);
 
+  // Update state when `data` prop changes
+  useEffect(() => {
+    if (data) {
+      setSpeakerName(data.speakerName || '');
+      setWord(data.word || '');
+      setWordTranslate(data.wordTranslation || '');
+    }
+  }, [data]);
+
   const collectionSelectOnChange = (event) => {
     setSelectedCollection(event.value);
   };
@@ -429,7 +438,6 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
 
     try {
       const docRef = await firebase.firestore.collection(collectionId).add(modifiedData);
-      //console.log("Document written with ID: ", docRef.id);
     
       saveThumbnail(collectionId + "/" + docRef.id);
       setIsDocSaved(true);
