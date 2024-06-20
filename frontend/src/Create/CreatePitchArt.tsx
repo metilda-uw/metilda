@@ -500,6 +500,10 @@ class CreatePitchArt extends React.Component<
               updated: item[6],
               user: item[7]
             };
+          }).sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
           }),
         })
       );

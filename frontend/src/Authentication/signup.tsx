@@ -263,7 +263,6 @@ class SignUpFormBase extends React.Component<Props, State> {
       body: formData
     });
     const body = await response.json();
-    console.log("response from email", body);
 
     if(body)
       this.code = body.verificationCode;

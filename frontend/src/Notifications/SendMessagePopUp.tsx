@@ -118,15 +118,15 @@ const SendMessagePopUp = (props) => {
               </DialogActions>
           </Dialog>
         );
-      }
+      };
   
       const showAttachLinkModal = () =>{
         setIsAttachLinkModalOpen(true);
-      }
+      };
   
       const closeAttachLinkModal = () =>{
         setIsAttachLinkModalOpen(false);
-      }
+      };
  
 
     const closeSendMessagePopUp = () => {
@@ -177,7 +177,7 @@ const SendMessagePopUp = (props) => {
             }
         }
 
-    }
+    };
 
     const saveMessage = async() =>{
         try{
@@ -197,7 +197,7 @@ const SendMessagePopUp = (props) => {
             }catch(e){
               NotificationManager.error('Messages sending failed');
             }
-    }
+    };
 
     const tabs = [
         { name: 'Send Message', heading: 'Send Message' },
@@ -224,22 +224,22 @@ const SendMessagePopUp = (props) => {
   
         if(event && event.length > constants.MAXIMUN_RECIPIENTS_ALLOWED){
           displayMaxRecieversAlert(true);
-        }else{
+        } else {
           displayMaxRecieversAlert(false);
         }
-    }
+    };
   
     const handleOptionCreation = (event) => {
         console.log(event);
-        const newOption = {value : event , label:event}
+        const newOption = {value : event , label: event }
         setSelectedUsers([...selectedUsers, newOption]);
-    }
+    };
 
     const handleMessageChange = (event) => {
         setMessage(event.target.innerHTML);
     };
 
-    const handleAttachLink = (data) =>{
+    const handleAttachLink = (data) => {
 
         const linkText = data.linkText ? data.linkText : "link";
         const link = data.link;
@@ -253,7 +253,7 @@ const SendMessagePopUp = (props) => {
         newMsg += ' <a href="' + link + '" target="_blank">' + linkText + '</a>';
         setMessage(newMsg);
         closeAttachLinkModal();
-    }
+    };
 
     return (
         <>

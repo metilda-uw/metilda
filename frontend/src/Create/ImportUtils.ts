@@ -507,7 +507,11 @@ export function getModifiedFieldsofPitchArt(parentDocdata:any,currentData:any,pa
   // const data = parentDocdata && parentDocdata.data;
   for (const key in parentDocdata) {
     if (parentDocdata.hasOwnProperty(key) && key != "childVersions") {
-      if (typeof parentDocdata[key] === 'object' && typeof currentData[key] === 'object') {
+      if (typeof parentDocdata[key] === 'object' && typeof currentData[key] === 'object' && Array.isArray(parentDocdata[key])) {
+        if (!arraysAreEqual(parentDocdata[key], currentData[key])) {
+          modifiedData[key] = currentData[key];
+        }
+      }else if (typeof parentDocdata[key] === 'object' && typeof currentData[key] === 'object') {
         if(!(JSON.stringify(parentDocdata[key]) === JSON.stringify(currentData[key]))){
           modifiedData[key] = currentData[key];
         }
@@ -522,6 +526,46 @@ export function getModifiedFieldsofPitchArt(parentDocdata:any,currentData:any,pa
   return modifiedData;
 
 }
+
+function arraysAreEqual(arr1, arr2) {
+  // Check if the arrays have the same length
+  if (arr1.length !== arr2.length) {
+    return false;
+  }
+  
+  // Sort the arrays of objects based on a unique property to ensure consistent ordering
+  const sortedArr1 = arr1.slice().sort((a, b) => a.name - b.name);
+  const sortedArr2 = arr2.slice().sort((a, b) => a.name - b.name);
+  
+  // Compare each object in the arrays
+  for (let i = 0; i < sortedArr1.length; i++) {
+    if (!objectsAreEqual(sortedArr1[i], sortedArr2[i])) {
+      return false;
+    }
+  }
+  
+  return true;
+};
+
+function objectsAreEqual(obj1, obj2) {
+  const obj1Props = Object.getOwnPropertyNames(obj1);
+  const obj2Props = Object.getOwnPropertyNames(obj2);
+  
+  // Check if the objects have the same number of properties
+  if (obj1Props.length !== obj2Props.length) {
+    return false;
+  }
+  
+  // Compare the properties of the objects
+  for (let i = 0; i < obj1Props.length; i++) {
+    const propName = obj1Props[i];
+    if (obj1[propName] !== obj2[propName]) {
+      return false;
+    }
+  }
+  
+  return true;
+};
 
 /**
  * when loading child version of pitch art, this method combines 
