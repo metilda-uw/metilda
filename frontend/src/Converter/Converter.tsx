@@ -35,7 +35,7 @@ function Converter(){
             handleFromScaleValueChange(event);
         }
 
-        const newTimer = setTimeout(callback, 1000, e);
+        const newTimer = setTimeout(callback, 1500, e);
 
         setFromTimer(newTimer);
     }
@@ -47,7 +47,7 @@ function Converter(){
         e.persist();
         const newTimer = setTimeout((event) => {
             handleToScaleValueChange(event);
-        }, 1000,e)
+        }, 1500,e)
 
         setToTimer(newTimer);
     }
