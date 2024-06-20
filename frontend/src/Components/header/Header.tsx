@@ -45,34 +45,47 @@ class Header extends Component<HeaderProps, State> {
       isMessagesLoaded: false,
       dispalyCreatePitchArtTab:false,
     };
-   // console.log(props.currentUserRole + " user role");
   }
 
   async componentDidMount() {
-    const response = await fetch(
-      `/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Admin",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body = await response.json();
-    // console.log("call wnt");
-    if (body.result != null && body.result.length > 0) {
-      this.setState({
-        isAdmin: true,
-        dispalyCreatePitchArtTab:true,
-      });
-      if(this.props.currentUserRole == null){
-        this.props.setCurrentUserRole(constants.ADMIN_ROLE);
+    if(this.props.currentUserRole == null){
+      const response = await fetch(
+        `/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` +
+          "?user-role=Admin",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const body = await response.json();
+  
+      if (body.result != null && body.result.length > 0) {
+        this.setState({
+          isAdmin: true,
+          dispalyCreatePitchArtTab:true,
+        });
+        if(this.props.currentUserRole == null){
+          this.props.setCurrentUserRole(constants.ADMIN_ROLE);
+        }
+      }else{
+        await this.getCurrentUserRole();
       }
     }else{
-      await this.getCurrentUserRole();
+      if(this.props.currentUserRole === constants.ADMIN_ROLE){
+        this.setState({
+          isAdmin: true,
+          dispalyCreatePitchArtTab:true,
+        });
+      }else if(this.props.currentUserRole === constants.TEACHER_ROLE || this.props.currentUserRole === constants.RESEARCHER_ROLE){
+        this.setState({
+          dispalyCreatePitchArtTab:true,
+        });
+      }
     }
+    
     let noOfUnReadMessages = 0;
     try {
         const currentUser = this.props.firebase.auth.currentUser && this.props.firebase.auth.currentUser.email;
@@ -123,13 +136,13 @@ class Header extends Component<HeaderProps, State> {
       );
       const body = await response.json();
       if(body && body.result && body.result.length > 0 && body.result[0][0]){
-        console.log(body.result[0][0] + " cur user role");
         userRole = body.result[0][0];
         this.props.setCurrentUserRole(userRole);
+      }else{
+        this.props.setCurrentUserRole(constants.STUDENT_ROLE);
       }
     }
     userRole = this.props.currentUserRole;
-    // console.log("from constants ", constants.ADMIN_ROLE);
     if(userRole === constants.ADMIN_ROLE || userRole === constants.TEACHER_ROLE || userRole === constants.RESEARCHER_ROLE){
       this.setState({
         dispalyCreatePitchArtTab:true
