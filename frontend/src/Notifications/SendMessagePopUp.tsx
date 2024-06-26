@@ -91,7 +91,7 @@ const SendMessagePopUp = (props) => {
                 id="alert-dialog-title"
                 onClose={closeAttachLinkModal}
               >
-                <p className="dialog-title">Send Message</p>
+                <p className="dialog-title">Attach Link</p>
               </DialogTitle>
               <DialogContent className="attach-link-content">
                 <div>
