@@ -7,6 +7,7 @@ matplotlib.use('Agg')
 
 import decimal
 from flask import Flask, render_template, json
+from flask_compress import Compress
 
 class CustomJSONEncoder(json.JSONEncoder):
 
@@ -26,6 +27,7 @@ app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
 app.config["CERTIFICATES"] = os.path.join(os.path.dirname(__file__), "certificates")
 
 app.json_encoder = CustomJSONEncoder
+Compress(app)
 
 import metilda.controllers.pitch_art_wizard
 import metilda.controllers.mail

@@ -126,7 +126,7 @@ const InboxMessages = () =>{
                     const newObj = {...doc.data(), id: doc.id};
                     return newObj
                 });
-                console.log("received data", receivedMessages);
+               
 
                 const sortedMessagesReceived = receivedMessages.sort((a, b) => b.timestamp - a.timestamp);
         
@@ -139,7 +139,7 @@ const InboxMessages = () =>{
           } else {
             setMessagesReceived([]);
             setAreMessagesLoaded(true);
-            console.log('User not found');
+            
             return null;
           }
         }catch (error) {
@@ -150,7 +150,7 @@ const InboxMessages = () =>{
 
 
     const onDeleteMessages = async() =>{
-        // console.log("On messages delete");
+       
         if(selectedMessagesIds.length > 0){
             const currentUser = firebase.auth.currentUser && firebase.auth.currentUser.email;
             if(currentUser == null || currentUser == undefined) return;
@@ -210,7 +210,7 @@ const InboxMessages = () =>{
     }
 
     const closeDisplayMessageModal = async() =>{
-        console.log("meessage: ", MessagesReceived[selectedRow]);
+        
         const id =  MessagesReceived[selectedRow].id;
         const currentUser = firebase.auth.currentUser && firebase.auth.currentUser.email;
         const updatedData = {...MessagesReceived[selectedRow], isRead:true};
@@ -268,7 +268,7 @@ const InboxMessages = () =>{
                         </tr>
                     </thead>
                     <tbody>
-                        {MessagesReceived && MessagesReceived.filter((msg, index) => index >= paginationIndexes.low && index < paginationIndexes.high).map((msg, index) => (
+                        {MessagesReceived && MessagesReceived.length > 0 ? MessagesReceived && MessagesReceived.filter((msg, index) => index >= paginationIndexes.low && index < paginationIndexes.high).map((msg, index) => (
                             <React.Fragment key={msg.id}>
                                { msg.Message != undefined && 
                                     <tr >
@@ -289,7 +289,11 @@ const InboxMessages = () =>{
                                     </tr>
                                 }
                             </React.Fragment>
-                        ))}
+                        )): 
+                        <tr>
+                         <td colSpan={4} style={{ textAlign: 'center' }}>No Messages</td>
+                        </tr>
+                        }
                         
                     </tbody>
                     

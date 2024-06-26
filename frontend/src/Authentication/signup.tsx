@@ -118,7 +118,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           id="alert-dialog-title"
           onClose={this.closeEmailConfirmationModal}
         >
-          <p className="dialog-title">Send Message</p>
+          <p className="dialog-title">Enter Verification Code</p>
         </DialogTitle>
         <DialogContent>
             <h3>Enter code here</h3>
@@ -136,7 +136,7 @@ class SignUpFormBase extends React.Component<Props, State> {
             className="sendMsg waves-effect waves-light btn globalbtn"
             onClick={this.compareVerficationCode}
           >
-            Send
+            Submit
           </button>
         </DialogActions>
       </Dialog>
