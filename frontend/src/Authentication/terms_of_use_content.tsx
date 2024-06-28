@@ -8,6 +8,7 @@ import ReactGA from "react-ga";
 
 const TermsOfUseContent = () => {
  
+  //  console.log('ToUse Page landing')
   
    return(
       <div className="terms-of-use">

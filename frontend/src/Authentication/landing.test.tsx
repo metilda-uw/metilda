@@ -10,6 +10,12 @@ describe("Landing", () => {
         expect(subject.find(".login_Button")).to.be.present();
     });
 
+
+    it("renders the Landing User with new para tags", () => {
+      const subject = shallowRender({});
+      expect(subject.find(".para")).to.be.present();
+  });
+
   it("clicking the landing page should set hisotry to sign in page", () => {
     const history = ["/"];
     const subject = shallowRender({history});

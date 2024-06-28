@@ -50,11 +50,12 @@ constructor(props: any) {
   onSubmit = async (event: any) => {
     event.preventDefault();
     const { email, password } = this.state;
-    ReactGA.event({
-      category: "Login",
-      action: "User pressed login button",
-      transport: "beacon"
-    });
+
+    // ReactGA.event({
+    //   category: "Login",
+    //   action: "User pressed login button",
+    //   transport: "beacon"
+    // });
 
     interface LoginError {
         code: string;
@@ -70,9 +71,11 @@ constructor(props: any) {
         });
 
     if (userIsAuthorized) {
-        ReactGA.set({
-          userId: authUser.user.uid
-        });
+
+        // ReactGA.set({
+        //   userId: authUser.user.uid
+        // });
+
         this.setState({ ...INITIAL_STATE });
         const formData = new FormData();
         formData.append("user_id", authUser.user.email);

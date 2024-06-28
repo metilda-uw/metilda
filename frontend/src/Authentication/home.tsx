@@ -3,10 +3,9 @@ import * as React from "react";
 import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
 
-class Home extends React.Component {
-  render() {
+export const HomeWrapper = () =>  {
     return (
-      <div className="Home">
+      <div>
         <Header />
         <br />
         <h1>Welcome to MeTILDA</h1>
@@ -14,15 +13,17 @@ class Home extends React.Component {
           <b>
             Melodic Transcription in Language Documentation and Application
             (MeTILDA)
-          </b>{" "}
+          </b>
           is an online platform for studying and learning word melody in a language where pitch is an important part of pronunciation.
           <b />
         </p>
         <p className="list">
           <b>MeTILDA:</b>
-          <li>was developed based on the Blackfoot language, however, the goal is to accommodate any language that uses pitch and needs a visual aid to represent pitch movement. </li>
-          <li>enables users to create Pitch Art in one application without having to use multiple tools.</li>
-          <li>has been developed based on the Blackfoot language by an interdisciplinary team consisting of a Blackfoot language teacher, a linguistics researcher, and a computer scientist.</li>
+          <ul>
+            <li>was developed based on the Blackfoot language, however, the goal is to accommodate any language that uses pitch and needs a visual aid to represent pitch movement. </li>
+            <li>enables users to create Pitch Art in one application without having to use multiple tools.</li>
+            <li>has been developed based on the Blackfoot language by an interdisciplinary team consisting of a Blackfoot language teacher, a linguistics researcher, and a computer scientist.</li>
+          </ul>
         </p>
         <p className="para">
           Currently, there are two Beta features: “Create Pitch Art” and “Learn Word Melody” which are available for test use. Create Pitch Art is a feature where users can create a visual guide for word melody using uploaded recordings. Learn Word Melody is a space where users can compare their production of word melody to a recording. Other features are in-progress.
@@ -34,22 +35,23 @@ class Home extends React.Component {
         <p className="para"><b>Who can use MeTILDA?</b><br/>
         MeTILDA is available for test use. Create an account and login to MeTILDA. Feedback is welcomed.</p>
         <p className="para"><b>MeTILDA Development Team</b>
-          <li>Mizuki Miyashita (Linguist, University of Montana)</li>
-          <li>Min Chen (Computer Scientist, University of Washington)</li>
-          <li>Naatosi Fish (Community Linguist, Blackfeet Nation)</li>
-          <li>James Randall (Musicologist, University of Montana)</li>
-          <li> Research Assistants ( see acknowledgements )</li></p>
-
+          <ul>
+            <li>Mizuki Miyashita (Linguist, University of Montana)</li>
+            <li>Min Chen (Computer Scientist, University of Washington)</li>
+            <li>Naatosi Fish (Community Linguist, Blackfeet Nation)</li>
+            <li>James Randall (Musicologist, University of Montana)</li>
+            <li> Research Assistants ( see acknowledgements )</li>
+          </ul>
+        </p>
          <p className="para">
           <b>Acknowledgements:</b> <br/>
           We would like to thank the following individuals and groups:
-        
+          <ul>
             <li>Blackfoot speakers: the late Chief Earl Old Person, Mr. Rod Scout, and Ms. Natalie Creighton. The recordings used for the development were originally provided for the Blackfoot Linguistics Study at the University of Montana.
             </li>
              <li>Kaylene Big Knife for the graphic design of Pitch Art </li>
-          <li>Students in LING 491 Audio Data Processing (Fall 2022) for testing the tool.
-          </li>
-          <li >
+          <li>Students in LING 491 Audio Data Processing (Fall 2022) for testing the tool.</li>
+          <li>
               Audience at the conferences:
               <ul className="subList" >
                 <li >
@@ -66,8 +68,7 @@ class Home extends React.Component {
                 </li>
               </ul>
           </li>
-          <li>
-          University of Washington-Bothell( Computer Science):
+          <li> University of Washington-Bothell( Computer Science):
           <ul className="subList" >
               <li>Mitchell Lee</li>
               <li>Jignasha Borad</li>
@@ -76,8 +77,7 @@ class Home extends React.Component {
               <li>Sanjay Penmetsa</li>
             </ul>
           </li>
-          <li>
-          University of Montana (Linguistics):
+          <li> University of Montana (Linguistics):
           <ul className="subList" >
               <li>Shay Sullivan(2022)</li>
               <li>Bethany Tafoya(2023)</li>
@@ -92,13 +92,12 @@ class Home extends React.Component {
               <li>Computer Science at the University of Washington - Bothell. </li>
             </ul>
           </li>
+          </ul>
         </p>
         
         {/* TODO: Add citation for MeTILDA */}
       </div>
     );
-  }
 }
 
-const authCondition = (authUser: any) => !!authUser;
-export default withAuthorization(authCondition)(Home as any);
+export default withAuthorization(!!HomeWrapper)(HomeWrapper as any);

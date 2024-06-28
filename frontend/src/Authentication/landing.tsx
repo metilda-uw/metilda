@@ -9,9 +9,6 @@ export interface Props {
   history: any;
 }
 
-
-
-
 export class Landing extends React.Component<Props> {
 
   displayLoginPage = () => {

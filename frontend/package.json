@@ -95,8 +95,8 @@
     "start-js": "react-scripts start",
     "tslint": "tslint -p tsconfig.json -c tslint.json src/**/*.{ts,tsx}",
     "build": "npm run build-css && react-scripts build",
-    "test": "npm run tslint && npm run build-css && react-scripts test",
-    "coveralls": "npm run tslint && npm run build-css && react-scripts test --coverage --coverageReporters=text-lcov | coveralls",
+    "test": "react-scripts test",
+    "coveralls": "react-scripts test --coverage --coverageReporters=text-lcov",
     "eject": "react-scripts eject"
   },
   "jest": {

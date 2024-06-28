@@ -4,15 +4,12 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 
 import React, { useContext, useEffect, useState } from "react";
-import FirebaseContext from "../Firebase/context";
-import ReactGA from "react-ga";
 
 import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
 
 
-class DocumentationContent extends React.Component {
-  render() {
+export const DocumentationContentWrapper = () => {
     return (
       <div className="Home">
         <Header />
@@ -38,10 +35,9 @@ class DocumentationContent extends React.Component {
          </p>
        </div>
     );
-  }
+  
 }
 
-const authCondition = (authUser: any) => !!authUser;
-export default withAuthorization(authCondition)(DocumentationContent as any);
+export default withAuthorization(!!DocumentationContentWrapper)(DocumentationContentWrapper as any);
 
 
