@@ -17,15 +17,31 @@ function Converter(){
     const [toTimer, setToTimer] = useState(null);
     const [meTtext, setMetScaleText] = useState("Steps from A4 , A2");
     const [noteText, setNoteText] = useState('');
-
     const scaleOptions = ['Hz', 'Semitones', 'Mel', 'MeT'];
 
+    /** States to keep track and update the active from scale input field as well as the 
+     * values contained in the four from scale input fields and to scale output fields
+    */
+    const [activeFromScaleInput, setActiveFromScaleInput] = useState(null);
+    const [fromScaleValuesArray, setFromScaleValuesArray] = useState([null, null, null, null]);
+    const [toScaleValuesArray, setToScaleValuesArray] = useState([null, null, null, null]);
+    
     /**
      * Method to handle user input
      * It waits till the user complete's entering input
      * @param e input event
      */
     const onFromScaleValueChange = (e) => {
+        if (activeFromScaleInput === 0) {
+            setFromScaleName(scaleOptions[0]);
+        } else if (activeFromScaleInput === 1) {
+            setFromScaleName(scaleOptions[1]);
+        } else if (activeFromScaleInput === 2) {
+            setFromScaleName(scaleOptions[2]);
+        } else if (activeFromScaleInput === 3) {
+            setFromScaleName(scaleOptions[3]);
+        }
+
         const eventData = e;
         setFromScaleValue(e.target.value);
 
@@ -39,18 +55,19 @@ function Converter(){
 
         setFromTimer(newTimer);
     }
+    
+    // To Scale: dropdown menu code from previous research student/programmer
+    // const onToScaleValueChange = (e) => {
+    //     setToScaleValue(e.target.value)
 
-    const onToScaleValueChange = (e) => {
-        setToScaleValue(e.target.value)
+    //     clearTimeout(toTimer)
+    //     e.persist();
+    //     const newTimer = setTimeout((event) => {
+    //         handleToScaleValueChange(event);
+    //     }, 1500,e)
 
-        clearTimeout(toTimer)
-        e.persist();
-        const newTimer = setTimeout((event) => {
-            handleToScaleValueChange(event);
-        }, 1500,e)
-
-        setToTimer(newTimer);
-    }
+    //     setToTimer(newTimer);
+    // }
 
     /** This function is called when FROM scale name changes
      */
@@ -61,13 +78,23 @@ function Converter(){
     };
 
     /** This function is called when TO scale name changes
+     * To Scale: dropdown menu code from previous research student/programmer
      */
-    const handleToScaleNameChange = (e) => {
-        setToScaleName(e.target.value);
-        const convertedValue = convertScales(fromScaleValue,fromScaleName,e.target.value); // Automatically convert "To" amount
-        setToScaleValue(convertedValue);
+    // const handleToScaleNameChange = (e) => {
+    //     setToScaleName(e.target.value);
+    //     const convertedValue = convertScales(fromScaleValue,fromScaleName,e.target.value); // Automatically convert "To" amount
+    //     setToScaleValue(convertedValue);
+    // };
 
-    };
+    /** This function is called when an inactive from scale input field becomes active
+     */
+    const handleActiveFromScaleInput = (activeFromScaleInputIndex) => {
+        setActiveFromScaleInput(activeFromScaleInputIndex);
+        const newFromScaleValues = [...fromScaleValuesArray].map((value, currentIndex) =>
+            currentIndex === activeFromScaleInputIndex ? value : null
+        );
+        setFromScaleValuesArray(newFromScaleValues);
+    }
 
     /** This function is called when FROM scale VALUE changes
      */
@@ -84,27 +111,42 @@ function Converter(){
             }
         }
         setFromScaleValue(e.target.value);
-        const convertedValue = convertScales(e.target.value, fromScaleName, toScaleName); // Automatically convert "From" amount
-        setToScaleValue(convertedValue);
+        // From Scale: dropdown menu code from previous research student/programmer
+            // const convertedValue = convertScales(e.target.value, fromScaleName, toScaleName); // Automatically convert "From" amount
+        calculateConvertedValues(e.target.value, fromScaleName);
+        // From Scale: dropdown menu code from previous research student/programmer
+            // setToScaleValue(convertedValue);
     };
 
     /** This function is called when TO scale VALUE changes
+     * To Scale: dropdown menu code from previous research student/programmer
      */
-    const handleToScaleValueChange = (e) => {
-        if(toScaleName == 'Hz' && fromScaleName == 'MeT'){
-            if(e.target.value < MIN_FREQUENCY){
-                const newValue = window.confirm(`Value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added window prompt for wrong input min value HZ
-                e.target.value = MIN_FREQUENCY;
-            }
-            if(e.target.value > MAX_FREQUENCY){
-                const newValue = window.confirm(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added window prompt for wrong input max value HZ
-                e.target.value = MAX_FREQUENCY;
-            }
-        }
-        setToScaleValue(e.target.value);
-        const convertedValue = convertScales(e.target.value, toScaleName, fromScaleName); // Automatically convert "To" amount
-        setFromScaleValue(convertedValue);
-    };
+    // const handleToScaleValueChange = (e) => {
+    //     if(toScaleName == 'Hz' && fromScaleName == 'MeT'){
+    //         if(e.target.value < MIN_FREQUENCY){
+    //             const newValue = window.confirm(`Value must greater than or equal to ${MIN_FREQUENCY} HZ.`);//Added window prompt for wrong input min value HZ
+    //             e.target.value = MIN_FREQUENCY;
+    //         }
+    //         if(e.target.value > MAX_FREQUENCY){
+    //             const newValue = window.confirm(`Value must less than or equal to ${MAX_FREQUENCY} HZ.`);//Added window prompt for wrong input max value HZ
+    //             e.target.value = MAX_FREQUENCY;
+    //         }
+    //     }
+    //     setToScaleValue(e.target.value);
+    //     const convertedValue = convertScales(e.target.value, toScaleName, fromScaleName); // Automatically convert "To" amount
+    //     setFromScaleValue(convertedValue);
+    // };
+
+    /** This function is called when a FROM scale input field value changes
+    */
+    const calculateConvertedValues = (value, fromScaleName) => {
+        const newToScaleValues = [...toScaleValuesArray];
+        newToScaleValues[0] = convertScales(value, fromScaleName, scaleOptions[0]);
+        newToScaleValues[1] = convertScales(value, fromScaleName, scaleOptions[1]);
+        newToScaleValues[2] = convertScales(value, fromScaleName, scaleOptions[2]);
+        newToScaleValues[3] = convertScales(value, fromScaleName, scaleOptions[3]);
+        setToScaleValuesArray(newToScaleValues);
+    }
 
     /** This function converts value from one scale to  another scale
      * @param value : value of from scale
@@ -209,11 +251,11 @@ function Converter(){
     const getUnit = (scaleName) => {
         switch (scaleName) {
             case "Hz":
-                return "hz";
+                return "Hz";
             case "Semitones":
-                return "semitones";
+                return "Semitones";
             case "Mel":
-                return "mel";
+                return "Mel";
             case "MeT":
                 return "MeT";
             default:
@@ -229,7 +271,8 @@ function Converter(){
                 <div className="from-scale" >
                     <label className="from-label">From Scale:</label>
                     <div className="from-scale-details">
-                        <select className="from-scale-name" value={fromScaleName} onChange={handleFromScaleNameChange}>
+                        {/*From Scale: dropdown menu code from previous research student/programmer*/}
+                        {/* <select className="from-scale-name" value={fromScaleName} onChange={handleFromScaleNameChange}>
                             {scaleOptions.map((scale) => (
                                 <option key={scale} value={scale}>
                                     {scale}
@@ -257,7 +300,61 @@ function Converter(){
                                 <span className="from-scale-unit">{getUnit(fromScaleName)}</span>
                             </div>
                         )
-                        }
+                        } */}
+                        <div>
+                            <div>
+                                <input type="number" min="16.35" max="7902.13" step="0.1"
+                                    className="from-scale-value"
+                                    value={fromScaleValuesArray[0]}
+                                    onChange={onFromScaleValueChange}
+                                    onFocus={() => handleActiveFromScaleInput(0)}
+                                    style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}
+                                />
+                                <span className="from-scale-unit"
+                                    style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}>
+                                    {getUnit(scaleOptions[0])}
+                                </span>
+                            </div>
+                            <div>
+                                <input type="number" min="16.35" max="7902.13" step="0.1"
+                                    className="from-scale-value"
+                                    value={fromScaleValuesArray[1]}
+                                    onChange={onFromScaleValueChange}
+                                    onFocus={() => handleActiveFromScaleInput(1)}
+                                    style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}
+                                />
+                                <span className="from-scale-unit"
+                                    style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}>
+                                    {getUnit(scaleOptions[1])}
+                                </span>
+                            </div>
+                            <div>
+                                <input type="number" min="16.35" max="7902.13" step="0.1"
+                                    className="from-scale-value"
+                                    value={fromScaleValuesArray[2]}
+                                    onChange={onFromScaleValueChange}
+                                    onFocus={() => handleActiveFromScaleInput(2)}
+                                    style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}
+                                />
+                                <span className="from-scale-unit"
+                                    style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}>
+                                    {getUnit(scaleOptions[2])}
+                                </span>
+                            </div>
+                            <div>
+                                <input type="number" min="16.35" max="7902.13" step="0.1"
+                                    className="from-scale-value"
+                                    value={fromScaleValuesArray[3]}
+                                    onChange={onFromScaleValueChange}
+                                    onFocus={() => handleActiveFromScaleInput(3)}
+                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}
+                                />
+                                <span className="from-scale-unit"
+                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}>
+                                    {getUnit(scaleOptions[3])}
+                                </span>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         {(fromScaleName == "MeT" && toScaleName == "Hz") && <p className="p">{meTtext}</p>}
@@ -266,7 +363,8 @@ function Converter(){
                 <div className="to-scale" >
                     <label className="to-label">To Scale:</label>
                     <div className="to-scale-details">
-                        <select className="to-scale-name" value={toScaleName} onChange={handleToScaleNameChange}>
+                        {/*To Scale: dropdown menu code from previous research student/programmer*/}
+                        {/* <select className="to-scale-name" value={toScaleName} onChange={handleToScaleNameChange}>
                             {scaleOptions.map((scale) => (
                                 <option key={scale} value={scale}>
                                     {scale}
@@ -294,6 +392,52 @@ function Converter(){
                                     onChange={onToScaleValueChange}
                                 />
                                 <span className="to-scale-unit">{getUnit(toScaleName)}</span>
+                            </div>
+                        )
+                        } */}
+                        {(fromScaleName == "MeT") && (toScaleName == "Hz") && (
+                            <div>
+                            </div>
+                        )
+                        }
+                        {!((fromScaleName == "MeT") && (toScaleName == "Hz")) && (
+                            <div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="to-scale-value"
+                                        value={toScaleValuesArray[0]}
+                                        readOnly
+                                    />
+                                    <span className="to-scale-unit">{getUnit(scaleOptions[0])}</span>
+                                </div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="to-scale-value"
+                                        value={toScaleValuesArray[1]}
+                                        readOnly
+                                    />
+                                    <span className="to-scale-unit">{getUnit(scaleOptions[1])}</span>
+                                </div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="to-scale-value"
+                                        value={toScaleValuesArray[2]}
+                                        readOnly
+                                    />
+                                    <span className="to-scale-unit">{getUnit(scaleOptions[2])}</span>
+                                </div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="to-scale-value"
+                                        value={toScaleValuesArray[3]}
+                                        readOnly
+                                    />
+                                    <span className="to-scale-unit">{getUnit(scaleOptions[3])}</span>
+                                </div>
                             </div>
                         )
                         }
