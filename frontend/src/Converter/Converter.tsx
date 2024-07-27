@@ -15,7 +15,7 @@ function Converter(){
     const [toScaleValue, setToScaleValue] = useState(-96);
     const [fromTimer, setFromTimer] = useState(null);
     const [toTimer, setToTimer] = useState(null);
-    const [meTtext, setMetScaleText] = useState("Steps from A4 , A2");
+    const [meTtext, setMetScaleText] = useState("Steps from A4, A2");
     const [noteText, setNoteText] = useState('');
     const scaleOptions = ['Hz', 'Semitones', 'Mel', 'MeT'];
 
@@ -185,7 +185,7 @@ function Converter(){
         let noteName = null;
         if(freqIndex != null){
             noteName = frequencyData[freqIndex].note;
-            setMetScaleText("Steps from A4 , " + noteName);
+            setMetScaleText("Steps from A4, " + noteName);
             return ConverterHelper.ConversionFormulas[fromScaleName][toScaleName](frequency).toFixed(2);
         }
 
@@ -269,7 +269,7 @@ function Converter(){
             <h3>Converter</h3>
             <div className="scale-conversion">
                 <div className="from-scale" >
-                    <label className="from-label">From Scale:</label>
+                    <p className="from-label">From Scale:</p>
                     <div className="from-scale-details">
                         {/*From Scale: dropdown menu code from previous research student/programmer*/}
                         {/* <select className="from-scale-name" value={fromScaleName} onChange={handleFromScaleNameChange}>
@@ -361,7 +361,7 @@ function Converter(){
                     </div>
                 </div>
                 <div className="to-scale" >
-                    <label className="to-label">To Scale:</label>
+                    <p className="to-label">To Scale:</p>
                     <div className="to-scale-details">
                         {/*To Scale: dropdown menu code from previous research student/programmer*/}
                         {/* <select className="to-scale-name" value={toScaleName} onChange={handleToScaleNameChange}>

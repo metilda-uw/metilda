@@ -4,12 +4,13 @@
     .scale-conversion {
         display: flex;
         width: 100%;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
+        justify-content: space-between;
 
         .from-scale {
             width: 65%;
-            display: flex;
+            display: block;
             flex-direction: row;
             align-items: center;
             margin-left: auto;
@@ -17,14 +18,14 @@
             .from-label {
                 font-size: 16px;
                 color: brown;
-                margin-right: 10px;
+                // margin-right: 10px;
             }
 
             .from-scale-details{
-                display: flex;
-                width:400px;
+                display: block;
+                width: 100%;
                 flex-direction: row;
-                margin-right: 10px;
+                // margin-right: 10px;
                 align-items: center;
 
                 .from-scale-name{
@@ -50,7 +51,7 @@
 
         .to-scale {
             width: 65%;
-            display: flex;
+            display: block;
             flex-direction: row;
             align-items: center;
             margin-left: auto;
@@ -58,16 +59,16 @@
             .to-label {
                 font-size: 16px;
                 color: brown;
-                margin-right: 10px;
+                // margin-right: 10px;
             }
 
             .to-scale-details{
-                display: flex;
-                width:400px;
+                display: block;
+                width: 100%;
                 flex-direction: row;
                 align-items: center;
-                margin-left: 10px;
-                margin-right: 10px;
+                // margin-left: 10px;
+                // margin-right: 10px;
 
                 .to-scale-name{
                     display: block;
