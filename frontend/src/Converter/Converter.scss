@@ -37,14 +37,16 @@
                 }
 
                 .from-scale-value{
-                    width: 100px;
+                    width: 220px;
                     text-align: center;
                     margin-left: 10px;
                 }
 
             }
             .from-scale-unit{
-                width: 100px;
+                display: block;
+                width: 100%;
+                margin-bottom: 20px;
             }
 
         }
@@ -80,13 +82,15 @@
                 }
 
                 .to-scale-value{
-                    width: 100px;
+                    width: 220px;
                     text-align: center;
                     margin-left: 10px;
                 }
 
                 .to-scale-unit{
-                    width: 100px;
+                    display: block;
+                    width: 100%;
+                    margin-bottom: 20px;
                 }
             }
         }
