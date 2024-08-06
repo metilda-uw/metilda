@@ -171,7 +171,7 @@ const SendMessagePopUp = (props) => {
                 body: formData
             });
             const body = await response.json();
-            console.log("isMessageSent", body.isMessageSent);
+            // console.log("isMessageSent", body.isMessageSent);
             if(body && body.isMessageSent){
                 await saveMessage();
             }
@@ -183,10 +183,6 @@ const SendMessagePopUp = (props) => {
         try{
             const data = {firebase:firebase,timestamp :timestamp,selectedUsers:selectedUsers,message:message};
             const messages =   await saveMessagesToDatabase(data);
-            // const newMessages = [...messages, ...messagesSent];
-    
-            // const sortedMessagesSent = newMessages.sort((a, b) => b.timestamp - a.timestamp);
-            // setMessagesSent(sortedMessagesSent);
     
             setMessage("");
             setSelectedUsers([] as any);
