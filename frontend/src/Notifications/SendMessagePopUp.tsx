@@ -171,7 +171,7 @@ const SendMessagePopUp = (props) => {
                 body: formData
             });
             const body = await response.json();
-            // console.log("isMessageSent", body.isMessageSent);
+          
             if(body && body.isMessageSent){
                 await saveMessage();
             }

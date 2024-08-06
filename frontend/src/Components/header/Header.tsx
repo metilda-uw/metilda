@@ -175,10 +175,10 @@ class Header extends Component<HeaderProps, State> {
   };
 
   renderSendMessageOverlay = async () =>{
-    // console.log("Inside send msg overlay");
+   
 
     const users = await getUsers() as any;
-    // console.log("users data in ", users);
+    
     const usersData = users.map((user) =>{ return {value:user.id , label: user.name}});
 
     const appSelector = document.querySelector('.App');
