@@ -234,7 +234,7 @@ class PitchArtColorChooser extends Component<Props, State> {
             <Dialog fullWidth={true} maxWidth="md" open={this.props.isColorChangeDialogOpen}
             onClose={this.props.handleClose}aria-labelledby="form-dialog-title"> 
                 <DialogTitle onClose={this.props.handleClose} id="form-dialog-title">
-                    <p>Change Color</p>
+                    <p>{this.state.tabValue === 0 ? "Change Designs" : "Change Color"}</p>
                 </DialogTitle>
                
                 <AppBar position="static">
