@@ -53,22 +53,22 @@ const WORDS: WordLookup = {
     pitchArt21: [
         {
             uploadId: "PHEOP019 onni.wav",
-            minPitch: 30,
-            maxPitch: 38,
+            minPitch: 90,
+            maxPitch: 105,
             letters: [
                 {
                     syllable: "ON",
-                    t0: 0.5703882232235339,
-                    t1: 0.7036232238391321,
-                    pitch: 106.1081048153841,
+                    t0: 2.28,
+                    t1: 2.46,
+                    pitch: 103.6768220610205,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "NI",
-                    t0: 0.70243362561935,
-                    t1: 0.9915059930264069,
-                    pitch: 90.95704281719073,
+                    t0: 2.28,
+                    t1: 2.64,
+                    pitch: 92.82383449939886,
                     isManualPitch: false,
                     isWordSep: false
                 }
