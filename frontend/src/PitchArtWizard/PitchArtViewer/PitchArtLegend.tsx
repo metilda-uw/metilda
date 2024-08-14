@@ -48,7 +48,7 @@ export default class PitchArtLegend extends React.Component<PitchArtLegendProps,
             <div className="pitch-art-legend-list-item" key={speakerIndex}>
                 <span style={{backgroundColor: color}} className="pitch-art-legend-icon"></span>
                 <p className="pitch-art-legend-list-item-text">Speaker {speakerIndex + 1}</p>
-                <button className="waves-effect waves-light btn globalbtn" onClick={()=>{this.openColorChangeDailog(speakerIndex)}}>Change Color</button>
+                <button className="waves-effect waves-light btn globalbtn" onClick={()=>{this.openColorChangeDailog(speakerIndex)}}>Change Design</button>
             </div>
         );
     }

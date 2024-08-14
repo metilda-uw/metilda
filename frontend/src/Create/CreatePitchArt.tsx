@@ -184,7 +184,7 @@ class CreatePitchArt extends React.Component<
   }
 
   listenForData(collectionId:string,docId:string) {
-   // const id = this.props.match.params.id ? this.props.match.params.id : "";
+   
    const navigationSource = this.props.location.state ? this.props.location.state.from : null;
    if(collectionId == undefined && docId == undefined && navigationSource === 'nav-link'){
     window.location.reload();
