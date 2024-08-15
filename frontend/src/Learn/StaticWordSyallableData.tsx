@@ -76,22 +76,22 @@ const WORDS: WordLookup = {
         },
         {
             uploadId: "PHEOP011 isska.wav",
-            minPitch: 75,
-            maxPitch: 500,
+            minPitch: 70,
+            maxPitch: 120,
             letters: [
                 {
                     syllable: "ISS",
-                    t0: 0.4749116999992116,
-                    t1: 0.6468954553263592,
-                    pitch: 114.53712084993575,
+                    t0: 0.44,
+                    t1: 0.86,
+                    pitch: 114.53712084822074,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "KA",
-                    t0: 0.9550330169541649,
-                    t1: 1.2130086499448858,
-                    pitch: 77.26587110531462,
+                    t0: 0.93,
+                    t1: 1.15,
+                    pitch: 77.26587110530951,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -101,22 +101,22 @@ const WORDS: WordLookup = {
     pitchArt22: [
         {
             uploadId: "PHEOP002 aakiiwa.wav",
-            minPitch: 75,
+            minPitch: 50,
             maxPitch: 500,
             letters: [
                 {
                     syllable: "AAK",
-                    t0: 4.6757559811288205,
-                    t1: 5.024208672770138,
-                    pitch: 72.34960285118446,
+                    t0: 0.41,
+                    t1: 0.81,
+                    pitch: 90.68466546864435,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "IIWA",
-                    t0: 5.211472364196425,
-                    t1: 5.517257379310235,
-                    pitch: 80.20179997985323,
+                    t0: 0.81,
+                    t1: 1.17,
+                    pitch: 175.1823883731017,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -126,30 +126,30 @@ const WORDS: WordLookup = {
     pitchArt31: [
         {
             uploadId: "PHEOP151 awakaasiwa.wav",
-            minPitch: 75,
-            maxPitch: 500,
+            minPitch: 85,
+            maxPitch: 115,
             letters: [
                 {
                     syllable: "A",
-                    t0: 0.475870033358618,
-                    t1: 0.6303939947172325,
-                    pitch: 101.10661309610012,
+                    t0: 0,
+                    t1: 0.54,
+                    pitch: 105.57222520987281,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "WAK",
-                    t0: 0.6352228685096891,
-                    t1: 0.788137205270818,
-                    pitch: 98.62790131202878,
+                    t0: 0.54,
+                    t1: 0.7,
+                    pitch: 99.21264292740709,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "AASIWA",
-                    t0: 0.8766665581325241,
-                    t1: 1.0746503836232488,
-                    pitch: 65.07054964843938,
+                    t0: 0.7,
+                    t1: 1.42,
+                    pitch: 94.6409184237842,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -159,30 +159,30 @@ const WORDS: WordLookup = {
     pitchArt32: [
         {
             uploadId: "EOP-RS-NC-makoyi.wav",
-            minPitch: 75,
-            maxPitch: 500,
+            minPitch: 100,
+            maxPitch: 165,
             letters: [
                 {
                     syllable: "MA",
-                    t0: 0.03625365429756595,
-                    t1: 0.18647402295731383,
-                    pitch: 84.38275517277124,
+                    t0: 0.88,
+                    t1: 1.29,
+                    pitch: 123.40625662541245,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "KO",
-                    t0: 0.3159192342492243,
-                    t1: 0.45974724679579143,
-                    pitch: 105.28008985015153,
+                    t0: 1.28,
+                    t1: 1.51,
+                    pitch: 154.8095303666799,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "YI",
-                    t0: 0.4709338699938578,
-                    t1: 0.717039580351317,
-                    pitch: 65.12509898086948,
+                    t0: 1.49,
+                    t1: 1.74,
+                    pitch: 109.98694917255786,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -193,29 +193,29 @@ const WORDS: WordLookup = {
         {
             uploadId: "PHEOP014 ponokawa.wav",
             minPitch: 75,
-            maxPitch: 500,
+            maxPitch: 110,
             letters: [
                 {
                     syllable: "PO",
-                    t0: 0.7033966597605494,
-                    t1: 0.8667995289725832,
-                    pitch: 90.4558843537849,
+                    t0: 0.68,
+                    t1: 0.84,
+                    pitch: 90.17102774825014,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "NO",
-                    t0: 0.8731658745262987,
-                    t1: 1.0047370159697544,
-                    pitch: 87.51784567506309,
+                    t0: 0.84,
+                    t1: 1.09,
+                    pitch: 87.74878123206575,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "KAWA",
-                    t0: 1.1278196966749228,
-                    t1: 1.3018331418098157,
-                    pitch: 98.22343675532215,
+                    t0: 1.09,
+                    t1: 1.3,
+                    pitch: 98.75241226770078,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -225,38 +225,38 @@ const WORDS: WordLookup = {
     pitchArt41: [
         {
             uploadId: "PHEOP163 nikso'kowaksi.wav",
-            minPitch: 75,
-            maxPitch: 500,
+            minPitch: 70,
+            maxPitch: 120,
             letters: [
                 {
                     syllable: "NIK",
-                    t0: 3.318991933619896,
-                    t1: 3.48215451749801,
-                    pitch: 103.9968955854266,
+                    t0: 0.87,
+                    t1: 0.97,
+                    pitch: 111.19976398286593,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "SO",
-                    t0: 3.595369371617518,
-                    t1: 3.7785110473990744,
-                    pitch: 81.09938422857613,
+                    t0: 0.97,
+                    t1: 1.14,
+                    pitch: 103.95624057155192,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "KO",
-                    t0: 3.9649825718312046,
-                    t1: 4.184752582769073,
-                    pitch: 74.39267052767232,
+                    t0: 1.14,
+                    t1: 1.2,
+                    pitch: 86.2687918527912,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "WAKSI",
-                    t0: 4.174763036817351,
-                    t1: 4.45780017211612,
-                    pitch: 69.4276310793272,
+                    t0: 1.2,
+                    t1: 1.45,
+                    pitch: 79.68972773407367,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -266,38 +266,38 @@ const WORDS: WordLookup = {
     pitchArt42: [
         {
             uploadId: "EOP-AF-saahkomaapiwa_mono.wav",
-            minPitch: 75,
-            maxPitch: 500,
+            minPitch: 65,
+            maxPitch: 250,
             letters: [
                 {
                     syllable: "SAAH",
-                    t0: 0.5681797411724614,
-                    t1: 0.7073615563224249,
-                    pitch: 79.42285264855812,
+                    t0: 0.37,
+                    t1: 0.82,
+                    pitch: 124.8134575933624,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "KO",
-                    t0: 0.9886865018383084,
-                    t1: 1.1752493604435787,
-                    pitch: 96.09724363584401,
+                    t0: 0.82,
+                    t1: 1.08,
+                    pitch: 244.0563211173035,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "MAA",
-                    t0: 1.2137464582510153,
-                    t1: 1.4654582516073322,
-                    pitch: 69.85057161998193,
+                    t0: 1.08,
+                    t1: 1.2,
+                    pitch: 88.6713720906401,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "PIWA",
-                    t0: 1.5957561211094258,
-                    t1: 1.755667142771086,
-                    pitch: 64.56488685272433,
+                    t0: 1.2,
+                    t1: 1.73,
+                    pitch: 78.88766614778135,
                     isManualPitch: false,
                     isWordSep: false
                 }
@@ -308,37 +308,37 @@ const WORDS: WordLookup = {
         {
             uploadId: "PHEOP066 nottoana.wav",
             minPitch: 75,
-            maxPitch: 500,
+            maxPitch: 110,
             letters: [
                 {
                     syllable: "NOT",
-                    t0: 0.16198128823059565,
-                    t1: 0.28179239592252603,
-                    pitch: 97.28029198685712,
+                    t0: 2.19,
+                    t1: 2.47,
+                    pitch: 87.06193281873325,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "TO",
-                    t0: 0.5347269566054901,
-                    t1: 0.6998000383143719,
-                    pitch: 99.36647391253892,
+                    t0: 2.47,
+                    t1: 2.76,
+                    pitch: 93.17458507819406,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "AN",
-                    t0: 0.7104499145536546,
-                    t1: 0.8728605272027157,
-                    pitch: 99.99846973423681,
+                    t0: 2.77,
+                    t1: 2.88,
+                    pitch: 98.06507889644391,
                     isManualPitch: false,
                     isWordSep: false
                 },
                 {
                     syllable: "A",
-                    t0: 0.9074726249803844,
-                    t1: 1.0938454591678315,
-                    pitch: 67.34023383638507,
+                    t0: 2.88,
+                    t1: 3.2,
+                    pitch: 87.59215187153842,
                     isManualPitch: false,
                     isWordSep: false
                 }
