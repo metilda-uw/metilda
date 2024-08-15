@@ -26,7 +26,7 @@ def sendEmail():
     em['Subject'] = request.form['subject']
 
 
-    APP_PASSWORD = os.environ['GMAIL_APP_PASSWORD']
+    APP_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
     if not APP_PASSWORD:
         return jsonify({'status': 400, 'isMessageSent': False})
 
@@ -70,9 +70,9 @@ def verifyEmail():
     em['Subject'] = request.form['subject']
 
 
-    APP_PASSWORD = os.environ['GMAIL_APP_PASSWORD']
+    APP_PASSWORD = os.getenv('GMAIL_APP_PASSWORD')
     if not APP_PASSWORD:
-        return jsonify({'status': 400, 'isMessageSent': False})
+        return jsonify({'status': 400, 'isMessageSent': False,'verificationCode': -1})
 
     em.set_content(body)
 
