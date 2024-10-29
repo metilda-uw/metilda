@@ -1,4 +1,4 @@
-import React, { createRef } from "react"
+import React, { createRef } from "react" 
 import { useState, useContext, useEffect} from "react";
 import { Link, useHistory } from "react-router-dom";
 import Header from "../../../Components/header/Header";
@@ -19,6 +19,7 @@ function GradesGradableDetail() {
     const [maxGrade,setMaxGrade] = useState(0.0)
     const [veri, setVeri] = useState(true)
     const [newGrade,setNewGrade] = useState(-1)
+    const [errorMessage, setErrorMessage] = useState('')
     const history=useHistory()
 
     useEffect(() => {
@@ -43,23 +44,25 @@ function GradesGradableDetail() {
                 setMaxGrade(+response['max_grade'])
 
                 formData.append('student',studentId)
-                response = await fetch('/cms/grades/gradable/student/read', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                response = await response.json()
-                setPrevGrade(response['grade'])
+                setTimeout(async () => {
+                    response = await fetch('/cms/grades/gradable/student/read', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    })
+                    response = await response.json()
+                    setPrevGrade(response['grade'])
+                }, 1000);
             }
             catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                setErrorMessage("Error loading data.")
             }
         }
         fetchData()
     }, [])
-    
+
     function onGrade(e) {
         e.preventDefault()
         if (newGrade>1000000 || newGrade<0)
@@ -92,7 +95,6 @@ function GradesGradableDetail() {
         if (newGrade>1000000 || newGrade<0)
             return
         async function fetchData() {
-            // Grade
             let formData = new FormData();
             formData.append('user', user.email);
             formData.append('student', studentId);
@@ -110,8 +112,7 @@ function GradesGradableDetail() {
             catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console")
             }
-            
-            // Next
+
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('student', studentId);
@@ -132,7 +133,7 @@ function GradesGradableDetail() {
                 else {
                     history.push(`/content-management/course/${courseId}/grades/gradable/${gradableId}`)
                 }
-                    
+
             }
             catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console")
@@ -140,7 +141,6 @@ function GradesGradableDetail() {
         }
         fetchData()
     }
-
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
@@ -156,6 +156,7 @@ function GradesGradableDetail() {
                         <div className="title">{title}</div>
                         <div><b>Student:</b> {studentId}</div>
                         <div><b>Grade:</b> {prevGrade === -1.0 ? '-' : prevGrade}/{maxGrade} </div>
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
                         <form>
                             <div>
                                 <input type="number" onChange={(e) => setNewGrade(+e.target.value)} style={{ 'width': 'auto', 'height': 'auto' }} required max={1000000} min={0} step={0.01}></input> &nbsp;

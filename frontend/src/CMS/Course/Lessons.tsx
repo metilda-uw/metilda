@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react" 
 import { useState, useContext, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import Header from "../../Components/header/Header";
@@ -19,6 +19,7 @@ function Lessons() {
     const [name, setName] = useState('')
     const [available, setAvailable] = useState('')
     const [veri, setVeri] = useState(true)
+    const [error, setError] = useState<string | null>(null); // New error state
 
     const [draggable,setDraggable]=useState(false)
 
@@ -32,6 +33,7 @@ function Lessons() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating a 2-second delay
                 await fetch('/cms/lessons', {
                     method: "POST",
                     headers: {
@@ -41,14 +43,17 @@ function Lessons() {
                 }).then(x => x.json())
                 .then(x => x.map(obj => obj[0]+','+obj[1]+','+obj[2]+','+obj[3]))
                 .then(x => x.join(';'))
-                .then(setLessonListString);
-            }
-            catch (error) {
-                console.log(error)
+                .then(setLessonListString)
+                .catch(err => {
+                    console.log(err)
+                    setError("Error loading lessons."); // Set error message
+                });
+            } catch (error) {
+                setError("Error loading lessons."); // Set error message
             }
         }
         fetchData()
-    },[])
+    }, [])
 
     Modal.setAppElement('.App')
 
@@ -62,11 +67,11 @@ function Lessons() {
             backgroundColor: 'rgba(255, 255, 255, 0.75)'
         },
         content: {
-          top: '50%',
-          left: '50%',
-          right: 'auto',
-          bottom: 'auto',
-          transform: 'translate(-50%, -50%)',
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            transform: 'translate(-50%, -50%)',
         },
     };
 
@@ -147,30 +152,31 @@ function Lessons() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className='title'>Lessons:</div>
-                        {lessonListString ?
+                        {error && <div style={{ color: 'red' }}>{error}</div>}
+                        {lessonListString ? (
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                                 <Droppable droppableId="lessons">
                                     {(provided) => (
                                         <div className="lessons" {...provided.droppableProps} ref={provided.innerRef}>
                                             {
-                                            lessonList.map((lesson, index) => {
-                                            return (
-                                                <Draggable isDragDisabled={!draggable} key={lesson.split(',')[0]} draggableId={lesson.split(',')[0]} index={index}>
-                                                    {(provided) => (
-                                                        <div className="unstyle list-item" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                lessonList.map((lesson, index) => {
+                                                    return (
+                                                        <Draggable isDragDisabled={!draggable} key={lesson.split(',')[0]} draggableId={lesson.split(',')[0]} index={index}>
+                                                            {(provided) => (
+                                                                <div className="unstyle list-item" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
                                                             <Link to={'/content-management/course/'+courseId+'/lessons/'+lesson.split(',')[0]} className="content-link list-item-title">{ lesson.split(',')[1] }</Link>
-                                                            <div><b>Available:</b> {lesson.split(',')[3] === 'true' ? 'Yes' : 'No'}</div>
-                                                        </div>
-                                                    )}
-                                                </Draggable>
-                                            );
-                                            })}
+                                                                    <div><b>Available:</b> {lesson.split(',')[3] === 'true' ? 'Yes' : 'No'}</div>
+                                                                </div>
+                                                            )}
+                                                        </Draggable>
+                                                    );
+                                                })}
                                             {provided.placeholder}
                                         </div>
                                     )}
                                 </Droppable>
                             </DragDropContext>
-                        :null}
+                        ) : null}
                     </div>
 
                     <div className="float-right">
@@ -178,11 +184,11 @@ function Lessons() {
                         <div>
                             {
                                 draggable ?
-                                <button className='btn waves-light globalbtn' onClick={() => { onReorganize();setDraggable(false) }}>Save lesson list</button>
-                                :
-                                <button className='btn waves-light globalbtn' onClick={() => setDraggable(true)}>Reorganize lesson list</button>
+                                    <button className='btn waves-light globalbtn' onClick={() => { onReorganize();setDraggable(false) }}>Save lesson list</button>
+                                    :
+                                    <button className='btn waves-light globalbtn' onClick={() => setDraggable(true)}>Reorganize lesson list</button>
                             }
-                            
+
                         </div>
                     </div>
 

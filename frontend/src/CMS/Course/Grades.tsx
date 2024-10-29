@@ -1,5 +1,5 @@
-import React from "react"
-import { useState, useContext, useEffect, useMemo } from "react";
+import React from "react" 
+import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../Components/header/Header";
 import { withAuthorization } from "../../Session";
@@ -23,6 +23,7 @@ function Grades() {
     const [name, setName] = useState('')
     const [maxGrade, setMaxGrade] = useState('')
     const [weight, setWeight] = useState(0.0)
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -34,6 +35,7 @@ function Grades() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 await fetch('/cms/assignments', {
                     method: "POST",
                     headers: {
@@ -45,16 +47,19 @@ function Grades() {
                 .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
                 .then(JSON.stringify)
                 .then(setAssignmentListString)
+                .catch(err => {
+                    console.log("Fetch failed, see if it is 403 in error console");
+                    setError("Error loading assignments.");
+                });
+            } catch (error) {
+                setError("Error loading assignments.");
             }
-            catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
-            }
-
 
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
+                await new Promise(resolve => setTimeout(resolve, 2000));
                 await fetch('/cms/grades/quiz', {
                     method: "POST",
                     headers: {
@@ -63,17 +68,21 @@ function Grades() {
                     body: formData
                 })
                 .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
+                .then(x => x.sort((b, a) => { return (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime() }))
                 .then(setQuizList)
-            }
-            catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                .catch(err => {
+                    console.log("Fetch failed, see if it is 403 in error console");
+                    setError("Error loading quizzes.");
+                });
+            } catch (error) {
+                setError("Error loading quizzes.");
             }
 
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating a 2-second delay
                 await fetch('/cms/grades/gradables', {
                     method: "POST",
                     headers: {
@@ -82,12 +91,15 @@ function Grades() {
                     body: formData
                 })
                 .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.created_at)).getTime()-(new Date(a.created_at)).getTime()}))
+                .then(x => x.sort((b, a) => { return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime() }))
                 .then(JSON.stringify)
                 .then(setOtherListString)
-            }
-            catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                .catch(err => {
+                    console.log("Fetch failed, see if it is 403 in error console");
+                    setError("Error loading gradables.");
+                });
+            } catch (error) {
+                setError("Error loading gradables.");
             }
         }
         fetchData()
@@ -120,9 +132,9 @@ function Grades() {
         formData.append('name', name);
         formData.append('max_grade', maxGrade);
         formData.append('weight', weight.toString())
-        const newDate=new Date()
-        formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth())+1) + '-' + newDate.getUTCDate() + ' '
-            + newDate.getUTCHours() + ':' + newDate.getUTCMinutes()+':'+newDate.getUTCSeconds())
+        const newDate = new Date()
+        formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth()) + 1) + '-' + newDate.getUTCDate() + ' '
+            + newDate.getUTCHours() + ':' + newDate.getUTCMinutes() + ':' + newDate.getUTCSeconds())
         formData.append('course', courseId);
         try {
             await fetch('/cms/grades/gradable/create', {
@@ -132,8 +144,7 @@ function Grades() {
                 },
                 body: formData
             })
-        }
-        catch (error) {
+        } catch (error) {
             console.log("Fetch failed, see if it is 403 in error console")
         }
 
@@ -159,26 +170,36 @@ function Grades() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className="title">Assignments:</div>
-                        {assignmentListString?JSON.parse(assignmentListString).map(x => (
-                            <div key={x.assignment+'1'} className="list-item">
-                                <div key={x.assignment+'2'}><Link className="content-link list-item-title" key={x.assignment+'3'} to={'/content-management/course/' + courseId + '/grades/assignment/' + x.assignment}>{x.name}</Link></div>
+                        {error ? ( // Display error message if there is an error
+                            <div style={{ color: 'red' }}>{error}</div>
+                        ) : assignmentListString ? JSON.parse(assignmentListString).map(x => (
+                            <div key={x.assignment + '1'} className="list-item">
+                                <div key={x.assignment + '2'}>
+                                    <Link className="content-link list-item-title" key={x.assignment + '3'} to={'/content-management/course/' + courseId + '/grades/assignment/' + x.assignment}>{x.name}</Link>
+                                </div>
                             </div>
                         )) : null}
                         <div className="title">Quiz:</div>
-                        {quizList.length?quizList.map(x => (
+                        {error ? ( // Display error message if there is an error
+                            <div style={{ color: 'red' }}>{error}</div>
+                        ) : quizList.length ? quizList.map(x => (
                             <div key={x.quiz} className="list-item">
                                 <Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/grades/quiz/' + x.quiz}>{x.name}</Link>
                             </div>
                         )) : null}
                         <div className="title">Other:</div>
-                        {otherListString?JSON.parse(otherListString).map(x => (
-                            <div key={x.id+'1'} className="list-item">
-                                <div key={x.id+'2'}><Link className="content-link list-item-title" key={x.id+'3'} to={'/content-management/course/' + courseId + '/grades/gradable/' + x.id}>{x.name}</Link></div>
+                        {error ? ( // Display error message if there is an error
+                            <div style={{ color: 'red' }}>{error}</div>
+                        ) : otherListString ? JSON.parse(otherListString).map(x => (
+                            <div key={x.id + '1'} className="list-item">
+                                <div key={x.id + '2'}>
+                                    <Link className="content-link list-item-title" key={x.id + '3'} to={'/content-management/course/' + courseId + '/grades/gradable/' + x.id}>{x.name}</Link>
+                                </div>
                             </div>
                         )) : null}
                     </div>
 
-                    
+
                     <Modal
                         isOpen={showModal}
                         // onAfterOpen={afterOpenModal}

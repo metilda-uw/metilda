@@ -1,55 +1,53 @@
-import React from "react"
-import { useState, useContext, } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import Header from "../../../Components/header/Header";
 import { withAuthorization } from "../../../Session";
 import { AuthUserContext } from "../../../Session";
 import Sidebar from ".././Sidebar";
 import { useParams } from "react-router-dom";
-import { Editor } from 'react-draft-wysiwyg'
+import { Editor } from 'react-draft-wysiwyg';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import "../GeneralStyles.scss"
+import "../GeneralStyles.scss";
 import { useHistory } from "react-router-dom";
-import "./Discussion.scss"
+import "./Discussion.scss";
 
 export function CreatePost() {
-    const user = useContext(AuthUserContext) as any
-    const courseId = useParams()['id']
-    const topicId = useParams()['topic_id']
+    const user = useContext(AuthUserContext) as any;
+    const courseId = useParams()['id'];
+    const topicId = useParams()['topic_id'];
 
-    const history = useHistory()
+    const history = useHistory();
     
     const [contentState, setContentState] = useState();
-        
-    const [newTitle, setNewTitle] = useState('')
+    const [newTitle, setNewTitle] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     async function onSubmit(e) {
-        e.preventDefault()
+        e.preventDefault();
         const formData = new FormData();
         formData.append('user', user.email);
         formData.append('title', newTitle);
-        formData.append('content', JSON.stringify(contentState))
-        formData.append('author', user.email)
-        formData.append('topic', topicId)
-        const newDate=new Date()
-        formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth())+1) + '-' + newDate.getUTCDate() + ' '
-            + newDate.getUTCHours() + ':' + newDate.getUTCMinutes()+':'+newDate.getUTCSeconds())
+        formData.append('content', JSON.stringify(contentState));
+        formData.append('author', user.email);
+        formData.append('topic', topicId);
+        const newDate = new Date();
+        formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth()) + 1) + '-' + newDate.getUTCDate() + ' '
+            + newDate.getUTCHours() + ':' + newDate.getUTCMinutes() + ':' + newDate.getUTCSeconds());
 
-        try {
-            await fetch('/cms/posts/create', {
-                method: "POST",
-                headers: {
-                    Accept: "application/json"
-                },
-                body: formData
-            })
-        }
-        catch (error) {
-            console.log("Fetch failed, see if it is 403 in error console")
-        }
-
-        history.push('/content-management/course/'+courseId+'/discussion/topic/'+topicId)
+        setTimeout(async () => {
+            try {
+                await fetch('/cms/posts/create', {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+                history.push('/content-management/course/' + courseId + '/discussion/topic/' + topicId);
+            } catch (error) {
+                setErrorMessage("Error creating post. Please try again.");
+            }
+        }, 1000);
     }
-
 
     return (
         <div>
@@ -59,8 +57,9 @@ export function CreatePost() {
                 <div className="height-column"></div>
                 <div className="main-view">
                     <div className="info-list">
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
                         <form onSubmit={onSubmit}>
-                            <div><b>Title:</b> <input className="new-title" onChange={(e)=>setNewTitle(e.target.value)} required maxLength={30}></input></div>
+                            <div><b>Title:</b> <input className="new-title" onChange={(e) => setNewTitle(e.target.value)} required maxLength={30}></input></div>
                             <Editor
                                 onContentStateChange={setContentState}
                                 wrapperClassName="editor-wrapper"
@@ -69,20 +68,14 @@ export function CreatePost() {
                                 stripPastedStyles={true}
                             >
                             </Editor>
-                            {/* <div>Preview: {contentState ? <div>{JSON.stringify(contentState)}</div> : null}</div>
-                            <div>Preview: {contentState ? <div>{JSON.stringify(JSON.parse(JSON.stringify(contentState)))}</div> : null}</div>
-                            <div>Preview: {contentState ? <div dangerouslySetInnerHTML={{ __html: draftToHtml(contentState) }}></div>: null}</div> */}
                             <div><button type="submit" className='btn waves-light globalbtn'>Create</button></div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    )
+    );
 }
-
-
-
 
 const authCondition = (authUser: any) => !!authUser;
 export default withAuthorization(authCondition)(CreatePost as any) as any;

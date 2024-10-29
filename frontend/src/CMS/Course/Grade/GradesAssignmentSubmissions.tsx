@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react" 
 import { useState, useContext, useEffect} from "react";
 import { Link } from "react-router-dom";
 import Header from "../../../Components/header/Header";
@@ -17,6 +17,7 @@ function GradesAssignmentSubmissions() {
     const [average, setAverage] = useState(0.0)
     const [std,setStd]=useState(0.0)
     const [veri, setVeri] = useState(true)
+    const [error, setError] = useState('')
 
     useEffect(() => {
         async function fetchData() {
@@ -28,43 +29,46 @@ function GradesAssignmentSubmissions() {
             formData.append('user', user.email);
             formData.append('assignment', assignmentId);
             try {
-                let response=await fetch('/cms/grades/assignment/submissions', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                let responseJSON = await response.json()
-                responseJSON.sort((a,b)=>{return (new Date(b.time)).getTime()-(new Date(a.time)).getTime()})
-                setSubmissionListString(JSON.stringify(responseJSON))
+                setTimeout(async () => {
+                    let response=await fetch('/cms/grades/assignment/submissions', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    })
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    let responseJSON = await response.json()
+                    responseJSON.sort((a,b)=>{return (new Date(b.time)).getTime()-(new Date(a.time)).getTime()})
+                    setSubmissionListString(JSON.stringify(responseJSON))
 
-                let graded=Object.keys(responseJSON).length
-                let sum = 0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += record.grade
+                    let graded=Object.keys(responseJSON).length
+                    let sum = 0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += record.grade
+                        else
+                            graded-=1
+                    }
+                    if(graded)
+                        setAverage(sum / graded)
                     else
-                        graded-=1
-                }
-                if(graded)
-                    setAverage(sum / graded)
-                else
-                    setAverage(0)
-                
-                let avg = sum / graded
-                sum = 0.0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += (record.grade - avg) ** 2
-                }
-                if(graded)
-                    setStd((sum / graded) ** 0.5)
-                else
-                    setStd(0)
+                        setAverage(0)
+                    
+                    let avg = sum / graded
+                    sum = 0.0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += (record.grade - avg) ** 2
+                    }
+                    if(graded)
+                        setStd((sum / graded) ** 0.5)
+                    else
+                        setStd(0)
+                }, 1000);
             }
             catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                setError('Error loading submissions, please try again later.')
             }
         }
         fetchData()
@@ -73,6 +77,7 @@ function GradesAssignmentSubmissions() {
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
     }
+    
     return (
         <div>
             <Header></Header>
@@ -82,7 +87,8 @@ function GradesAssignmentSubmissions() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className='title'>Submissions:</div>
-                        {submissionListString?JSON.parse(submissionListString).map(x => (
+                        {error ? <div>{error}</div> : null}
+                        {submissionListString ? JSON.parse(submissionListString).map(x => (
                             <div key={x.submission + '1'} className="list-item">
                                 <div key={x.submission+'2'}><Link className="content-link list-item-title" key={x.submission+'3'} to={'/content-management/course/' + courseId + '/grades/assignment/' + assignmentId+'/submission/'+x.submission}>{x.user}</Link></div>
                                 <div key={x.submission + '4'}><b>Grade:</b> {x.grade===-1?'-':x.grade}/{x.max_grade} &nbsp;&nbsp; <b>Submission time:</b> {new Date(x.time).toLocaleString()}</div>

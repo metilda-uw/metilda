@@ -7,6 +7,7 @@ import { withAuthorization } from "../Session";
 import { AuthUserContext } from "../Session";
 import Modal from 'react-modal'
 import { verifyTeacher } from "./AuthUtils";
+import { spinner } from "../Utils/LoadingSpinner";
 
 function ContentManagement() {
     const [courseListString, setCourseListString] = useState('')
@@ -21,6 +22,9 @@ function ContentManagement() {
     const [newAvailable, setNewAvailable] = useState('1')
     const [newSchedule, setNewSchedule] = useState('')
     const [veri, setVeri] = useState(true)
+
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -41,9 +45,14 @@ function ContentManagement() {
                     .then(x => x.map(obj => obj[0] + ',' + obj[1]))
                     .then(x => x.join(';'))
                     .then(setCourseListString);
+
+                    setError(null);
             }
             catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                console.log("Fetch failed, see if it is 403 in error console");
+                setError("Failed to load courses. Please try again.");
+            } finally {
+                setTimeout(() => setIsLoading(false), 6000);
             }
         }
         fetchData()
@@ -139,8 +148,14 @@ function ContentManagement() {
             <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)}>Create a course</button>
             <div className="course-list">
                 <div className="title">My Courses</div>
-                {courseList.map(x =>
-                    <div className="list-item" key={x}><Link className="content-link" to={'/content-management/course/' + x.split(',')[0]}>{x.split(',')[1]}</Link></div>
+                {isLoading ? (
+                    <div>{spinner()} </div>
+                ) : error ? (
+                    <div className="error">{error}</div>
+                ) : (
+                    courseList.map(x =>
+                        <div className="list-item" key={x}><Link className="content-link" to={'/content-management/course/' + x.split(',')[0]}>{x.split(',')[1]}</Link></div>
+                    )
                 )}
             </div>
         </div>

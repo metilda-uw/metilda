@@ -1,4 +1,4 @@
-import React, { createRef } from "react"
+import React, { createRef } from "react" 
 import { useState, useContext, useEffect} from "react";
 import { Link, useHistory } from "react-router-dom";
 import Header from "../../../Components/header/Header";
@@ -21,6 +21,7 @@ function GradesQuiz() {
     const [average, setAverage] = useState(0.0)
     const [std, setStd] = useState(0.0)
     const [questionList,setQuestionList]=useState([])
+    const [errorMessage, setErrorMessage] = useState('')
 
     useEffect(() => {
         async function fetchData() {
@@ -32,58 +33,59 @@ function GradesQuiz() {
             formData.append('user', user.email);
             formData.append('quiz', quizId);
             try {
-                let response = await fetch('/cms/grades/quiz/read', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                response = await response.json()
-                setTitle(response['name'])
-                setMaxGrade(+response['max_grade'])
-                setStudentList(response['grades'].sort((a, b) => {
-                    if (a.student > b.student)
-                        return 1
-                    else 
-                        return -1
-                }))
+                setTimeout(async () => {
+                    let response = await fetch('/cms/grades/quiz/read', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    })
+                    response = await response.json()
+                    setTitle(response['name'])
+                    setMaxGrade(+response['max_grade'])
+                    setStudentList(response['grades'].sort((a, b) => {
+                        if (a.student > b.student)
+                            return 1
+                        else 
+                            return -1
+                    }))
 
-                let responseJSON=response['grades']
-                let graded=Object.keys(responseJSON).length
-                let sum = 0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += record.grade
+                    let responseJSON=response['grades']
+                    let graded=Object.keys(responseJSON).length
+                    let sum = 0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += record.grade
+                        else
+                            graded-=1
+                    }
+                    if(graded)
+                        setAverage(sum / graded)
                     else
-                        graded-=1
-                }
-                if(graded)
-                    setAverage(sum / graded)
-                else
-                    setAverage(0)
-                
-                let avg = sum / graded
-                sum = 0.0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += (record.grade - avg) ** 2
-                }
-                if(graded)
-                    setStd((sum / graded) ** 0.5)
-                else
-                    setStd(0)
+                        setAverage(0)
 
-                
-                setQuestionList(response['questions'])
+                    let avg = sum / graded
+                    sum = 0.0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += (record.grade - avg) ** 2
+                    }
+                    if(graded)
+                        setStd((sum / graded) ** 0.5)
+                    else
+                        setStd(0)
+
+
+                    setQuestionList(response['questions'])
+                }, 1000)
             }
             catch (error) {
-                console.log(error)
+                setErrorMessage("Error loading data.")
             }
         }
         fetchData()
     }, [])
-    
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
@@ -107,6 +109,8 @@ function GradesQuiz() {
                         )) : null}
                         <div className="title">Statistics:</div>
                         <div><b>Average:</b> {average.toFixed(2)} &nbsp; <b>Standard deviation:</b> {std.toFixed(2)}</div>
+
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
 
                         <div className="title">Speech Questions to Grade</div>
                         {questionList ? questionList.map((x, index) =>

@@ -10,6 +10,7 @@ import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss"
 import "./Discussion/Discussion.scss"
 import { verifyTeacherCourse } from "../AuthUtils";
+import { spinner } from "../../Utils/LoadingSpinner";
 
 function Discussion() {
     const user = useContext(AuthUserContext) as any
@@ -22,6 +23,9 @@ function Discussion() {
 
     const [showModal, setShowModal] = useState(false)
     const [veri, setVeri] = useState(true)
+
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(false);
 
     function resetStates() {
         setNewName('')
@@ -37,26 +41,33 @@ function Discussion() {
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
-            try {
-                await fetch('/cms/topics', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.created_at)).getTime()-(new Date(a.created_at)).getTime()}))
-                .then(JSON.stringify)
-                .then(setTopicListString)
-            }
-            catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
-            }
+
+            setTimeout(async () => {
+                try {
+                    const response = await fetch('/cms/topics', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    });
+                    const data = await response.json();
+                    const sortedData = data.sort((b, a) => {
+                        return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
+                    });
+                    setTopicListString(JSON.stringify(sortedData));
+                } catch (error) {
+                    console.log("Fetch failed, see if it is 403 in error console");
+                    setError(true);
+                } finally {
+                    setLoading(false);
+                }
+            }, 1000); // Simulate a 1 second loading time
         }
-        fetchData()
-    },[])
-    
+
+        fetchData();
+    }, []);
+
     Modal.setAppElement('.App')
 
     const customStyles = {
@@ -69,11 +80,11 @@ function Discussion() {
             backgroundColor: 'rgba(255, 255, 255, 0.75)'
         },
         content: {
-          top: '50%',
-          left: '50%',
-          right: 'auto',
-          bottom: 'auto',
-          transform: 'translate(-50%, -50%)',
+            top: '50%',
+            left: '50%',
+            right: 'auto',
+            bottom: 'auto',
+            transform: 'translate(-50%, -50%)',
         },
     };
 
@@ -106,7 +117,7 @@ function Discussion() {
         resetStates()
         window.location.reload()
     }
-    
+
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
     }
@@ -117,16 +128,22 @@ function Discussion() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <div className="info-list">
-                        <div className="title">Topics:</div>
+                    {loading ? (
+                        <div>{spinner()} </div>
+                    ) : error ? (
+                        <div className="error-message">Error loading topics. Please try again later.</div>
+                    ) : (
+                        <div className="info-list">
+                            <div className="title">Topics:</div>
                         {topicListString?JSON.parse(topicListString).map(x => (
-                            <div key={x.topic} className="list-item">
-                                <div key={x.topic}><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/discussion/topic/' + x.topic}>{x.name}</Link></div>
-                                <div key={x.description}>{x.description}</div>
-                                <div key={x.created_at} className="created-at"><b>Created at:</b> {new Date(x.created_at).toLocaleString()}</div>
-                            </div>
+                                <div key={x.topic} className="list-item">
+                                    <div key={x.topic}><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/discussion/topic/' + x.topic}>{x.name}</Link></div>
+                                    <div key={x.description}>{x.description}</div>
+                                    <div key={x.created_at} className="created-at"><b>Created at:</b> {new Date(x.created_at).toLocaleString()}</div>
+                                </div>
                         )):null}
-                    </div>
+                        </div>
+                    )}
 
                     <div className="float-right">
                         <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)}>Create a topic</button>
@@ -147,7 +164,6 @@ function Discussion() {
                                 <div><button type="submit" className='btn waves-light globalbtn'>Create</button></div>
                                 <div><button className='btn waves-light globalbtn' onClick={() => { setShowModal(false); resetStates() }}>Cancel</button></div>
                             </form>
-
                         </Modal>
                     </div>
 

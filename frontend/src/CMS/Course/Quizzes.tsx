@@ -1,5 +1,5 @@
-import React from "react"
-import { useState, useContext, useEffect, useMemo } from "react";
+import React from "react" 
+import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../Components/header/Header";
 import { withAuthorization } from "../../Session";
@@ -22,7 +22,7 @@ function Quizzes() {
     const [weight, setWeight] = useState(0.0)
     const [showModal, setShowModal] = useState(false)
     const [veri, setVeri] = useState(true)
-
+    const [errorMessage, setErrorMessage] = useState('');
 
     function resetStates() {
         setName('')
@@ -35,32 +35,40 @@ function Quizzes() {
 
     useEffect(() => {
         async function fetchData() {
-            await verifyTeacherCourse(user.email,courseId,setVeri)
-            if(!veri)
+            await verifyTeacherCourse(user.email, courseId, setVeri)
+            if (!veri)
                 return
 
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await fetch('/cms/quiz', {
+                // Simulate delay
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+                const response = await fetch('/cms/quiz', {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
                     },
                     body: formData
-                })
-                .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
-                .then(setQuizList)
-            }
-            catch (e) {
-                console.log(e)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                setQuizList(data.sort((b, a) => (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime()));
+                setErrorMessage('');
+            } catch (error) {
+                console.error(error);
+                setErrorMessage('Error loading quizzes. Please try again later.');
             }
         }
         fetchData()
-    },[])
-    
+    }, [])
+
     Modal.setAppElement('.App')
 
     const customStyles = {
@@ -93,7 +101,6 @@ function Quizzes() {
         formData.append('max_grade', maxGrade.toString())
         formData.append('weight', weight.toString())
 
-
         try {
             await fetch('/cms/quiz/create', {
                 method: "POST",
@@ -102,8 +109,7 @@ function Quizzes() {
                 },
                 body: formData
             })
-        }
-        catch (error) {
+        } catch (error) {
             console.log("Fetch failed, see if it is 403 in error console")
         }
 
@@ -111,7 +117,6 @@ function Quizzes() {
         resetStates()
         window.location.reload()
     }
-
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
@@ -125,7 +130,8 @@ function Quizzes() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className="title">Quiz:</div>
-                        {quizList.length?quizList.map(x => (
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
+                        {quizList.length ? quizList.map(x => (
                             <div key={x.quiz} className="list-item">
                                 <div><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/quiz/' + x.quiz}>{x.name}</Link></div>
                                 <div className="deadline"><b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
@@ -140,7 +146,6 @@ function Quizzes() {
                     <div>
                         <Modal
                             isOpen={showModal}
-                            // onAfterOpen={afterOpenModal}
                             onRequestClose={() => { setShowModal(false); resetStates() }}
                             contentLabel="Example Modal"
                             style={customStyles}
@@ -158,7 +163,6 @@ function Quizzes() {
                             </form>
                         </Modal>
                     </div>
-                    
                 </div>
             </div>
         </div>

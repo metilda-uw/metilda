@@ -1,5 +1,5 @@
-import React from "react"
-import { useState, useContext, } from "react";
+import React from "react" 
+import { useState, useContext } from "react";
 import Header from "../../../Components/header/Header";
 import { withAuthorization } from "../../../Session";
 import { AuthUserContext } from "../../../Session";
@@ -29,11 +29,12 @@ export function CreateAssignment() {
     const [fileName, setfileName] = useState('')
     const [maxGrade, setMaxGrade] = useState(0.0)
     const [weight, setWeight] = useState(0.0)
+    const [errorMessage, setErrorMessage] = useState('')
     let assignmentId=''
 
     const uploadHandler = async (para_files: any) => {
         try {
-          await uploadFileWrapper(para_files, f=>f, firebase, courseId, 'assignment','','/cms/assignment/file',{'assignment':assignmentId});
+          await uploadFileWrapper(para_files, f => f, firebase, courseId, 'assignment', '', '/cms/assignment/file', { 'assignment': assignmentId });
         } catch (ex) {
           console.log(ex);
         }
@@ -62,8 +63,8 @@ export function CreateAssignment() {
         formData.append('max_grade', maxGrade.toString())
         formData.append('weight', weight.toString())
 
-
         try {
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await fetch('/cms/assignments/create', {
                 method: "POST",
                 headers: {
@@ -72,10 +73,12 @@ export function CreateAssignment() {
                 body: formData
             })
             .then(x => x.json())
-            .then(x => assignmentId=x.assignment)
+            .then(x => assignmentId = x.assignment)
+            setErrorMessage('');
         }
         catch (error) {
-            console.log(error)
+            setErrorMessage('Error loading. Please try again later.');
+            console.log(error);
         }
         try {
             if (uploadFiles) {
@@ -84,7 +87,7 @@ export function CreateAssignment() {
         } catch (ex) {
             console.log(ex);
         }
-        history.push('/content-management/course/'+courseId+'/assignments')
+        history.push('/content-management/course/' + courseId + '/assignments')
     }
     
     return (
@@ -96,7 +99,7 @@ export function CreateAssignment() {
                 <div className="main-view">
                     <div className="info-list">
                         <form onSubmit={onSubmit}>
-                            <div><b>Title:</b> <input style={{'height':'auto','width':'auto'}} className="new-title" onChange={(e)=>setNewTitle(e.target.value)} required maxLength={30}></input></div>
+                            <div><b>Title:</b> <input style={{ 'height': 'auto', 'width': 'auto' }} className="new-title" onChange={(e) => setNewTitle(e.target.value)} required maxLength={30}></input></div>
                             <Editor
                                 onContentStateChange={setContentState}
                                 wrapperClassName="editor-wrapper"
@@ -106,7 +109,7 @@ export function CreateAssignment() {
                             >
                             </Editor>
                             <div><b>Deadline:</b> <input style={{ 'width': 'auto', 'height': 'auto' }} type='datetime-local' onChange={(e) => setNewDeadline(e.target.value)} required></input></div>
-                            <div><b>Available:</b> <input type='checkbox' checked={newAvailable === '1' ? true : false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position':'unset' }} onChange={(e) => setNewAvailable(e.target.checked ? '1' : '0')}></input></div>
+                            <div><b>Available:</b> <input type='checkbox' checked={newAvailable === '1' ? true : false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position': 'unset' }} onChange={(e) => setNewAvailable(e.target.checked ? '1' : '0')}></input></div>
                             <div>
                                 <b>Assignment File:</b> {fileName ? fileName : 'No file selected'} &nbsp;&nbsp;&nbsp;
                                 <ReactFileReader
@@ -123,7 +126,8 @@ export function CreateAssignment() {
                                 </FileDrop>
                             </div>
                             <div><b>Max Grades:</b> <input type="number" value={maxGrade} style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e) => setMaxGrade(+e.target.value)} required max={1000000} min={0.01} step={0.01}></input></div>
-                            <div><b>Weight:</b> <input type="number" value={weight} style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e)=>setWeight(+e.target.value)} required max={1} min={0} step={0.0001}></input></div>
+                            <div><b>Weight:</b> <input type="number" value={weight} style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e) => setWeight(+e.target.value)} required max={1} min={0} step={0.0001}></input></div>
+                            {errorMessage && <div className="error-message">{errorMessage}</div>}
                             <div><button type="submit" className='btn waves-light globalbtn'>Create</button></div>
                         </form>
                     </div>
@@ -132,7 +136,6 @@ export function CreateAssignment() {
         </div>
     )
 }
-
 
 const authCondition = (authUser: any) => !!authUser;
 export default withAuthorization(authCondition)(CreateAssignment as any) as any;
