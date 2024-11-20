@@ -153,6 +153,8 @@ class PitchRange extends Component {
             />
           </label>
           <p>Hz</p>
+          </div>
+        <div>
           <button
             className="waves-effect waves-light btn globalbtn"
             type="submit"
