@@ -12,6 +12,7 @@ export default function Sidebar(args) {
                 <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/assignments'} >Assignment</Link></div>
                 <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/quiz'} >Quiz</Link></div>
                 <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/grades'} >Grades</Link></div>
+                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/play_and_learn'} >Play & Learn</Link></div>
             </aside>
         </div>
     )

@@ -1,4 +1,4 @@
-import React, { createRef } from "react"
+import React, { createRef } from "react" 
 import { useState, useContext, useEffect} from "react";
 import { Link, useHistory } from "react-router-dom";
 import Header from "../../../Components/header/Header";
@@ -25,6 +25,7 @@ function GradesGradable() {
     const [newWeight, setNewWeight] = useState(0.0)
     const [average, setAverage] = useState(0.0)
     const [std,setStd]=useState(0.0)
+    const [error, setError] = useState('')
     const history=useHistory()
 
     useEffect(() => {
@@ -37,56 +38,59 @@ function GradesGradable() {
             formData.append('user', user.email);
             formData.append('gradable', gradableId);
             try {
-                let response = await fetch('/cms/grades/gradable/read', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                response = await response.json()
-                setTitle(response['name'])
-                setNewTitle(response['name'])
-                setMaxGrade(+response['max_grade'])
-                setNewMaxGrade(+response['max_grade'])
-                setStudentListString(JSON.stringify(response['grades'].sort((a, b) => {
-                    if (a.student > b.student)
-                        return 1
-                    else 
-                        return -1
-                })))
-                setWeight(+response['weight'])
-                setNewWeight(+response['weight'])
+                setTimeout(async () => {
+                    let response = await fetch('/cms/grades/gradable/read', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    })
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    response = await response.json()
+                    setTitle(response['name'])
+                    setNewTitle(response['name'])
+                    setMaxGrade(+response['max_grade'])
+                    setNewMaxGrade(+response['max_grade'])
+                    setStudentListString(JSON.stringify(response['grades'].sort((a, b) => {
+                        if (a.student > b.student)
+                            return 1
+                        else 
+                            return -1
+                    })))
+                    setWeight(+response['weight'])
+                    setNewWeight(+response['weight'])
 
 
-                let responseJSON=response['grades']
-                let graded=Object.keys(responseJSON).length
-                let sum = 0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += record.grade
+                    let responseJSON=response['grades']
+                    let graded=Object.keys(responseJSON).length
+                    let sum = 0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += record.grade
+                        else
+                            graded-=1
+                    }
+                    if(graded)
+                        setAverage(sum / graded)
                     else
-                        graded-=1
-                }
-                if(graded)
-                    setAverage(sum / graded)
-                else
-                    setAverage(0)
-                
-                let avg = sum / graded
-                sum = 0.0
-                for (let record of responseJSON) {
-                    if (record.grade!==-1.0)
-                        sum += (record.grade - avg) ** 2
-                }
-                if(graded)
-                    setStd((sum / graded) ** 0.5)
-                else
-                    setStd(0)
+                        setAverage(0)
+                    
+                    let avg = sum / graded
+                    sum = 0.0
+                    for (let record of responseJSON) {
+                        if (record.grade!==-1.0)
+                            sum += (record.grade - avg) ** 2
+                    }
+                    if(graded)
+                        setStd((sum / graded) ** 0.5)
+                    else
+                        setStd(0)
 
+                }, 1000);
             }
             catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                setError('Error loading gradable data, please try again later.')
             }
         }
         fetchData()
@@ -117,7 +121,6 @@ function GradesGradable() {
         }
         fetchData()
     }
-
 
     Modal.setAppElement('.App')
 
@@ -159,10 +162,9 @@ function GradesGradable() {
                         <div className="title">{title}</div>
                         <div><b>Max grade:</b> {maxGrade}</div>
                         <div><b>Weight:</b> {weight}</div>
-                        
+                        {error && <div>{error}</div>}
                         <Modal
                             isOpen={showModal}
-                            // onAfterOpen={afterOpenModal}
                             onRequestClose={() => { setShowModal(false); resetStates() }}
                             contentLabel="Example Modal"
                             style={customStyles}

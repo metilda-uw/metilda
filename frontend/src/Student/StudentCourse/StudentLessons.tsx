@@ -8,6 +8,7 @@ import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../CMS/Course/GeneralStyles.scss"
 import { verifyStudentCourse } from "../../CMS/AuthUtils";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function StudentLessons() {
     const courseId=useParams()['id']
@@ -15,6 +16,8 @@ function StudentLessons() {
     const lessonList=useMemo(()=>lessonListString.split(';'),[lessonListString])
     const user = (useContext(AuthUserContext) as any)
     const [veri, setVeri] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -34,9 +37,13 @@ function StudentLessons() {
                 .then(x => x.map(obj => obj[0]+','+obj[1]+','+obj[2]+','+obj[3]))
                 .then(x => x.join(';'))
                 .then(setLessonListString);
+                setError(null);
             }
             catch (error) {
-                console.log(error)
+                setError("Error loading lessons")
+            }
+            finally {
+                setLoading(false);
             }
         }
         fetchData()
@@ -54,7 +61,14 @@ function StudentLessons() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className='title'>Lessons:</div>
-                        {lessonListString ?
+                        {loading ? (
+                            <div className="spinner-container">
+                                {spinnerIcon()}
+                            </div>
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) : (
+                            lessonListString ?
                             <div className="lessons">
                                 {
                                     lessonList.map((lesson) => {
@@ -71,7 +85,9 @@ function StudentLessons() {
                                     })
                                 }
                             </div>
-                        :null}
+                        :null
+                        )
+                    }
                     </div>
                 </div>
             </div>

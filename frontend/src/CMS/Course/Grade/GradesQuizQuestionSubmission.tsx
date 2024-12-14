@@ -1,5 +1,5 @@
 import React, { createRef } from "react"
-import { useState, useContext, useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 import Header from "../../../Components/header/Header";
 import { withAuthorization } from "../../../Session";
@@ -22,70 +22,47 @@ function GradesQuizQuestionSubmission() {
     const [newGrade, setNewGrade] = useState(-1.0)
     const [prevGrade, setPrevGrade] = useState(-1.0);
     const [maxGrade, setMaxGrade] = useState(0.0)
+    const [errorMessage, setErrorMessage] = useState('')
     const history = useHistory()
     const firebase = useContext(FirebaseContext)
 
     useEffect(() => {
         async function fetchData() {
-            await verifyTeacherCourse(user.email,courseId,setVeri)
-            if(!veri)
+            await verifyTeacherCourse(user.email, courseId, setVeri)
+            if (!veri)
                 return
 
             try {
-                let formData = new FormData()
-                formData.append('user',user.email)
-                formData.append('question',questionId)
-                formData.append('student',studentId)
-                let response = await fetch('/cms/grades/quiz/question/answer/read', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                })
-                response = await response.json()
-                setPrevGrade(response['grade'])
-                setMaxGrade(response['max_grade'])
+                setTimeout(async () => {
+                    let formData = new FormData()
+                    formData.append('user', user.email)
+                    formData.append('question', questionId)
+                    formData.append('student', studentId)
+                    let response = await fetch('/cms/grades/quiz/question/answer/read', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    })
+                    response = await response.json()
+                    setPrevGrade(response['grade'])
+                    setMaxGrade(response['max_grade'])
 
-                let temp = {}
-                await getFileSrcDict(firebase,temp,'file',`/student-view/quiz/question/answer/file/read/${courseId}/quiz-question-answer/${questionId}/${studentId}`)
-                setFileSrc(temp['file'])
-
-                // let responseJSON=response['grades']
-                // let graded=Object.keys(responseJSON).length
-                // let sum = 0
-                // for (let record of responseJSON) {
-                //     if (record.grade!==-1.0)
-                //         sum += record.grade
-                //     else
-                //         graded-=1
-                // }
-                // if(graded)
-                //     setAverage(sum / graded)
-                // else
-                //     setAverage(0)
-                
-                // let avg = sum / graded
-                // sum = 0.0
-                // for (let record of responseJSON) {
-                //     if (record.grade!==-1.0)
-                //         sum += (record.grade - avg) ** 2
-                // }
-                // if(graded)
-                //     setStd((sum / graded) ** 0.5)
-                // else
-                //     setStd(0)
-            }
-            catch (error) {
-                console.log(error)
+                    let temp = {}
+                    await getFileSrcDict(firebase, temp, 'file', `/student-view/quiz/question/answer/file/read/${courseId}/quiz-question-answer/${questionId}/${studentId}`)
+                    setFileSrc(temp['file'])
+                }, 1000)
+            } catch (error) {
+                setErrorMessage("Error loading data.")
             }
         }
         fetchData()
     }, [])
-    
+
     function onGrade(e) {
         e.preventDefault()
-        if (newGrade>1000000 || newGrade<0)
+        if (newGrade > 1000000 || newGrade < 0)
             return
         async function fetchData() {
             let formData = new FormData();
@@ -102,8 +79,7 @@ function GradesQuizQuestionSubmission() {
                     },
                     body: formData
                 })
-            }
-            catch (error) {
+            } catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console")
             }
             window.location.reload()
@@ -113,7 +89,7 @@ function GradesQuizQuestionSubmission() {
 
     function onGradeAndNext(e) {
         e.preventDefault()
-        if (newGrade>1000000 || newGrade<0)
+        if (newGrade > 1000000 || newGrade < 0)
             return
         async function fetchData() {
             let formData = new FormData();
@@ -130,12 +106,10 @@ function GradesQuizQuestionSubmission() {
                     },
                     body: formData
                 })
-            }
-            catch (error) {
+            } catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console")
             }
 
-            // Next
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('student', studentId);
@@ -149,23 +123,19 @@ function GradesQuizQuestionSubmission() {
                     },
                     body: formData
                 })
-                response=await response.json()
+                response = await response.json()
                 if (response['student']) {
                     history.push(`/content-management/course/${courseId}/grades/quiz/${quizId}/question/${questionId}/student/${response['student']}`)
                     window.location.reload()
-                }
-                else {
+                } else {
                     history.push(`/content-management/course/${courseId}/grades/quiz/${quizId}/question/${questionId}`)
                 }
-                    
-            }
-            catch (error) {
+            } catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console")
             }
         }
         fetchData()
     }
-
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
@@ -180,11 +150,11 @@ function GradesQuizQuestionSubmission() {
                     <div className="info-list">
                         <div className='title'>Student: {studentId}</div>
                         <div><b>Student answer:</b></div>
-                        {fileSrc?
+                        {fileSrc ?
                             <div>
                                 <audio src={fileSrc} controls></audio>
                             </div>
-                        : null}
+                            : null}
                         <div><b>Grade:</b> {prevGrade === -1.0 ? '-' : prevGrade}/{maxGrade} </div>
                         <form>
                             <div>
@@ -193,6 +163,7 @@ function GradesQuizQuestionSubmission() {
                                 <button className='btn waves-light globalbtn' onClick={onGradeAndNext}>Save Grade & Next</button>
                             </div>
                         </form>
+                        {errorMessage && <div className="error-message">{errorMessage}</div>}
                         <Link className="content-link" to={`/content-management/course/${courseId}/grades/quiz/${quizId}/question/${questionId}`}>Back</Link>
                     </div>
                 </div>

@@ -1,6 +1,8 @@
 from flask import request, jsonify
 from metilda import app
 from uuid import uuid4
+from sklearn.cluster import KMeans
+import numpy as np
 
 import sys
 import os
@@ -37,6 +39,72 @@ def read_assignments():
         'description':arr[4],
         'max_grade':arr[5]
     },result)))
+
+@app.route('/cms/assignment_clusters', methods=["POST"])
+def get_assignment_clusters():
+    course_id = request.form['course']
+
+    with Postgres() as connection:
+        # Fetch assignments for the course with their names
+        assignments_query = '''
+            SELECT id, name 
+            FROM assignments 
+            WHERE course = %s
+        '''
+        assignments = connection.execute_select_query(assignments_query, (course_id,))
+        assignment_map = {assignment[0]: assignment[1] for assignment in assignments}
+        assignment_ids = tuple(assignment_map.keys())
+
+        if not assignment_ids:
+            return jsonify({"error": "No valid assignment IDs found"}), 404
+
+        # Fetch grades for these assignments
+        grades_query = '''
+            SELECT gradable_id, grade, user_id
+            FROM gradable_grades 
+            WHERE gradable_id IN %s
+        '''
+        grades = connection.execute_select_query(grades_query, (assignment_ids,))
+
+        if not grades:
+            return jsonify({"error": "No grades found"}), 404
+
+        # Organize grades by assignment ID
+        assignment_scores = {}
+        for gradable_id, grade, user_id in grades:
+            if grade != -1:  # Ignore invalid grades
+                if gradable_id not in assignment_scores:
+                    assignment_scores[gradable_id] = []
+                assignment_scores[gradable_id].append((grade, user_id))
+
+        result = []
+        for assignment_id, scores_with_users in assignment_scores.items():
+            if scores_with_users:
+                # Prepare data for KMeans
+                scores = [score for score, _ in scores_with_users]
+                scores_array = np.array(scores).reshape(-1, 1)
+
+                # Apply KMeans
+                kmeans = KMeans(n_clusters=min(3, len(scores)), random_state=42)
+                kmeans.fit(scores_array)
+
+                # Collect cluster data with user emails
+                cluster_data = [
+                    {'score': score, 'user_id': user_id, 'cluster': int(label)}
+                    for (score, user_id), label in zip(scores_with_users, kmeans.labels_)
+                ]
+
+                centroids = kmeans.cluster_centers_.flatten().tolist()
+
+                result.append({
+                    'id': assignment_id,
+                    'name': assignment_map[assignment_id],  # Include assignment name
+                    'cluster_data': cluster_data,
+                    'cluster_centroids': centroids
+                })
+
+    return jsonify(result)
+
 
 @app.route('/cms/assignments/read', methods=["POST"])
 def read_assignment():

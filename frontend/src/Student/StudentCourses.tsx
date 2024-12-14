@@ -5,6 +5,7 @@ import Header from "../Components/header/Header";
 import { withAuthorization } from "../Session";
 import { AuthUserContext } from "../Session";
 import { verifyStudent } from "../CMS/AuthUtils";
+import { spinnerIcon } from "../Utils/SpinnerIcon";
 
 function StudentCourses() {
     const [courseListString, setCourseListString] = useState('')
@@ -13,6 +14,8 @@ function StudentCourses() {
 
     const [enrollCourse, setEnrollCOurse] = useState('')
     const [veri, setVeri] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         async function fetchData() {
@@ -33,8 +36,14 @@ function StudentCourses() {
                 .then(x => x.map(obj => obj[0]+','+obj[1]))
                 .then(x => x.join(';'))
                 .then(setCourseListString);
+                setError(null);
             }
-            catch (e) {}
+            catch (error) {
+                setError("Error loading courses")
+            }
+            finally {
+                setLoading(false);
+            }
         }
         fetchData()
     },[])
@@ -65,9 +74,17 @@ function StudentCourses() {
                 <div><button className='btn waves-light globalbtn' onClick={onEnroll}>Enroll</button></div>
                 <div className="course-list">
                     <div className="title">My Courses:</div>
-                    {courseList.map(x => 
+                    {loading ? (
+                            <div className="spinner-container">
+                                {spinnerIcon()}
+                            </div>
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) :
+                    (courseList.map(x => 
                         <div className="list-item" key={x}><Link className="content-link" to={'student-view/course/'+x.split(',')[0]}>{x.split(',')[1]}</Link></div>
-                    )}
+                    )
+                )}
                 </div>
             </div>
         </div>

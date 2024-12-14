@@ -8,18 +8,21 @@ import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../CMS/Course/GeneralStyles.scss"
 import { verifyStudentCourse } from "../../CMS/AuthUtils";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function StudentQuizzes() {
     const user = useContext(AuthUserContext) as any
     const courseId = useParams()['id']
     const [quizList, setQuizList] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     const [veri, setVeri] = useState(true)
 
     useEffect(() => {
         async function fetchData() {
-            await verifyStudentCourse(user.email,courseId,setVeri)
-            if(!veri)
+            await verifyStudentCourse(user.email, courseId, setVeri)
+            if (!veri)
                 return
 
             const formData = new FormData();
@@ -33,17 +36,21 @@ function StudentQuizzes() {
                     },
                     body: formData
                 })
-                .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
-                .then(setQuizList)
+                    .then(x => x.json())
+                    .then(x => x.sort((b, a) => { return (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime() }))
+                    .then(setQuizList)
+                    setError(null);
             }
-            catch (e) {
-                console.log(e)
+            catch (error) {
+                setError("Error loading quizzes")
+            }
+            finally {
+                setLoading(false);
             }
         }
         fetchData()
-    },[])
-    
+    }, [])
+
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
     }
@@ -56,12 +63,19 @@ function StudentQuizzes() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className="title">Quiz:</div>
-                        {quizList.length?quizList.map(x => (
-                            <div key={x.quiz} className="list-item">
-                                <div><Link className="content-link list-item-title" to={'/student-view/course/' + courseId + '/quiz/' + x.quiz}>{x.name}</Link></div>
-                                <div><b>Start:</b> {new Date(x.start).toLocaleString()} &nbsp;&nbsp; <b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
+                        {loading ? (
+                            <div className="spinner-container">
+                                {spinnerIcon()}
                             </div>
-                        )) : null}
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) :
+                            (quizList.length ? quizList.map(x => (
+                                <div key={x.quiz} className="list-item">
+                                    <div><Link className="content-link list-item-title" to={'/student-view/course/' + courseId + '/quiz/' + x.quiz}>{x.name}</Link></div>
+                                    <div><b>Start:</b> {new Date(x.start).toLocaleString()} &nbsp;&nbsp; <b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
+                                </div>
+                            )) : null)}
                     </div>
                 </div>
             </div>

@@ -1,21 +1,21 @@
-.main-layout{
+.main-layout {
     display: flex;
 }
 
-.main-view{
+.main-view {
     display: flex;
     // margin-left: 10px;
     width: 100%;
 }
 
 
-.sidebar{
+.sidebar {
     background-color: #ee6e73;
     width: 200px;
     flex-shrink: 0;
 }
 
-.sidebar-item{
+.sidebar-item {
     display: block;
     width: 200px;
     justify-content: center;
@@ -23,7 +23,7 @@
     background-color: #ee6e73;
 }
 
-.float-right{
+.float-right {
     position: absolute;
     right: 10px;
     float: right;
@@ -31,75 +31,75 @@
     text-align: left;
 }
 
-.download-link{
+.download-link {
     color: rgb(61, 61, 255);
     cursor: pointer;
 }
 
-a>span{
+a>span {
     color: rgb(61, 61, 255) !important;
 }
 
-.public-DraftStyleDefault-ltr{
+.public-DraftStyleDefault-ltr {
     text-align: unset !important;
 }
 
-.react-file-reader{
+.react-file-reader {
     display: inline;
     width: min-content;
 }
 
-.react-file-reader-button{
+.react-file-reader-button {
     display: inline;
     width: min-content;
 }
 
-.centered{
+.centered {
     width: 100%;
 }
 
 
-.assignment{
+.assignment {
     border-bottom: solid;
     border-width: 1px;
     border-color: rgb(87, 173, 174);
 }
 
-.block{
+.block {
     border: solid;
     border-width: 1px;
     border-color: rgb(87, 173, 174);
 }
 
-.grades-grade_list-name_col{
+.grades-grade_list-name_col {
     text-align: center;
     width: 300px;
 }
 
-.grades-grade_list-grade_col{
+.grades-grade_list-grade_col {
     text-align: center;
     width: 50px;
 }
 
-td{
+td {
     text-align: center;
 }
 
-a{
+a {
     color: black;
 }
 
-.content-link{
+.content-link {
     color: black;
     text-decoration: underline;
 }
 
-.draggable-item{
+.draggable-item {
     margin: 10px;
     border-style: solid;
 }
 
-.lesson-block p{
+.lesson-block p {
     text-align: unset;
     letter-spacing: unset;
     font-family: unset;
@@ -108,7 +108,7 @@ a{
     margin: unset;
 }
 
-.unstyle p{
+.unstyle p {
     text-align: unset;
     letter-spacing: unset;
     font-family: unset;
@@ -122,9 +122,9 @@ a{
     position: relative;
     height: 100px;
     width: 100%;
-  }
-  
-  .file-drop > .file-drop-target {
+}
+
+.file-drop>.file-drop-target {
     /* basic styles */
     position: absolute;
     top: 0;
@@ -132,109 +132,107 @@ a{
     height: 100px;
     width: 200px;
     border-radius: 2px;
-  
+
     /* horizontally and vertically center all content */
     display: flex;
     display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
-  
+
     flex-direction: column;
     -webkit-box-orient: vertical;
     -webkit-box-direction: normal;
     -webkit-flex-direction: column;
     -ms-flex-direction: column;
-  
+
     align-items: center;
     -webkit-box-align: center;
     -webkit-align-items: center;
     -ms-flex-align: center;
-  
+
     justify-content: center;
     -webkit-box-pack: center;
     -webkit-justify-content: center;
     -ms-flex-pack: center;
-  
+
     align-content: center;
     -webkit-align-content: center;
     -ms-flex-line-pack: center;
-  
+
     text-align: center;
 
     background-color: rgb(240, 240, 240);
-  }
-  
-  .file-drop > .file-drop-target.file-drop-dragging-over-frame {
+}
+
+.file-drop>.file-drop-target.file-drop-dragging-over-frame {
     /* overlay a black mask when dragging over the frame */
     border: none;
     background-color: rgb(240, 240, 240);
     box-shadow: none;
     z-index: 50;
     opacity: 1;
-  
+
     /* typography */
     color: white;
-  }
-  
-  .file-drop > .file-drop-target.file-drop-dragging-over-target {
+}
+
+.file-drop>.file-drop-target.file-drop-dragging-over-target {
     /* turn stuff orange when we are dragging over the target */
     // color: #40ff59;
     // box-shadow: 0 0 13px 3px #40ff59;
     background-color: rgb(200, 200, 200);
-  }
+}
 
-  .lesson-video{
+.lesson-video {
     width: 80%;
-  }
+}
 
-  .pitch-art-block-create-view{
+.pitch-art-block-create-view {
     display: flex;
-  }
+}
 
 
-.title{
-    font-family:'Times New Roman', Times, serif;
+.title {
+    font-family: 'Times New Roman', Times, serif;
     font-size: x-large;
     font-weight: bold;
 }
 
-.list-item-title{
-    font-family:'Times New Roman', Times, serif;
+.list-item-title {
+    font-family: 'Times New Roman', Times, serif;
     font-weight: bold;
     font-size: large;
 }
 
-.course-list{
+.course-list {
     background-color: rgb(220, 255, 255);
     width: 60%;
     margin: auto;
 }
 
-.info-list{
+.info-list {
     text-align: left;
     gap: 50px 20px;
     width: 100%;
     background-color: rgb(220, 255, 255);
 }
 
-.list-item{
-    border-bottom: solid;
-    border-width: 1px;
-    border-color: rgb(200, 200, 200);
+.list-item {
     margin-bottom: 2px;
     width: 100%;
+    display: inline-flex;
 }
 
 
-.lesson-block{
+.lesson-block {
     background-color: rgb(255, 255, 220);
 }
 
-.blocks{
+.blocks {
     background-color: rgb(255, 255, 220);
 }
 
-.pagination{
+.pagination {
     text-align: center;
 }
 
@@ -242,13 +240,157 @@ img.rdw-link-decorator-icon {
     display: none;
 }
 
-.lesson-word-card{
+.lesson-word-card {
     width: 350px;
     margin-right: 10px;
 }
 
-.height-column{
+.height-column {
     height: calc(100vh - 70px);
     width: 10px;
     flex-shrink: 0;
+}
+
+.info-list {
+    padding: 50px;
+    padding-left: 100px;
+}
+
+.error-message {
+    color: #d9534f;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.section {
+    background-color: #e9f5fc;
+    border: 1px solid #d1e7dd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    width: 50%;
+}
+
+.section-title {
+    font-size: 1.4rem;
+    color: #1a1a1a;
+    margin-bottom: 10px;
+    text-align: left;
+    margin-top: 5px;
+}
+
+.section-heading {
+    width: 900px;
+}
+
+.assignments-section,
+.quizzes-section,
+.others-section {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.list-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+}
+
+.list-item:hover {
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    cursor: pointer;
+    background-color: #fff;
+    font-weight: 600;
+}
+
+.section-heading.open {
+    background-color: #eef6ff;
+    color: #007bff;
+}
+
+.toggle-icon {
+    transition: transform 0.3s;
+}
+
+.expanded-content {
+    padding: 15px;
+    background-color: #fff;
+    border-top: 1px solid #ddd;
+}
+
+.score-range {
+    width: 100%;
+    accent-color: #007bff;
+    margin-bottom: 10px;
+}
+
+.score-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.no-items {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+.play_n_learn_heading {
+    font-size: 30px;
+    color: black;
+}
+
+.play_n_learn_button {
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 18px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+
+.activity_name {
+    cursor: pointer;
+    font-size: 17px;
+    text-decoration: underline;
+}
+/* Spinner styling */
+.gradeSpinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(0, 0, 0, 0.1); 
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Spin animation */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

@@ -678,7 +678,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
                 <Modal
                   isOpen={this.state.shareModal}
                   style={this.customStyles}
-                  appElement={document.getElementById("root" || undefined)}
+                  appElement={document.getElementById("root")}
                 >
                   <p> Enter email id to share with:</p>
                   <input

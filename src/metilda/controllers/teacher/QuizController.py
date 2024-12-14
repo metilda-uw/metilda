@@ -6,6 +6,8 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
+from sklearn.cluster import KMeans
+import numpy as np
 
 @app.route('/cms/quiz/create', methods=["POST"])
 def create_quiz():
@@ -46,6 +48,75 @@ def read_quizzes():
         },result)))
     else:
         return jsonify([])
+
+
+@app.route('/cms/quiz_clusters', methods=["POST"])
+def get_quiz_clusters():
+    # Get course input and user email
+    course_id = request.form['course']
+
+    with Postgres() as connection:
+        # Fetch quizzes for the course
+        quiz_query = '''
+            SELECT id, name 
+            FROM quiz 
+            WHERE course = %s
+        '''
+        quizzes = connection.execute_select_query(quiz_query, (course_id,))
+        quiz_map = {quiz[0]: quiz[1] for quiz in quizzes}
+        quiz_ids = tuple(quiz_map.keys())
+
+        if not quiz_ids:
+            return jsonify({"error": "No valid quiz IDs found"}), 404
+
+        # Fetch grades for these quizzes
+        grades_query = '''
+            SELECT gradable_id, grade, user_id
+            FROM gradable_grades 
+            WHERE gradable_id IN %s
+        '''
+        grades = connection.execute_select_query(grades_query, (quiz_ids,))
+
+        if not grades:
+            return jsonify({"error": "No grades found"}), 404
+
+        # Organize grades by quiz ID
+        quiz_scores = {}
+        for gradable_id, grade, user_id in grades:
+            if grade != -1:  # Ignore invalid grades
+                if gradable_id not in quiz_scores:
+                    quiz_scores[gradable_id] = []
+                quiz_scores[gradable_id].append((grade, user_id))
+
+        result = []
+        for quiz_id, scores_with_users in quiz_scores.items():
+            if scores_with_users:
+                # Prepare data for KMeans
+                scores = [score for score, _ in scores_with_users]
+                scores_array = np.array(scores).reshape(-1, 1)
+
+                # Apply KMeans (minimum of 3 clusters or the number of unique scores)
+                kmeans = KMeans(n_clusters=min(3, len(scores)), random_state=42)
+                kmeans.fit(scores_array)
+
+                # Collect cluster data with user emails
+                cluster_data = [
+                    {'score': score, 'user_id': user_id, 'cluster': int(label)}
+                    for (score, user_id), label in zip(scores_with_users, kmeans.labels_)
+                ]
+
+                centroids = kmeans.cluster_centers_.flatten().tolist()
+
+                result.append({
+                    'id': quiz_id,
+                    'name': quiz_map[quiz_id],
+                    'cluster_data': cluster_data,
+                    'cluster_centroids': centroids
+                })
+
+    return jsonify(result)
+
+
 
 @app.route('/cms/quiz/read', methods=["POST"])
 def read_quiz():

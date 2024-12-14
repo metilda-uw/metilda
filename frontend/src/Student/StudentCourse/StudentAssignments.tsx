@@ -9,17 +9,20 @@ import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import "../../CMS/Course/GeneralStyles.scss"
 import { verifyStudentCourse } from "../../CMS/AuthUtils";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function StudentAssignments() {
     const user = useContext(AuthUserContext) as any
     const courseId = useParams()['id']
     const [assignmentListString, setAssignmentListString] = useState('')
     const [veri, setVeri] = useState(true)
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState('')
 
     useEffect(() => {
         async function fetchData() {
-            await verifyStudentCourse(user.email,courseId,setVeri)
-            if(!veri)
+            await verifyStudentCourse(user.email, courseId, setVeri)
+            if (!veri)
                 return
             const formData = new FormData();
             formData.append('user', user.email);
@@ -32,15 +35,20 @@ function StudentAssignments() {
                     },
                     body: formData
                 })
-                .then(x => x.json())
-                .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
-                .then(JSON.stringify)
-                .then(setAssignmentListString)
+                    .then(x => x.json())
+                    .then(x => x.sort((b, a) => { return (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime() }))
+                    .then(JSON.stringify)
+                    .then(setAssignmentListString)
+                    setError(null);
             }
-            catch (error) {}
+            catch (error) {
+                setError("Failed loading assignments");
+             } finally {
+                setLoading(false);
+             }
         }
         fetchData()
-    },[])
+    }, [])
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
@@ -52,14 +60,32 @@ function StudentAssignments() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <div className="info-list">
+                <div className="info-list">
                         <div className="title">Assignments:</div>
-                        {assignmentListString?JSON.parse(assignmentListString).map(x => (
-                            <div key={x.assignment+'1'} className="list-item">
-                                <div key={x.assignment+'2'}><Link className="content-link list-item-title" key={x.assignment+'3'} to={'/student-view/course/' + courseId + '/assignment/' + x.assignment}>{x.name}</Link></div>
-                                <div key={x.assignment + '4'} className="deadline"><b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
+                        {loading ? (
+                            <div className="spinner-container">
+                                {spinnerIcon()}
                             </div>
-                        )):null}
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) : (
+                            JSON.parse(assignmentListString).map((x: any) => (
+                                <div key={x.assignment + '1'} className="list-item">
+                                    <div key={x.assignment + '2'}>
+                                        <Link
+                                            className="content-link list-item-title"
+                                            key={x.assignment + '3'}
+                                            to={'/student-view/course/' + courseId + '/assignment/' + x.assignment}
+                                        >
+                                            {x.name}
+                                        </Link>
+                                    </div>
+                                    <div key={x.assignment + '4'} className="deadline">
+                                        <b>Deadline:</b> {new Date(x.deadline).toLocaleString()}
+                                    </div>
+                                </div>
+                            ))
+                        )}
                     </div>
                 </div>
             </div>
