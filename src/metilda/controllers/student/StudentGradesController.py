@@ -64,6 +64,101 @@ def student_grades():
 
         return jsonify(res)
 
+@app.route('/student-view/other_grades', methods=["POST"])
+def get_other_grades():
+    # Get the user's course input
+    course_id = request.form['course']
+    current_user_email = request.form.get("user")  # Email of the logged-in user
+
+    with Postgres() as connection:
+        
+        # Fetch other items for the course
+        query = '''
+        SELECT g.id, g.name, g.created_at, g.max_grade, g.weight
+        FROM gradables g
+        WHERE g.course = %s 
+        AND g.name NOT IN (
+            SELECT name FROM quiz WHERE course = %s
+            UNION
+            SELECT name FROM assignments WHERE course = %s
+        )
+        '''
+        args = (request.form['course'], request.form['course'], request.form['course'])
+        others = connection.execute_select_query(query, args)
+
+        if not others:
+            return jsonify({"error": "No other items found for this course"}), 404
+
+        # Extract other items IDs
+        other_ids = tuple(other[0] for other in others)
+
+        if not other_ids:
+            return jsonify({"error": "No valid other items IDs found"}), 404
+
+        # Fetch grades for these other items using IN clause
+        grades_query = '''
+            SELECT gradable_id, grade, user_id
+            FROM gradable_grades 
+            WHERE gradable_id IN %s
+        '''
+        grades = connection.execute_select_query(grades_query, (other_ids,))
+
+        if not grades:
+            return jsonify({"error": "No grades found for other items"}), 404
+
+        # Organize grades by other items ID
+        other_scores = {}
+        for gradable_id, grade, user_id in grades:
+            if grade != -1:  # Ignore invalid grades
+                if gradable_id not in other_scores:
+                    other_scores[gradable_id] = []
+                other_scores[gradable_id].append((grade, user_id))
+
+        # Prepare the result with additional metrics
+        result = []
+        gradable_ids = {gradable_id for gradable_id, _, _ in grades}
+        for other in others:
+            other_id, name, created_at, max_grade, weight = other
+            if other_id in gradable_ids:
+                scores = [score for score, _ in other_scores.get(other_id, [])]
+
+                user_grade=0
+                
+                # Calculate metrics if there are valid scores
+                if scores:
+                    lowest_score = min(scores)
+                    average_score = sum(scores) / len(scores)
+                    highest_score = max(scores)
+
+                    # Calculate the current user's percentile if email is provided
+                    user_grade = next(
+                        (grade for grade, uid in other_scores.get(other_id, []) if uid == current_user_email),
+                        None
+                    )
+
+                    if user_grade is not None:
+                        sorted_scores = sorted(scores)
+                        percentile_rank = (sorted_scores.index(user_grade) / len(sorted_scores)) * 100
+                    else:
+                        percentile_rank = None
+                else:
+                    lowest_score = average_score = highest_score = percentile_rank = None
+
+                # Add other item details to the result
+                result.append({
+                    'other_id': other_id,
+                    'name': name,
+                    'created_at': created_at,
+                    'user_grade': round(user_grade, 2) if user_grade is not None else None,
+                    'max_grade': round(max_grade, 2) if max_grade is not None else None,
+                    'weight': round(weight, 2) if weight is not None else None,
+                    'lowest_score': round(lowest_score, 2) if lowest_score is not None else None,
+                    'average_score': round(average_score, 2) if average_score is not None else None,
+                    'highest_score': round(highest_score, 2) if highest_score is not None else None,
+                    'percentile': round(percentile_rank, 2) if percentile_rank is not None else None
+                })
+    return jsonify(result)
+
     
 @app.route('/student-view/grades/stats', methods=["POST"])
 def student_grades_stats():

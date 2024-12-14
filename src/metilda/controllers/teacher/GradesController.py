@@ -2,6 +2,9 @@ from flask import request, jsonify
 from metilda import app
 from uuid import uuid4
 from datetime import datetime
+from sklearn.cluster import KMeans
+import numpy as np
+from flask import jsonify, request
 
 import sys
 import os
@@ -390,3 +393,81 @@ def next_quiz_answer():
         }
 
     return jsonify(res)
+
+
+@app.route('/cms/other_clusters', methods=["POST"])
+def get_other_clusters():
+    # Get course input
+    course_id = request.form['course']
+
+    with Postgres() as connection:
+        # Fetch other items for the course
+        query = '''
+            SELECT g.id, g.name, g.created_at, g.max_grade, g.weight
+            FROM gradables g
+            WHERE g.course = %s 
+            AND g.name NOT IN (
+                SELECT name FROM quiz WHERE course = %s
+                UNION
+                SELECT name FROM assignments WHERE course = %s
+            )
+        '''
+        args = (course_id, course_id, course_id)
+        others = connection.execute_select_query(query, args)
+
+        if not others:
+            return jsonify({"error": "No other items found for this course"}), 404
+
+        # Extract IDs and names
+        other_map = {other[0]: other[1] for other in others}  # Map of {id: name}
+        other_ids = tuple(other_map.keys())
+
+        if not other_ids:
+            return jsonify({"error": "No valid other items IDs found"}), 404
+
+        # Fetch grades for other items
+        grades_query = '''
+            SELECT gradable_id, grade, user_id
+            FROM gradable_grades 
+            WHERE gradable_id IN %s
+        '''
+        grades = connection.execute_select_query(grades_query, (other_ids,))
+
+        if not grades:
+            return jsonify({"error": "No grades found for other items"}), 404
+
+        # Organize grades by item ID
+        other_scores = {}
+        for gradable_id, grade, user_id in grades:
+            if grade != -1:  # Ignore invalid grades
+                if gradable_id not in other_scores:
+                    other_scores[gradable_id] = []
+                other_scores[gradable_id].append((grade, user_id))
+
+        result = []
+        for other_id, scores_with_users in other_scores.items():
+            if scores_with_users:
+                # Prepare data for KMeans
+                scores = [score for score, _ in scores_with_users]
+                scores_array = np.array(scores).reshape(-1, 1)
+
+                # Apply KMeans clustering
+                kmeans = KMeans(n_clusters=min(3, len(scores)), random_state=42)
+                kmeans.fit(scores_array)
+
+                # Collect cluster data
+                cluster_data = [
+                    {'score': score, 'user_id': user_id, 'cluster': int(label)}
+                    for (score, user_id), label in zip(scores_with_users, kmeans.labels_)
+                ]
+
+                centroids = kmeans.cluster_centers_.flatten().tolist()
+
+                result.append({
+                    'name': other_map[other_id],
+                    'id': other_id,
+                    'cluster_data': cluster_data,
+                    'cluster_centroids': centroids
+                })
+
+    return jsonify(result)
