@@ -1013,7 +1013,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 Open
               </FileReaderInput>
             </button>
-            <button
+            {/* <button
               className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
               type="submit"
               name="action"
@@ -1030,7 +1030,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               onClick={this.downloadAnalysis}
             >
               Download
-            </button>
+            </button> */}
             {/* <SaveAnalysisFireStore analysis={speaker} /> */}
           </div>
         </div>
