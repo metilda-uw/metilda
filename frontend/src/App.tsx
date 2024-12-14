@@ -47,6 +47,7 @@ import StudentCourses from "./Student/StudentCourses";
 import StudentSyllabus from "./Student/StudentCourse/StudentSyllabus";
 import StudentLessons from "./Student/StudentCourse/StudentLessons";
 import StudentGrades from "./Student/StudentCourse/StudentGrades";
+import StudentPlayLearn from "./Student/StudentCourse/StudentPlayLearn";
 import StudentCourse from "./Student/StudentCourse/StudentCourse";
 import Discussion from "./CMS/Course/Discussion";
 // import Word from "./Components/collections/Word";
@@ -206,6 +207,7 @@ const App = () => (
       <Route exact path="/student-view/course/:id/quiz/:quiz_id" component={StudentQuiz} />
       <Route exact path="/student-view/course/:id/quiz/:quiz_id/question/:question_id/:index" component={StudentQuizQuestion} />
       <Route exact path="/student-view/course/:id/grades" component={StudentGrades} />
+      <Route exact path="/student-view/course/:id/play_and_learn" component={StudentPlayLearn} />
 
     </div>
   </Router>

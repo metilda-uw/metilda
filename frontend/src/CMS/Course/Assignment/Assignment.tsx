@@ -1,4 +1,4 @@
-import React, { createRef } from "react" 
+import React, { createRef } from "react"
 import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../../Components/header/Header";
@@ -11,6 +11,7 @@ import "../GeneralStyles.scss"
 import { getFile, onDownloadFiles } from "../Utils";
 import { FirebaseContext } from "../../../Firebase";
 import { verifyTeacherCourse } from "../../AuthUtils";
+import { spinnerIcon } from "../../../Utils/SpinnerIcon";
 
 export function Assignment() {
     const user = useContext(AuthUserContext) as any
@@ -27,6 +28,7 @@ export function Assignment() {
     const firebase = useContext(FirebaseContext)
     const downloadRef = createRef<HTMLAnchorElement>();
     const [veri, setVeri] = useState(true)
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
@@ -53,10 +55,12 @@ export function Assignment() {
                 setMaxGrade(+response['max_grade'])
                 setWeight(+response['weight'])
                 getFile(firebase, setFiles, `/cms/assignment/file/read/${courseId}/assignment/${assignmentId}`)
-                setErrorMessage('');
+                setErrorMessage(null);
             }
             catch {
                 setErrorMessage('Error loading assignment details. Please try again later.');
+            } finally {
+                setLoading(false);
             }
         }
         if (user) {
@@ -74,22 +78,29 @@ export function Assignment() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view centered">
-                    <div className="info-list">
-                        <div className='title'>{title}</div>
-                        <div className="content" dangerouslySetInnerHTML={{ __html: draftToHtml(JSON.parse(content)) }}></div>
-                        <div><b>Deadline:</b> {deadline ? new Date(deadline).toLocaleString() : 'Loading...'}</div>
-                        <div><b>Available:</b> {available === '1' ? 'Yes' : 'No'}</div>
-                        <div><b>Weight:</b> {weight ? weight : null}</div>
-                        {files.length ? 
-                            <div><b>Assignment file:</b> <u className="download-link" onClick={() => onDownloadFiles(files, downloadRef, firebase)}>{files.length ? files[0].name : null}</u></div>
-                        : null}
-                        <a className="hide" ref={downloadRef} target="_blank">
-                            Hidden Download Link
-                        </a>
-                        <div><b>Max Grades:</b> {maxGrade}</div>
-                        {errorMessage && <div className="error-message">{errorMessage}</div>}
-                        <Link className="content-link" to={'/content-management/course/' + courseId + '/assignments/'}>Back</Link>
-                    </div>
+                    {
+                        loading ? (
+                            spinnerIcon()
+                        ) :
+                            (
+                                <div className="info-list">
+                                    <div className='title'>{title}</div>
+                                    <div className="content" dangerouslySetInnerHTML={{ __html: draftToHtml(JSON.parse(content)) }}></div>
+                                    <div><b>Deadline:</b> {deadline ? new Date(deadline).toLocaleString() : 'Loading...'}</div>
+                                    <div><b>Available:</b> {available === '1' ? 'Yes' : 'No'}</div>
+                                    <div><b>Weight:</b> {weight ? weight : null}</div>
+                                    {files.length ?
+                                        <div><b>Assignment file:</b> <u className="download-link" onClick={() => onDownloadFiles(files, downloadRef, firebase)}>{files.length ? files[0].name : null}</u></div>
+                                        : null}
+                                    <a className="hide" ref={downloadRef} target="_blank">
+                                        Hidden Download Link
+                                    </a>
+                                    <div><b>Max Grades:</b> {maxGrade}</div>
+                                    {errorMessage && <div className="error-message">{errorMessage}</div>}
+                                    <Link className="content-link" to={'/content-management/course/' + courseId + '/assignments/'}>Back</Link>
+                                </div>
+                            )
+                    }
                     <div className="float-right">
                         <Link className="content-link" to={'/content-management/course/' + courseId + '/assignment/' + assignmentId + '/update'}>Update assignment</Link>
                     </div>

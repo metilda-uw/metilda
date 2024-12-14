@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import "../GeneralStyles.scss";
 import "./Discussion.scss";
 import { verifyTeacherCourse } from "../../AuthUtils";
+import { spinnerIcon } from "../../../Utils/SpinnerIcon";
 
 export function Topic() {
     const postsPerPage = 10;
@@ -21,6 +22,8 @@ export function Topic() {
     const [curPage, setCurPage] = useState(1);
     const [veri, setVeri] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         async function fetchData() {
@@ -39,16 +42,19 @@ export function Topic() {
                         },
                         body: formData
                     })
-                    .then(x => x.json())
-                    .then(x => {
-                        setNumPages(Math.ceil(x.length / postsPerPage));
-                        return x;
-                    })
-                    .then(x => x.sort((a, b) => (new Date(b.updated_at)).getTime() - (new Date(a.updated_at)).getTime()))
-                    .then(JSON.stringify)
-                    .then(setPostListString);
+                        .then(x => x.json())
+                        .then(x => {
+                            setNumPages(Math.ceil(x.length / postsPerPage));
+                            return x;
+                        })
+                        .then(x => x.sort((a, b) => (new Date(b.updated_at)).getTime() - (new Date(a.updated_at)).getTime()))
+                        .then(JSON.stringify)
+                        .then(setPostListString);
+                        setErrorMessage(null);
                 } catch (error) {
                     setErrorMessage("Error loading posts. Please try again.");
+                } finally {
+                    setLoading(false);
                 }
             }, 1000);
         }
@@ -68,36 +74,42 @@ export function Topic() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <div className="info-list">
-                        {errorMessage && <div className="error-message">{errorMessage}</div>}
-                        {postListString ? <div className="title">Posts:</div> : null}
-                        {postListString ? JSON.parse(postListString).slice((curPage - 1) * postsPerPage, curPage * postsPerPage).map(x => (
-                            <div key={x.post} className="list-item">
-                                <div key={x.post + 1}><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/discussion/topic/' + topicId + '/post/' + x.post}>{x.title}</Link></div>
-                                {x.created_at === x.updated_at ?
-                                    <div key={x.post + 2} className="created-at"><b>Created at:</b> {new Date(x.created_at).toLocaleString()}</div>
-                                    :
-                                    <div key={x.post + 3} className="created-at"><b>Updated at:</b> {new Date(x.updated_at).toLocaleString()}</div>
-                                }
-                            </div>
-                        )) : null}
+                    {
+                        loading ? (
+                            spinnerIcon()
+                        )
+                            :
+                            <div className="info-list">
+                                {errorMessage && <div className="error-message">{errorMessage}</div>}
+                                {postListString ? <div className="title">Posts:</div> : null}
+                                {postListString ? JSON.parse(postListString).slice((curPage - 1) * postsPerPage, curPage * postsPerPage).map(x => (
+                                    <div key={x.post} className="list-item">
+                                        <div key={x.post + 1}><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/discussion/topic/' + topicId + '/post/' + x.post}>{x.title}</Link></div>
+                                        {x.created_at === x.updated_at ?
+                                            <div key={x.post + 2} className="created-at"><b>Created at:</b> {new Date(x.created_at).toLocaleString()}</div>
+                                            :
+                                            <div key={x.post + 3} className="created-at"><b>Updated at:</b> {new Date(x.updated_at).toLocaleString()}</div>
+                                        }
+                                    </div>
+                                )) : null}
 
-                        {numPages ?
-                            <div className='pagination'>
-                                <button className='btn waves-light globalbtn' onClick={() => {
-                                    if (curPage > 1) {
-                                        setCurPage(curPage - 1);
-                                    }
-                                }}> &lt; </button>
-                                {curPage} / {numPages}
-                                <button className='btn waves-light globalbtn' onClick={() => {
-                                    if (curPage < numPages) {
-                                        setCurPage(curPage + 1);
-                                    }
-                                }}> &gt; </button>
+                                {numPages ?
+                                    <div className='pagination'>
+                                        <button className='btn waves-light globalbtn' onClick={() => {
+                                            if (curPage > 1) {
+                                                setCurPage(curPage - 1);
+                                            }
+                                        }}> &lt; </button>
+                                        {curPage} / {numPages}
+                                        <button className='btn waves-light globalbtn' onClick={() => {
+                                            if (curPage < numPages) {
+                                                setCurPage(curPage + 1);
+                                            }
+                                        }}> &gt; </button>
+                                    </div>
+                                    : null}
                             </div>
-                            : null}
-                    </div>
+                    }
 
                     <div className="float-right">
                         <Link className="content-link" to={'/content-management/course/' + courseId + '/discussion/topic/' + topicId + '/create'}>Create a post</Link>

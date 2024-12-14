@@ -10,7 +10,7 @@ import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss"
 import "./Discussion/Discussion.scss"
 import { verifyTeacherCourse } from "../AuthUtils";
-import { spinner } from "../../Utils/LoadingSpinner";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function Discussion() {
     const user = useContext(AuthUserContext) as any
@@ -56,6 +56,7 @@ function Discussion() {
                         return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
                     });
                     setTopicListString(JSON.stringify(sortedData));
+                    setError(false);
                 } catch (error) {
                     console.log("Fetch failed, see if it is 403 in error console");
                     setError(true);
@@ -129,7 +130,7 @@ function Discussion() {
                 <div className="height-column"></div>
                 <div className="main-view">
                     {loading ? (
-                        <div>{spinner()} </div>
+                        <div>{spinnerIcon()} </div>
                     ) : error ? (
                         <div className="error-message">Error loading topics. Please try again later.</div>
                     ) : (

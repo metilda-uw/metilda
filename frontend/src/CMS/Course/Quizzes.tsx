@@ -1,4 +1,4 @@
-import React from "react" 
+import React from "react"
 import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../Components/header/Header";
@@ -9,6 +9,7 @@ import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss"
 import { verifyTeacherCourse } from "../AuthUtils";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function Quizzes() {
     const user = useContext(AuthUserContext) as any
@@ -22,7 +23,8 @@ function Quizzes() {
     const [weight, setWeight] = useState(0.0)
     const [showModal, setShowModal] = useState(false)
     const [veri, setVeri] = useState(true)
-    const [errorMessage, setErrorMessage] = useState('');
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
     function resetStates() {
         setName('')
@@ -60,10 +62,11 @@ function Quizzes() {
 
                 const data = await response.json();
                 setQuizList(data.sort((b, a) => (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime()));
-                setErrorMessage('');
+                setError(null);
             } catch (error) {
-                console.error(error);
-                setErrorMessage('Error loading quizzes. Please try again later.');
+                setError("Error loading quizzes.");
+            } finally {
+                setLoading(false);
             }
         }
         fetchData()
@@ -130,13 +133,19 @@ function Quizzes() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className="title">Quiz:</div>
-                        {errorMessage && <div className="error-message">{errorMessage}</div>}
-                        {quizList.length ? quizList.map(x => (
-                            <div key={x.quiz} className="list-item">
-                                <div><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/quiz/' + x.quiz}>{x.name}</Link></div>
-                                <div className="deadline"><b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
-                            </div>
-                        )) : null}
+                        {loading ? (
+                            <div>{spinnerIcon()} </div>
+                        ) : error ? (
+                            <div className="error-message">Error loading topics. Please try again later.</div>
+                        ) :
+                            (
+                                quizList.length ? quizList.map(x => (
+                                    <div key={x.quiz} className="list-item">
+                                        <div><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/quiz/' + x.quiz}>{x.name}</Link></div>
+                                        <div className="deadline"><b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
+                                    </div>
+                                )) : null
+                            )}
                     </div>
 
                     <div className="float-right">

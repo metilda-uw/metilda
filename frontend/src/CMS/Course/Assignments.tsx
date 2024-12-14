@@ -8,7 +8,7 @@ import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss"
 import { verifyTeacherCourse } from "../AuthUtils";
-import { spinner } from "../../Utils/LoadingSpinner";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function Assignments() {
     const user = useContext(AuthUserContext) as any
@@ -41,11 +41,13 @@ function Assignments() {
                     .then(JSON.stringify)
                     .then(setAssignmentListString)
                 }, 6000);
+                setError(null);
             }
             catch (error) {
                 console.log("Fetch failed, see if it is 403 in error console");
                 setError("Error loading data. Please try again.");
-                setLoading(false);
+            } finally {
+                setLoading(false); // Stop loading after data fetch
             }
         }
         fetchData()
@@ -64,7 +66,7 @@ function Assignments() {
                     <div className="info-list">
                         <div className="title">Assignments:</div>
                         {loading ? (
-                            <div>{spinner()} </div>
+                            <div>{spinnerIcon()} </div>
                         ) : error ? (
                             <div style={{ color: 'red' }}>{error}</div>
                         ) : (

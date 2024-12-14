@@ -1,4 +1,4 @@
-import React from "react" 
+import React from "react"
 import { useState, useContext, useEffect, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import Header from "../../Components/header/Header";
@@ -9,24 +9,26 @@ import "./GeneralStyles.scss"
 import Sidebar from "./Sidebar";
 import { verifyTeacherCourse } from "../AuthUtils";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 
 function Lessons() {
-    const courseId=useParams()['id']
+    const courseId = useParams()['id']
     const [lessonListString, setLessonListString] = useState('')
-    const lessonList=useMemo(()=>lessonListString.split(';'),[lessonListString])
+    const lessonList = useMemo(() => lessonListString.split(';'), [lessonListString])
     const user = (useContext(AuthUserContext) as any)
     const [showModal, setShowModal] = useState(false)
     const [name, setName] = useState('')
     const [available, setAvailable] = useState('')
     const [veri, setVeri] = useState(true)
-    const [error, setError] = useState<string | null>(null); // New error state
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(true);
 
-    const [draggable,setDraggable]=useState(false)
+    const [draggable, setDraggable] = useState(false)
 
     useEffect(() => {
         async function fetchData() {
-            await verifyTeacherCourse(user.email,courseId,setVeri)
-            if(!veri)
+            await verifyTeacherCourse(user.email, courseId, setVeri)
+            if (!veri)
                 return
 
             const formData = new FormData();
@@ -41,15 +43,14 @@ function Lessons() {
                     },
                     body: formData
                 }).then(x => x.json())
-                .then(x => x.map(obj => obj[0]+','+obj[1]+','+obj[2]+','+obj[3]))
-                .then(x => x.join(';'))
-                .then(setLessonListString)
-                .catch(err => {
-                    console.log(err)
-                    setError("Error loading lessons."); // Set error message
-                });
+                    .then(x => x.map(obj => obj[0] + ',' + obj[1] + ',' + obj[2] + ',' + obj[3]))
+                    .then(x => x.join(';'))
+                    .then(setLessonListString)             
+                setError(null);
             } catch (error) {
-                setError("Error loading lessons."); // Set error message
+                setError("Error loading lessons.");
+            } finally {
+                setLoading(false);
             }
         }
         fetchData()
@@ -105,14 +106,14 @@ function Lessons() {
     function resetStates() {
         setName('')
     }
-    
+
     function handleOnDragEnd(result) {
         if (!result.destination) return;
-    
+
         const items = Array.from(lessonList);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
-    
+
         setLessonListString(items.join(';'));
     }
 
@@ -121,7 +122,7 @@ function Lessons() {
         formData.append('user', user.email);
         formData.append('lessons', lessonList.map((lesson, index) => {
             return (
-                lesson.split(',')[0]+','+index
+                lesson.split(',')[0] + ',' + index
             );
         }).join(';')
         );
@@ -152,31 +153,37 @@ function Lessons() {
                 <div className="main-view">
                     <div className="info-list">
                         <div className='title'>Lessons:</div>
-                        {error && <div style={{ color: 'red' }}>{error}</div>}
-                        {lessonListString ? (
-                            <DragDropContext onDragEnd={handleOnDragEnd}>
-                                <Droppable droppableId="lessons">
-                                    {(provided) => (
-                                        <div className="lessons" {...provided.droppableProps} ref={provided.innerRef}>
-                                            {
-                                                lessonList.map((lesson, index) => {
-                                                    return (
-                                                        <Draggable isDragDisabled={!draggable} key={lesson.split(',')[0]} draggableId={lesson.split(',')[0]} index={index}>
-                                                            {(provided) => (
-                                                                <div className="unstyle list-item" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                                                            <Link to={'/content-management/course/'+courseId+'/lessons/'+lesson.split(',')[0]} className="content-link list-item-title">{ lesson.split(',')[1] }</Link>
-                                                                    <div><b>Available:</b> {lesson.split(',')[3] === 'true' ? 'Yes' : 'No'}</div>
-                                                                </div>
-                                                            )}
-                                                        </Draggable>
-                                                    );
-                                                })}
-                                            {provided.placeholder}
-                                        </div>
-                                    )}
-                                </Droppable>
-                            </DragDropContext>
-                        ) : null}
+                        {loading ? (
+                            <div>{spinnerIcon()} </div>
+                        ) : error ? (
+                            <div className="error-message">Error loading topics. Please try again later.</div>
+                        ) :
+                            (
+                                lessonListString ? (
+                                    <DragDropContext onDragEnd={handleOnDragEnd}>
+                                        <Droppable droppableId="lessons">
+                                            {(provided) => (
+                                                <div className="lessons" {...provided.droppableProps} ref={provided.innerRef}>
+                                                    {
+                                                        lessonList.map((lesson, index) => {
+                                                            return (
+                                                                <Draggable isDragDisabled={!draggable} key={lesson.split(',')[0]} draggableId={lesson.split(',')[0]} index={index}>
+                                                                    {(provided) => (
+                                                                        <div className="unstyle list-item" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                                            <Link to={'/content-management/course/' + courseId + '/lessons/' + lesson.split(',')[0]} className="content-link list-item-title">{lesson.split(',')[1]}</Link>
+                                                                            <div><b>Available:</b> {lesson.split(',')[3] === 'true' ? 'Yes' : 'No'}</div>
+                                                                        </div>
+                                                                    )}
+                                                                </Draggable>
+                                                            );
+                                                        })}
+                                                    {provided.placeholder}
+                                                </div>
+                                            )}
+                                        </Droppable>
+                                    </DragDropContext>
+                                ) : null
+                            )}
                     </div>
 
                     <div className="float-right">
@@ -184,7 +191,7 @@ function Lessons() {
                         <div>
                             {
                                 draggable ?
-                                    <button className='btn waves-light globalbtn' onClick={() => { onReorganize();setDraggable(false) }}>Save lesson list</button>
+                                    <button className='btn waves-light globalbtn' onClick={() => { onReorganize(); setDraggable(false) }}>Save lesson list</button>
                                     :
                                     <button className='btn waves-light globalbtn' onClick={() => setDraggable(true)}>Reorganize lesson list</button>
                             }
@@ -203,7 +210,7 @@ function Lessons() {
                             <div className="title">Create a lesson</div>
                             <form onSubmit={onSubmit}>
                                 <div><b>Lesson name:</b> <input onChange={(e) => setName(e.target.value)} required maxLength={30}></input></div>
-                                <div><b>Available:</b> <input type='checkbox' checked={available==='1'?true:false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position':'unset' }} onChange={(e) => setAvailable(e.target.checked?'1':'0')}></input></div>
+                                <div><b>Available:</b> <input type='checkbox' checked={available === '1' ? true : false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position': 'unset' }} onChange={(e) => setAvailable(e.target.checked ? '1' : '0')}></input></div>
                                 <div><button type='submit' className='btn waves-light globalbtn'>Create</button></div>
                                 <div><button className='btn waves-light globalbtn' onClick={() => { setShowModal(false); resetStates() }}>Cancel</button></div>
                             </form>
