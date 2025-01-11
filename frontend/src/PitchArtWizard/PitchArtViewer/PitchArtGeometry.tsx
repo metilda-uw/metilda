@@ -49,9 +49,9 @@ export default class PitchArtGeometry extends React.Component<Props> {
         if (JSON.stringify(syllables) === JSON.stringify(['ON', 'NI'])) {
             points.push({ x: 100, y: 100 }); // Accented
             points.push({ x: 600, y: 500 });
-        } else  if (JSON.stringify(syllables) === JSON.stringify(['ISS', 'KA'])) {
-            points.push({ x: 100, y: 100 }); // Accented
-            points.push({ x: 600, y: 500 });
+        } else if (JSON.stringify(syllables) === JSON.stringify(['ISS', 'KA'])) {
+            points.push({ x: 100, y: 100 }); // Left
+            points.push({ x: 600, y: 500 }); // Right
         } else if (JSON.stringify(syllables) === JSON.stringify(['AAK', 'IIWA'])) {
             points.push({ x: 100, y: 250 }); // Left
             points.push({ x: 600, y: 150 }); // Right
@@ -85,20 +85,31 @@ export default class PitchArtGeometry extends React.Component<Props> {
         }
     
         const linePoints = points.reduce((acc, point) => [...acc, point.x, point.y], []);
+    
+        // Generate circles and syllables
         const lineCircles = points.map((point, i) => (
-            <Circle
-                key={`circle-${i}`}
-                x={point.x}
-                y={point.y}
-                fill={this.props.colorSchemes[speakerIndex].praatDotFillColor}
-                stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}
-                strokeWidth={this.props.circleStrokeWidth}
-                radius={circleRadius}
-                onClick={() => this.props.playSound(speaker.letters[i]?.pitch || 0)}
-                draggable={speaker.letters[i]?.isManualPitch}
-            />
+            <React.Fragment key={`point-${i}`}>
+                <Circle
+                    x={point.x}
+                    y={point.y}
+                    fill={this.props.colorSchemes[speakerIndex].praatDotFillColor}
+                    stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}
+                    strokeWidth={this.props.circleStrokeWidth}
+                    radius={circleRadius}
+                    onClick={() => this.props.playSound(speaker.letters[i]?.pitch || 0)}
+                    draggable={speaker.letters[i]?.isManualPitch}
+                />
+                <Text
+                    x={point.x - this.props.fontSize / 2} // Center the text horizontally
+                    y={point.y + circleRadius * 1.5} // Position below the circle
+                    fontSize={this.props.fontSize}
+                    text={speaker.letters[i]?.syllable || ''}
+                    fill="#000" // Syllable text color set to black
+                />
+            </React.Fragment>
         ));
     
+        // Generate line
         const line = (
             <Line
                 key={`line-${speakerIndex}`}
@@ -116,7 +127,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
             </Layer>
         );
     };
-    
     
 
     accentedPoint = (x: number, y: number) => {
