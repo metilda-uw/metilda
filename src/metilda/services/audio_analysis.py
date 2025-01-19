@@ -10,12 +10,15 @@ import os
 import shutil
 import tempfile
 from math import isnan
+from datetime import datetime
 
 from matplotlib.figure import Figure
 import numpy as np
 import parselmouth
 
-# sns.set()  # Use seaborn's default style to make attractive graph
+import librosa
+import librosa.display
+import matplotlib.pyplot as plt
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 
 def draw_spectrogram(ax, spectrogram, dynamic_range=70):
@@ -98,7 +101,6 @@ def get_pitches_in_range(tmin, tmax, snd_pitch):
     pitch_samples = [(t, snd_pitch.get_value_at_time(t)) for t in snd_pitch.xs() if tmin <= t <= tmax]
     return [(t, p) for t, p in pitch_samples if not isnan(p)]
 
-
 def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
@@ -111,13 +113,11 @@ def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX
         pitches = list(zip(*pitch_samples))[1]
         return sum(pitches) / len(pitches)
 
-
 def get_all_pitches(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
     t0, t1 = time_range
     return get_pitches_in_range(t0, t1, snd_pitch)
-
 
 def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
@@ -145,3 +145,63 @@ def get_audio(upload_path, tmin=-1, tmax=-1):
 
     shutil.rmtree(temp_dir)
     return file_bytes
+
+
+def audio_analysis_with_beats(upload_path,
+                              tmin=-1,
+                              tmax=-1,
+                              min_pitch=MIN_PITCH_HZ,
+                              max_pitch=MAX_PITCH_HZ,
+                              output_path=None):
+    snd = parselmouth.Sound(upload_path)
+    snd = snd.convert_to_mono()
+
+    if tmin > -1 or tmax > -1:
+        tmin = max(0, tmin)
+        tmax = min(snd.xmax, tmax)
+        snd = snd.extract_part(from_time=tmin, to_time=tmax)
+        snd.scale_times_to(tmin, tmax)
+
+    audio_data = snd.values[0]
+    sample_rate = int(1 / snd.dx)
+    tempo, beat_frames = librosa.beat.beat_track(y=audio_data, sr=sample_rate)
+    beat_times = librosa.frames_to_time(beat_frames, sr=sample_rate)
+
+    fig = Figure(figsize=(7, 3.25), dpi=400)
+    (ax1, ax2) = fig.subplots(ncols=1, nrows=2, gridspec_kw={'height_ratios': [1, 2]})
+
+    # Draw waveform
+    ax1.plot(snd.xs(), snd.values.T)
+    ax1.set_xlim([snd.xmin, snd.xmax])
+    ax1.set_xticklabels([])
+    ax1.set_ylabel("amplitude")
+
+    # Draw spectrogram
+    spectrogram = snd.to_spectrogram()
+    draw_spectrogram(ax2, spectrogram)
+
+    # Highlight rhythm by overlaying beat markers
+    for beat_time in beat_times:
+        ax2.axvline(x=beat_time, color='cyan', linestyle='--', linewidth=0.8, alpha=0.7)
+
+    # Draw pitch
+    pitchAxis = ax2.twinx()
+    draw_pitch(pitchAxis, snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch), min_pitch, max_pitch)
+    ax2.set_xlim([snd.xmin, snd.xmax])
+
+    fig.subplots_adjust(hspace=0.1, top=0.98, bottom=0.14)
+
+    # Save the image locally if output_path is provided
+    if output_path is None:
+        output_dir = "saved_spectrograms"
+        os.makedirs(output_dir, exist_ok=True)
+        output_path = os.path.join(output_dir, f"spectrogram_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+
+    fig.savefig(output_path, format="png")
+    print(f"Spectrogram saved to: {output_path}")
+
+    # Save to BytesIO for returning
+    image = io.BytesIO()
+    fig.savefig(image, format="png")
+    image.seek(0)  # Reset the buffer to the start
+    return image  # Return BytesIO object

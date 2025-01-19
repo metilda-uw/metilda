@@ -54,6 +54,7 @@ export interface TargetPitchBarProps {
   minAudioX: number;
   maxAudioX: number;
   firebase: any;
+  typeOfBeat: any
   targetPitchSelected: (letterIndex: number) => void;
   removeLetter: (speakerIndex: number, index: number, indices?:number[]) => void;
   resetLetters: (speakerIndex: number) => void;
@@ -173,6 +174,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.initialY = 0;
     this.selectedContourElements = [];
   }
+
   componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
   }
@@ -924,6 +926,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     const controller = this;
     const letters = this.scaleIntervals();
     const speaker = this.props.speakers[this.props.speakerIndex];
+    const { typeOfBeat } = this.props; // Use the new prop
+  
     return (
       <div className="TargetPitchBar">
         {this.saveNewAnalysisModal()}
@@ -932,18 +936,19 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         {this.removeLetterEventModal()}
         <div className="metilda-control-container metilda-target-pitch-bar">
           <div className="metilda-audio-analysis-image-col-1">
-            <span>Syllables</span>
+            <span>{typeOfBeat}</span> {/* Display the active type */}
           </div>
-          <div className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container"
+          <div
+            className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container"
             ref={this.metildaSyllableBarRef}
             onMouseDown={this.handleMouseDown}
-            >
-            <div ref ={this.selectionOverlay} className="selection"></div>
+          >
+            <div ref={this.selectionOverlay} className="selection"></div>
             {letters.map(function (item, index) {
               if (!item.isShown) {
                 return;
               }
-
+  
               return (
                 <AudioLetter
                   key={index}
@@ -959,9 +964,10 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             })}
           </div>
         </div>
-        {/* <div ref ={this.selectionOverlay} className="selection"></div> */}
+  
         <div className="TargetPitchBarElements">
           <div className="btn-group-analysis-controls">
+            {/* Dynamically change the button text based on typeOfBeat */}
             <button
               className="TargetPitchBar-edit-syllable btn globalbtn waves-effect waves-light"
               type="submit"
@@ -969,22 +975,8 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
               disabled={this.state.selectedIndex === -1}
               onClick={this.editSyllableEvent}
             >
-              Edit Syllable
+              {typeOfBeat === "Melody" ? "Edit Melody" : "Edit Rhythm"}
             </button>
-            {/* <button className="TargetPitchBar-set-syllable btn globalbtn waves-effect waves-light"
-                            type="submit"
-                            name="action"
-                            disabled={this.state.selectedIndex === -1}
-                            onClick={this.setLetterSyllableEvent}>
-                        Set Syllable
-                    </button>
-                    <button className="TargetPitchBar-set-time btn globalbtn waves-effect waves-light"
-                            type="submit"
-                            name="action"
-                            disabled={this.state.selectedIndex === -1}
-                            onClick={this.setLetterTimeEvent}>
-                        Set Time
-                    </button> */}
             <button
               className="TargetPitchBar-remove-letter btn globalbtn waves-effect waves-light"
               type="submit"
@@ -1013,30 +1005,12 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 Open
               </FileReaderInput>
             </button>
-            {/* <button
-              className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
-              type="submit"
-              name="action"
-              disabled={speaker.letters.length === 0}
-              onClick={this.saveAnalysis}
-            >
-              Save
-            </button>
-            <button
-              className="TargetPitchBar-download-analysis btn globalbtn waves-effect waves-light"
-              type="submit"
-              name="action"
-              disabled={speaker.letters.length === 0}
-              onClick={this.downloadAnalysis}
-            >
-              Download
-            </button> */}
-            {/* <SaveAnalysisFireStore analysis={speaker} /> */}
           </div>
         </div>
       </div>
     );
   }
+  
 }
 
 const mapStateToProps = (state: AppState) => ({

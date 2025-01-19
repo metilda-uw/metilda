@@ -141,23 +141,35 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   static getDerivedStateFromProps(props, state) {
-    //alert("here")
-    if(state.minAudioTime === 0 && state.maxAudioTime === -1){
-      state.imageUrl = AudioAnalysis.formatImageUrl(
-        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch);
-    } else {
-      state.imageUrl = AudioAnalysis.formatImageUrl(
-        props.speakers[props.speakerIndex].uploadId, props.minPitch, props.maxPitch, state.minAudioTime, state.maxAudioTime);
+    if (state.manualImageUrlOverride) {
+      // Skip automatic updates if the image URL was manually overridden
+      console.log("Skipping getDerivedStateFromProps due to manualImageUrlOverride");
+      return null;
     }
-    state.minPitch = props.minPitch;
-    state.maxPitch = props.maxPitch;
-    return state;
+  
+    const uploadId = props.speakers[props.speakerIndex]?.uploadId;
+    if (!uploadId) return null;
+  
+    const newImageUrl = state.minAudioTime === 0 && state.maxAudioTime === -1
+      ? AudioAnalysis.formatImageUrl(uploadId, props.minPitch, props.maxPitch)
+      : AudioAnalysis.formatImageUrl(uploadId, props.minPitch, props.maxPitch, state.minAudioTime, state.maxAudioTime);
+  
+    if (state.imageUrl !== newImageUrl || state.minPitch !== props.minPitch || state.maxPitch !== props.maxPitch) {
+      return {
+        imageUrl: newImageUrl,
+        minPitch: props.minPitch,
+        maxPitch: props.maxPitch,
+      };
+    }
+  
+    return null;
   }
 
   constructor(props: AudioAnalysisProps) {
     super(props);
 
     this.state = {
+      typeOfBeat: "Melody",
       selectedFolderName: "Uploads",
       speakerName: this.props.speakers[this.props.speakerIndex].speakerName,
       word: this.props.speakers[this.props.speakerIndex].word,
@@ -173,7 +185,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         this.props.minPitch,
         this.props.maxPitch),
       audioUrl: AudioAnalysis.formatAudioUrl(this.getSpeaker().uploadId),
-      imageUrlStack:[],
+      imageUrlStack: [],
       audioEditVersion: 0,
       minSelectX: -1,
       maxSelectX: -1,
@@ -205,12 +217,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.manualPitchChange = this.manualPitchChange.bind(this);
     this.addPitch = this.addPitch.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
+    this.toggleTypeOfBeat = this.toggleTypeOfBeat.bind(this);
+    
   }
 
   getSpeaker = (): Speaker => {
     return this.props.speakers[this.props.speakerIndex];
   }
-
+  
   componentDidMount() {
     const uploadId = this.getSpeaker().uploadId;
     if (!uploadId) {
@@ -235,7 +249,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     fetch(`/api/audio/${uploadId}/duration`, request)
       .then((response) => response.json())
-      .then(function(data: any) {
+      .then(function (data: any) {
         controller.setState({
           imageUrl,
           audioUrl,
@@ -260,7 +274,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         });
         this.props.setUploadId(this.props.speakerIndex, uploadId, fileIndex);
         this.props.resetLetters(this.props.speakerIndex);
-      }).catch(function(error: any) {
+      }).catch(function (error: any) {
         // return;
       });
     } else {
@@ -328,7 +342,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
-  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false, isContour: boolean = false,pitchRange:number[] = null) {
+  addPitch(pitch: number, letter: string, ts: number[], isManualPitch: boolean = false, isWordSep: boolean = false, isContour: boolean = false, pitchRange: number[] = null) {
     if (!isWordSep) {
       if (pitch < this.props.minPitch || pitch > this.props.maxPitch) {
         // the pitch outside the bounds of the window, omit it
@@ -342,7 +356,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       ts[1] = Math.min(ts[1] + 0.001, this.state.soundLength);
     }
 
-    const newLetter:Letter = {
+    const newLetter: Letter = {
       t0: ts[0],
       t1: ts[1],
       pitch,
@@ -351,7 +365,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       isWordSep,
       isContour
     };
-    if(isContour && pitchRange != null){
+    if (isContour && pitchRange != null) {
       newLetter.contourGroupRange = pitchRange;
     }
 
@@ -419,7 +433,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       .then((response) => response.json())
       .then((data) => (data as PitchRangeDTO).pitches.map((item) => this.addPitch(item[1],
         DEFAULT.SYLLABLE_TEXT,
-        [item[0], item[0]],false, false, true,ts)),
+        [item[0], item[0]], false, false, true, ts)),
       );
   }
 
@@ -555,8 +569,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const tmin = parseFloat(urlObj.searchParams.get('tmin'));
     const tmax = parseFloat(urlObj.searchParams.get('tmax'));
 
-    console.log('tmin:', tmin); 
-    console.log('tmax:', tmax); 
+    console.log('tmin:', tmin);
+    console.log('tmax:', tmax);
 
     const newAudioUrl = AudioAnalysis.formatAudioUrl(
       this.getSpeaker().uploadId,
@@ -600,7 +614,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       config.maxAudioTime);
 
     this.state.closeImgSelectionCallback();
-    
+
     this.state.imageUrlStack.push(this.state.imageUrl);
 
     this.setState({
@@ -613,9 +627,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   }
 
-  completeZoomOut = ()=>{
-    if(this.state.imageUrlStack.length === 0) return;
-    while(this.state.imageUrlStack.length > 1){
+  completeZoomOut = () => {
+    if (this.state.imageUrlStack.length === 0) return;
+    while (this.state.imageUrlStack.length > 1) {
       this.state.imageUrlStack.pop();
     }
     this.showAllClicked();
@@ -633,7 +647,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           removeSpeaker={() => this.props.removeSpeaker(this.props.speakerIndex)}
           canAddSpeaker={isLastSpeaker && this.props.speakerIndex < (DEFAULT.SPEAKER_LIMIT - 1)}
           canRemoveSpeaker={!isFirstSpeaker} />
-        <button className="complete-zoomout waves-effect waves-light btn globalbtn" 
+        <button className="complete-zoomout waves-effect waves-light btn globalbtn"
           disabled={this.state.imageUrlStack.length === 0}
           onClick={this.completeZoomOut}>
           Complete Zoom Out
@@ -653,11 +667,11 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
       const isAllShown = this.state.minAudioTime === 0
         && this.state.maxAudioTime === this.state.soundLength;
-      
+
       const config = this.getAudioConfigForSelection(
-          this.state.minSelectX,
-          this.state.maxSelectX);
-      
+        this.state.minSelectX,
+        this.state.maxSelectX);
+
       const isSoundLengthLarge = (config.maxAudioTime - config.minAudioTime > 0.05);
 
 
@@ -673,7 +687,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           newAvgPitch={this.averagePitchArtClicked}
           newRangePitch={this.pitchArtRangeClicked}
           showAllAudio={this.showAllClicked}
-          isSoundLengthLarge= {isSoundLengthLarge}
+          isSoundLengthLarge={isSoundLengthLarge}
           onClick={() => this.showImgMenu(-1, -1)}
         />
       );
@@ -700,10 +714,155 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ [event.target.name]: event.target.value });
   };
 
+  static formatBeatsUrl() {
+    return "http://localhost:5000/api/audio/spectrogram/beats/aakiiwa.wav.png/image";
+  }
+
+  // toggleTypeOfBeat() {
+  //   const newTypeOfBeat = this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody";
+  //   const uploadId = this.getSpeaker().uploadId;
+  
+  //   if (!uploadId) {
+  //     console.error("No upload ID found. Cannot toggle type of beat.");
+  //     return;
+  //   }
+  
+  //   if (newTypeOfBeat === "Rhythm") {
+  //     var rhythmUrl = `http://localhost:5000/api/audio/spectrogram/beats/${uploadId}.png/image?timestamp=${new Date().getTime()}`;;
+  
+  //     this.setState({ isAudioImageLoaded: false });
+  //     fetch(rhythmUrl)
+  //       .then((response) => {
+  //         if (!response.ok) {
+  //           throw new Error(`HTTP error! Status: ${response.status}`);
+  //         }
+  //         console.log("Rhythm spectrogram fetched successfully:", rhythmUrl);
+  //         return rhythmUrl; // Pass the URL directly
+  //       })
+  //       .then((url) => {
+  //         this.setState({
+  //           typeOfBeat: newTypeOfBeat,
+  //           imageUrl: rhythmUrl ,
+  //           isAudioImageLoaded: true,
+  //           audioEditVersion: this.state.audioEditVersion + 1, // Force re-render
+  //         }, () => {
+  //           console.log("State updated for Rhythm:", this.state);
+  //         });
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error fetching rhythm spectrogram:", error);
+  //         this.setState({ isAudioImageLoaded: true });
+  //       });
+  //   } else {
+  //     const melodyUrl = AudioAnalysis.formatImageUrl(
+  //       uploadId,
+  //       this.props.minPitch,
+  //       this.props.maxPitch,
+  //       this.state.minAudioTime,
+  //       this.state.maxAudioTime
+  //     );
+  
+  //     this.setState({
+  //       typeOfBeat: newTypeOfBeat,
+  //       imageUrl: melodyUrl,
+  //       isAudioImageLoaded: true,
+  //       audioEditVersion: this.state.audioEditVersion + 1, // Force re-render
+  //     }, () => {
+  //       console.log("State updated for Melody:", this.state);
+  //     });
+  //   }
+  // }
+  // toggleTypeOfBeat = () => {
+  //   const newTypeOfBeat = this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody";
+  //   const newImageUrl = newTypeOfBeat === "Rhythm"
+  //     ? "http://localhost:5000/api/audio/spectrogram/beats/test.png"
+  //     : AudioAnalysis.formatImageUrl(
+  //         this.getSpeaker().uploadId,
+  //         this.props.minPitch,
+  //         this.props.maxPitch,
+  //         this.state.minAudioTime,
+  //         this.state.maxAudioTime
+  //       );
+  
+  //   this.setState(
+  //     {
+  //       typeOfBeat: newTypeOfBeat,
+  //       imageUrl: newImageUrl,
+  //       manualImageUrlOverride: true, // Signal manual update
+  //       audioEditVersion: this.state.audioEditVersion + 1,
+  //     },
+  //     () => {
+  //       console.log("State after toggleTypeOfBeat:", this.state);
+  //     }
+  //   );
+  // };
+  toggleTypeOfBeat = () => {
+    const newTypeOfBeat = this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody";
+    const uploadId = this.getSpeaker().uploadId;
+  
+    if (!uploadId) {
+      console.error("No upload ID found. Cannot toggle type of beat.");
+      return;
+    }
+  
+    if (newTypeOfBeat === "Rhythm") {
+      const rhythmUrl = `http://localhost:5000/api/audio/spectrogram/beats/${uploadId}.png/image?timestamp=${new Date().getTime()}`;
+      this.setState({ isAudioImageLoaded: false, manualImageUrlOverride: true });
+  
+      fetch(rhythmUrl)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+          console.log("Rhythm spectrogram fetched successfully:", rhythmUrl);
+          return rhythmUrl;
+        })
+        .then((url) => {
+          this.setState(
+            {
+              typeOfBeat: newTypeOfBeat,
+              imageUrl: url,
+              isAudioImageLoaded: true,
+              audioEditVersion: this.state.audioEditVersion + 1,
+              manualImageUrlOverride: true,
+            },
+            () => {
+              console.log("State updated for Rhythm:", this.state);
+            }
+          );
+        })
+        .catch((error) => {
+          console.error("Error fetching rhythm spectrogram:", error);
+          this.setState({ isAudioImageLoaded: true });
+        });
+    } else {
+      const melodyUrl = AudioAnalysis.formatImageUrl(
+        uploadId,
+        this.props.minPitch,
+        this.props.maxPitch,
+        this.state.minAudioTime,
+        this.state.maxAudioTime
+      );
+  
+      this.setState(
+        {
+          typeOfBeat: newTypeOfBeat,
+          imageUrl: melodyUrl,
+          isAudioImageLoaded: true,
+          audioEditVersion: this.state.audioEditVersion + 1,
+          manualImageUrlOverride: true,
+        },
+        () => {
+          console.log("State updated for Melody:", this.state);
+        }
+      );
+    }
+  };
   render() {
+    const { typeOfBeat } = this.state;
     const uploadId = this.getSpeaker().uploadId;
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
-
+  
     if (speakerName === undefined) {
       this.props.setSpeakerName(this.props.speakerIndex, "Speaker");
     }
@@ -713,56 +872,71 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     if (wordTranslation === undefined) {
       this.props.setWordTranslation(this.props.speakerIndex, "WordTranslation");
     }
-
+  
     const isInvalid = speakerName === "";
-
+  
     let nonAudioImg;
     if (!uploadId) {
       nonAudioImg = <AudioImgDefault />;
     } else if (!this.state.isAudioImageLoaded) {
       nonAudioImg = <AudioImgLoading />;
     }
-
+  
     return (
       <div className="AudioAnalysis">
         <div className="row">
           <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
             <h6 className="metilda-control-header">Speaker {this.props.speakerIndex + 1}</h6>
-            <UploadAudio initFileName={uploadId} setUploadId={this.setUploadId}
-              userFiles={this.props.files} firebase={this.props.firebase} />
-            <PitchRange initMinPitch={this.props.minPitch}
+            <UploadAudio
+              initFileName={uploadId}
+              setUploadId={this.setUploadId}
+              userFiles={this.props.files}
+              firebase={this.props.firebase}
+            />
+            <PitchRange
+              initMinPitch={this.props.minPitch}
               initMaxPitch={this.props.maxPitch}
-              applyPitchRange={this.applyPitchRange} />
+              applyPitchRange={this.applyPitchRange}
+            />
             {this.renderSpeakerControl()}
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              onClick={this.toggleTypeOfBeat}
+
+            >
+              {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
+              
+      
+            </button>
           </div>
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7">
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
               {this.maybeRenderImgMenu()}
-              {
-                uploadId ?
-                  <AudioImg
-                    key={this.state.audioEditVersion}
-                    uploadId={uploadId}
-                    speakerIndex={this.props.speakerIndex}
-                    src={this.state.imageUrl}
-                    ref="audioImage"
-                    imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
-                    xminPerc={DEFAULT.MIN_IMAGE_XPERC}
-                    xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
-                    audioIntervalSelected={this.audioIntervalSelected}
-                    audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                    onAudioImageLoaded={this.onAudioImageLoaded}
-                    showImgMenu={this.showImgMenu}
-                    minAudioX={this.state.minAudioX}
-                    maxAudioX={this.state.maxAudioX}
-                    minAudioTime={this.state.minAudioTime}
-                    maxAudioTime={this.state.maxAudioTime} />
-                  : []
-              }
+              {uploadId && (
+                <AudioImg
+                  key={this.state.imageUrl}
+                  uploadId={uploadId}
+                  speakerIndex={this.props.speakerIndex}
+                  src={this.state.imageUrl}
+                  ref="audioImage"
+                  imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                  xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+                  xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
+                  audioIntervalSelected={this.audioIntervalSelected}
+                  audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                  onAudioImageLoaded={this.onAudioImageLoaded}
+                  showImgMenu={this.showImgMenu}
+                  minAudioX={this.state.minAudioX}
+                  maxAudioX={this.state.maxAudioX}
+                  minAudioTime={this.state.minAudioTime}
+                  maxAudioTime={this.state.maxAudioTime}
+                />
+              )}
             </div>
             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
-            <TargetPitchBar letters={this.props.speakers}
+            <TargetPitchBar
+              letters={this.props.speakers}
               files={this.props.files}
               minAudioX={this.state.minAudioX}
               maxAudioX={this.state.maxAudioX}
@@ -770,7 +944,9 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               maxAudioTime={this.state.maxAudioTime}
               targetPitchSelected={this.targetPitchSelected}
               speakerIndex={this.props.speakerIndex}
-              firebase={this.props.firebase} />
+              firebase={this.props.firebase}
+              typeOfBeat={typeOfBeat}
+            />
           </div>
         </div>
       </div>
