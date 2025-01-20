@@ -20,6 +20,7 @@ import librosa
 import librosa.display
 import matplotlib.pyplot as plt
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 def draw_spectrogram(ax, spectrogram, dynamic_range=70):
     X, Y = spectrogram.x_grid(), spectrogram.y_grid()
@@ -147,12 +148,7 @@ def get_audio(upload_path, tmin=-1, tmax=-1):
     return file_bytes
 
 
-def audio_analysis_with_beats(upload_path,
-                              tmin=-1,
-                              tmax=-1,
-                              min_pitch=MIN_PITCH_HZ,
-                              max_pitch=MAX_PITCH_HZ,
-                              output_path=None):
+def audio_analysis_with_beats(upload_path, tmin=-1, tmax=-1, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ, output_path=None):
     snd = parselmouth.Sound(upload_path)
     snd = snd.convert_to_mono()
 
@@ -167,6 +163,7 @@ def audio_analysis_with_beats(upload_path,
     tempo, beat_frames = librosa.beat.beat_track(y=audio_data, sr=sample_rate)
     beat_times = librosa.frames_to_time(beat_frames, sr=sample_rate)
 
+    # Generate the spectrogram image
     fig = Figure(figsize=(7, 3.25), dpi=400)
     (ax1, ax2) = fig.subplots(ncols=1, nrows=2, gridspec_kw={'height_ratios': [1, 2]})
 
@@ -191,7 +188,7 @@ def audio_analysis_with_beats(upload_path,
 
     fig.subplots_adjust(hspace=0.1, top=0.98, bottom=0.14)
 
-    # Save the image locally if output_path is provided
+    # Save the image locally
     if output_path is None:
         output_dir = "saved_spectrograms"
         os.makedirs(output_dir, exist_ok=True)
@@ -204,4 +201,6 @@ def audio_analysis_with_beats(upload_path,
     image = io.BytesIO()
     fig.savefig(image, format="png")
     image.seek(0)  # Reset the buffer to the start
-    return image  # Return BytesIO object
+    return image,beat_times.tolist()   # Return BytesIO object
+    # Return the beat times alongside the image path
+  

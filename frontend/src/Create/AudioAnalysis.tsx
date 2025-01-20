@@ -61,6 +61,7 @@ export interface AudioAnalysisProps {
   ) => void;
   parentCallBack: (selectedFolderName: string) => void;
   updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
+  
 }
 
 interface State {
@@ -91,6 +92,8 @@ interface State {
   selectionCallback: (t1: number, t2: number) => void;
   // needed for the onChange event to work.
   [key: string]: any;
+  beats: number[]; // Stores the time positions of the beats
+
 }
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
@@ -193,6 +196,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       maxPitch: this.props.maxPitch,
       minAudioX: DEFAULT.MIN_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
       maxAudioX: DEFAULT.MAX_IMAGE_XPERC * DEFAULT.AUDIO_IMG_WIDTH,
+      beats: [],
       minAudioTime: 0.0,
       maxAudioTime: -1.0,
       audioImgWidth: (DEFAULT.MAX_IMAGE_XPERC - DEFAULT.MIN_IMAGE_XPERC)
@@ -814,17 +818,21 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
-          console.log("Rhythm spectrogram fetched successfully:", rhythmUrl);
-          return rhythmUrl;
+          return response.json(); // Parse JSON response
         })
-        .then((url) => {
+        .then((data) => {
+          const { image_binary, beats } = data;
+  
+          // Construct the image source from Base64 binary
+          const imageSrc = `data:image/png;base64,${image_binary}`;
+  
           this.setState(
             {
               typeOfBeat: newTypeOfBeat,
-              imageUrl: url,
+              imageUrl: imageSrc, // Use the constructed Base64 image
+              beats: beats || [], // Populate beats from the response
               isAudioImageLoaded: true,
               audioEditVersion: this.state.audioEditVersion + 1,
-              manualImageUrlOverride: true,
             },
             () => {
               console.log("State updated for Rhythm:", this.state);
@@ -848,15 +856,23 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         {
           typeOfBeat: newTypeOfBeat,
           imageUrl: melodyUrl,
+          beats: [], // Clear beats for Melody
           isAudioImageLoaded: true,
           audioEditVersion: this.state.audioEditVersion + 1,
-          manualImageUrlOverride: true,
         },
         () => {
           console.log("State updated for Melody:", this.state);
         }
       );
     }
+  };
+  updateBeat = (index: number, newTime: number) => {
+    const updatedBeats = [...this.state.beats];
+    updatedBeats[index] = newTime;
+  
+    this.setState({ beats: updatedBeats }, () => {
+      console.log("Beats updated:", this.state.beats);
+    });
   };
   render() {
     const { typeOfBeat } = this.state;
@@ -914,24 +930,30 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               {nonAudioImg}
               {this.maybeRenderImgMenu()}
               {uploadId && (
-                <AudioImg
-                  key={this.state.imageUrl}
-                  uploadId={uploadId}
-                  speakerIndex={this.props.speakerIndex}
-                  src={this.state.imageUrl}
-                  ref="audioImage"
-                  imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
-                  xminPerc={DEFAULT.MIN_IMAGE_XPERC}
-                  xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
-                  audioIntervalSelected={this.audioIntervalSelected}
-                  audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
-                  onAudioImageLoaded={this.onAudioImageLoaded}
-                  showImgMenu={this.showImgMenu}
-                  minAudioX={this.state.minAudioX}
-                  maxAudioX={this.state.maxAudioX}
-                  minAudioTime={this.state.minAudioTime}
-                  maxAudioTime={this.state.maxAudioTime}
-                />
+               <AudioImg
+               key={this.state.imageUrl}
+               uploadId={uploadId}
+               speakerIndex={this.props.speakerIndex}
+               src={this.state.imageUrl}
+               ref="audioImage"
+               imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+               xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+               xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
+               audioIntervalSelected={this.audioIntervalSelected}
+               audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+               onAudioImageLoaded={this.onAudioImageLoaded}
+               showImgMenu={this.showImgMenu}
+               minAudioX={this.state.minAudioX}
+               maxAudioX={this.state.maxAudioX}
+               minAudioTime={this.state.minAudioTime}
+               maxAudioTime={this.state.maxAudioTime}
+               beats={this.state.typeOfBeat === "Rhythm" ? this.state.beats : []} // Pass beats
+               tmin={this.state.minAudioTime} // Pass tmin
+               tmax={this.state.maxAudioTime} // Pass tmax
+               spectrogramWidth={DEFAULT.AUDIO_IMG_WIDTH} // Pass width of spectrogram
+               onBeatMove={this.updateBeat} // Update beat positions on drag
+               typeOfBeat={this.state.typeOfBeat} // Pass typeOfBeat
+             />
               )}
             </div>
             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}

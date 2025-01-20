@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import flask
 import uuid
-from flask import request, jsonify, send_file, flash
+from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
@@ -22,7 +22,7 @@ from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
 from PIL import Image
-
+from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
@@ -1114,29 +1114,34 @@ def update_rhythm_data(id):
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/audio/spectrogram/beats/<string:upload_id>.png/image', methods=["GET"])
-
 def generate_rhythm_spectrogram(upload_id):
-    """
-    Generates a spectrogram for rhythm features of the given audio file.
-    """
-    image_path = os.path.join(app.config["SOUNDS"], upload_id)
-    print("Image path:", image_path)  # Debugging: Check input file path
+    try:
+        # Prepare file paths and sanitize filename
+        image_path = os.path.join(app.config["SOUNDS"], upload_id)
+        tmin = request.args.get('tmin', -1, type=float)
+        tmax = request.args.get('tmax', -1, type=float)
+        min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
+        max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
 
-    tmin = request.args.get('tmin', -1, type=float)
-    tmax = request.args.get('tmax', -1, type=float)
-    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
-    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
-    sanitized_filename = re.sub(r'[^\w\-_\.]', '_', upload_id)
-    output_path = os.path.join("saved_spectrograms", f"{sanitized_filename}_spectrogram.png")
-    print("Sanitized Output path:", output_path)
+        # Generate the spectrogram with beats
+        image_binary, beats = audio_analysis.audio_analysis_with_beats(
+            image_path,
+            tmin=tmin,
+            tmax=tmax,
+            min_pitch=min_pitch,
+            max_pitch=max_pitch
+        )
 
-    image_binary = audio_analysis.audio_analysis_with_beats(
-        image_path,
-        min_pitch=min_pitch,
-        max_pitch=max_pitch,
-        tmin=tmin,
-        tmax=tmax,
-                output_path=output_path,
-    )
+        # Encode the image binary in Base64 for frontend consumption
+        import base64
+        image_base64 = base64.b64encode(image_binary.getvalue()).decode('utf-8')
 
-    return send_file(image_binary, mimetype="image/png")
+        # Return beats and Base64 image as JSON response
+        return jsonify({
+            "image_binary": image_base64,
+            "beats": beats,
+        })
+
+    except Exception as e:
+        print(f"Error generating rhythm spectrogram: {e}")
+        return jsonify({"error": str(e)}), 500
