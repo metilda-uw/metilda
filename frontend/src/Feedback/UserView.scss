@@ -1,0 +1,131 @@
+.page-feedback {
+  font-family: 'Trebuchet MS', Helvetica, sans-serif;
+}
+
+.title {
+  color: brown;
+  text-align: center;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+.question-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;  
+  justify-content: center;
+
+}
+
+.question-item p {
+  color: brown;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.option-button {
+  background-color: lightgray;
+  color: rgb(15, 13, 13);
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+  
+  &.selected {
+    background-color: #c1474d;
+  }
+
+  &:hover {
+    background-color: #c1474d;
+  }
+}
+
+.text-input {
+  margin-top: 10px;
+  position: relative;
+}
+
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  resize: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.word-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: gray;
+  font-size: 14px;
+}
+
+.navigation-buttons {
+  display: flex;
+  align-items: center;  
+  justify-content: center;
+  margin-top: 30px;
+}
+
+.navigation-buttons button {
+  margin: 0 10px;  
+}
+
+.btn-back,
+.btn-next,
+.btn-submit {
+  background-color: #f25e68;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+
+  &:hover {
+    background-color: #c1474d;
+  }
+
+  &:disabled {
+    background-color: lightgray;
+    cursor: not-allowed;
+  }
+}
+
+.btn-submit {
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 50px;
+}
+.progressbar {
+  height: 20px;
+  width: 90%;
+  overflow: hidden;
+  border-radius: 5px;
+  background-color: lightgrey;
+  margin: 20px auto;
+}
+
+.progressbar-inner {
+  height: 100%;
+  width: 0%;  
+  background-color: #66bb6a; 
+  transition: width 0.3s ease;  
+}
+
+h3 {
+  margin: 10px 50px 10px 70px; 
+  font-size: 18px;
+  color: #c1474d;
+}

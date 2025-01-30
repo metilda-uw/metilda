@@ -1,4 +1,33 @@
-.h1 {
-  color: brown;
-  margin-bottom: 48px;
+.thank-you-container {
+  text-align: center;
+  margin: 20px;
+
+  .h1 {
+    font-size: 24px;
+    color: #c1474d; 
+    margin: 10px 50px 10px 70px;
+  }
+
+  p {
+    font-size: 16px;
+    color: #333; 
+    margin: 10px 0;
+  }
+
+  a {
+    display: inline-block;
+    margin-top: 15px;
+    font-size: 16px;
+    color: #c1474d; 
+    text-decoration: none;
+    border: 1px solid #c1474d;
+    padding: 8px 15px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+
+    &:hover {
+      background-color: #c1474d;
+      color: #fff;
+    }
+  }
 }

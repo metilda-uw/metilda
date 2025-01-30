@@ -30,6 +30,7 @@ interface Props {
     pitchArtSoundLengthSeconds: number;
     accentedCircleRadius: number;
     setPointerEnabled: (isEnabled: boolean) => (void);
+    isLearn?: boolean;
 }
 
 export default class PitchArtGeometry extends React.Component<Props> {
@@ -38,7 +39,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
     }
 
     renderLayer = (speaker: Speaker, speakerIndex: number) => {
-        const circleRadius = this.props.showLargeCircles
+        if (this.props.isLearn){
+            const circleRadius = this.props.showLargeCircles
             ? this.props.largeCircleRadius
             : this.props.smallCircleRadius;
     
@@ -83,10 +85,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
             points.push({ x: 350, y: 100 }); // Point 3 (Accented)
             points.push({ x: 550, y: 350 }); // Point 4
         }
-    
         const linePoints = points.reduce((acc, point) => [...acc, point.x, point.y], []);
-    
-        // Generate circles and syllables
+
         const lineCircles = points.map((point, i) => (
             <React.Fragment key={`point-${i}`}>
                 <Circle
@@ -108,8 +108,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 />
             </React.Fragment>
         ));
-    
-        // Generate line
         const line = (
             <Line
                 key={`line-${speakerIndex}`}
@@ -119,15 +117,161 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 lineJoin="round"
             />
         );
-    
         return (
             <Layer key={speakerIndex}>
                 {line}
                 {lineCircles}
             </Layer>
         );
-    };
+        }
+        else{
+            const pitches = speaker.letters.map((item) => item.pitch);
+            const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
     
+            const circleRadius = this.props.showLargeCircles ?
+                this.props.largeCircleRadius : this.props.smallCircleRadius;
+
+            const pitchValues: RawPitchValue[] = speaker.letters.filter((data) => !data.isWordSep);
+    
+            const coordConverter = new PitchArtCoordConverter(
+                this.props.windowConfig,
+                pitchValues,
+                this.props.showVerticallyCentered,
+                this.props.showTimeNormalization,
+                this.props.showPerceptualScale
+            );
+    
+            const points = [];
+            const pointPairs = [];
+            const lineCircles = [];
+            const controller = this;
+            const letterSyllables = [];
+            const lines = [];
+            let currLinePoints = [];
+            for (let i = 0; i < speaker.letters.length; i++) {
+                if (speaker.letters[i].isWordSep) {
+                    if (currLinePoints.length > 0) {
+                        lines.push(
+                            <Line key={i + "_pa_line"}
+                                  points={currLinePoints}
+                                  strokeWidth={this.props.graphWidth}
+                                  stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}/>
+                        );
+                        currLinePoints = [];
+                    }
+                    continue;
+                }
+    
+                const currPitch = speaker.letters[i].pitch;
+                const x = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
+                const y = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);
+    
+                // The 'align' property is not working with the current version of
+                // react-konva that's used. As a result, we're manually shifting
+                // the text to be centered.
+                const konvaFontSizeAsPixels = this.props.fontSize * 0.65;
+                const text = speaker.letters[i].syllable;
+    
+                letterSyllables.push(
+                    <Text key={i}
+                          x={x - (konvaFontSizeAsPixels * text.length / 2.0)}
+                          y={y + circleRadius * 1.9}  // position text below the pitch circle
+                          fontSize={this.props.fontSize}
+                          text={text}/>
+                );
+    
+                let circleFill = this.props.colorSchemes[speakerIndex].praatDotFillColor;
+                let circleStroke = this.props.colorSchemes[speakerIndex].lineStrokeColor;
+    
+                if (this.props.showDynamicContent) {
+                    if (this.props.activePlayIndex === i) {
+                        circleFill = this.props.colorSchemes[speakerIndex].activePlayColor;
+                        circleStroke = this.props.colorSchemes[speakerIndex].activePlayColor;
+                    } else if (speaker.letters[i].isManualPitch) {
+                        circleFill = this.props.colorSchemes[speakerIndex].manualDotFillColor;
+                        circleStroke = this.props.colorSchemes[speakerIndex].manualDotFillColor;
+                    } else {
+                        circleFill = this.props.colorSchemes[speakerIndex].praatDotFillColor;
+                        circleStroke = this.props.colorSchemes[speakerIndex].lineStrokeColor;
+                    }
+                }
+    
+                points.push(x);
+                points.push(y);
+                currLinePoints.push(x);
+                currLinePoints.push(y);
+                pointPairs.push([x, y]);
+                lineCircles.push(
+                    <Circle key={i + circleFill + circleStroke}
+                            x={x}
+                            y={y}
+                            fill={circleFill}
+                            stroke={circleStroke}
+                            strokeWidth={this.props.circleStrokeWidth}
+                            radius={circleRadius}
+                            onClick={() => this.props.playSound(currPitch)}
+                            onMouseEnter={() => this.props.setPointerEnabled(true)}
+                            onMouseLeave={() => this.props.setPointerEnabled(false)}
+                            draggable={speaker.letters[i].isManualPitch}
+                            dragDistance={5}
+                            dragBoundFunc={
+                                function(pos) {
+                                    // @ts-ignore
+                                    if (!this.isDragging()) {
+                                        return pos;
+                                    }
+    
+                                    const newPitch = coordConverter.rectCoordsToVertValue(pos.y);
+                                    return {
+                                        // @ts-ignore
+                                        x: this.getAbsolutePosition().x,
+                                        y: coordConverter.vertValueToRectCoords(newPitch)
+                                    };
+                                }
+                            }
+                            onDragEnd={
+                                function() {
+                                    // @ts-ignore
+                                    const yPos: number = this.getPosition().y;
+                                    const newPitch = coordConverter.rectCoordsToVertValue(yPos);
+                                    controller.props.setLetterPitch(speakerIndex, i, newPitch);
+                                }
+                            }
+                    />);
+            }
+    
+            if (currLinePoints.length > 0) {
+                lines.push(
+                    <Line key={"last_pa_line"}
+                          points={currLinePoints}
+                          strokeWidth={this.props.graphWidth}
+                          stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}/>
+                );
+            }
+    
+            let accentedPoint;
+    
+            if (this.props.showAccentPitch
+                && maxPitchIndex !== null
+                && pointPairs.length >= 1) {
+                accentedPoint = this.accentedPoint(
+                    pointPairs[maxPitchIndex][0],
+                    pointPairs[maxPitchIndex][1]);
+            }
+    
+            return (
+                <Layer key={speakerIndex}>
+                    {accentedPoint}
+                    {
+                        this.props.showPitchArtLines ? lines : []
+                    }
+                    {lineCircles}
+                    {this.props.showSyllableText ? letterSyllables : []}
+                </Layer>
+            );
+        }
+        }
+       
 
     accentedPoint = (x: number, y: number) => {
         const accentedPoint =
