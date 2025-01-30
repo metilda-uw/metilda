@@ -877,6 +877,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
                     speakers={speakers}
                     rawPitchValueLists={this.state.userPitchValueLists}
                     firebase={this.props.firebase}
+                    isLearn={true}
                   />
                 )}
                 <PlayerBar
