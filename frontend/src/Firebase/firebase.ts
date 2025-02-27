@@ -63,6 +63,10 @@ class Firebase {
     return newReference;
   }
 
+  rhythmDataRef = (email, uploadId) => {
+    return this.firestore.collection("rhythms").doc(email).collection("audioRhythms").doc(uploadId);
+  };
+  
   updateSharedPage = (state, type, pageId) => {
     if(type !== "share") return;
     console.log("*****************************");

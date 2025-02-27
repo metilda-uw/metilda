@@ -1112,30 +1112,3 @@ def update_rhythm_data(id):
 
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-@app.route('/api/audio/<string:upload_id>/spectrogram/beats', methods=["GET"])
-def generate_rhythm_spectrogram(upload_id):
-    """
-    Generates a spectrogram for rhythm features of the given audio file.
-    """
-    image_path = os.path.join(app.config["SOUNDS"], upload_id)
-    print("Image path:", image_path)  # Debugging: Check input file path
-
-    tmin = request.args.get('tmin', -1, type=float)
-    tmax = request.args.get('tmax', -1, type=float)
-    min_pitch = request.args.get('min-pitch', MIN_PITCH_HZ, type=float)
-    max_pitch = request.args.get('max-pitch', MAX_PITCH_HZ, type=float)
-    sanitized_filename = re.sub(r'[^\w\-_\.]', '_', upload_id)
-    output_path = os.path.join("saved_spectrograms", f"{sanitized_filename}_spectrogram.png")
-    print("Sanitized Output path:", output_path)
-
-    image_binary = audio_analysis.audio_analysis_with_beats(
-        image_path,
-        min_pitch=min_pitch,
-        max_pitch=max_pitch,
-        tmin=tmin,
-        tmax=tmax,
-                output_path=output_path,
-    )
-
-    return send_file(image_binary, mimetype="image/png")

@@ -69,6 +69,7 @@ export interface PitchArtDrawingWindowProps {
   showMetildaWatermark: boolean;
   rawPitchValueLists?: RawPitchValue[][];
   firebase: any;
+  isLearn?: boolean;
   setLatestAnalysisId: (
     speakerIndex: number,
     latestAnalysisId: number,
@@ -745,6 +746,7 @@ export class PitchArtDrawingWindow extends React.Component<
             pitchArtSoundLengthSeconds={this.pitchArtSoundLengthSeconds}
             accentedCircleRadius={this.accentedCircleRadius}
             setPointerEnabled={this.setPointerEnabled}
+            isLearn={this.props.isLearn}
           />
         </Stage>
         <a className="hide" ref={this.downloadRef}>
