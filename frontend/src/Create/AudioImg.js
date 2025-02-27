@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
@@ -11,11 +11,13 @@ class AudioImg extends Component {
         super(props);
         this.state = {
             isLoaded: false,
-            imgObj: null
+            imgObj: null,
+            verticalLines: this.props.verticalLines || [],
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.metildaAudioAnalysisImageRef = React.createRef();
+        this.isSelecting = false;
     }
 
     timeCoordToImageCoord(t) {
@@ -39,7 +41,7 @@ class AudioImg extends Component {
     }
 
     componentWillUnmount() {
-        if(this.state.imgObj){
+        if (this.state.imgObj) {
             this.state.imgObj.remove();
         }
     }
@@ -48,8 +50,28 @@ class AudioImg extends Component {
         return `imgareaselect-speaker-${this.props.speakerIndex}`;
     }
 
+    updateVerticalLinePositions() {
+        this.setState(prevState => ({
+            verticalLines: prevState.verticalLines.map(line => ({
+                ...line,
+                x: this.timeCoordToImageCoord(line.x) // Adjust position based on zoom
+            }))
+        }));
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.minAudioX !== this.props.minAudioX || prevProps.maxAudioX !== this.props.maxAudioX) {
+            this.updateVerticalLinePositions();
+        }
+        
+        if (prevProps.verticalLines !== this.props.verticalLines) {
+            // Update state when props change
+            this.setState({ verticalLines: this.props.verticalLines });
+          }
+    }
+
     componentDidMount() {
-        const {xminPerc, xmaxPerc} = this.props;
+        const { xminPerc, xmaxPerc } = this.props;
 
         let audioImage = this;
         let cropAreaLeftX;
@@ -57,7 +79,7 @@ class AudioImg extends Component {
         let $el = $(this.metildaAudioAnalysisImageRef.current);
         $el.mousedown(this.onMouseDown);
 
-        let imgBox = {xminPerc, xmaxPerc};
+        let imgBox = { xminPerc, xmaxPerc };
         let prevMaxWidth;
         let isProgrammaticSelection = false;
 
@@ -81,9 +103,9 @@ class AudioImg extends Component {
                     `.${audioImgId}-border3, ` +
                     `.${audioImgId}-border4, ` +
                     `.${audioImgId}-outer`).mousedown((e) => {
-                    e.preventDefault();
-                    audioImage.onMouseDown(e)
-                }).contextmenu((e) => e.preventDefault());
+                        e.preventDefault();
+                        audioImage.onMouseDown(e)
+                    }).contextmenu((e) => e.preventDefault());
 
                 // apply styling to custom imgareaselect divs
                 $(`.${audioImgId}-border1`).addClass("imgareaselect-border1");
@@ -92,8 +114,8 @@ class AudioImg extends Component {
                 $(`.${audioImgId}-border4`).addClass("imgareaselect-border4");
                 $(`.${audioImgId}-outer`).addClass("imgareaselect-outer");
 
-                audioImage.setState({isLoaded: true, imgObj: imgObj}, function () {
-                    imgObj.setOptions({minHeight: $el.height()});
+                audioImage.setState({ isLoaded: true, imgObj: imgObj }, function () {
+                    imgObj.setOptions({ minHeight: $el.height() });
                 });
 
                 audioImage.props.onAudioImageLoaded(imgObj.cancelSelection, function (t1, t2) {
@@ -111,7 +133,7 @@ class AudioImg extends Component {
                         let y1 = imgObj.getOptions().minHeight * 0.002;
                         let y2 = imgObj.getOptions().minHeight * 0.998;
                         imgObj.setSelection(leftX, y1, rightX, y2, true);
-                        imgObj.setOptions({show: true});
+                        imgObj.setOptions({ show: true });
                         imgObj.update();
                     }
                     isProgrammaticSelection = false;
@@ -127,6 +149,7 @@ class AudioImg extends Component {
                     cropAreaLeftX = loc.x1;
                     cropAreaRightX = loc.x2;
                 }
+                this.isSelecting = true;
             },
             onSelectChange: function (img, loc) {
                 if (isProgrammaticSelection) {
@@ -149,7 +172,7 @@ class AudioImg extends Component {
                     // image sizes.
                     if (maxWidth !== undefined && prevMaxWidth !== maxWidth) {
                         prevMaxWidth = maxWidth;
-                        imgObj.setOptions({maxWidth: maxWidth});
+                        imgObj.setOptions({ maxWidth: maxWidth });
                     }
                 }
             },
@@ -159,35 +182,139 @@ class AudioImg extends Component {
                 }
                 cropAreaLeftX = undefined;
                 cropAreaRightX = undefined;
-
+            
                 if (loc.x1 < loc.x2) {
                     let startOffset = audioImage.props.imageWidth * audioImage.props.xminPerc;
-                    audioImage.props.audioIntervalSelected(loc.x1 - startOffset,
-                        loc.x2 - startOffset);
+                    let selectedStart = loc.x1 - startOffset;
+                    let selectedEnd = loc.x2 - startOffset;
+            
+                    // Get vertical lines in the selected area
+                    const selectedLines = audioImage.state.verticalLines.filter(line => 
+                        line.x >= loc.x1 && line.x <= loc.x2
+                    );
+            
+                    audioImage.props.audioIntervalSelected(selectedStart, selectedEnd, selectedLines);
                 } else if (loc.x1 === loc.x2) {
                     audioImage.props.audioIntervalSelectionCanceled();
                 }
+                this.isSelecting = false;
             }
+            
         });
     }
 
     onMouseDown = (event) => {
-        if (event.which === 1) {
-            this.props.showImgMenu(-1, -1);
-        } else if (event.which === 3) {
+        if (this.isSelecting) return; // Prevent interaction while selecting
+        if (event.which === 1) { // Left click
+            if (this.props.typeOfBeat === 'Rhythm') {
+                this.toggleVerticalLine(event.pageX);
+            }
+        } else if (event.which === 3) { // Right click
             this.props.showImgMenu(event.pageX, event.pageY);
         }
-    }
+    };
+
+    toggleVerticalLine = (xPos) => {
+        this.setState((prevState) => {
+          const existingLineIndex = prevState.verticalLines.findIndex(
+            (line) => Math.abs(line.x - xPos) < 5
+          );
+      
+          let updatedLines;
+          if (existingLineIndex !== -1) {
+            // Remove the line if it already exists
+            updatedLines = prevState.verticalLines.filter(
+              (_, index) => index !== existingLineIndex
+            );
+          } else {
+            // Add a new line
+            const newLine = { id: `line-${Date.now()}`, x: xPos };
+            updatedLines = [...prevState.verticalLines, newLine];
+          }
+      
+          // Notify parent component to update state
+          this.props.onVerticalLinesUpdate(updatedLines);
+          return { verticalLines: updatedLines };
+        });
+      };
+      
+      handleDrag = (event, id) => {
+        this.setState((prevState) => {
+          const updatedLines = prevState.verticalLines.map((line) => {
+            if (line.id === id) {
+              return { ...line, x: event.pageX }; // Update x position
+            }
+            return line;
+          });
+      
+          // Notify parent component to update state
+          this.props.onVerticalLinesUpdate(updatedLines);
+          return { verticalLines: updatedLines };
+        });
+      };
+    
+
+    handleDrag = (event, id) => {
+        this.setState(prevState => {
+            const updatedLines = prevState.verticalLines.map(line => {
+                if (line.id === id) {
+                    return { ...line, x: event.pageX }; // Update X position
+                }
+                return line;
+            });
+    
+            // Notify parent (`AudioAnalysis.tsx`) to update state immediately
+            this.props.onVerticalLinesUpdate(updatedLines);
+            return { verticalLines: updatedLines };
+        });
+    };
+    
+
+    renderVerticalLines = () => {
+        const { verticalLines, typeOfBeat } = this.props;
+
+        if (typeOfBeat !== 'Rhythm') return null;
+      
+        return verticalLines.map((line) => (
+          <div
+            key={line.id}
+            className="draggable-line"
+            style={{
+              left: line.x + 'px', // Use x position from state
+              position: 'absolute',
+              top: '12%', // Adjust top position as needed
+              height: '42%', // Adjust height as needed
+              width: '2px', // Line thickness
+              background: 'red', // Line color
+              cursor: 'ew-resize', // Cursor style
+            }}
+            onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging
+            onDoubleClick={() => this.toggleVerticalLine(line.x)} // Enable double-click to remove
+          />
+        ));
+      };
+
+
+      startDragging = (event, id) => {
+        event.preventDefault();
+        document.onmousemove = (e) => this.handleDrag(e, id);
+        document.onmouseup = () => {
+          document.onmousemove = null;
+          document.onmouseup = null;
+        };
+      };
 
     render() {
-        const {src} = this.props;
+        const { src } = this.props;
         return (
             <div onContextMenu={(e) => e.preventDefault()}>
                 <div id={this.audioImgId()} />
                 <img id="metilda-audio-analysis-image"
-                     ref={this.metildaAudioAnalysisImageRef}
-                     className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
-                     src={src}/>
+                    ref={this.metildaAudioAnalysisImageRef}
+                    className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
+                    src={src} />
+                {this.renderVerticalLines()}
+
             </div>
         );
     }

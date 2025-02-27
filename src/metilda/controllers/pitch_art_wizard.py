@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import flask
 import uuid
-from flask import request, jsonify, send_file, flash
+from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
@@ -22,7 +22,7 @@ from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
 from PIL import Image
-
+from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
@@ -1021,3 +1021,94 @@ def annotationTimeSelection(eaffilename, sound, start, end, text0, text1, text2,
     os.remove(filepath)
 
     return eafstring
+
+# Rythm related features
+@app.route('/api/create-rhythm-data', methods=["POST"])
+def create_rhythm_data():
+    """
+    Inserts a new record into the rhythm_data table.
+    Expects upload_id, file_path, and file_name in the POST request.
+    """
+    try:
+        # Get data from request
+        upload_id = request.form.get('upload_id')
+        file_path = request.form.get('file_path')
+        file_name = request.form.get('file_name')
+
+        # Validate input
+        if not upload_id or not file_path or not file_name:
+            return jsonify({'error': 'Missing required fields'}), 400
+
+        # Insert data into the database
+        with Postgres() as connection:
+            postgres_insert_query = """
+                INSERT INTO rhythm_data (upload_id, file_path, file_name, created_at)
+                VALUES (%s, %s, %s, %s)
+                RETURNING id
+            """
+            record_to_insert = (upload_id, file_path, file_name, datetime.utcnow())
+            last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+
+        return jsonify({'result': last_row_id, 'message': 'Rhythm data inserted successfully'}), 201
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+@app.route('/api/rhythm-data', methods=["GET"])
+def get_all_rhythm_data():
+    try:
+        with Postgres() as connection:
+            postgres_select_query = "SELECT * FROM rhythm_data ORDER BY created_at DESC"
+            results = connection.execute_select_query(postgres_select_query)
+
+        return jsonify({'result': results}), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/rhythm-data/<int:id>', methods=["DELETE"])
+def delete_rhythm_data(id):
+    try:
+        with Postgres() as connection:
+            delete_query = "DELETE FROM rhythm_data WHERE id = %s"
+            row_count = connection.execute_update_query(delete_query, (id,))
+
+        if row_count > 0:
+            return jsonify({'message': 'Record deleted successfully'}), 200
+        else:
+            return jsonify({'error': 'Record not found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+@app.route('/api/rhythm-data/<int:id>', methods=["PATCH"])
+def update_rhythm_data(id):
+    try:
+        data = request.json
+        fields_to_update = []
+        values = []
+
+        if 'upload_id' in data:
+            fields_to_update.append("upload_id = %s")
+            values.append(data['upload_id'])
+        if 'file_path' in data:
+            fields_to_update.append("file_path = %s")
+            values.append(data['file_path'])
+        if 'file_name' in data:
+            fields_to_update.append("file_name = %s")
+            values.append(data['file_name'])
+
+        if not fields_to_update:
+            return jsonify({'error': 'No valid fields provided to update'}), 400
+
+        values.append(id)
+        update_query = f"UPDATE rhythm_data SET {', '.join(fields_to_update)} WHERE id = %s"
+
+        with Postgres() as connection:
+            row_count = connection.execute_update_query(update_query, tuple(values))
+
+        if row_count > 0:
+            return jsonify({'message': 'Record updated successfully'}), 200
+        else:
+            return jsonify({'error': 'Record not found'}), 404
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
