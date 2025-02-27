@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import flask
 import uuid
-from flask import request, jsonify, send_file, flash
+from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
@@ -22,7 +22,7 @@ from pylab import *
 import xml.etree.ElementTree as ET
 import lxml.etree as etree
 from PIL import Image
-
+from io import BytesIO
 
 ALLOWED_EXTENSIONS = {'wav', 'mp3', 'mpeg'}
 def allowed_file(filename):
