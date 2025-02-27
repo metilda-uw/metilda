@@ -254,24 +254,11 @@ class AudioImg extends Component {
       };
     
 
-    handleDrag = (event, id) => {
-        this.setState(prevState => {
-            const updatedLines = prevState.verticalLines.map(line => {
-                if (line.id === id) {
-                    return { ...line, x: event.pageX }; // Update X position
-                }
-                return line;
-            });
-    
-            // Notify parent (`AudioAnalysis.tsx`) to update state immediately
-            this.props.onVerticalLinesUpdate(updatedLines);
-            return { verticalLines: updatedLines };
-        });
-    };
-    
-
     renderVerticalLines = () => {
         const { verticalLines, typeOfBeat } = this.props;
+        const imageElement = this.metildaAudioAnalysisImageRef.current;
+        const imageHeight = imageElement ? imageElement.clientHeight : 0;
+        const imageTop = imageElement ? imageElement.offsetTop : 0;
 
         if (typeOfBeat !== 'Rhythm') return null;
       
@@ -282,8 +269,8 @@ class AudioImg extends Component {
             style={{
               left: line.x + 'px', // Use x position from state
               position: 'absolute',
-              top: '12%', // Adjust top position as needed
-              height: '42%', // Adjust height as needed
+              top: imageTop + 'px',
+              height: imageHeight + 'px', // Adjust height as needed
               width: '2px', // Line thickness
               background: 'red', // Line color
               cursor: 'ew-resize', // Cursor style
