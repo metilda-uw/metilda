@@ -41,8 +41,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
     renderLayer = (speaker: Speaker, speakerIndex: number) => {
         if (this.props.isLearn){
             const circleRadius = this.props.showLargeCircles
-        if (this.props.isLearn){
-            const circleRadius = this.props.showLargeCircles
             ? this.props.largeCircleRadius
             : this.props.smallCircleRadius;
     
@@ -88,7 +86,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
             points.push({ x: 550, y: 350 }); // Point 4
         }
         const linePoints = points.reduce((acc, point) => [...acc, point.x, point.y], []);
-
 
         const lineCircles = points.map((point, i) => (
             <React.Fragment key={`point-${i}`}>
@@ -274,7 +271,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
             );
         }
         }
-        }
+       
 
     accentedPoint = (x: number, y: number) => {
         const accentedPoint =
