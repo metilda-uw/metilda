@@ -191,10 +191,6 @@ class CreatePitchArt extends React.Component<
     }
   }
 
-  setVerticalLines = (lines) => {
-    this.setState({ verticalLines: lines });
-  };
-
   setAudioUrl = (url: string) => {
     this.setState({ audioUrl: url });
   };
@@ -470,8 +466,6 @@ class CreatePitchArt extends React.Component<
         maxPitch={this.state.pitchRange[index].maxPitch}
         parentCallBack={this.callBackSelectionInterval}
         updateAudioPitch={this.updateAudioPitch}
-        setVerticalLines={this.setVerticalLines} // <-- New prop
-        verticalLines={this.state.verticalLines} // Pass the verticalLines state
         setAudioUrl={this.setAudioUrl} // Pass the new callback
         userEmail={this.props.firebase.auth.currentUser.email}
       />
