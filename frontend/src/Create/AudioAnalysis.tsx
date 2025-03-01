@@ -1026,7 +1026,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
-              {this.maybeRenderImgMenu()}
+              {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
               {uploadId && (
                 <AudioImg
                   key={this.state.imageUrl}
