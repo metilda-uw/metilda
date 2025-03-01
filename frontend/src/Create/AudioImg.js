@@ -272,7 +272,7 @@ class AudioImg extends Component {
               top: imageTop + 'px',
               height: imageHeight + 'px', // Adjust height as needed
               width: '2px', // Line thickness
-              background: 'red', // Line color
+              background: 'yellow', // Line color
               cursor: 'ew-resize', // Cursor style
             }}
             onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging

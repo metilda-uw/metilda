@@ -794,41 +794,123 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
+  // Method to play taps corresponding to beats
   playBeats = () => {
-    const { verticalLines } = this.state;
-
+    const { verticalLines, soundLength } = this.state;
+  
     if (!verticalLines.length) {
       console.warn("No beats to play.");
       return;
     }
-
+  
+    // Calculate the time for each vertical line based on its x-coordinate
+    const tapTimes = verticalLines.map((line) => {
+      // Map the x-coordinate to a time in the audio
+      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength ;
+      if(time > 5){
+        return time - 4
+      } 
+      else{
+        return time
+      }
+    });
+  
+    // Function to play a single tap sound
     const playTap = () => {
       const audioCtx = new (window.AudioContext || window.AudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-
-      oscillator.type = 'square'; // Tap-like sound
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency in Hz
-
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime); // Start volume
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out quickly
-
+  
+      oscillator.type = 'square';
+      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency of the tap sound
+      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out the tap sound
+  
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-
       oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2); // Stop after 200ms
+      oscillator.stop(audioCtx.currentTime + 0.2); // Duration of the tap sound
     };
+  
+    console.log("Tap times:", tapTimes); // Debugging: Log the calculated tap times
 
-    const playNextTap = (index: number) => {
-      if (index >= verticalLines.length) return;
-
-      playTap();
-
-      setTimeout(() => playNextTap(index + 1), 900); // Adjust delay if needed
+    // Play taps at the calculated times
+    tapTimes.forEach((time) => {
+      setTimeout(() => {
+        playTap();
+      }, time * 1000); // Convert seconds to milliseconds
+    });
+  };
+  // Method to play audio along with tap sounds at the beat positions
+  playAudioWithTaps = () => {
+    const { verticalLines, audioUrl, soundLength } = this.state;
+  
+    if (!verticalLines.length) {
+      console.warn("No beats to play.");
+      return;
+    }
+  
+    if (!audioUrl) {
+      console.warn("Audio URL not set!");
+      return;
+    }
+  
+    // Create or get the audio element
+    let audioElement = document.getElementById('audio-player') as HTMLAudioElement;
+    if (!audioElement) {
+      audioElement = new Audio(audioUrl);
+      audioElement.id = 'audio-player';
+      document.body.appendChild(audioElement);
+    }
+  
+    // Reset and play the audio
+    audioElement.currentTime = 0;
+    audioElement.play();
+  
+    // Calculate the time for each vertical line based on its x-coordinate
+    const tapTimes = verticalLines.map((line) => {
+      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
+      return time;
+    });
+  
+    let triggeredTaps = new Set();
+  
+    // Add a listener for time updates to trigger taps at the right time
+    const handleTimeUpdate = () => {
+      const currentTime = audioElement.currentTime;
+      for (let i = 0; i < tapTimes.length; i++) {
+        if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
+          this.playTapSound();
+          triggeredTaps.add(i);
+        }
+      }
     };
+  
+    // Attach the event listener
+    audioElement.addEventListener('timeupdate', handleTimeUpdate);
+  
+    // Remove the event listener once playback ends
+    audioElement.addEventListener('ended', () => {
+      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+      triggeredTaps.clear();
+    });
+  };
 
-    playNextTap(0);
+  // Helper method to play the tap sound
+  playTapSound = () => {
+    const audioCtx = new (window.AudioContext || window.AudioContext)();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
+
+    oscillator.type = 'square';
+    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+    oscillator.start();
+    oscillator.stop(audioCtx.currentTime + 0.2);
   };
 
   saveRhythm = async () => {
@@ -864,11 +946,32 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       NotificationManager.error("Failed to save rhythm.");
     }
   };
+  renderVerticalLineDots = () => {
+    return this.state.verticalLines.map((line) => {
+      const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
+      const mappedX = ((line.x / indicatorWidth) * 100) - 67;
 
+      return (
+        <div
+          key={line.id}
+          style={{
+            position: 'absolute',
+            left: `${mappedX}%`,
+            top: '50%',
+            transform: 'translate(-90%, -60%)',
+            width: '6px',
+            height: '6px',
+            backgroundColor: 'red',
+            borderRadius: '50%',
+          }}
+        />
+      );
+    });
+  };
 
   render() {
     const { typeOfBeat } = this.state;
-    const { verticalLines } = this.props;
+    const { verticalLines } = this.state;
 
     const uploadId = this.getSpeaker().uploadId;
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
@@ -971,7 +1074,37 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 </button>
               }
             </div>
+            {
+              typeOfBeat == 'Rhythm' &&
+              <div className="vertical-lines-container">
+                <div
+                  className="vertical-lines-indicator"
+                  style={{
+                    position: "relative",
+                    width: `${DEFAULT.AUDIO_IMG_WIDTH}px`,
+                    height: "30px",
+                    backgroundColor: "#f8f8f8",
+                    border: "5px solid #ccc",
+                    marginTop: "10px",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  {this.renderVerticalLineDots()}
+                </div>
 
+                <div style={{ marginBottom: "5px", textAlign: "center" }}>
+                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
+                    Play Taps
+                  </button>
+                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
+                    Play Audio + Taps
+                  </button>
+                </div>
+                <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
+
+              </div>
+            }
           </div>
 
         </div>
