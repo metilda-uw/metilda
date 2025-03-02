@@ -10,13 +10,15 @@ import os
 import shutil
 import tempfile
 from math import isnan
+from datetime import datetime
 
 from matplotlib.figure import Figure
 import numpy as np
 import parselmouth
 
-# sns.set()  # Use seaborn's default style to make attractive graph
+import matplotlib.pyplot as plt
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 def draw_spectrogram(ax, spectrogram, dynamic_range=70):
     X, Y = spectrogram.x_grid(), spectrogram.y_grid()
@@ -98,7 +100,6 @@ def get_pitches_in_range(tmin, tmax, snd_pitch):
     pitch_samples = [(t, snd_pitch.get_value_at_time(t)) for t in snd_pitch.xs() if tmin <= t <= tmax]
     return [(t, p) for t, p in pitch_samples if not isnan(p)]
 
-
 def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
@@ -111,13 +112,11 @@ def get_avg_pitch(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX
         pitches = list(zip(*pitch_samples))[1]
         return sum(pitches) / len(pitches)
 
-
 def get_all_pitches(time_range, upload_path, min_pitch=MIN_PITCH_HZ, max_pitch=MAX_PITCH_HZ):
     snd = parselmouth.Sound(upload_path)
     snd_pitch = snd.to_pitch(pitch_floor=min_pitch, pitch_ceiling=max_pitch)
     t0, t1 = time_range
     return get_pitches_in_range(t0, t1, snd_pitch)
-
 
 def get_sound_length(upload_path):
     return parselmouth.Sound(upload_path).get_total_duration()
@@ -145,3 +144,4 @@ def get_audio(upload_path, tmin=-1, tmax=-1):
 
     shutil.rmtree(temp_dir)
     return file_bytes
+ 

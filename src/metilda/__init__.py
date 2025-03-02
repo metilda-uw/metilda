@@ -8,6 +8,7 @@ matplotlib.use('Agg')
 import decimal
 from flask import Flask, render_template, json
 from flask_compress import Compress
+from flask_cors import CORS
 
 class CustomJSONEncoder(json.JSONEncoder):
 
@@ -25,10 +26,11 @@ app = Flask(__name__,
 app.config["SOUNDS"] = os.path.join(os.path.dirname(__file__), "sounds")
 app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
 app.config["CERTIFICATES"] = os.path.join(os.path.dirname(__file__), "certificates")
+app.config["SPECTROGRAMS"] = os.path.join(os.path.dirname(__file__), "saved_spectrograms")
 
 app.json_encoder = CustomJSONEncoder
 Compress(app)
-
+CORS(app)
 import metilda.controllers.pitch_art_wizard
 import metilda.controllers.mail
 import metilda.controllers.controller_firestore
