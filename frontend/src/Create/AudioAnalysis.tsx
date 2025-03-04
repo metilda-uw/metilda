@@ -63,12 +63,13 @@ export interface AudioAnalysisProps {
   parentCallBack: (selectedFolderName: string) => void;
   updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
   setAudioUrl: (url: string) => void; // New prop
-  // verticalLines: VerticalLine[]
 }
+
 interface VerticalLine {
   id: string;
   x: number;
 }
+
 interface State {
   selectedFolderName: string;
   showImgMenu: boolean;
@@ -95,9 +96,8 @@ interface State {
   wordTranslation: string;
   closeImgSelectionCallback: () => void;
   selectionCallback: (t1: number, t2: number) => void;
-  // needed for the onChange event to work.
   [key: string]: any;
-  beats: number[]; // Stores the time positions of the beats
+  beats: number[]; 
   showDraggableLine: boolean;
   linePositions: number[];
   draggingIndex: number;
@@ -732,12 +732,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   toggleTypeOfBeat = async () => {
     const newTypeOfBeat = this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody";
     const uploadId = this.getSpeaker().uploadId;
-  
+
     if (!uploadId) {
       console.error("No upload ID found. Cannot toggle type of beat.");
       return;
     }
-  
+
     const melodyUrl = AudioAnalysis.formatImageUrl(
       uploadId,
       this.props.minPitch,
@@ -745,20 +745,20 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       this.state.minAudioTime,
       this.state.maxAudioTime
     );
-  
+
     if (newTypeOfBeat === "Rhythm") {
       try {
         const rhythmRef = this.props.firebase.rhythmDataRef(this.props.userEmail, uploadId);
         const rhythmDoc = await rhythmRef.get();
-  
+
         if (rhythmDoc.exists) {
           const rhythmData = rhythmDoc.data();
-  
+
           const verticalLines = rhythmData.verticalLines.map((line) => ({
             id: line.id || `line-${Date.now()}`, // Ensure each line has a unique ID
             x: line.x, // Ensure x is a number
           }));
-  
+
           // Update verticalLines state directly in this component
           this.setState({ verticalLines });
         } else {
@@ -770,7 +770,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         NotificationManager.error("Failed to fetch rhythm data.");
       }
     }
-  
+
     this.setState(
       {
         typeOfBeat: newTypeOfBeat,
@@ -790,117 +790,103 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
-  // Method to play taps corresponding to beats
   playBeats = () => {
     const { verticalLines, soundLength } = this.state;
-  
+
     if (!verticalLines.length) {
       console.warn("No beats to play.");
       return;
     }
-  
-    // Calculate the time for each vertical line based on its x-coordinate
+
     const tapTimes = verticalLines.map((line) => {
       // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength ;
-      if(time > 5){
+      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
+      if (time > 5) {
         return time - 4
-      } 
-      else{
+      }
+      else {
         return time
       }
     });
-  
+
     // Function to play a single tap sound
     const playTap = () => {
       const audioCtx = new (window.AudioContext || window.AudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
-  
+
       oscillator.type = 'square';
       oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency of the tap sound
       gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
       gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out the tap sound
-  
+
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       oscillator.start();
       oscillator.stop(audioCtx.currentTime + 0.2); // Duration of the tap sound
     };
-  
 
-    // Play taps at the calculated times
     tapTimes.forEach((time) => {
       setTimeout(() => {
         playTap();
       }, time * 1000); // Convert seconds to milliseconds
     });
   };
-  // Method to play audio along with tap sounds at the beat positions
+
   playAudioWithTaps = () => {
-  const { verticalLines, audioUrl, soundLength } = this.state;
+    const { verticalLines, audioUrl, soundLength } = this.state;
 
-  if (!verticalLines.length) {
-    console.warn("No beats to play.");
-    return;
-  }
-
-  if (!audioUrl) {
-    console.warn("Audio URL not set!");
-    return;
-  }
-
-  // Create or get the audio element
-  let audioElement = document.getElementById('audio-player') as HTMLAudioElement;
-  if (!audioElement) {
-    audioElement = new Audio(audioUrl);
-    audioElement.id = 'audio-player';
-    document.body.appendChild(audioElement);
-  }
-
-  // Initialize the AudioContext for tap sounds
-  const audioContext = new (window.AudioContext || window.AudioContext)();
-  const tapGainNode = audioContext.createGain();
-  tapGainNode.connect(audioContext.destination);
-
-  // Calculate the time for each vertical line based on its x-coordinate
-  const tapTimes = verticalLines.map((line) => {
-    const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-    return time;
-  });
-
-
-  // Reset and play the audio
-  audioElement.currentTime = 0;
-  audioElement.play();
-
-  // Track which taps have been triggered
-  const triggeredTaps = new Set();
-
-  // Add a listener for time updates to trigger taps at the right time
-  const handleTimeUpdate = () => {
-    const currentTime = audioElement.currentTime;
-
-    for (let i = 0; i < tapTimes.length; i++) {
-      if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
-        // Play the tap sound using AudioContext for precise timing
-        this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
-        triggeredTaps.add(i);
-      }
+    if (!verticalLines.length) {
+      console.warn("No beats to play.");
+      return;
     }
+
+    if (!audioUrl) {
+      console.warn("Audio URL not set!");
+      return;
+    }
+
+    let audioElement = document.getElementById('audio-player') as HTMLAudioElement;
+    if (!audioElement) {
+      audioElement = new Audio(audioUrl);
+      audioElement.id = 'audio-player';
+      document.body.appendChild(audioElement);
+    }
+
+    const audioContext = new (window.AudioContext || window.AudioContext)();
+    const tapGainNode = audioContext.createGain();
+    tapGainNode.connect(audioContext.destination);
+
+    const tapTimes = verticalLines.map((line) => {
+      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
+      return time;
+    });
+
+    audioElement.currentTime = 0;
+    audioElement.play();
+
+    const triggeredTaps = new Set();
+
+    const handleTimeUpdate = () => {
+      const currentTime = audioElement.currentTime;
+
+      for (let i = 0; i < tapTimes.length; i++) {
+        if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
+          // Play the tap sound using AudioContext for precise timing
+          this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
+          triggeredTaps.add(i);
+        }
+      }
+    };
+
+    audioElement.addEventListener('timeupdate', handleTimeUpdate);
+
+    audioElement.addEventListener('ended', () => {
+      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
+      triggeredTaps.clear();
+    });
   };
 
-  // Attach the event listener
-  audioElement.addEventListener('timeupdate', handleTimeUpdate);
-
-  // Remove the event listener once playback ends
-  audioElement.addEventListener('ended', () => {
-    audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-    triggeredTaps.clear();
-  });
-};
-
-  // Helper method to play the tap sound
   playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
     const audioCtx = new (window.AudioContext || window.AudioContext)();
     const oscillator = audioCtx.createOscillator();
@@ -918,7 +904,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   saveRhythm = async () => {
-
     const { verticalLines } = this.state;
     const { speakerIndex, firebase } = this.props;
     const uploadId = this.getSpeaker().uploadId;
@@ -928,28 +913,28 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       return;
     }
 
-    if (verticalLines.length === 0) {
-      NotificationManager.error("No rhythm data to save.");
-      return;
-    }
-
     try {
-      const rhythmData = {
-        audioName: uploadId, // Use the upload ID as the audio name
-        createdDate: new Date().toISOString(),
-        verticalLines,
-      };
-
-      // Save rhythm data to Firebase under the user's email document
       const rhythmRef = firebase.rhythmDataRef(this.props.userEmail, uploadId);
-      await rhythmRef.set(rhythmData);
 
-      NotificationManager.success("Rhythm saved successfully!");
+      if (verticalLines.length === 0) {
+        await rhythmRef.delete();
+        NotificationManager.success("Rhythm data deleted successfully!");
+      } else {
+        const rhythmData = {
+          audioName: uploadId,
+          createdDate: new Date().toISOString(),
+          verticalLines,
+        };
+
+        await rhythmRef.set(rhythmData);
+        NotificationManager.success("Rhythm saved successfully!");
+      }
     } catch (error) {
-      console.error("Error saving rhythm:", error);
-      NotificationManager.error("Failed to save rhythm.");
+      console.error("Error saving/deleting rhythm:", error);
+      NotificationManager.error("Failed to save/delete rhythm.");
     }
   };
+
   renderVerticalLineDots = () => {
     return this.state.verticalLines.map((line) => {
       const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
