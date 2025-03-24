@@ -14,11 +14,7 @@ const Root = () => {
     const [loading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        const timer = setTimeout(() => {
-            setLoading(false);
-        }, 1000);
-
-        return () => clearTimeout(timer);
+        setLoading(false);
     }, []);
 
     if (loading) {

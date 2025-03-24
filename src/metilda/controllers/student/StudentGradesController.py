@@ -1,13 +1,20 @@
 from flask import request, jsonify
 from metilda import app
 from datetime import datetime
+from metilda.cache import cache
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
 
+def clear_student_grade_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "grade" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
+
 @app.route('/student-view/grades', methods=["POST"])
+@cache.memoize(500)
 def student_grades():
     with Postgres() as connection:
         res={}
@@ -65,7 +72,8 @@ def student_grades():
         return jsonify(res)
 
 @app.route('/student-view/other_grades', methods=["POST"])
-def get_other_grades():
+@cache.memoize(500)
+def student_get_other_grades():
     # Get the user's course input
     course_id = request.form['course']
     current_user_email = request.form.get("user")  # Email of the logged-in user
@@ -161,6 +169,7 @@ def get_other_grades():
 
     
 @app.route('/student-view/grades/stats', methods=["POST"])
+@cache.memoize(500)
 def student_grades_stats():
     with Postgres() as connection:
         stats=[]

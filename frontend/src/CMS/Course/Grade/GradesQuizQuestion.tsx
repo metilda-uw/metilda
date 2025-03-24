@@ -28,7 +28,7 @@ function GradesQuizQuestion() {
             formData.append('user', user.email);
             formData.append('question', questionId);
             try {
-                setTimeout(async () => {
+                async () => {
                     let response = await fetch('/cms/grades/quiz/question/read', {
                         method: "POST",
                         headers: {
@@ -39,7 +39,7 @@ function GradesQuizQuestion() {
                     let responseJSON = await response.json()
                     responseJSON['submissions'].sort((a, b) => { return (new Date(b.time)).getTime() - (new Date(a.time)).getTime() })
                     setSubmissionList(responseJSON['submissions'])
-                }, 1000)
+                }
             }
             catch (error) {
                 setErrorMessage("Error loading data.")

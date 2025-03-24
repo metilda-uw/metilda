@@ -61,7 +61,7 @@ function StudentAssignments() {
                 <div className="height-column"></div>
                 <div className="main-view">
                 <div className="info-list">
-                        <div className="title">Assignments:</div>
+                        <div className="title-name">Assignments</div>
                         {loading ? (
                             <div className="spinner-container">
                                 {spinnerIcon()}

@@ -249,3 +249,27 @@ export async function removeFileWrapper(firebase: any, oldPath, fetchDir,additio
   // });
   // return filePromise;
 }
+
+export async function previewFileWrapper(firebase: any, filePath: string, setPreview: (url: string) => void) {
+  try {
+    const storageRef = firebase.uploadFile();
+    const fileRef = storageRef.child(filePath);
+
+    // Get the download URL of the file
+    const url = await fileRef.getDownloadURL();
+
+    // Check the file type and generate preview accordingly
+    const fileExtension = filePath.split('.').pop()?.toLowerCase();
+    if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+      // Image preview
+      setPreview(url); // The url can be used in an <img /> tag in your component
+    } else if (fileExtension === 'pdf') {
+      // PDF preview
+      setPreview(url); // You can embed this in a <iframe /> or use a PDF viewer
+    } else {
+      setPreview(url);
+    }
+  } catch (ex) {
+    console.error("Error previewing file:", ex);
+  }
+}

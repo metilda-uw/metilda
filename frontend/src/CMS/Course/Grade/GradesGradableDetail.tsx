@@ -44,7 +44,7 @@ function GradesGradableDetail() {
                 setMaxGrade(+response['max_grade'])
 
                 formData.append('student',studentId)
-                setTimeout(async () => {
+                async () => {
                     response = await fetch('/cms/grades/gradable/student/read', {
                         method: "POST",
                         headers: {
@@ -54,7 +54,7 @@ function GradesGradableDetail() {
                     })
                     response = await response.json()
                     setPrevGrade(response['grade'])
-                }, 1000);
+                }
             }
             catch (error) {
                 setErrorMessage("Error loading data.")

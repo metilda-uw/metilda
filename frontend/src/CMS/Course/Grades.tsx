@@ -53,64 +53,40 @@ function Grades() {
             await verifyTeacherCourse(user.email, courseId, setVeri);
             if (!veri) return;
 
-            // Fetch assignments
             try {
                 const formData = new FormData();
                 formData.append("user", user.email);
                 formData.append("course", courseId);
-                const response = await fetch("/cms/assignment_clusters", {
+
+                const response = await fetch("/cms/all_clusters", {
                     method: "POST",
                     headers: { Accept: "application/json" },
                     body: formData,
                 });
+
                 const data = await response.json();
-                setAssignmentListString(JSON.stringify(data));
+
+                // Set assignments
+                setAssignmentListString(JSON.stringify(data.assignments));
                 setErrorAssignments(null);
-            } catch {
-                setErrorAssignments("Error loading assignments.");
+
+                // Set quizzes
+                setQuizList(JSON.stringify(data.quizzes));
+                setErrorQuizzes(null);
+
+                // Set other items
+                setOtherListString(JSON.stringify(data.other_items));
+                setErrorOthers(null);
+            } catch (error) {
+                setErrorAssignments("Error loading data.");
+                setErrorQuizzes("Error loading data.");
+                setErrorOthers("Error loading data.");
             } finally {
                 setLoadingAssignments(false);
-            }
-
-            // Fetch quizzes
-            try {
-                const formData = new FormData();
-                formData.append("user", user.email);
-                formData.append("course", courseId);
-                const response = await fetch("/cms/quiz_clusters", {
-                    method: "POST",
-                    headers: { Accept: "application/json" },
-                    body: formData,
-                });
-                const data = await response.json();
-                setQuizList(JSON.stringify(data));
-                setErrorQuizzes(null);
-            } catch {
-                setErrorQuizzes("Error loading quizzes.");
-            } finally {
                 setLoadingQuizzes(false);
-            }
-
-            // Fetch other items
-            try {
-                const formData = new FormData();
-                formData.append("user", user.email);
-                formData.append("course", courseId);
-                const response = await fetch("/cms/other_clusters", {
-                    method: "POST",
-                    headers: { Accept: "application/json" },
-                    body: formData,
-                });
-                const data = await response.json();
-                setOtherListString(JSON.stringify(data));
-                setErrorOthers(null);
-            } catch {
-                setErrorOthers("Error loading other items.");
-            } finally {
                 setLoadingOthers(false);
             }
         }
-
         fetchData();
     }, [user, courseId, veri]);
 
@@ -176,147 +152,161 @@ function Grades() {
             <div className="main-layout">
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
-                <div className="main-view" style={{ display: 'inline-grid', height: 'fit-content', margin: "5%" }}>
-                    <>
-                        <div className="section assignments-section" style={{width: "auto"}}>
-                            <h3 className="section-title">Assignments</h3>
-                            {loadingAssignments ? (
-                                <div className="gradeSpinner"></div>
-                            ) : errorAssignments ? (
-                                <p className="error-message">{errorAssignments}</p>
-                            ) : assignmentListString ? (
-                                JSON.parse(assignmentListString).map((x) => (
-                                    <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
-                                        <div
-                                            className={`section-heading ${openItems["assignment"][x.id] ? 'open' : ''}`}
-                                            onClick={() => toggleDropdown("assignment", x.id)}
-                                            role="button"
-                                            aria-expanded={!!openItems["assignment"][x.id]}
-                                            tabIndex={0}
-                                            style={{ width: openItems["assignment"][x.id] ? '30%' : '100%' }}
-                                        >
-                                            <span>{x.name}</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                className="toggle-icon"
+                <div className="main-view-container">
+                    <div className="main-view" style={{ display: 'inline-grid', height: 'fit-content', margin: "5%", width: "-webkit-fill-available" }}>
+                        <>
+                            <div className="section assignments-section" style={{ width: "auto" }}>
+                                <h3 className="section-title">Assignments</h3>
+                                {loadingAssignments ? (
+                                    <div className="gradeSpinner"></div>
+                                ) : errorAssignments ? (
+                                    <p className="error-message">{errorAssignments}</p>
+                                ) : assignmentListString ? (
+                                    JSON.parse(assignmentListString).map((x) => (
+                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                            <div
+                                                className={`section-heading ${openItems["assignment"][x.id] ? 'open' : ''}`}
+                                                onClick={() => toggleDropdown("assignment", x.id)}
+                                                role="button"
+                                                aria-expanded={!!openItems["assignment"][x.id]}
+                                                tabIndex={0}
+                                                style={{ width: '100%' }}
                                             >
-                                                {openItems["assignment"][x.id] ? (
-                                                    <path d="M7 14l5-5 5 5H7z" />
-                                                ) : (
-                                                    <path d="M7 10l5 5 5-5H7z" />
-                                                )}
-                                            </svg>
-                                        </div>
-                                        {openItems["assignment"][x.id] && (
-                                            <div className="expanded-content" style={{ 'width': '70%' }}>
-                                                <Visualization category={x} />
+                                                <span>{x.name}</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                    className="toggle-icon"
+                                                >
+                                                    {openItems["assignment"][x.id] ? (
+                                                        <path d="M7 14l5-5 5 5H7z" />
+                                                    ) : (
+                                                        <path d="M7 10l5 5 5-5H7z" />
+                                                    )}
+                                                </svg>
                                             </div>
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No assignments available.</p>
-                            )}
-                        </div>
+                                            {openItems["assignment"][x.id] && (
+                                                <div className="expanded-content" style={{ 'width': '70%' }}>
+                                                    <div style={{ display: "inline-flex", width: '100%', marginBottom: '2px' }}>
+                                                        <div style={{ fontSize: '18px', marginRight: '15%' }}>Average: {x.average}</div>
+                                                        <div style={{ fontSize: '18px' }}>Standard deviation: {x.standard_deviation}</div>
+                                                    </div>
+                                                    <Visualization category={x} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No assignments available.</p>
+                                )}
+                            </div>
 
-                        {/* Quizzes Section */}
-                        <div className="section quizzes-section" style={{width: "auto"}}>
-                            <h3 className="section-title">Quizzes</h3>
-                            {loadingQuizzes ? (
-                                <div className="gradeSpinner"></div>
-                            ) : errorQuizzes ? (
-                                <p className="error-message">{errorQuizzes}</p>
-                            ) : quizList ? (
-                                JSON.parse(quizList).map((x) => (
-                                    <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
-                                        <div
-                                            className={`section-heading ${openItems["quiz"][x.id] ? 'open' : ''}`}
-                                            onClick={() => toggleDropdown("quiz", x.id)}
-                                            role="button"
-                                            aria-expanded={!!openItems["quiz"][x.id]}
-                                            tabIndex={0}
-                                            style={{ width: openItems["quiz"][x.id] ? '30%' : '100%' }}
-                                        >
-                                            <span>{x.name}</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                className="toggle-icon"
+                            {/* Quizzes Section */}
+                            <div className="section quizzes-section" style={{ width: "auto" }}>
+                                <h3 className="section-title">Quizzes</h3>
+                                {loadingQuizzes ? (
+                                    <div className="gradeSpinner"></div>
+                                ) : errorQuizzes ? (
+                                    <p className="error-message">{errorQuizzes}</p>
+                                ) : quizList ? (
+                                    JSON.parse(quizList).map((x) => (
+                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                            <div
+                                                className={`section-heading ${openItems["quiz"][x.id] ? 'open' : ''}`}
+                                                onClick={() => toggleDropdown("quiz", x.id)}
+                                                role="button"
+                                                aria-expanded={!!openItems["quiz"][x.id]}
+                                                tabIndex={0}
+                                                style={{ width: '100%' }}
                                             >
-                                                {openItems["quiz"][x.id] ? (
-                                                    <path d="M7 14l5-5 5 5H7z" />
-                                                ) : (
-                                                    <path d="M7 10l5 5 5-5H7z" />
-                                                )}
-                                            </svg>
-                                        </div>
-                                        {openItems["quiz"][x.id] && (
-                                            <div className="expanded-content" style={{ 'width': '70%' }}>
-                                                <Visualization category={x} />
+                                                <span>{x.name}</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                    className="toggle-icon"
+                                                >
+                                                    {openItems["quiz"][x.id] ? (
+                                                        <path d="M7 14l5-5 5 5H7z" />
+                                                    ) : (
+                                                        <path d="M7 10l5 5 5-5H7z" />
+                                                    )}
+                                                </svg>
                                             </div>
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No quizzes available.</p>
-                            )}
-                        </div>
+                                            {openItems["quiz"][x.id] && (
+                                                <div className="expanded-content" style={{ 'width': '70%' }}>
+                                                    <div style={{ display: "inline-flex", width: '100%', marginBottom: '2px' }}>
+                                                        <div style={{ fontSize: '18px', marginRight: '15%' }}>Average: {x.average}</div>
+                                                        <div style={{ fontSize: '18px' }}>Standard deviation: {x.standard_deviation}</div>
+                                                    </div>
+                                                    <Visualization category={x} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No quizzes available.</p>
+                                )}
+                            </div>
 
-                        {/* Other Items Section */}
-                        <div className="section others-section" style={{width: "auto"}}>
-                            <h3 className="section-title">Other Items</h3>
-                            {loadingOthers ? (
-                                <div className="gradeSpinner"></div>
-                            ) : errorOthers ? (
-                                <p className="error-message">{errorOthers}</p>
-                            ) : otherListString ? (
-                                JSON.parse(otherListString).map((x) => (
-                                    <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
-                                        <div
-                                            className={`section-heading ${openItems["other"][x.id] ? 'open' : ''}`}
-                                            onClick={() => toggleDropdown("other", x.id)}
-                                            role="button"
-                                            aria-expanded={!!openItems["other"][x.id]}
-                                            tabIndex={0}
-                                            style={{ width: openItems["other"][x.id] ? '30%' : '100%' }}
-                                        >
-                                            <span>{x.name}</span>
-                                            <svg
-                                                xmlns="http://www.w3.org/2000/svg"
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 24 24"
-                                                fill="currentColor"
-                                                className="toggle-icon"
+                            {/* Other Items Section */}
+                            <div className="section others-section" style={{ width: "auto" }}>
+                                <h3 className="section-title">Other Items</h3>
+                                {loadingOthers ? (
+                                    <div className="gradeSpinner"></div>
+                                ) : errorOthers ? (
+                                    <p className="error-message">{errorOthers}</p>
+                                ) : otherListString ? (
+                                    JSON.parse(otherListString).map((x) => (
+                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                            <div
+                                                className={`section-heading ${openItems["other"][x.id] ? 'open' : ''}`}
+                                                onClick={() => toggleDropdown("other", x.id)}
+                                                role="button"
+                                                aria-expanded={!!openItems["other"][x.id]}
+                                                tabIndex={0}
+                                                style={{ width: '100%' }}
                                             >
-                                                {openItems["other"][x.id] ? (
-                                                    <path d="M7 14l5-5 5 5H7z" />
-                                                ) : (
-                                                    <path d="M7 10l5 5 5-5H7z" />
-                                                )}
-                                            </svg>
-                                        </div>
-                                        {openItems["other"][x.id] && (
-                                            <div className="expanded-content" style={{ 'width': '70%' }}>
-                                                <Visualization category={x} />
+                                                <span>{x.name}</span>
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 24 24"
+                                                    fill="currentColor"
+                                                    className="toggle-icon"
+                                                >
+                                                    {openItems["other"][x.id] ? (
+                                                        <path d="M7 14l5-5 5 5H7z" />
+                                                    ) : (
+                                                        <path d="M7 10l5 5 5-5H7z" />
+                                                    )}
+                                                </svg>
                                             </div>
-                                        )}
-                                    </div>
-                                ))
-                            ) : (
-                                <p>No other items available.</p>
-                            )}
-                        </div>
+                                            {openItems["other"][x.id] && (
+                                                <div className="expanded-content" style={{ 'width': '70%' }}>
+                                                    <div style={{ display: "inline-flex", width: '100%', marginBottom: '2px' }}>
+                                                        <div style={{ fontSize: '18px', marginRight: '15%' }}>Average: {x.average}</div>
+                                                        <div style={{ fontSize: '18px' }}>Standard deviation: {x.standard_deviation}</div>
+                                                    </div>
+                                                    <Visualization category={x} />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p>No other items available.</p>
+                                )}
+                            </div>
 
 
-                    </>
+                        </>
+                    </div>
                 </div>
                 <Modal
                     isOpen={showModal}
@@ -325,7 +315,7 @@ function Grades() {
                     contentLabel="Example Modal"
                     style={customStyles}
                 >
-                    <div className="title">Create a gradable item</div>
+                    <div className="title-name">Create a gradable item</div>
                     <form onSubmit={onCreate}>
                         <div><b>Item name:</b> <input onChange={(e) => setName(e.target.value)} required maxLength={30}></input></div>
                         <div><b>Max Grade:</b> <input type='number' onChange={(e) => setMaxGrade(e.target.value)} required max={1000000} min={0.01} step={0.01}></input></div>

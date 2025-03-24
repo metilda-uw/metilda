@@ -1,197 +1,107 @@
 import "./Header.scss";
-
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withAuthorization } from "../../Session";
 import Submenu from "./DropdownComponent";
+import { FaUserCircle } from "react-icons/fa";
 
 interface HeaderProps {
   firebase: any;
 }
+
 interface State {
-  anchorEl: any;
   isAdmin: boolean;
   isModerator: boolean;
   isUser: boolean;
+  expandedMenu: string | null;
+  courseName: string | null;
 }
+
 class Header extends Component<HeaderProps, State> {
   constructor(props: HeaderProps) {
     super(props);
-
     this.state = {
-      anchorEl: null,
       isAdmin: false,
       isModerator: false,
-      isUser: false
+      isUser: false,
+      expandedMenu: null,
+      courseName: null,
     };
   }
 
-  async componentDidMount() {
-    const response = await fetch(
-      `/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Admin",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body = await response.json();
-    if (body.result != null && body.result.length > 0) {
-      this.setState({
-        isAdmin: true,
-      });
-    }
-
-    
-    const response_moderator = await fetch(
-      `/api/get-user-with-verified-role/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Teacher",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body_moderator = await response_moderator.json();
-    if (body_moderator.result != null && body_moderator.result.length > 0) {
-      this.setState({
-        isModerator: true,
-      });
-    }
-
-    const response_user = await fetch(
-      `/api/get-user-roles/${this.props.firebase.auth.currentUser.email}` +
-        "?user-role=Student",
-      {
-        method: "GET",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const body_user = await response_user.json();
-    if (body_user.result != null && body_user.result[0][0]==='Student') {
-      this.setState({
-        isUser: true,
-      });
-    }
-
-    let node = document.getElementById('course-system-link')
-    if(node)
-      node.style.setProperty('pointer-events', 'unset')
+  componentDidMount() {
+    this.setState({
+      isAdmin: localStorage.getItem("admin") === "true",
+      isModerator: localStorage.getItem("moderator") === "true",
+      isUser: localStorage.getItem("user") === "true",
+      courseName: localStorage.getItem("course_name")
+    });
   }
 
-  handleClick = (event: any) => {
-    this.setState({ anchorEl: event.currentTarget });
-  };
-
-  handleClose = () => {
-    this.setState({ anchorEl: null });
-  };
-
-  renderNavBarItem = (title: string, link: string, index: number) => {
-    return (
-      <li
-        key={index}
-        className={window.location.href.includes(link) ? "active" : ""}
-      >
-        <Link to={link}>{title}</Link>
-      </li>
-    );
-  };
-
-  onChange = (event: any) => {
-    // location.href = event.value;
+  handleSubmenuToggle = (menuName: string, isOpen: boolean) => {
+    this.setState({ expandedMenu: isOpen ? menuName : null });
   };
 
   render() {
     return (
-      <div>
-        <nav className="nav">
-          <ul className="nav-menu">
-         
-            <li className="nav-menu-item">
-              <Link to="/home">Home</Link>
-            </li>
-            <li className="nav-menu-item">
-              <Link to="/pitchartwizard">Create Pitch Art</Link>
-            </li>
-           
-            <li className="nav-menu-item">
-              <a>Explore</a>
-              <Submenu
+      <nav className="nav">
+        <div className="nav-menu">
+          <div className="nav-menu-item">
+            <Link to="/home">Home</Link>
+          </div>
+          <div className="nav-menu-item">
+            <Link to="/pitchartwizard">Create Pitch Art</Link>
+          </div>
+          <div className={`nav-menu-item ${this.state.expandedMenu === "explore" ? "expanded" : ""}`}>
+            <a>Explore</a>
+            <Submenu
+              navLinks={[
+                { name: "Learn", link: "/learn/words/syllables" },
+                { name: "Collections", link: "/collections" },
+                { name: "PELDA", link: "/peldaview" },
+              ]}
+              onToggle={(isOpen) => this.handleSubmenuToggle("explore", isOpen)}
+            />
+          </div>
+          <div className="nav-menu-item">
+            <Link to="/converter">Converter</Link>
+          </div>
+          <div className="nav-menu-item">
+            <Link to="/feedback">Feedback</Link>
+          </div>
+          {this.state.isAdmin && (
+            <div className="nav-menu-item">
+              <Link to="/manage-users">Manage Users</Link>
+            </div>
+          )}
+          <div className="nav-menu-item">
+            <Link to={this.state.isUser ? "/student-view" : this.state.isModerator ? "/content-management" : ""}>
+              Courses System
+            </Link>
+          </div>
+          <div className="nav-menu-item">
+            <Link to="/documentation">Documentation</Link>
+          </div>
+          <div className="course_name">Course: {this.state.courseName}</div>
+          <div className="nav-user-icon">
+            <div className="nav-menu-item">
+              <FaUserCircle size={24} className="cursor-pointer" />
+              <Submenu style={{right: '0', left: 'unset'}}
                 navLinks={[
-                  {
-                    name: "Learn",
-                    link: "/learn/words/syllables",
-                  },
-                  {
-                    name: "Collections",
-                    link: "/collections",
-                  },
-                  {
-                    name: "PELDA",
-                    link: "/peldaview",
-                  },
+                  { name: "History", link: "/history" },
+                  { name: "My Files", link: "/my-files" },
+                  { name: "Settings", link: "/manage-account" },
+                  { name: "Signout", link: "/signout" },
                 ]}
+                onToggle={(isOpen) => this.handleSubmenuToggle("account", isOpen)}
               />
-            </li>
-            <li className="nav-menu-item">
-              <a>My Account</a>
-              <Submenu
-                navLinks={[
-                  {
-                    name: "History",
-                    link: "/history",
-                  },
-                  {
-                    name: "My Files",
-                    link: "/my-files",
-                  },
-                  {
-                    name: "Settings",
-                    link: "/manage-account",
-                  },
-                  {
-                    name: "Signout",
-                    link: "/signout",
-                  },
-                ]}
-              />
-              {/* update this to documentation and change page link too  */}
-           
-            </li>
-            <li className="nav-menu-item">
-              <Link to="/converter">Converter</Link>
-            </li>
-            <li className="nav-menu-item">
-              <Link to="/feedback">Feedback</Link>
-            </li>
-            {this.state.isAdmin && (
-              <li className="nav-menu-item">
-                <Link to="/manage-users">Manage Users</Link>
-              </li>
-            )}
-            <li className="nav-menu-item">
-              <Link id={'course-system-link'} to={
-                this.state.isUser ? "/student-view" :
-                  this.state.isModerator ? "/content-management" :''
-              } style={{ 'pointerEvents': 'none' }}>Courses System</Link>
-            </li>
-            <li className="nav-menu-item">
-              <Link to="/documentation">Documentation</Link>
-            </li>
-          </ul>
-        </nav>
-      </div>
+            </div>
+          </div>
+        </div>
+      </nav>
     );
   }
 }
+
 const condition = (authUser: any) => !!authUser;
 export default withAuthorization(condition)(Header as any);

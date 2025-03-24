@@ -63,7 +63,7 @@ function StudentDiscussion() {
                 <div className="height-column"></div>
                 <div className="main-view">
                     <div className="info-list">
-                        <div className="title">Topics:</div>
+                        <div className="title-name">Topics</div>
                         {loading ? (
                             <div className="spinner-container">
                                 {spinnerIcon()}

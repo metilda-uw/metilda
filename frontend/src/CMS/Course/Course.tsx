@@ -8,7 +8,7 @@ import Modal from 'react-modal'
 import Sidebar from "./Sidebar";
 import "./GeneralStyles.scss"
 import { verifyTeacherCourse } from "../AuthUtils";
-import { spinner } from "../../Utils/LoadingSpinner";
+import { spinnerIcon } from "../../Utils/SpinnerIcon";
 // import { useHistory } from "react-router-dom";
 
 function Course() {
@@ -57,8 +57,6 @@ function Course() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
                 await fetch('/cms/courses/read', {
                     method: "POST",
                     headers: {
@@ -74,8 +72,8 @@ function Course() {
                         setNewLanguage(x.language)
                         setCredits(x.credits)
                         setNewCredits(x.credits)
-                        setAvailable(x.available?'1':'0')
-                        setNewAvailable(x.available?'1':'0')
+                        setAvailable(x.available ? '1' : '0')
+                        setNewAvailable(x.available ? '1' : '0')
                         setSchedule(x.schedule)
                         setNewSchedule(x.schedule)
                     }).catch(err => {
@@ -124,6 +122,7 @@ function Course() {
         formData.append('available', newAvailable);
         formData.append('schedule', newSchedule);
 
+        localStorage.setItem('course_name', newName);
         try {
             await fetch('/cms/courses/update', {
                 method: "POST",
@@ -175,35 +174,41 @@ function Course() {
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <div className="info-list">
-                        <div className="title">Course information:</div>
-                        <div>
-                            <b>Course number:</b> {courseId}
-                        </div>
-                        <div>
-                            <b>Course name:</b> {name}
-                        </div>
-                        <div>
-                            <b>Language:</b> {language}
-                        </div>
-                        <div>
-                            <b>Credits:</b> {credits}
-                        </div>
-                        <div>
-                            <b>Available:</b> {available==='loading'?'Loading...':(available==='1'?'Yes':'No')}
-                        </div>
-                        <div>
-                            <b>Schedule:</b> {schedule}
-                        </div>
+                    <div className="course-info">
+                        {loading ? (
+                            <div className="spinner-container">
+                                {spinnerIcon()}
+                            </div>
+                        ) : error ? (
+                            <div className="error-message">{error}</div>
+                        ) : (
+                            <>
+                                <div className="course-info-title">Course Information</div>
+                                <div className="course-info-item">
+                                    <b>Course number:</b> {courseId}
+                                </div>
+                                <div className="course-info-item">
+                                    <b>Course name:</b> {name}
+                                </div>
+                                <div className="course-info-item">
+                                    <b>Language:</b> {language}
+                                </div>
+                                <div className="course-info-item">
+                                    <b>Credits:</b> {credits}
+                                </div>
+                                <div className="course-info-item">
+                                    <b>Available:</b> {available === "loading" ? "Loading..." : available === "1" ? "Yes" : "No"}
+                                </div>
+                                <div className="course-info-item">
+                                    <b>Schedule:</b> {schedule}
+                                </div>
+                            </>
+                        )}
                     </div>
-
                     <div className="float-right">
                         <button className='btn waves-light globalbtn' onClick={() => setShowUpdateModal(true)}>Update course</button>
                         {/* <button onClick={() => setShowDeleteModal(true)}>Delete course</button> */}
                     </div>
-
-                    {loading && <div>{spinner()} </div>}
-                    {error && <div style={{ color: 'red' }}>{error}</div>}
 
                     <div>
                         <Modal
@@ -211,13 +216,13 @@ function Course() {
                             onRequestClose={() => { setShowUpdateModal(false); resetStates() }}
                             style={customStyles}
                         >
-                            <div className="title">Update a course</div>
+                            <div className="title-name">Update a course</div>
                             <form onSubmit={onUpdate}>
                                 <div><b>Course number (id):</b>{courseId}</div>
                                 <div><b>Course name:</b> <input value={newName} onChange={(e) => setNewName(e.target.value)} required maxLength={30}></input></div>
                                 <div><b>Language:</b> <input value={newLanguage} onChange={(e) => setNewLanguage(e.target.value)} required maxLength={20}></input></div>
                                 <div><b>Credits:</b> <input value={newCredits} type='number' onChange={(e) => setNewCredits(e.target.value)} required min={0} max={20}></input></div>
-                                <div><b>Available:</b> <input type='checkbox' checked={available==='1'?true:false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position':'unset' }} onChange={(e) => setNewAvailable(e.target.checked?'1':'0')}></input></div>
+                                <div><b>Available:</b> <input type='checkbox' checked={available === '1' ? true : false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position': 'unset' }} onChange={(e) => setNewAvailable(e.target.checked ? '1' : '0')}></input></div>
                                 <div><b>Schedule:</b> <input value={newSchedule} onChange={(e) => setNewSchedule(e.target.value)} required min={0} max={50}></input></div>
                                 <div><button type='submit' className='btn waves-light globalbtn'>Update</button></div>
                                 <div><button className='btn waves-light globalbtn' onClick={() => { setShowUpdateModal(false); resetStates() }}>Cancel</button></div>

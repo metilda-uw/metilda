@@ -42,43 +42,41 @@ function GradesAssignmentSubmissionDetail() {
             let formData = new FormData();
             formData.append('user', user.email);
             formData.append('assignment', assignmentId);
-            setTimeout(async () => {
-                try {
-                    let response = await fetch('/cms/assignments/read', {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        body: formData
-                    });
-                    response = await response.json();
-                    setTitle(response['name']);
-                    setDeadline(response['deadline']);
-                    setMaxGrade(+response['max_grade']);
+            try {
+                let response = await fetch('/cms/assignments/read', {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+                response = await response.json();
+                setTitle(response['name']);
+                setDeadline(response['deadline']);
+                setMaxGrade(+response['max_grade']);
 
-                    formData = new FormData();
-                    formData.append('user', user.email);
-                    formData.append('submission', submissionId);
-                    response = await fetch('/cms/grades/assignment/submission/read', {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        body: formData
-                    });
-                    response = await response.json();
-                    if (response) {
-                        setPrevTime(response['time']);
-                        if (response['content'] !== 'undefined')
-                            setContent(response['content']);
-                        setPrevGrade(response['grade']);
-                        setPrevComment(response['comment']);
-                        getFile(firebase, setPrevFiles, `/student-view/assignment/submission/file/read/${response['user']}/${assignmentId}`);
-                    }
-                } catch (error) {
-                    setErrorMessage("Error loading data. Please try again.");
+                formData = new FormData();
+                formData.append('user', user.email);
+                formData.append('submission', submissionId);
+                response = await fetch('/cms/grades/assignment/submission/read', {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+                response = await response.json();
+                if (response) {
+                    setPrevTime(response['time']);
+                    if (response['content'] !== 'undefined')
+                        setContent(response['content']);
+                    setPrevGrade(response['grade']);
+                    setPrevComment(response['comment']);
+                    getFile(firebase, setPrevFiles, `/student-view/assignment/submission/file/read/${response['user']}/${assignmentId}`);
                 }
-            }, 1000);
+            } catch (error) {
+                setErrorMessage("Error loading data. Please try again.");
+            }
         }
         fetchData();
     }, []);

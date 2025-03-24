@@ -41,6 +41,10 @@ import metilda.controllers.student.StudentGradesController
 import metilda.controllers.student.StudentLessonsController
 import metilda.controllers.student.StudentQuizController
 import metilda.controllers.AuthUtils
+from .cache import cache
+
+app.config['CACHE_TYPE'] = 'simple'  # In-memory cache (use Redis for production)
+cache.init_app(app)
 
 @app.route('/')
 @app.route('/<path:path>')

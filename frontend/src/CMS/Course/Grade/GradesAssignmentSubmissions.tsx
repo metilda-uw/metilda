@@ -29,7 +29,7 @@ function GradesAssignmentSubmissions() {
             formData.append('user', user.email);
             formData.append('assignment', assignmentId);
             try {
-                setTimeout(async () => {
+                async () => {
                     let response=await fetch('/cms/grades/assignment/submissions', {
                         method: "POST",
                         headers: {
@@ -65,7 +65,7 @@ function GradesAssignmentSubmissions() {
                         setStd((sum / graded) ** 0.5)
                     else
                         setStd(0)
-                }, 1000);
+                }
             }
             catch (error) {
                 setError('Error loading submissions, please try again later.')

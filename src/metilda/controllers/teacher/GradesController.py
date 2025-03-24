@@ -1,8 +1,8 @@
 from flask import request, jsonify
 from metilda import app
+from metilda.cache import cache
 from uuid import uuid4
 from datetime import datetime
-from sklearn.cluster import KMeans
 import numpy as np
 from flask import jsonify, request
 
@@ -11,8 +11,16 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
 
+import statistics
+
+def clear_teacher_assignmentGrade_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "grade" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
+
 @app.route('/cms/grades/assignment/submissions', methods=["POST"])
-def assignment_submissions():
+@cache.memoize(500)
+def teacher_grade_submissions():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -33,7 +41,8 @@ def assignment_submissions():
         },result)))
 
 @app.route('/cms/grades/assignment/submission/read', methods=["POST"])
-def read_assignment_submission():
+@cache.memoize(500)
+def teacher_grade_read_submission():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -55,7 +64,7 @@ def read_assignment_submission():
     return jsonify(res)
 
 @app.route('/cms/grades/assignment/submission/grade', methods=["POST"])
-def grade_assignment_submission():
+def teacher_update_grade():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -65,10 +74,12 @@ def grade_assignment_submission():
         query = 'update assignment_submissions set grade=%s,comment=%s where id=%s'
         args = (request.form['grade'],request.form['comment'],request.form['submission'],)
         connection.execute_update_query(query, args)
+        clear_teacher_assignmentGrade_cache()
     return jsonify({})
 
 @app.route('/cms/grades/assignment/submission/next', methods=["POST"])
-def next_assignment_submission():
+@cache.memoize(500)
+def teacher_grade_next_submission():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -94,11 +105,9 @@ def next_assignment_submission():
 
     return jsonify(res)
 
-
-#---------------------------------------------------------------------------------------------------------
-
 @app.route('/cms/grades/gradables', methods=["POST"])
-def gradable():
+@cache.memoize(500)
+def teacher_get_grade_gradable():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -117,7 +126,7 @@ def gradable():
         },result)))
 
 @app.route('/cms/grades/gradable/create', methods=["POST"])
-def create_gradable():
+def teacher_grade_create_gradable():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -137,11 +146,13 @@ def create_gradable():
             query = 'insert into gradable_grades(gradable_id,user_id,grade) values(%s,%s,%s)'
             args = (id,student[0],-1.0)
             connection.execute_insert_query(query, args, False)
+            clear_teacher_assignmentGrade_cache()
 
     return jsonify({})
 
 @app.route('/cms/grades/gradable/read', methods=["POST"])
-def read_gradable():
+@cache.memoize(500)
+def teacher_grade_read_gradable():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -168,7 +179,7 @@ def read_gradable():
     return jsonify(res)
 
 @app.route('/cms/grades/gradable/update', methods=["POST"])
-def update_gradable():
+def teacher_grade_update_gradable():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -178,12 +189,14 @@ def update_gradable():
         query = 'update gradables set name=%s,max_grade=%s,weight=%s where id=%s'
         args = (request.form['name'],request.form['max_grade'],request.form['weight'],request.form['gradable'])
         result = connection.execute_update_query(query, args)[0]
+        clear_teacher_assignmentGrade_cache()
 
     return jsonify({})
 
 
 @app.route('/cms/grades/gradable/student/read', methods=["POST"])
-def read_gradable_student():
+@cache.memoize(500)
+def teacher_grade_read_student():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -200,7 +213,7 @@ def read_gradable_student():
     return jsonify(res)
 
 @app.route('/cms/grades/gradable/student/grade', methods=["POST"])
-def grade_gradable():
+def teacher_grade_gradable():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -210,11 +223,13 @@ def grade_gradable():
         query = 'update gradable_grades set grade=%s where gradable_id=%s and user_id=%s'
         args = (request.form['grade'],request.form['gradable'],request.form['student'],)
         connection.execute_update_query(query, args)
+        clear_teacher_assignmentGrade_cache()
 
     return jsonify({})
 
 @app.route('/cms/grades/gradable/student/next', methods=["POST"])
-def next_gradable_student():
+@cache.memoize(500)
+def teacher_grade_next_gradable_student():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -240,11 +255,9 @@ def next_gradable_student():
 
     return jsonify(res)
 
-
-
-# --------------------------------------------------------
 @app.route('/cms/grades/quiz', methods=["POST"])
-def grade_quizzes():
+@cache.memoize(500)
+def teacher_grade_quizzes():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -265,7 +278,8 @@ def grade_quizzes():
     
 
 @app.route('/cms/grades/quiz/read', methods=["POST"])
-def grade_read_quiz():
+@cache.memoize(500)
+def teacher_grade_read_quiz():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -302,7 +316,8 @@ def grade_read_quiz():
     return jsonify(res)
 
 @app.route('/cms/grades/quiz/question/read', methods=["POST"])
-def grade_read_quiz_question():
+@cache.memoize(500)
+def teacher_read_quiz_question():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -333,7 +348,8 @@ def grade_read_quiz_question():
 
 
 @app.route('/cms/grades/quiz/question/answer/read', methods=["POST"])
-def grade_read_quiz_question_answer():
+@cache.memoize(500)
+def teacher_read_quiz_question_answer():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -353,7 +369,7 @@ def grade_read_quiz_question_answer():
     return jsonify(res)
 
 @app.route('/cms/grades/quiz/question/answer/grade', methods=["POST"])
-def grade_quiz_question_answer():
+def teacher_quiz_question_answer():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -363,12 +379,14 @@ def grade_quiz_question_answer():
         query = 'update quiz_answers set grade=%s where quiz=%s and question=%s and student=%s'
         args = (request.form['grade'],request.form['quiz'],request.form['question'],request.form['student'],)
         connection.execute_update_query(query, args)
+        clear_teacher_assignmentGrade_cache()
 
     return jsonify({})
 
 
 @app.route('/cms/grades/quiz/question/answer/next', methods=["POST"])
-def next_quiz_answer():
+@cache.memoize(500)
+def teacher_next_quiz_answer():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -394,16 +412,156 @@ def next_quiz_answer():
 
     return jsonify(res)
 
+# @app.route('/cms/all_clusters', methods=["POST"])
+# @cache.memoize(500)
+# def teacher_assignmentGrade_get_all_clusters():
+#     # Get course input
+#     course_id = request.form['course']
 
-@app.route('/cms/other_clusters', methods=["POST"])
-def get_other_clusters():
+#     with Postgres() as connection:
+#         # Fetch assignments, quizzes, and other items for the course
+#         assignments_query = '''
+#             SELECT id, name 
+#             FROM assignments 
+#             WHERE course = %s
+#         '''
+#         quizzes_query = '''
+#             SELECT id, name 
+#             FROM quiz 
+#             WHERE course = %s
+#         '''
+#         others_query = '''
+#             SELECT g.id, g.name, g.created_at, g.max_grade, g.weight
+#             FROM gradables g
+#             WHERE g.course = %s 
+#             AND g.name NOT IN (
+#                 SELECT name FROM quiz WHERE course = %s
+#                 UNION
+#                 SELECT name FROM assignments WHERE course = %s
+#             )
+#         '''
+
+#         # Fetch assignments
+#         assignments = connection.execute_select_query(assignments_query, (course_id,))
+#         assignment_map = {assignment[0]: assignment[1] for assignment in assignments}
+#         assignment_ids = tuple(assignment_map.keys())
+
+#         # Fetch quizzes
+#         quizzes = connection.execute_select_query(quizzes_query, (course_id,))
+#         quiz_map = {quiz[0]: quiz[1] for quiz in quizzes}
+#         quiz_ids = tuple(quiz_map.keys())
+
+#         # Fetch other items
+#         others = connection.execute_select_query(others_query, (course_id, course_id, course_id))
+#         other_map = {other[0]: other[1] for other in others}
+#         other_ids = tuple(other_map.keys())
+
+#         # Fetch grades for assignments, quizzes, and other items
+#         all_ids = assignment_ids + quiz_ids + other_ids
+#         if not all_ids:
+#             return jsonify({"error": "No valid IDs found"}), 404
+
+#         grades_query = '''
+#             SELECT gradable_id, grade, user_id
+#             FROM gradable_grades 
+#             WHERE gradable_id IN %s
+#         '''
+#         grades = connection.execute_select_query(grades_query, (all_ids,))
+
+#         if not grades:
+#             return jsonify({"error": "No grades found"}), 404
+
+#         # Organize grades by gradable_id
+#         all_scores = {}
+#         for gradable_id, grade, user_id in grades:
+#             if grade != -1:  # Ignore invalid grades
+#                 if gradable_id not in all_scores:
+#                     all_scores[gradable_id] = []
+#                 all_scores[gradable_id].append((grade, user_id))
+
+#         # Helper function to cluster scores
+#         def cluster_scores(scores_with_users):
+#             scores = [score for score, _ in scores_with_users]
+#             sorted_scores = sorted(scores)
+#             n = len(sorted_scores)
+#             low_cutoff = sorted_scores[n // 3]  # 33rd percentile
+#             high_cutoff = sorted_scores[2 * n // 3]  # 66th percentile
+
+#             cluster_data = []
+#             for score, user_id in scores_with_users:
+#                 if score <= low_cutoff:
+#                     group = 0  # Low
+#                 elif score <= high_cutoff:
+#                     group = 1  # Average
+#                 else:
+#                     group = 2  # High
+
+#                 cluster_data.append({'score': score, 'user_id': user_id, 'cluster': group})
+
+#             return cluster_data
+
+#         # Process assignments
+#         assignment_results = []
+#         for assignment_id in assignment_ids:
+#             if assignment_id in all_scores:
+#                 cluster_data = cluster_scores(all_scores[assignment_id])
+#                 assignment_results.append({
+#                     'id': assignment_id,
+#                     'name': assignment_map[assignment_id],
+#                     'data_points': cluster_data
+#                 })
+
+#         # Process quizzes
+#         quiz_results = []
+#         for quiz_id in quiz_ids:
+#             if quiz_id in all_scores:
+#                 cluster_data = cluster_scores(all_scores[quiz_id])
+#                 quiz_results.append({
+#                     'id': quiz_id,
+#                     'name': quiz_map[quiz_id],
+#                     'data_points': cluster_data
+#                 })
+
+#         # Process other items
+#         other_results = []
+#         for other_id in other_ids:
+#             if other_id in all_scores:
+#                 cluster_data = cluster_scores(all_scores[other_id])
+#                 other_results.append({
+#                     'id': other_id,
+#                     'name': other_map[other_id],
+#                     'data_points': cluster_data
+#                 })
+
+#         # Combine all results
+#         result = {
+#             'assignments': assignment_results,
+#             'quizzes': quiz_results,
+#             'other_items': other_results
+#         }
+
+#     return jsonify(result)
+
+@app.route('/cms/all_clusters', methods=["POST"])
+@cache.memoize(500)
+def teacher_assignmentGrade_get_all_clusters():
     # Get course input
     course_id = request.form['course']
 
     with Postgres() as connection:
-        # Fetch other items for the course
-        query = '''
-            SELECT g.id, g.name, g.created_at, g.max_grade, g.weight
+        # Fetch assignments, quizzes, and other items for the course
+        assignments_query = '''
+            SELECT id, name 
+            FROM assignments 
+            WHERE course = %s
+        '''
+        quizzes_query = '''
+            SELECT id, name 
+            FROM quiz 
+            WHERE course = %s
+        '''
+        others_query = '''
+            SELECT g.id, g.name
             FROM gradables g
             WHERE g.course = %s 
             AND g.name NOT IN (
@@ -412,62 +570,118 @@ def get_other_clusters():
                 SELECT name FROM assignments WHERE course = %s
             )
         '''
-        args = (course_id, course_id, course_id)
-        others = connection.execute_select_query(query, args)
 
-        if not others:
-            return jsonify({"error": "No other items found for this course"}), 404
+        # Fetch assignments
+        assignments = connection.execute_select_query(assignments_query, (course_id,))
+        assignment_map = {assignment[0]: assignment[1] for assignment in assignments}
+        assignment_ids = tuple(assignment_map.keys())
 
-        # Extract IDs and names
-        other_map = {other[0]: other[1] for other in others}  # Map of {id: name}
+        # Fetch quizzes
+        quizzes = connection.execute_select_query(quizzes_query, (course_id,))
+        quiz_map = {quiz[0]: quiz[1] for quiz in quizzes}
+        quiz_ids = tuple(quiz_map.keys())
+
+        # Fetch other items
+        others = connection.execute_select_query(others_query, (course_id, course_id, course_id))
+        other_map = {other[0]: other[1] for other in others}
         other_ids = tuple(other_map.keys())
 
-        if not other_ids:
-            return jsonify({"error": "No valid other items IDs found"}), 404
+        # Fetch grades
+        all_ids = assignment_ids + quiz_ids + other_ids
+        if not all_ids:
+            return jsonify({"error": "No valid IDs found"}), 404
 
-        # Fetch grades for other items
         grades_query = '''
             SELECT gradable_id, grade, user_id
             FROM gradable_grades 
             WHERE gradable_id IN %s
         '''
-        grades = connection.execute_select_query(grades_query, (other_ids,))
+        grades = connection.execute_select_query(grades_query, (all_ids,))
 
         if not grades:
-            return jsonify({"error": "No grades found for other items"}), 404
+            return jsonify({"error": "No grades found"}), 404
 
-        # Organize grades by item ID
-        other_scores = {}
+        # Organize grades by gradable_id
+        all_scores = {}
         for gradable_id, grade, user_id in grades:
             if grade != -1:  # Ignore invalid grades
-                if gradable_id not in other_scores:
-                    other_scores[gradable_id] = []
-                other_scores[gradable_id].append((grade, user_id))
+                if gradable_id not in all_scores:
+                    all_scores[gradable_id] = []
+                all_scores[gradable_id].append((grade, user_id))
 
-        result = []
-        for other_id, scores_with_users in other_scores.items():
-            if scores_with_users:
-                # Prepare data for KMeans
-                scores = [score for score, _ in scores_with_users]
-                scores_array = np.array(scores).reshape(-1, 1)
+        # Helper function to compute statistics and cluster scores
+        def cluster_scores(scores_with_users):
+            scores = [score for score, _ in scores_with_users]
+            
+            if not scores:
+                return [], 0, 0  # Return empty cluster data with 0 stats
+            
+            sorted_scores = sorted(scores)
+            n = len(sorted_scores)
+            low_cutoff = sorted_scores[n // 3]  # 33rd percentile
+            high_cutoff = sorted_scores[2 * n // 3]  # 66th percentile
 
-                # Apply KMeans clustering
-                kmeans = KMeans(n_clusters=min(3, len(scores)), random_state=42)
-                kmeans.fit(scores_array)
+            cluster_data = []
+            for score, user_id in scores_with_users:
+                if score <= low_cutoff:
+                    group = 0  # Low
+                elif score <= high_cutoff:
+                    group = 1  # Average
+                else:
+                    group = 2  # High
 
-                # Collect cluster data
-                cluster_data = [
-                    {'score': score, 'user_id': user_id, 'cluster': int(label)}
-                    for (score, user_id), label in zip(scores_with_users, kmeans.labels_)
-                ]
+                cluster_data.append({'score': score, 'user_id': user_id, 'cluster': group})
 
-                centroids = kmeans.cluster_centers_.flatten().tolist()
+            # Compute mean and standard deviation
+            mean_score = round(statistics.mean(scores), 2)
+            std_dev = round(statistics.stdev(scores), 2) if len(scores) > 1 else 0
 
-                result.append({
-                    'name': other_map[other_id],
-                    'id': other_id,
-                    'cluster_data': cluster_data,
-                    'cluster_centroids': centroids
+            return cluster_data, mean_score, std_dev
+
+        # Process assignments
+        assignment_results = []
+        for assignment_id in assignment_ids:
+            if assignment_id in all_scores:
+                cluster_data, mean, std_dev = cluster_scores(all_scores[assignment_id])
+                assignment_results.append({
+                    'id': assignment_id,
+                    'name': assignment_map[assignment_id],
+                    'average': mean,
+                    'standard_deviation': std_dev,
+                    'data_points': cluster_data
                 })
+
+        # Process quizzes
+        quiz_results = []
+        for quiz_id in quiz_ids:
+            if quiz_id in all_scores:
+                cluster_data, mean, std_dev = cluster_scores(all_scores[quiz_id])
+                quiz_results.append({
+                    'id': quiz_id,
+                    'name': quiz_map[quiz_id],
+                    'average': mean,
+                    'standard_deviation': std_dev,
+                    'data_points': cluster_data
+                })
+
+        # Process other items
+        other_results = []
+        for other_id in other_ids:
+            if other_id in all_scores:
+                cluster_data, mean, std_dev = cluster_scores(all_scores[other_id])
+                other_results.append({
+                    'id': other_id,
+                    'name': other_map[other_id],
+                    'average': mean,
+                    'standard_deviation': std_dev,
+                    'data_points': cluster_data
+                })
+
+        # Combine all results
+        result = {
+            'assignments': assignment_results,
+            'quizzes': quiz_results,
+            'other_items': other_results
+        }
 
     return jsonify(result)

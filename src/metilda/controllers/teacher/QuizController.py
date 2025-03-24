@@ -1,16 +1,21 @@
 from flask import request, jsonify
 from metilda import app
+from metilda.cache import cache
 from uuid import uuid4
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
-from sklearn.cluster import KMeans
 import numpy as np
 
+def clear_teacher_quiz_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "quiz" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
+
 @app.route('/cms/quiz/create', methods=["POST"])
-def create_quiz():
+def teacher_quiz_create():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -22,11 +27,13 @@ def create_quiz():
         args = (id,request.form['name'],int(request.form['course']),request.form['start'],
                 request.form['deadline'],request.form['description'],request.form['max_grade'],request.form['weight'])
         connection.execute_insert_query(query, args, False)
+        clear_teacher_quiz_cache()
 
     return jsonify({'quiz':id})
 
 @app.route('/cms/quiz', methods=["POST"])
-def read_quizzes():
+@cache.memoize(500)
+def teacher_quiz():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -49,77 +56,9 @@ def read_quizzes():
     else:
         return jsonify([])
 
-
-@app.route('/cms/quiz_clusters', methods=["POST"])
-def get_quiz_clusters():
-    # Get course input and user email
-    course_id = request.form['course']
-
-    with Postgres() as connection:
-        # Fetch quizzes for the course
-        quiz_query = '''
-            SELECT id, name 
-            FROM quiz 
-            WHERE course = %s
-        '''
-        quizzes = connection.execute_select_query(quiz_query, (course_id,))
-        quiz_map = {quiz[0]: quiz[1] for quiz in quizzes}
-        quiz_ids = tuple(quiz_map.keys())
-
-        if not quiz_ids:
-            return jsonify({"error": "No valid quiz IDs found"}), 404
-
-        # Fetch grades for these quizzes
-        grades_query = '''
-            SELECT gradable_id, grade, user_id
-            FROM gradable_grades 
-            WHERE gradable_id IN %s
-        '''
-        grades = connection.execute_select_query(grades_query, (quiz_ids,))
-
-        if not grades:
-            return jsonify({"error": "No grades found"}), 404
-
-        # Organize grades by quiz ID
-        quiz_scores = {}
-        for gradable_id, grade, user_id in grades:
-            if grade != -1:  # Ignore invalid grades
-                if gradable_id not in quiz_scores:
-                    quiz_scores[gradable_id] = []
-                quiz_scores[gradable_id].append((grade, user_id))
-
-        result = []
-        for quiz_id, scores_with_users in quiz_scores.items():
-            if scores_with_users:
-                # Prepare data for KMeans
-                scores = [score for score, _ in scores_with_users]
-                scores_array = np.array(scores).reshape(-1, 1)
-
-                # Apply KMeans (minimum of 3 clusters or the number of unique scores)
-                kmeans = KMeans(n_clusters=min(3, len(scores)), random_state=42)
-                kmeans.fit(scores_array)
-
-                # Collect cluster data with user emails
-                cluster_data = [
-                    {'score': score, 'user_id': user_id, 'cluster': int(label)}
-                    for (score, user_id), label in zip(scores_with_users, kmeans.labels_)
-                ]
-
-                centroids = kmeans.cluster_centers_.flatten().tolist()
-
-                result.append({
-                    'id': quiz_id,
-                    'name': quiz_map[quiz_id],
-                    'cluster_data': cluster_data,
-                    'cluster_centroids': centroids
-                })
-
-    return jsonify(result)
-
-
-
 @app.route('/cms/quiz/read', methods=["POST"])
-def read_quiz():
+@cache.memoize(500)
+def teacher_quiz_read():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -141,7 +80,7 @@ def read_quiz():
     return jsonify(res)
 
 @app.route('/cms/quiz/update', methods=["POST"])
-def update_quiz():
+def teacher_quiz_update():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -152,11 +91,13 @@ def update_quiz():
         args = (request.form['name'],request.form['start'],request.form['deadline'],request.form['description'],
                 float(request.form['max_grade']),float(request.form['weight']),request.form['quiz'],)
         result = connection.execute_update_query(query, args)
+        clear_teacher_quiz_cache()
+        cache.delete("teacher_assignmentGrade_get_all_clusters")
 
     return jsonify({})
 
 @app.route('/cms/quiz/delete', methods=["POST"])
-def delete_quiz():
+def teacher_quiz_delete():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -166,13 +107,13 @@ def delete_quiz():
         query = 'delete from quiz where id=%s'
         args=(request.form['quiz'],)
         result = connection.execute_update_query(query, args)
+        clear_teacher_quiz_cache()
+
     return jsonify({})
 
 
-
-# --------------Quiz question------------------------
 @app.route('/cms/quiz/questions/create', methods=["POST"])
-def create_quiz_question():
+def teacher_quiz_create_question():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -189,11 +130,14 @@ def create_quiz_question():
             args = (id,request.form['quiz'],request.form['content'],request.form['choices'],request.form['solution'],
                 request.form['index'],request.form['max_grade'],request.form['type'])
         connection.execute_insert_query(query, args, False)
+        clear_teacher_quiz_cache()
+        cache.delete("teacher_assignmentGrade_get_all_clusters")
 
     return jsonify({'question':id})
 
 @app.route('/cms/quiz/questions', methods=["POST"])
-def read_quiz_questions():
+@cache.memoize(500)
+def teacher_quiz_questions():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -218,7 +162,8 @@ def read_quiz_questions():
         return jsonify([])
 
 @app.route('/cms/quiz/questions/read', methods=["POST"])
-def read_quiz_question():
+@cache.memoize(500)
+def teacher_quiz_read_question():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -250,7 +195,7 @@ def read_quiz_question():
     return jsonify(res)
 
 @app.route('/cms/quiz/questions/update', methods=["POST"])
-def update_quiz_question():
+def teacher_quiz_update_question():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -264,11 +209,12 @@ def update_quiz_question():
             query = 'update quiz_questions set content=%s,choices=%s,solution=%s,max_grade=%s where id=%s'
             args = (request.form['content'],request.form['choices'],request.form['solution'],request.form['max_grade'],request.form['question'])
         result = connection.execute_update_query(query, args)
+        clear_teacher_quiz_cache()
 
     return jsonify({})
 
 @app.route('/cms/quiz/questions/delete', methods=["POST"])
-def delete_quiz_question():
+def teacher_quiz_delete_question():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -278,12 +224,12 @@ def delete_quiz_question():
         query = 'delete from quiz_questions where id=%s'
         args=(request.form['question'],)
         result = connection.execute_update_query(query, args)
+        clear_teacher_quiz_cache()
+
     return jsonify({})
 
-
-
 @app.route('/cms/quiz/questions/reorganize', methods=["POST"])
-def reorganize_questions():
+def teacher_quiz_reorganize_questions():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
         args = (request.form['user'],)
@@ -296,29 +242,35 @@ def reorganize_questions():
             query = 'update quiz_questions set idx=%s where id=%s'
             args = (data[1],data[0])
             connection.execute_update_query(query, args)
+            clear_teacher_quiz_cache()
+
     return jsonify({})
 
-
 @app.route('/cms/quiz/question/file/create', methods=["POST"])
-def quiz_question_create_file():
+def teacher_quiz_question_create_file():
     with Postgres() as connection:
         query = 'insert into quiz_question_files values(%s,%s,%s,%s,%s,%s,%s)'
         args = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'], 
                 request.form['file_size'],request.form['question'],request.form['course'])
         connection.execute_insert_query(query, args, False)
+        clear_teacher_quiz_cache()
+
     return jsonify({})
 
 @app.route('/cms/quiz/question/file/delete', methods=["POST"])
-def quiz_question_delete_file():
+def teacher_quiz_question_delete_file():
     with Postgres() as connection:
         if(request.form['old_path']):
             query = 'delete from quiz_question_files where path=%s'
             args=(request.form['old_path'],)
             connection.execute_update_query(query, args)
+            clear_teacher_quiz_cache()
+
     return jsonify({})
 
 @app.route('/cms/quiz/question/file/read/<string:course>/<string:type>/<string:question>', methods=["GET"])
-def quiz_question_get_file(course,type,question):
+@cache.memoize(500)
+def teacher_quiz_question_get_file(course,type,question):
     with Postgres() as connection:
         query = 'select * from quiz_question_files where course=%s and type=%s and question=%s'
 

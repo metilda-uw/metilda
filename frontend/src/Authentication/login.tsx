@@ -47,6 +47,61 @@ constructor(props: any) {
     this.state = { ...INITIAL_STATE };
   }
 
+  setUserType = async (userId: string) => {
+    const response = await fetch(
+      "/api/get-user-with-verified-role/" + userId +
+      "?user-role=Admin",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const body = await response.json();
+    if (body.result != null && body.result.length > 0) {
+      localStorage.setItem('admin', 'true');
+    } else {
+      localStorage.setItem('admin', 'false');
+    }
+    const response_moderator = await fetch(
+      "/api/get-user-with-verified-role/" + userId +
+      "?user-role=Teacher",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const body_moderator = await response_moderator.json();
+    if (body_moderator.result != null && body_moderator.result.length > 0) {
+      localStorage.setItem('moderator', 'true');
+    } else {
+      localStorage.setItem('moderator', 'false');
+    }
+
+    const response_user = await fetch(
+      "/api/get-user-roles/" + userId +
+      "?user-role=Student",
+      {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const body_user = await response_user.json();
+    if (body_user.result != null && body_user.result[0][0] === 'Student') {
+      localStorage.setItem('user', 'true');
+    } else {
+      localStorage.setItem('user', 'false');
+    }
+  }
+
   onSubmit = async (event: any) => {
     event.preventDefault();
     const { email, password } = this.state;
@@ -70,6 +125,7 @@ constructor(props: any) {
         });
 
     if (userIsAuthorized) {
+      this.setUserType(authUser.user.email)
         ReactGA.set({
           userId: authUser.user.uid
         });

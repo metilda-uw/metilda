@@ -42,28 +42,27 @@ function Discussion() {
             formData.append('user', user.email);
             formData.append('course', courseId);
 
-            setTimeout(async () => {
-                try {
-                    const response = await fetch('/cms/topics', {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        body: formData
-                    });
-                    const data = await response.json();
-                    const sortedData = data.sort((b, a) => {
-                        return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
-                    });
-                    setTopicListString(JSON.stringify(sortedData));
-                    setError(false);
-                } catch (error) {
-                    console.log("Fetch failed, see if it is 403 in error console");
-                    setError(true);
-                } finally {
-                    setLoading(false);
-                }
-            }, 1000); // Simulate a 1 second loading time
+            try {
+                const response = await fetch('/cms/topics', {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+                const sortedData = data.sort((b, a) => {
+                    return (new Date(b.created_at)).getTime() - (new Date(a.created_at)).getTime();
+                });
+                setLoading(false)
+                setTopicListString(JSON.stringify(sortedData));
+                setError(false);
+            } catch (error) {
+                console.log("Fetch failed, see if it is 403 in error console");
+                setError(true);
+            } finally {
+                setLoading(false);
+            }
         }
 
         fetchData();
@@ -135,7 +134,7 @@ function Discussion() {
                         <div className="error-message">Error loading topics. Please try again later.</div>
                     ) : (
                         <div className="info-list">
-                            <div className="title">Topics:</div>
+                            <div className="title-name">Topics</div>
                         {topicListString?JSON.parse(topicListString).map(x => (
                                 <div key={x.topic} className="list-item">
                                     <div key={x.topic}><Link className="content-link list-item-title" to={'/content-management/course/' + courseId + '/discussion/topic/' + x.topic}>{x.name}</Link></div>
@@ -158,7 +157,7 @@ function Discussion() {
                             contentLabel="Example Modal"
                             style={customStyles}
                         >
-                            <div className="title">Create a topic</div>
+                            <div className="title-name">Create a topic</div>
                             <form onSubmit={onSubmit}>
                                 <div><b>Topic name:</b> <input onChange={(e) => setNewName(e.target.value)} required maxLength={30}></input></div>
                                 <div><b>Description:</b> <input onChange={(e) => setNewDescription(e.target.value)} maxLength={200}></input></div>

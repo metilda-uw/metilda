@@ -38,7 +38,7 @@ function GradesGradable() {
             formData.append('user', user.email);
             formData.append('gradable', gradableId);
             try {
-                setTimeout(async () => {
+                async () => {
                     let response = await fetch('/cms/grades/gradable/read', {
                         method: "POST",
                         headers: {
@@ -87,7 +87,7 @@ function GradesGradable() {
                     else
                         setStd(0)
 
-                }, 1000);
+                }
             }
             catch (error) {
                 setError('Error loading gradable data, please try again later.')

@@ -2,13 +2,20 @@ from flask import request, jsonify
 from metilda import app
 from uuid import uuid4
 from datetime import datetime
+from metilda.cache import cache
 
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
 
+def clear_student_quiz_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "quiz" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
+
 @app.route('/student-view/quiz', methods=["POST"])
+@cache.memoize(500)
 def student_read_quizzes():
     with Postgres() as connection:
         query = 'select id,name,start,deadline,description,max_grade,weight from quiz where course=%s'
@@ -29,6 +36,7 @@ def student_read_quizzes():
 
 
 @app.route('/student-view/quiz_grades', methods=["POST"])
+@cache.memoize(500)
 def get_quiz_grades():
     # Get the user's course input
     course_id = request.form['course']
@@ -119,6 +127,7 @@ def get_quiz_grades():
 
 
 @app.route('/student-view/quiz/read', methods=["POST"])
+@cache.memoize(500)
 def student_read_quiz():
     with Postgres() as connection:
         query = 'select name,start,deadline,description,max_grade,weight from quiz where id=%s'
@@ -142,6 +151,7 @@ def student_read_quiz():
 
 # --------------Quiz question------------------------
 @app.route('/student-view/quiz/questions', methods=["POST"])
+@cache.memoize(500)
 def student_read_quiz_questions():
     with Postgres() as connection:
         query = 'select id,content,choices,idx,max_grade from quiz_questions where quiz=%s'
@@ -161,6 +171,7 @@ def student_read_quiz_questions():
         return jsonify([])
 
 @app.route('/student-view/quiz/questions/read', methods=["POST"])
+@cache.memoize(500)
 def student_read_quiz_question():
     with Postgres() as connection:
         query = 'select content,choices,max_grade,type,max_trials from quiz_questions where id=%s'
@@ -253,11 +264,13 @@ def student_answer_quiz_question():
                         request.form['answer'],request.form['time'],0.0,request.form['max_grade'])
                 connection.execute_insert_query(query, args, False)
 
+    clear_student_quiz_cache()
     return jsonify({})
 
 
 @app.route('/student-view/quiz/question/next', methods=["POST"])
-def student_next_question():
+@cache.memoize(500)
+def student_quiz_next_question():
     with Postgres() as connection:
         query = 'select id,idx from quiz_questions where quiz=%s'
         args = (request.form['quiz'],)
@@ -288,6 +301,7 @@ def student_quiz_question_answer_create_file():
         args = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'], 
                 request.form['file_size'],request.form['question'],request.form['course'])
         connection.execute_insert_query(query, args, False)
+        clear_student_quiz_cache()
     return jsonify({})
 
 @app.route('/student-view/quiz/question/answer/file/delete', methods=["POST"])
@@ -297,9 +311,11 @@ def student_quiz_question_answer_delete_file():
             query = 'delete from quiz_answer_files where path=%s'
             args=(request.form['old_path'],)
             connection.execute_update_query(query, args)
+            clear_student_quiz_cache()
     return jsonify({})
 
 @app.route('/student-view/quiz/question/answer/file/read/<string:course>/<string:type>/<string:question>/<string:user>', methods=["GET"])
+@cache.memoize(500)
 def student_quiz_question_answer_get_file(course,type,question,user):
     with Postgres() as connection:
         query = 'select * from quiz_answer_files where course=%s and type=%s and question=%s and user_id=%s'

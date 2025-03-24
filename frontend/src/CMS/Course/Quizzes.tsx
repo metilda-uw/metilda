@@ -45,9 +45,6 @@ function Quizzes() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                // Simulate delay
-                await new Promise(resolve => setTimeout(resolve, 1000));
-
                 const response = await fetch('/cms/quiz', {
                     method: "POST",
                     headers: {
@@ -132,7 +129,7 @@ function Quizzes() {
                 <div className="height-column"></div>
                 <div className="main-view">
                     <div className="info-list">
-                        <div className="title">Quiz:</div>
+                        <div className="title-name">Quiz</div>
                         {loading ? (
                             <div>{spinnerIcon()} </div>
                         ) : error ? (
@@ -159,7 +156,7 @@ function Quizzes() {
                             contentLabel="Example Modal"
                             style={customStyles}
                         >
-                            <div className="title">Create a quiz</div>
+                            <div className="title-name">Create a quiz</div>
                             <form onSubmit={onSubmit}>
                                 <div><b>Quiz name:</b> <input onChange={(e) => setName(e.target.value)} required maxLength={30}></input></div>
                                 <div><b>Description:</b> <input onChange={(e) => setDescription(e.target.value)} maxLength={200}></input></div>

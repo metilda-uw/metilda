@@ -1,94 +1,110 @@
-import React from "react" 
-import { useState, useContext, useEffect} from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../Components/header/Header";
 import { withAuthorization } from "../../Session";
 import { AuthUserContext } from "../../Session";
 import Sidebar from "./Sidebar";
 import { useParams } from "react-router-dom";
-import "./GeneralStyles.scss"
+import "./GeneralStyles.scss";
 import { verifyTeacherCourse } from "../AuthUtils";
 import { spinnerIcon } from "../../Utils/SpinnerIcon";
+import { cacheApiResponse, getCachedApiResponse } from "../../Utils/cacheUtils";
 
 function Assignments() {
-    const user = useContext(AuthUserContext) as any
-    const courseId = useParams()['id']
-    const [assignmentListString, setAssignmentListString] = useState('')
-    const [veri, setVeri] = useState(true)
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    const user = useContext(AuthUserContext) as any;
+    const courseId = useParams()['id'];
+    const [assignments, setAssignments] = useState<any[]>([]);
+    const [veri, setVeri] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchData() {
-            await verifyTeacherCourse(user.email, courseId, setVeri)
-            if (!veri)
-                return
+            const cacheKey = `assignments_${courseId}`;
+            const cachedData = await getCachedApiResponse(cacheKey);
+
+            if (cachedData) {
+                setAssignments(cachedData);
+                setLoading(false);
+                return;
+            }
+            await verifyTeacherCourse(user.email, courseId, setVeri);
+            if (!veri) return;
 
             const formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
+
             try {
-                setTimeout(async () => {
-                    const response = await fetch('/cms/assignments', {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        body: formData
-                    })
-                    .then(x => x.json())
-                    .then(x=>x.sort((b,a)=>{return (new Date(b.deadline)).getTime()-(new Date(a.deadline)).getTime()}))
-                    .then(JSON.stringify)
-                    .then(setAssignmentListString)
-                }, 6000);
+                const response = await fetch('/cms/assignments', {
+                    method: "POST",
+                    headers: { Accept: "application/json" },
+                    body: formData
+                });
+                const data = await response.json();
+                data.sort((b, a) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime());
+                await cacheApiResponse(cacheKey, data);
+                setAssignments(data);
                 setError(null);
-            }
-            catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console");
+            } catch (error) {
+                console.log("Fetch failed, check for 403 errors in the console.");
                 setError("Error loading data. Please try again.");
             } finally {
-                setLoading(false); // Stop loading after data fetch
+                setLoading(false);
             }
         }
-        fetchData()
-    },[])
+        fetchData();
+    }, []);
 
     if (!veri) {
-        return <div>Authentication Error, please do not use URL for direct access.</div>
+        return <div>Authentication Error, please do not use URL for direct access.</div>;
     }
+
     return (
         <div>
-            <Header></Header>
+            <Header />
             <div className="main-layout">
-                <Sidebar courseId={courseId}></Sidebar>
+                <Sidebar courseId={courseId} />
                 <div className="height-column"></div>
                 <div className="main-view">
                     <div className="info-list">
-                        <div className="title">Assignments:</div>
+                        <div className="assignments-header">
+                            <h2 className="title-name">Assignments</h2>
+                            <Link className="create-assignment-button" to={`/content-management/course/${courseId}/assignments/create`}>
+                                + Create an Assignment
+                            </Link>
+                        </div>
+
                         {loading ? (
-                            <div>{spinnerIcon()} </div>
+                            <div className="loading-container">{spinnerIcon()}</div>
                         ) : error ? (
-                            <div style={{ color: 'red' }}>{error}</div>
+                            <div className="error-message">{error}</div>
                         ) : (
-                            assignmentListString ? JSON.parse(assignmentListString).map(x => (
-                                <div key={x.assignment + '1'} className="list-item">
-                                    <div key={x.assignment + '2'}>
-                                        <Link className="content-link list-item-title" key={x.assignment + '3'} to={'/content-management/course/' + courseId + '/assignment/' + x.assignment}>{x.name}</Link>
-                                    </div>
-                                    <div key={x.assignment + '4'} className="deadline"><b>Deadline:</b> {new Date(x.deadline).toLocaleString()}</div>
-                                </div>
-                            )) : null
+                            <div className="assignment-list">
+                                {assignments.length > 0 ? (
+                                    assignments.map((assignment) => (
+                                        <div className="list-item">
+                                            <Link key={assignment.assignment} className="content-link list-item-title" to={`/content-management/course/${courseId}/assignment/${assignment.assignment}`}>
+                                                {assignment.name}
+                                            </Link>
+                                            <div className={`deadline ${new Date(assignment.deadline) < new Date() ? "past-deadline" : "upcoming-deadline"}`}>
+                                                    <b>Deadline:</b> {new Date(assignment.deadline).toLocaleString()}
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="no-assignments">No assignments available.</p>
+                                )}
+                            </div>
                         )}
                     </div>
 
-                    <div className="float-right">
-                        <Link className="content-link" to={'/content-management/course/'+courseId+'/assignments/create'}>Create an assigment</Link>
-                    </div>
+
 
                 </div>
             </div>
         </div>
-    )
+    );
 }
 
 const authCondition = (authUser: any) => !!authUser;

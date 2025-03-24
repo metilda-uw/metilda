@@ -47,18 +47,16 @@ function Quiz() {
                     body: formData
                 });
 
-                setTimeout(async () => {
-                    if (!response.ok) {
-                        throw new Error('Error loading quiz information');
-                    }
-                    response = await response.json();
-                    setName(response['name']);
-                    setDescription(response['description']);
-                    setStart(response['start']);
-                    setDeadline(response['deadline']);
-                    setMaxGrade(response['max_grade']);
-                    setWeight(response['weight']);
-                }, 2000);
+                if (!response.ok) {
+                    throw new Error('Error loading quiz information');
+                }
+                response = await response.json();
+                setName(response['name']);
+                setDescription(response['description']);
+                setStart(response['start']);
+                setDeadline(response['deadline']);
+                setMaxGrade(response['max_grade']);
+                setWeight(response['weight']);
 
                 response = await fetch('/cms/quiz/questions', {
                     method: "POST",
@@ -68,13 +66,13 @@ function Quiz() {
                     body: formData
                 });
 
-                setTimeout(async () => {
+                async () => {
                     if (!response.ok) {
                         throw new Error('Error loading questions');
                     }
                     let responseJSON = await response.json();
                     setQuestionList(responseJSON);
-                }, 2000);
+                }
             } catch (error) {
                 console.log(error);
             }

@@ -15,7 +15,10 @@ class SignOut extends Component<Props> {
 
   render() {
     this.props.firebase.doSignOut();
-
+    localStorage.removeItem('admin');
+    localStorage.removeItem('moderator');
+    localStorage.removeItem('user');
+    
     return(<div>
       <h3>You have been signed out successfully</h3>
       <button className="login_Button globalbtn" onClick={this.displayLoginPage}>

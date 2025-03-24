@@ -33,20 +33,20 @@ export function CreatePost() {
         formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth()) + 1) + '-' + newDate.getUTCDate() + ' '
             + newDate.getUTCHours() + ':' + newDate.getUTCMinutes() + ':' + newDate.getUTCSeconds());
 
-        setTimeout(async () => {
-            try {
-                await fetch('/cms/posts/create', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                });
-                history.push('/content-management/course/' + courseId + '/discussion/topic/' + topicId);
-            } catch (error) {
-                setErrorMessage("Error creating post. Please try again.");
+            async () => {
+                try {
+                    await fetch('/cms/posts/create', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    });
+                    history.push('/content-management/course/' + courseId + '/discussion/topic/' + topicId);
+                } catch (error) {
+                    setErrorMessage("Error creating post. Please try again.");
+                }
             }
-        }, 1000);
     }
 
     return (

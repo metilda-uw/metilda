@@ -64,7 +64,6 @@ export function CreateAssignment() {
         formData.append('weight', weight.toString())
 
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
             await fetch('/cms/assignments/create', {
                 method: "POST",
                 headers: {
@@ -87,7 +86,7 @@ export function CreateAssignment() {
         } catch (ex) {
             console.log(ex);
         }
-        history.push('/content-management/course/' + courseId + '/assignments')
+        history.push('/content-management/course/' + courseId + '/assignment')
     }
     
     return (

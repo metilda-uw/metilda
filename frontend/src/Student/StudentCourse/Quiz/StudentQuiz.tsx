@@ -77,9 +77,9 @@ function StudentQuiz() {
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>
     }
-    if (!inTime) {
-        return <div>Quiz time error, please access the quiz at correct time.</div>
-    }
+    // if (!inTime) {
+    //     return <div>Quiz time error, please access the quiz at correct time.</div>
+    // }
     return (
         <div>
             <Header></Header>
@@ -91,8 +91,8 @@ function StudentQuiz() {
                         <div className="title">Quiz Information</div>
                         <div><b>Quiz Name:</b> {name}</div>
                         <div><b>Description:</b> {description}</div>
-                        <div><b>Quiz Start Time:</b> {start?new Date(start).toLocaleString():'Loading...'}</div>
-                        <div><b>Quiz End time:</b> {deadline?new Date(deadline).toLocaleString():'Loading...'}</div>
+                        <div><b>Quiz Start Time:</b> {start?start:'Loading...'}</div>
+                        <div><b>Quiz End time:</b> {deadline?deadline:'Loading...'}</div>
                         <div><b>Max Grade:</b> {maxGrade}</div>
                         <div><b>Weight:</b> {weight*100}%</div>
                         <div className="title">Question List:</div>

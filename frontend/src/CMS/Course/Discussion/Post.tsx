@@ -38,7 +38,7 @@ export function Post() {
             let formData = new FormData();
             formData.append('user', user.email);
             formData.append('post', postId);
-            setTimeout(async () => {
+            async () => {
                 try {
                     let response = await fetch('/cms/posts/read', {
                         method: "POST",
@@ -55,12 +55,12 @@ export function Post() {
                 } catch (error) {
                     setErrorMessage("Error loading post. Please try again.");
                 }
-            }, 1000);
+            }
 
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('post', postId);
-            setTimeout(async () => {
+            async () => {
                 try {
                     await fetch('/cms/replies', {
                         method: "POST",
@@ -80,7 +80,7 @@ export function Post() {
                 } catch (error) {
                     setErrorMessage("Error loading replies. Please try again.");
                 }
-            }, 1000);
+            }
         }
         if (user) {
             fetchData();
@@ -97,21 +97,21 @@ export function Post() {
         formData.append('created_at', newDate.getUTCFullYear() + '-' + (Number(newDate.getUTCMonth()) + 1) + '-' + newDate.getUTCDate() + ' '
             + newDate.getUTCHours() + ':' + newDate.getUTCMinutes() + ':' + newDate.getUTCSeconds());
 
-        setTimeout(async () => {
-            try {
-                await fetch('/cms/replies/create', {
-                    method: "POST",
-                    headers: {
-                        Accept: "application/json"
-                    },
-                    body: formData
-                });
-            } catch (error) {
-                setErrorMessage("Error submitting reply. Please try again.");
+            async () => {
+                try {
+                    await fetch('/cms/replies/create', {
+                        method: "POST",
+                        headers: {
+                            Accept: "application/json"
+                        },
+                        body: formData
+                    });
+                } catch (error) {
+                    setErrorMessage("Error submitting reply. Please try again.");
+                }
+    
+                window.location.reload();
             }
-
-            window.location.reload();
-        }, 1000);
     }
 
     if (!veri) {

@@ -52,6 +52,8 @@ function StudentCourse() {
                 setCredits(courseData.credits);
                 setSchedule(courseData.schedule);
                 setError(null);
+
+                localStorage.setItem('course_name', courseData.name);
             } catch (err: any) {
                 setError("Failed loading courses.");
             } finally {
@@ -72,8 +74,8 @@ function StudentCourse() {
                 <Sidebar courseId={courseId} />
                 <div className="height-column"></div>
                 <div className="main-view">
-                    <div className="info-list">
-                        <div className="title">Course Information:</div>
+                    <div className="course-info">
+                    <div className="course-info-title">Course Information</div>
                         {loading ? (
                             <div className="spinner-container">
                                 {spinnerIcon()}
@@ -81,20 +83,21 @@ function StudentCourse() {
                         ) : error ? (
                             <div className="error-message">{error}</div>
                         ) : (
+                            
                             <>
-                                <div>
+                                <div className="course-info-item">
                                     <b>Course number:</b> {courseId}
                                 </div>
-                                <div>
+                                <div className="course-info-item">
                                     <b>Course name:</b> {name}
                                 </div>
-                                <div>
+                                <div className="course-info-item">
                                     <b>Language:</b> {language}
                                 </div>
-                                <div>
+                                <div className="course-info-item">
                                     <b>Credits:</b> {credits}
                                 </div>
-                                <div>
+                                <div className="course-info-item">
                                     <b>Schedule:</b> {schedule}
                                 </div>
                             </>

@@ -27,41 +27,40 @@ export function Topic() {
 
     useEffect(() => {
         async function fetchData() {
-            await verifyTeacherCourse(user.email, courseId, setVeri);
-            if (!veri) return;
-
-            const formData = new FormData();
-            formData.append('user', user.email);
-            formData.append('topic', topicId);
-            setTimeout(async () => {
-                try {
-                    await fetch('/cms/posts', {
-                        method: "POST",
-                        headers: {
-                            Accept: "application/json"
-                        },
-                        body: formData
-                    })
-                        .then(x => x.json())
-                        .then(x => {
-                            setNumPages(Math.ceil(x.length / postsPerPage));
-                            return x;
-                        })
-                        .then(x => x.sort((a, b) => (new Date(b.updated_at)).getTime() - (new Date(a.updated_at)).getTime()))
-                        .then(JSON.stringify)
-                        .then(setPostListString);
-                        setErrorMessage(null);
-                } catch (error) {
-                    setErrorMessage("Error loading posts. Please try again.");
-                } finally {
-                    setLoading(false);
-                }
-            }, 1000);
+            try {
+                const formData = new FormData();
+                formData.append('user', user.email);
+                formData.append('topic', topicId);
+    
+                const response = await fetch('/cms/posts', {
+                    method: "POST",
+                    headers: {
+                        Accept: "application/json"
+                    },
+                    body: formData
+                });
+    
+                const data = await response.json();
+    
+                setNumPages(Math.ceil(data.length / postsPerPage));
+    
+                const sortedData = data.sort(
+                    (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+                );
+    
+                setPostListString(JSON.stringify(sortedData));
+                setErrorMessage('');
+            } catch (error) {
+                setErrorMessage("Error loading posts. Please try again.");
+            } finally {
+                setLoading(false);
+            }
         }
-        if (user) {
-            fetchData();
-        }
-    }, [user]);
+    
+        fetchData(); // <-- Call the function
+    
+    }, [user.email, topicId]); // Add dependencies
+    
 
     if (!veri) {
         return <div>Authentication Error, please do not use URL for direct access.</div>;

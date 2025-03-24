@@ -65,7 +65,6 @@ export function UpdateAssignment() {
             formData.append('user', user.email);
             formData.append('assignment', assignmentId);
             try {
-                setTimeout(async () => {
                     let response = await fetch('/cms/assignments/read', {
                         method: "POST",
                         headers: {
@@ -114,7 +113,7 @@ export function UpdateAssignment() {
                     setWeight(+data['weight']);
                     getFile(firebase, setFiles, `/cms/assignment/file/read/${courseId}/assignment/${assignmentId}`);
                     setLoaded(true);
-                }, 1000);
+                
             } catch (error) {
                 setErrorMessage("Error loading assignment data.");
             }
@@ -155,7 +154,7 @@ export function UpdateAssignment() {
         } catch (ex) {
             console.log(ex);
         }
-        history.push('/content-management/course/' + courseId + '/assignments/')
+        history.push('/content-management/course/' + courseId + '/assignment/')
     }
 
     if (!veri) {

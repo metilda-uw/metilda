@@ -33,7 +33,7 @@ function GradesQuizQuestionSubmission() {
                 return
 
             try {
-                setTimeout(async () => {
+                async () => {
                     let formData = new FormData()
                     formData.append('user', user.email)
                     formData.append('question', questionId)
@@ -52,7 +52,7 @@ function GradesQuizQuestionSubmission() {
                     let temp = {}
                     await getFileSrcDict(firebase, temp, 'file', `/student-view/quiz/question/answer/file/read/${courseId}/quiz-question-answer/${questionId}/${studentId}`)
                     setFileSrc(temp['file'])
-                }, 1000)
+                }
             } catch (error) {
                 setErrorMessage("Error loading data.")
             }

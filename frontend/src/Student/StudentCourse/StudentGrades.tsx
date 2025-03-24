@@ -55,31 +55,43 @@ function StudentGrades() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                await fetch('/student-view/assignment_grades', {
+                const response = await fetch('/student-view/assignment_grades', {
                     method: "POST",
                     headers: {
                         Accept: "application/json"
                     },
                     body: formData
-                })
-                    .then(x => x.json())
-                    .then(x => x.sort((b, a) => { return (new Date(b.deadline)).getTime() - (new Date(a.deadline)).getTime() }))
-                    .then(JSON.stringify)
-                    .then(setAssignmentListString)
+                });
+                const data: { deadline: string }[] = await response.json();
+
+            
+                if (Object.keys(data).length === 0) {
+                    setErrorAssignments("No assignments found.");
+                    setLoadingAssignments(false);
+                }
+                else {
+                     // Explicitly type the data
+
+                    // Ensure that deadlines are properly parsed as Date objects before sorting
+                    const sortedData = data.sort((b, a) => {
+                        return new Date(b.deadline).getTime() - new Date(a.deadline).getTime();
+                    });
+
+                    setAssignmentListString(JSON.stringify(sortedData));
+                }
+
             } catch (error) {
+                console.error("Error fetching assignments:", error);
                 setErrorAssignments("Error loading assignments.");
+            } finally {
                 setLoadingAssignments(false);
             }
-            finally {
-                setLoadingAssignments(false);
-            }
+
 
             formData = new FormData();
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await new Promise(resolve => setTimeout(resolve, 2000));
                 await fetch('/student-view/quiz_grades', {
                     method: "POST",
                     headers: {
@@ -101,7 +113,6 @@ function StudentGrades() {
             formData.append('user', user.email);
             formData.append('course', courseId);
             try {
-                await new Promise(resolve => setTimeout(resolve, 2000)); // Simulating a 2-second delay
                 await fetch('/student-view/other_grades', {
                     method: "POST",
                     headers: {
@@ -191,7 +202,7 @@ function StudentGrades() {
                             {loadingAssignments ? (
                                 <div className="gradeSpinner"></div>
                             ) : errorAssignments ? (
-                                <p className="error-message">{errorAssignments}</p>
+                                <p>{errorAssignments}</p>
                             ) : (
                                 assignmentListString
                                     ? JSON.parse(assignmentListString).map((x) => (
@@ -234,7 +245,6 @@ function StudentGrades() {
                                                         <p>Mean: {x.average_score ? x.average_score : '-'}</p>
                                                         <p>High: {x.highest_score ? x.highest_score : '-'}</p>
                                                     </div>
-                                                    <div>Grade: {x.user_grade ? x.user_grade : "-"}</div>
                                                     <div>Percentile: {x.percentile ? x.percentile : "-"}</div>
                                                     <div>Weight: {x.weight ? x.weight : "-"}</div>
                                                 </div>
@@ -392,7 +402,6 @@ function StudentGrades() {
                     <div className="float-right">
                         <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)}>Create a gradable item</button>
                     </div>
-
                 </div>
             </div>
         </div>
