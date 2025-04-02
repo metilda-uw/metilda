@@ -13,12 +13,14 @@ class AudioImg extends Component {
             isLoaded: false,
             imgObj: null,
             verticalLines: this.props.verticalLines || [],
+            lineColor: this.props.lineColor || 'yellow',
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.metildaAudioAnalysisImageRef = React.createRef();
         this.isSelecting = false;
     }
+    
 
     timeCoordToImageCoord(t) {
         let startOffset = this.props.imageWidth * this.props.xminPerc;
@@ -259,7 +261,7 @@ class AudioImg extends Component {
         const imageElement = this.metildaAudioAnalysisImageRef.current;
         const imageHeight = imageElement ? imageElement.clientHeight : 0;
         const imageTop = imageElement ? imageElement.offsetTop : 0;
-
+        console.log(this.props.lineColor)
         if (typeOfBeat !== 'Rhythm') return null;
       
         return verticalLines.map((line) => (
@@ -272,7 +274,7 @@ class AudioImg extends Component {
               top: imageTop + 'px',
               height: imageHeight + 'px', // Adjust height as needed
               width: '2px', // Line thickness
-              background: 'yellow', // Line color
+              background: this.props.lineColor, // Line color
               cursor: 'ew-resize', // Cursor style
             }}
             onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging

@@ -33,6 +33,7 @@ import * as DEFAULT from "../constants/create";
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
+import ColorPicker from "./ColorPicker";
 
 export interface AudioAnalysisProps {
   speakerIndex: number;
@@ -103,6 +104,7 @@ interface State {
   draggingIndex: number;
   isDragging: boolean;
   verticalLines: VerticalLine[];
+  lineColor?: string;
 }
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
@@ -218,6 +220,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       isDragging: false,
       verticalLines: [],
       userEmail: '',
+      lineColor: "yellow",
     };
     this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -790,6 +793,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
+  setColor = (newColor: string) => {
+    this.setState({ lineColor: newColor });
+  };
+
   playBeats = () => {
     const { verticalLines, soundLength } = this.state;
 
@@ -1037,10 +1044,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                   typeOfBeat={this.state.typeOfBeat}
                   onVerticalLinesUpdate={this.handleVerticalLinesUpdate} // Pass callback
                   verticalLines={verticalLines}
+                  lineColor={this.state.lineColor}
                 />
               )}
             </div>
             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+            {typeOfBeat === 'Rhythm' && (<ColorPicker setColor={this.setColor}/> )}
             <div >
               <TargetPitchBar
                 letters={this.props.speakers}
