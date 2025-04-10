@@ -261,7 +261,6 @@ class AudioImg extends Component {
         const imageElement = this.metildaAudioAnalysisImageRef.current;
         const imageHeight = imageElement ? imageElement.clientHeight : 0;
         const imageTop = imageElement ? imageElement.offsetTop : 0;
-        console.log(this.props.lineColor)
         if (typeOfBeat !== 'Rhythm') return null;
       
         return verticalLines.map((line) => (
