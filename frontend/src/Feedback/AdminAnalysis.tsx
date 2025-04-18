@@ -7,8 +7,7 @@ import React, { useEffect, useState } from 'react'
 import { NotificationManager } from 'react-notifications' // notifications for API success/fail
 import axios from 'axios' // for requests to flask API
 import Select from '@material-ui/core/Select'
-import { MenuItem } from '@material-ui/core'
-import { Chart as ChartJS, Title, BarElement, Tooltip, Legend } from 'chart.js'
+import { MenuItem, FormControl, InputLabel, Box } from '@material-ui/core'
 import { Bar } from 'react-chartjs-2'
 
 const AdminAnalysis: React.FC = () => {
@@ -32,7 +31,7 @@ const AdminAnalysis: React.FC = () => {
       const resultArr = options.data.result
       let optStrings: string[] = []
       resultArr.forEach((arr) => {
-        optStrings.push(arr[1]) // grab string from array
+        optStrings.push(arr[1].charAt(0).toUpperCase() + arr[1].slice(1)) // grab string from array + capitalize
       })
       setAnswerLabels(optStrings)
     } else {
@@ -78,20 +77,42 @@ const AdminAnalysis: React.FC = () => {
     labels: answerLabels,
     datasets: [{
       label: "Data for selected question",
-      data: answerData
+      data: answerData,
+      backgroundColor: 'rgba(242, 94, 104, 0.8)'
     }]
   }
 
   // Might change it so that title dynamically shows selected question.
-  let answerChartOptions = {
-    title: {
-      display: true,
-      text: 'Question Responses.'
+  const answerChartOptions = {
+    legend: {
+      display: false
+    },
+    layout: {
+      padding: {
+        left: 250,
+        right: 250,
+        bottom: 250,
+      },
     },
     scales: {
       yAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Number of responses",
+          fontSize: 20
+        },
         ticks: {
           beginAtZero: true
+        }
+      }],
+      xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Option chosen by user",
+          fontSize: 20
+        },
+        ticks: {
+          fontSize: 15
         }
       }]
     }
@@ -130,16 +151,27 @@ const AdminAnalysis: React.FC = () => {
 
   return (
     <>
-      <h1>Available Questions:</h1>
-      <Select
-        label='hi'
-        id='question-selection'
-        onChange={handleQuestionSelect}
-      >
-        {questionList.map((qList) => (
-          <MenuItem value={qList.qid} key={qList.qid}>{qList.qName}</MenuItem>
-        ))}
-      </Select>
+      <h2>Feedback Statistics</h2>
+      <Box sx={{
+        justifyContent: 'center',
+        display: 'flex'
+      }}>
+        <Box sx={{ width: 500 }}>
+          <FormControl fullWidth>
+            <InputLabel id="question-select-label">Please select a feedback question:</InputLabel>
+            <Select
+              label='hi'
+              id='question-selection'
+              onChange={handleQuestionSelect}
+            >
+              {questionList.map((qList) => (
+                <MenuItem value={qList.qid} key={qList.qid}>{qList.qName}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+        </Box>
+      </Box>
       {generateQuestionBarGraph()}
     </>
   )
