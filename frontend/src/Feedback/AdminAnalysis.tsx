@@ -14,6 +14,7 @@ import { Bar } from 'react-chartjs-2'
 const AdminAnalysis: React.FC = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<string>('')
   const [questionList, setQuestionList] = useState<dropdownQuestion[]>(null)
+  const [answerLabels, setAnswerLabels] = useState<string[]>([])
 
   const handleQuestionSelect = (event) => {
     // see MUI v4 docs for explanation of how the select event value 
@@ -22,18 +23,39 @@ const AdminAnalysis: React.FC = () => {
     setSelectedQuestion(event.target.value as string)
   }
 
-  const answerLabels = [
-    'Strongly disagree',
-    'Somewhat disagree',
-    'Neither agree nor disagree',
-    'Somewhat agree',
-    'Strongly agree',
-    'Not applicable'
-  ]
+  // will use API to dynamically gather these in full implementation.
+  // const answerLabels = [
+  //   'Strongly disagree',
+  //   'Somewhat disagree',
+  //   'Neither agree nor disagree',
+  //   'Somewhat agree',
+  //   'Strongly agree',
+  //   'Not applicable'
+  // ]
+
+  const fetchAnswerLabels = async () => {
+    const options = await axios.get('/api/getOptions')
+    console.log(options)
+    //const processed = JSON.parse(options.data.result)
+    // processed.map((processed) => {
+    //   processed. as string; // get the name of the option
+    // })
+    if (options.data.result) {
+      const resultArr = options.data.result
+      let optStrings: string[] = []
+      resultArr.forEach((arr) => {
+        optStrings.push(arr[1]) // grab string from array
+      })
+      //console.log(processed)
+      setAnswerLabels(optStrings)
+    } else {
+      NotificationManager.error('No comments found')
+    }
+  }
 
   // would be dynamically created depending on selectedQuestion in actual 
   // implementation
-  const chartData = {
+  let chartData = {
     labels: answerLabels,
     datasets: [{
       label: "Test data",
@@ -42,7 +64,7 @@ const AdminAnalysis: React.FC = () => {
   }
 
   // Might change it so that title dynamically shows selected question.
-  const answerChartOptions = {
+  let answerChartOptions = {
     title: {
       display: true,
       text: 'Question Responses.'
@@ -65,6 +87,11 @@ const AdminAnalysis: React.FC = () => {
     // can't implement this yet,
     // focus on defining and establishing
     // frontend design/static elements first
+    const answers = 'Not implemented yet!'
+    // whether it will be getQuestions or getAllQuestions is a design 
+    // choice that hasn't been made yet.
+    //const questions = await axios.get('/api/getQuestions')
+    console.log(answers)
   }
 
   interface dropdownQuestion {
@@ -92,6 +119,7 @@ const AdminAnalysis: React.FC = () => {
 
   useEffect(() => {
     fetchFeedbackQuestions()
+    fetchAnswerLabels()
   }, [])
 
   if (questionList === null) {
