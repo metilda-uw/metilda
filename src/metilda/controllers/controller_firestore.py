@@ -367,6 +367,18 @@ def getAnswers():
         results = answer.execute_select_query(postgres_select_query, (filter_values,))
     return jsonify({'result': results})
 
+@app.route('/api/getAnswerCounts/<int:qid>', methods=["GET"])
+def getAnswerCounts(qid):
+    with Postgres() as answer:
+        postgres_select_query = """ 
+        SELECT o.oid, COUNT(a.oid) FROM public.options o
+        LEFT JOIN public.answers a ON a.oid = o.oid AND a.qid = %s
+        GROUP BY o.oid
+        ORDER BY o.oid ASC;
+        """
+        results = answer.execute_select_query(postgres_select_query, (qid,))
+    return jsonify({'result': results})
+
 # Add new Answer 
 @app.route('/api/addAnswer', methods=["POST"])
 def addAnswer():
