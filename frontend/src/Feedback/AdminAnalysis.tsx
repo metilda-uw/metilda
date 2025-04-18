@@ -12,7 +12,7 @@ import { Chart as ChartJS, Title, BarElement, Tooltip, Legend } from 'chart.js'
 import { Bar } from 'react-chartjs-2'
 
 const AdminAnalysis: React.FC = () => {
-  const [selectedQuestion, setSelectedQuestion] = useState<number>()
+  const [selectedQuestion, setSelectedQuestion] = useState<number>(null)
   const [questionList, setQuestionList] = useState<dropdownQuestion[]>(null)
   const [answerLabels, setAnswerLabels] = useState<string[]>(null)
   const [answerData, setAnswerData] = useState<number[]>([])
@@ -58,8 +58,18 @@ const AdminAnalysis: React.FC = () => {
     }
   }
 
+  // Fetch the number of answers for each option
   const fetchAnswerCounts = async () => {
-    // need to implement API endpoint
+    const counts = await axios.get(`/api/getAnswerCounts/${selectedQuestion}`)
+    console.log(counts)
+    if (counts.data.result) {
+      const resultArr = counts.data.result
+      let countArr: number[] = []
+      resultArr.forEach((arr) => {
+        countArr.push(arr[1])
+      })
+      setAnswerData(countArr)
+    }
   }
 
   // would be dynamically created depending on selectedQuestion in actual 
@@ -68,8 +78,7 @@ const AdminAnalysis: React.FC = () => {
     labels: answerLabels,
     datasets: [{
       label: "Data for selected question",
-      data: [1, 2, 3, 4, 5, 6]
-      // data: answerData
+      data: answerData
     }]
   }
 
@@ -98,10 +107,19 @@ const AdminAnalysis: React.FC = () => {
     qid: number
   }
 
+  // useEffect for initial page setup
   useEffect(() => {
     fetchQuestions()
     fetchAnswerLabels()
   }, [])
+
+  // useEffect for grabbing answer counts 
+  // after a question is selected
+  useEffect(() => {
+    if (selectedQuestion) {
+      fetchAnswerCounts()
+    }
+  }, [selectedQuestion])
 
   if (questionList === null ||
     answerLabels === null ||
