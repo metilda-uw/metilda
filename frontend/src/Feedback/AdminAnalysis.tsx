@@ -3,23 +3,23 @@
   * by users.
   */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { NotificationManager } from 'react-notifications' // notifications for API success/fail
 import axios from 'axios' // for requests to flask API
 import Select from '@material-ui/core/Select'
 import { MenuItem, FormControl, InputLabel, Box } from '@material-ui/core'
-import { Bar } from 'react-chartjs-2'
+import { Bar, HorizontalBar } from 'react-chartjs-2'
+
+export interface dropdownQuestion {
+  qName: string
+  qid: number
+}
 
 const AdminAnalysis: React.FC = () => {
   const [selectedQuestion, setSelectedQuestion] = useState<number>(null)
   const [questionList, setQuestionList] = useState<dropdownQuestion[]>(null)
   const [answerLabels, setAnswerLabels] = useState<string[]>(null)
   const [answerData, setAnswerData] = useState<number[]>([])
-
-  interface dropdownQuestion {
-    qName: string
-    qid: number
-  }
 
   const handleQuestionSelect = (event) => {
     // see MUI v4 docs for explanation of how the select event value 
@@ -28,7 +28,7 @@ const AdminAnalysis: React.FC = () => {
     setSelectedQuestion(event.target.value as number)
   }
 
-  // dynamically create answer labels
+  // dynamically create answer labels for distribution chart
   const fetchAnswerLabels = async () => {
     try {
       const options = await axios.get('/api/getOptions')
@@ -48,7 +48,7 @@ const AdminAnalysis: React.FC = () => {
     }
   }
 
-  // gets all questions and stores them as dropdown questions.
+  // gets all questions and stores them as dropdown questions
   const fetchQuestions = async () => {
     // whether it will be getQuestions or getAllQuestions is a design 
     // choice that hasn't been made yet.
@@ -90,7 +90,7 @@ const AdminAnalysis: React.FC = () => {
 
   // would be dynamically created depending on selectedQuestion in actual 
   // implementation
-  let chartData = {
+  let answerChartData = {
     labels: answerLabels,
     datasets: [{
       label: "Data for selected question",
@@ -108,7 +108,6 @@ const AdminAnalysis: React.FC = () => {
       padding: {
         left: 250,
         right: 250,
-        bottom: 250,
       },
     },
     scales: {
@@ -135,8 +134,54 @@ const AdminAnalysis: React.FC = () => {
     }
   }
 
-  const generateQuestionBarGraph = () => {
-    return <Bar options={answerChartOptions} data={chartData}></Bar>
+  let avgChartData = {
+    // ternary operator to prevent operation on null questionList when 
+    // waiting for fetch
+    labels: questionList ? questionList.map(question => question.qName) : [],
+    datasets: [{
+      label: "test data",
+      data: [1, 2, 3, 4],
+      backgroundColor: 'rgba(242, 94, 104, 0.8)'
+    }]
+  }
+
+  const avgChartOptions = {
+    layout: {
+      padding: {
+        left: 250,
+        right: 250,
+      }
+    },
+    scales: {
+      xAxes: [{
+        ticks: {
+          beginAtZero: true
+        }
+      }],
+      yAxes: [{
+        barPercentage: 0.9,
+      }]
+    },
+    maintainAspectRatio: false,
+  }
+
+  function QuestionBarGraph({ answerChartOptions, answerChartData }) {
+    return <Bar options={answerChartOptions} data={answerChartData}></Bar>
+  }
+
+  function AvgResponseGraph({ setSelectedQuestion, avgChartOptions, avgChartData }) {
+    // set selected question to bar that is clicked on
+    const onClick = (element) => {
+      if (element.length > 0) {
+        let index = element[0]._index;
+        setSelectedQuestion(questionList[index].qid)
+      }
+    }
+    return (
+      <div style={{ height: '700px' }}>
+        <HorizontalBar options={avgChartOptions} data={avgChartData} onElementsClick={onClick}></HorizontalBar>
+      </div>
+    )
   }
 
   // useEffect for initial page setup
@@ -148,7 +193,7 @@ const AdminAnalysis: React.FC = () => {
   // useEffect for grabbing answer counts 
   // after a question is selected
   useEffect(() => {
-    if (selectedQuestion) {
+    if (selectedQuestion !== null) {
       fetchAnswerCounts()
     }
   }, [selectedQuestion])
@@ -162,6 +207,7 @@ const AdminAnalysis: React.FC = () => {
   return (
     <>
       <h2>Feedback Statistics</h2>
+      <AvgResponseGraph setSelectedQuestion={setSelectedQuestion} avgChartData={avgChartData} avgChartOptions={avgChartOptions}></AvgResponseGraph>
       <Box sx={{
         justifyContent: 'center',
         display: 'flex'
@@ -173,6 +219,7 @@ const AdminAnalysis: React.FC = () => {
               label='hi'
               id='question-selection'
               onChange={handleQuestionSelect}
+              value={selectedQuestion ? selectedQuestion : ''} // show selected question if not null
             >
               {questionList.map((qList) => (
                 <MenuItem value={qList.qid} key={qList.qid}>{qList.qName}</MenuItem>
@@ -181,7 +228,7 @@ const AdminAnalysis: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      {generateQuestionBarGraph()}
+      <QuestionBarGraph answerChartData={answerChartData} answerChartOptions={answerChartOptions}></QuestionBarGraph>
     </>
   )
 }
