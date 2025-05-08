@@ -105,13 +105,15 @@ const AdminAnalysis: React.FC = () => {
 
   // Might change it so that title dynamically shows selected question.
   const answerChartOptions = {
+    responsive: true,
     legend: {
       display: false
     },
     layout: {
       padding: {
-        left: 250,
-        right: 250,
+        // left: 250,
+        // right: 250,
+        top: 25
       },
     },
     scales: {
@@ -150,14 +152,24 @@ const AdminAnalysis: React.FC = () => {
   }
 
   const avgChartOptions = {
+    responsive: true,
+    legend: {
+      display: false
+    },
     layout: {
       padding: {
-        left: 250,
-        right: 250,
+        // left: 250,
+        right: 25,
+        top: 25
       }
     },
     scales: {
       xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: "Total number of responses",
+          fontSize: 20
+        },
         ticks: {
           beginAtZero: true
         }
@@ -166,11 +178,14 @@ const AdminAnalysis: React.FC = () => {
         barPercentage: 0.9,
       }]
     },
-    maintainAspectRatio: false,
   }
 
   function QuestionBarGraph() {
-    return <Bar options={answerChartOptions} data={answerChartData}></Bar>
+    return (
+      <div style={{ width: '50%' }}>
+        <Bar options={answerChartOptions} data={answerChartData}></Bar>
+      </div>
+    )
   }
 
   function AvgResponseGraph() {
@@ -182,7 +197,7 @@ const AdminAnalysis: React.FC = () => {
       }
     }
     return (
-      <div style={{ height: '700px' }}>
+      <div style={{ width: '50%' }}>
         <HorizontalBar options={avgChartOptions} data={avgChartData} onElementsClick={onClick}></HorizontalBar>
       </div>
     )
@@ -211,7 +226,6 @@ const AdminAnalysis: React.FC = () => {
   return (
     <>
       <h2>Feedback Statistics</h2>
-      {AvgResponseGraph()}
       <Box sx={{
         justifyContent: 'center',
         display: 'flex'
@@ -232,7 +246,10 @@ const AdminAnalysis: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      {QuestionBarGraph()}
+      <div style={{ display: 'flex' }}>
+        {AvgResponseGraph()}
+        {QuestionBarGraph()}
+      </div>
     </>
   )
 }
