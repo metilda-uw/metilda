@@ -20,6 +20,7 @@ const AdminAnalysis: React.FC = () => {
   const [questionList, setQuestionList] = useState<dropdownQuestion[]>(null)
   const [answerLabels, setAnswerLabels] = useState<string[]>(null)
   const [answerData, setAnswerData] = useState<number[]>([])
+  const [totalAnswers, setTotalAnswers] = useState<number[]>([])
 
   const handleQuestionSelect = (event) => {
     // see MUI v4 docs for explanation of how the select event value 
@@ -53,14 +54,17 @@ const AdminAnalysis: React.FC = () => {
     // whether it will be getQuestions or getAllQuestions is a design 
     // choice that hasn't been made yet.
     try {
-      const questions = await axios.get('/api/getQuestions')
+      const questions = await axios.get('/api/getQuestionAnswerCounts')
       if (questions.data.result) {
         const resultArr = questions.data.result
         let ddQuestions: dropdownQuestion[] = []
+        let counts: number[] = []
         resultArr.forEach((arr) => {
           ddQuestions.push({ qName: arr[1], qid: arr[0] }) // grab string from array
+          counts.push(arr[2]) // grab total answer count per question
         })
         setQuestionList(ddQuestions)
+        setTotalAnswers(counts)
         NotificationManager.success('Question list fetched successfully.');
       } else {
         NotificationManager.error('No questions found')
@@ -139,8 +143,8 @@ const AdminAnalysis: React.FC = () => {
     // waiting for fetch
     labels: questionList ? questionList.map(question => question.qName) : [],
     datasets: [{
-      label: "test data",
-      data: [1, 2, 3, 4],
+      label: "Total Answer Count for Question",
+      data: totalAnswers,
       backgroundColor: 'rgba(242, 94, 104, 0.8)'
     }]
   }
@@ -165,11 +169,11 @@ const AdminAnalysis: React.FC = () => {
     maintainAspectRatio: false,
   }
 
-  function QuestionBarGraph({ answerChartOptions, answerChartData }) {
+  function QuestionBarGraph() {
     return <Bar options={answerChartOptions} data={answerChartData}></Bar>
   }
 
-  function AvgResponseGraph({ setSelectedQuestion, avgChartOptions, avgChartData }) {
+  function AvgResponseGraph() {
     // set selected question to bar that is clicked on
     const onClick = (element) => {
       if (element.length > 0) {
@@ -207,7 +211,7 @@ const AdminAnalysis: React.FC = () => {
   return (
     <>
       <h2>Feedback Statistics</h2>
-      <AvgResponseGraph setSelectedQuestion={setSelectedQuestion} avgChartData={avgChartData} avgChartOptions={avgChartOptions}></AvgResponseGraph>
+      {AvgResponseGraph()}
       <Box sx={{
         justifyContent: 'center',
         display: 'flex'
@@ -228,7 +232,7 @@ const AdminAnalysis: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      <QuestionBarGraph answerChartData={answerChartData} answerChartOptions={answerChartOptions}></QuestionBarGraph>
+      {QuestionBarGraph()}
     </>
   )
 }
