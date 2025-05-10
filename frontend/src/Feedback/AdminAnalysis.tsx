@@ -23,6 +23,8 @@ const AdminAnalysis: React.FC = () => {
   const [totalAnswers, setTotalAnswers] = useState<number[]>([])
   const [distribution, setDistribution] = useState(null)
 
+  const rating: Map<number, number> = new Map([[100, 1], [101, 2], [102, 3], [103, 4], [104, 5]])
+
   const handleQuestionSelect = (event) => {
     // see MUI v4 docs for explanation of how the select event value 
     // gets passed and is handled here:
@@ -136,11 +138,44 @@ const AdminAnalysis: React.FC = () => {
     // ternary operator to prevent operation on null questionList when 
     // waiting for fetch
     labels: questionList ? questionList.map(question => question.qName) : [],
-    datasets: [{
-      label: "Total Answer Count for Question",
-      data: totalAnswers,
-      backgroundColor: 'rgba(242, 94, 104, 0.8)'
-    }]
+    datasets: [
+      {
+        xAxisID: 'avg-axis',
+        label: "Average response for Question",
+        backgroundColor: 'rgba(42,183,169,0.8)',
+        data: distribution ? (() => {
+          let prevAvgCalced = 0
+          let vals = distribution.map(c => {
+            // c is an individual array from distribution made up of qid,
+            // oid, and count
+            if (c[0] != prevAvgCalced) { // if qid is not prev calced
+              let matching = distribution.filter(arr => arr[0] === c[0])
+              let total = 0
+              let count = 0
+              // hard coded disregard of n/a answer
+              matching.forEach(arr => {
+                if (arr[1] !== 105) {
+                  total += (rating.get(arr[1]) * arr[2])
+                  count += arr[2]
+                }
+              })
+              prevAvgCalced = c[0]
+              if (count === 0) { return 0 }
+              return (total / count).toFixed(2)
+            } else {
+              return 100000000
+            }
+          })
+          return vals.filter(val => { return val !== 100000000 })
+        })() : [1, 2, 3]
+      },
+      {
+        xAxisID: 'total-axis',
+        label: "Total Answer Count for Question",
+        data: totalAnswers,
+        backgroundColor: 'rgba(242, 94, 104, 0.8)'
+      }
+    ]
   }
 
   const avgChartOptions = {
@@ -155,16 +190,32 @@ const AdminAnalysis: React.FC = () => {
       }
     },
     scales: {
-      xAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: "Total number of responses",
-          fontSize: 20
+      xAxes: [
+        {
+          id: 'total-axis',
+          scaleLabel: {
+            display: true,
+            labelString: "Total number of responses",
+            fontSize: 20
+          },
+          ticks: {
+            beginAtZero: true,
+          }
         },
-        ticks: {
-          beginAtZero: true
+        {
+          id: 'avg-axis',
+          position: 'top',
+          type: 'linear',
+          scaleLabel: {
+            display: true,
+            labelString: "Average rating out of 5",
+            fontSize: 20
+          },
+          ticks: {
+            beginAtZero: true,
+          }
         }
-      }],
+      ],
       yAxes: [{
         barPercentage: 0.9,
       }]
