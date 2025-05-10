@@ -21,6 +21,7 @@ const AdminAnalysis: React.FC = () => {
   const [answerLabels, setAnswerLabels] = useState<string[]>(null)
   const [answerData, setAnswerData] = useState<number[]>([])
   const [totalAnswers, setTotalAnswers] = useState<number[]>([])
+  const [distribution, setDistribution] = useState(null)
 
   const handleQuestionSelect = (event) => {
     // see MUI v4 docs for explanation of how the select event value 
@@ -51,8 +52,6 @@ const AdminAnalysis: React.FC = () => {
 
   // gets all questions and stores them as dropdown questions
   const fetchQuestions = async () => {
-    // whether it will be getQuestions or getAllQuestions is a design 
-    // choice that hasn't been made yet.
     try {
       const questions = await axios.get('/api/getQuestionAnswerCounts')
       if (questions.data.result) {
@@ -77,14 +76,9 @@ const AdminAnalysis: React.FC = () => {
   // Fetch the number of answers for each option
   const fetchAnswerCounts = async () => {
     try {
-      const counts = await axios.get(`/api/getAnswerCounts/${selectedQuestion}`)
+      const counts = await axios.get(`/api/getAnswerCounts`)
       if (counts.data.result) {
-        const resultArr = counts.data.result
-        let countArr: number[] = []
-        resultArr.forEach((arr) => {
-          countArr.push(arr[1])
-        })
-        setAnswerData(countArr)
+        setDistribution(counts.data.result)
         NotificationManager.success('Answer counts fetched successfully.');
       }
     } catch (error) {
@@ -111,8 +105,6 @@ const AdminAnalysis: React.FC = () => {
     },
     layout: {
       padding: {
-        // left: 250,
-        // right: 250,
         top: 25
       },
     },
@@ -158,7 +150,6 @@ const AdminAnalysis: React.FC = () => {
     },
     layout: {
       padding: {
-        // left: 250,
         right: 25,
         top: 25
       }
@@ -207,13 +198,15 @@ const AdminAnalysis: React.FC = () => {
   useEffect(() => {
     fetchQuestions()
     fetchAnswerLabels()
+    fetchAnswerCounts()
   }, [])
 
   // useEffect for grabbing answer counts 
   // after a question is selected
   useEffect(() => {
     if (selectedQuestion !== null) {
-      fetchAnswerCounts()
+      let selectedDist = distribution.filter(arr => arr[0] === selectedQuestion)
+      setAnswerData(selectedDist.map(arr => arr[2])) // create array only of the relevant counts
     }
   }, [selectedQuestion])
 
