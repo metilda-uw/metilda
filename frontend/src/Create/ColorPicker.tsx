@@ -1,7 +1,6 @@
 import React from 'react';
 
 interface ColorPickerProps {
-    // onLineColorChange : any,
     setColor: (color:string) => void;
 }
 

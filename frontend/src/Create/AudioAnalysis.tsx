@@ -864,9 +864,21 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const tapGainNode = audioContext.createGain();
     tapGainNode.connect(audioContext.destination);
 
+    // const tapTimes = verticalLines.map((line) => {
+    //   const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
+    //   return time;
+    // });
+
     const tapTimes = verticalLines.map((line) => {
+      const delay = 1;
+      // Map the x-coordinate to a time in the audio
       const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      return time;
+      if (time > 5) {
+        return time - 4 - delay
+      }
+      else {
+        return time - delay
+      }
     });
 
     audioElement.currentTime = 0;
@@ -1049,7 +1061,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               )}
             </div>
             {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
-            {typeOfBeat === 'Rhythm' && (<ColorPicker setColor={this.setColor}/> )}
+            {/* {typeOfBeat === 'Rhythm' && (<ColorPicker setColor={this.setColor}/> )} */}
             <div >
               <TargetPitchBar
                 letters={this.props.speakers}
