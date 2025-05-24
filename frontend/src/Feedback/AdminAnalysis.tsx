@@ -169,15 +169,20 @@ const AdminAnalysis: React.FC = () => {
 
   function QuestionStats() {
     if (selectedQuestion !== null) {
+      const aresult = answerAverages.find((answ) => answ.qid === selectedQuestion)
       return (
         <Box sx={{
           justifyContent: 'center',
           display: 'flex',
         }}>
           <Box sx={{ paddingRight: '5vw' }}>
-            <h2 >Total responses: {answerTotals.find((answ) => answ.qid === selectedQuestion).qAnswerTotal}</h2>
+            <h2>Total responses: {answerTotals.find((answ) => answ.qid === selectedQuestion).qAnswerTotal}</h2>
           </Box>
-          <h2>Average response: {answerAverages.find((answ) => answ.qid === selectedQuestion).qAvg}</h2>
+          {aresult !== undefined ? (
+            <h2>Average response: {aresult.qAvg}</h2>
+          ) : (
+            <h2>Average response: {"N/A"}</h2>
+          )}
         </Box>
       )
     } else { return null }
