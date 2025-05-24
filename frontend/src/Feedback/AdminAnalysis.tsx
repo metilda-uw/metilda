@@ -9,9 +9,20 @@ import axios from 'axios' // for requests to flask API
 import Select from '@material-ui/core/Select'
 import { MenuItem, FormControl, InputLabel, Box } from '@material-ui/core'
 import { Bar, HorizontalBar } from 'react-chartjs-2'
+import { avgChartOptions, answerChartOptions } from './AdminAnalysisCharts'
 
 export interface dropdownQuestion {
   qName: string
+  qid: number
+}
+
+export interface answerAverage {
+  qAvg: number
+  qid: number
+}
+
+export interface answerTotal {
+  qAnswerTotal: number
   qid: number
 }
 
@@ -20,17 +31,11 @@ const AdminAnalysis: React.FC = () => {
   const [questionList, setQuestionList] = useState<dropdownQuestion[]>(null)
   const [answerLabels, setAnswerLabels] = useState<string[]>(null)
   const [answerData, setAnswerData] = useState<number[]>([])
-  const [totalAnswers, setTotalAnswers] = useState<number[]>([])
+  const [answerTotals, setAnswerTotals] = useState<answerTotal[]>([])
+  const [answerAverages, setAnswerAverages] = useState<answerAverage[]>([])
   const [distribution, setDistribution] = useState(null)
 
   const rating: Map<number, number> = new Map([[100, 1], [101, 2], [102, 3], [103, 4], [104, 5]])
-
-  const handleQuestionSelect = (event) => {
-    // see MUI v4 docs for explanation of how the select event value 
-    // gets passed and is handled here:
-    // https://v4.mui.com/api/select/
-    setSelectedQuestion(event.target.value as number)
-  }
 
   // dynamically create answer labels for distribution chart
   const fetchAnswerLabels = async () => {
@@ -59,13 +64,13 @@ const AdminAnalysis: React.FC = () => {
       if (questions.data.result) {
         const resultArr = questions.data.result
         let ddQuestions: dropdownQuestion[] = []
-        let counts: number[] = []
+        let counts: answerTotal[] = []
         resultArr.forEach((arr) => {
           ddQuestions.push({ qName: arr[1], qid: arr[0] }) // grab string from array
-          counts.push(arr[2]) // grab total answer count per question
+          counts.push({ qAnswerTotal: arr[2], qid: arr[0] }) // grab total answer count per question
         })
         setQuestionList(ddQuestions)
-        setTotalAnswers(counts)
+        setAnswerTotals(counts)
         NotificationManager.success('Question list fetched successfully.');
       } else {
         NotificationManager.error('No questions found')
@@ -88,8 +93,32 @@ const AdminAnalysis: React.FC = () => {
     }
   }
 
-  // would be dynamically created depending on selectedQuestion in actual 
-  // implementation
+  const calculateAverages = () => {
+    let prevAvgCalced = 0
+    let vals = distribution.map(c => {
+      // c is an individual array from distribution made up of qid,
+      // oid, and count
+      if (c[0] != prevAvgCalced) { // if qid is not prev calced
+        let matching = distribution.filter(arr => arr[0] === c[0])
+        let total = 0
+        let count = 0
+        // hard coded disregard of n/a answer
+        matching.forEach(arr => {
+          if (arr[1] !== 105) {
+            total += (rating.get(arr[1]) * arr[2])
+            count += arr[2]
+          }
+        })
+        prevAvgCalced = c[0]
+        if (count === 0) { return 0 }
+        return { qAvg: (total / count).toFixed(2), qid: c[0] }
+      } else {
+        return { qAvg: 100000000, qid: c[0] }
+      }
+    })
+    setAnswerAverages(vals.filter(val => { return val.qAvg !== 100000000 }))
+  }
+
   let answerChartData = {
     labels: answerLabels,
     datasets: [{
@@ -99,134 +128,27 @@ const AdminAnalysis: React.FC = () => {
     }]
   }
 
-  // Might change it so that title dynamically shows selected question.
-  const answerChartOptions = {
-    responsive: true,
-    legend: {
-      display: false
-    },
-    layout: {
-      padding: {
-        top: 25
-      },
-    },
-    scales: {
-      yAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: "Number of responses",
-          fontSize: 20
-        },
-        ticks: {
-          beginAtZero: true
-        }
-      }],
-      xAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: "Option chosen by user",
-          fontSize: 20
-        },
-        ticks: {
-          fontSize: 15
-        }
-      }]
-    }
-  }
-
   let avgChartData = {
-    // ternary operator to prevent operation on null questionList when 
-    // waiting for fetch
     labels: questionList ? questionList.map(question => question.qName) : [],
     datasets: [
       {
         xAxisID: 'avg-axis',
         label: "Average response for Question",
         backgroundColor: 'rgba(42,183,169,0.8)',
-        data: distribution ? (() => {
-          let prevAvgCalced = 0
-          let vals = distribution.map(c => {
-            // c is an individual array from distribution made up of qid,
-            // oid, and count
-            if (c[0] != prevAvgCalced) { // if qid is not prev calced
-              let matching = distribution.filter(arr => arr[0] === c[0])
-              let total = 0
-              let count = 0
-              // hard coded disregard of n/a answer
-              matching.forEach(arr => {
-                if (arr[1] !== 105) {
-                  total += (rating.get(arr[1]) * arr[2])
-                  count += arr[2]
-                }
-              })
-              prevAvgCalced = c[0]
-              if (count === 0) { return 0 }
-              return (total / count).toFixed(2)
-            } else {
-              return 100000000
-            }
-          })
-          return vals.filter(val => { return val !== 100000000 })
-        })() : [1, 2, 3]
+        data: answerAverages.map(answer => answer.qAvg)
       },
       {
         xAxisID: 'total-axis',
         label: "Total Answer Count for Question",
-        data: totalAnswers,
+        data: answerTotals.map(answer => answer.qAnswerTotal),
         backgroundColor: 'rgba(242, 94, 104, 0.8)'
       }
     ]
   }
 
-  const avgChartOptions = {
-    responsive: true,
-    legend: {
-      display: false
-    },
-    layout: {
-      padding: {
-        right: 25,
-        top: 25
-      }
-    },
-    scales: {
-      xAxes: [
-        {
-          id: 'total-axis',
-          scaleLabel: {
-            display: true,
-            labelString: "Total number of responses",
-            fontSize: 20
-          },
-          ticks: {
-            beginAtZero: true,
-          }
-        },
-        {
-          id: 'avg-axis',
-          position: 'top',
-          type: 'linear',
-          scaleLabel: {
-            display: true,
-            labelString: "Average rating out of 5",
-            fontSize: 20
-          },
-          ticks: {
-            beginAtZero: true,
-          }
-        }
-      ],
-      yAxes: [{
-        barPercentage: 0.9,
-      }]
-    },
-  }
-
   function QuestionBarGraph() {
     return (
-      <div style={{ width: '50%' }}>
-        <Bar options={answerChartOptions} data={answerChartData}></Bar>
-      </div>
+      <Bar options={answerChartOptions} data={answerChartData}></Bar>
     )
   }
 
@@ -245,6 +167,29 @@ const AdminAnalysis: React.FC = () => {
     )
   }
 
+  function QuestionStats() {
+    if (selectedQuestion !== null) {
+      return (
+        <Box sx={{
+          justifyContent: 'center',
+          display: 'flex',
+        }}>
+          <Box sx={{ paddingRight: '5vw' }}>
+            <h2 >Total responses: {answerTotals.find((answ) => answ.qid === selectedQuestion).qAnswerTotal}</h2>
+          </Box>
+          <h2>Average response: {answerAverages.find((answ) => answ.qid === selectedQuestion).qAvg}</h2>
+        </Box>
+      )
+    } else { return null }
+  }
+
+  const handleQuestionSelect = (event) => {
+    // see MUI v4 docs for explanation of how the select event value 
+    // gets passed and is handled here:
+    // https://v4.mui.com/api/select/
+    setSelectedQuestion(event.target.value as number)
+  }
+
   // useEffect for initial page setup
   useEffect(() => {
     fetchQuestions()
@@ -260,6 +205,13 @@ const AdminAnalysis: React.FC = () => {
       setAnswerData(selectedDist.map(arr => arr[2])) // create array only of the relevant counts
     }
   }, [selectedQuestion])
+
+  // caclulate all the averages once distributions are saved
+  useEffect(() => {
+    if (distribution !== null) {
+      calculateAverages()
+    }
+  }, [distribution])
 
   if (questionList === null ||
     answerLabels === null ||
@@ -290,10 +242,24 @@ const AdminAnalysis: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      <div style={{ display: 'flex' }}>
-        {AvgResponseGraph()}
-        {QuestionBarGraph()}
-      </div>
+      {(window.innerWidth < window.innerHeight && answerTotals.length > 0) ? (
+        <>
+          <QuestionStats />
+          <Box sx={{
+            justifyContent: 'center',
+            display: 'flex'
+          }}>
+            {QuestionBarGraph()}
+          </Box>
+        </>
+      ) : (
+        <div style={{ display: 'flex' }}>
+          {AvgResponseGraph()}
+          <div style={{ width: '50%' }}>
+            {QuestionBarGraph()}
+          </div>
+        </div>
+      )}
     </>
   )
 }
