@@ -34,6 +34,7 @@ const AdminAnalysis: React.FC = () => {
   const [answerTotals, setAnswerTotals] = useState<answerTotal[]>([])
   const [answerAverages, setAnswerAverages] = useState<answerAverage[]>([])
   const [distribution, setDistribution] = useState(null)
+  const [screenWidth, setScreenWidth] = useState<number>(window.innerWidth)
 
   const rating: Map<number, number> = new Map([[100, 1], [101, 2], [102, 3], [103, 4], [104, 5]])
 
@@ -218,6 +219,11 @@ const AdminAnalysis: React.FC = () => {
     }
   }, [distribution])
 
+  useEffect(() => {
+    const resizeHandler = () => setScreenWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
+
   if (questionList === null ||
     answerLabels === null ||
     answerData === null) {
@@ -247,7 +253,7 @@ const AdminAnalysis: React.FC = () => {
           </FormControl>
         </Box>
       </Box>
-      {(window.innerWidth < window.innerHeight && answerTotals.length > 0) ? (
+      {(screenWidth < window.innerHeight && answerTotals.length > 0) ? (
         <>
           <QuestionStats />
           <Box sx={{
