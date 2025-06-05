@@ -38,6 +38,7 @@ import { timeStamp } from "console";
 import { AppActions } from "../store/appActions";
 import * as constants from "../constants";
 import { canUserVisitCreatePitchArtpPage } from './ImportUtils';
+import Box from "@material-ui/core/Box";
 
 
 
@@ -101,7 +102,7 @@ interface State {
   parentDocumentId: string;
   verticalLines: VerticalLine[];
   audioUrl: string; // New state for the audio URL
-
+  windowWidth: number;
 }
 
 class CreatePitchArt extends React.Component<
@@ -155,6 +156,7 @@ class CreatePitchArt extends React.Component<
       parentDocumentId: '',
       verticalLines: [],
       audioUrl: '',
+      windowWidth: window.innerWidth,
     };
     this.loadPitchArtVersions = this.loadPitchArtVersions.bind(this);
     this.removeVersionsModal = this.removeVersionsModal.bind(this);
@@ -174,6 +176,8 @@ class CreatePitchArt extends React.Component<
       });
       this.getUserFiles();
     }
+    // event listener for window resize
+    window.addEventListener("resize", this.setWindowWidth)
   }
   componentDidUpdate(prevProps) {
 
@@ -189,6 +193,10 @@ class CreatePitchArt extends React.Component<
       // URL parameters have changed, trigger a reload
       this.listenForData(newType, newId);
     }
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   setAudioUrl = (url: string) => {
@@ -559,33 +567,37 @@ class CreatePitchArt extends React.Component<
   }
 
   renderPageOptions() {
+    const { windowWidth } = this.state
+    let classNameParams = "page-options waves-effect waves-light btn globalbtn";
+    if ((windowWidth / window.innerHeight) < 1.1) {
+      classNameParams = "waves-effect waves-light btn globalbtn";
+    }
     if (this.props.match.params.type === "share") {
       return (
-        <button className="page-options waves-effect waves-light btn globalbtn"
-          onClick={this.deleteSharedPage}>
-
-          <i className="material-icons right">person_add</i>
-          {this.isOwner()
-            ? "Stop Sharing"
-            : "Leave Page"
-          }
-        </button>
+        <>
+          <button className={classNameParams}
+            onClick={this.deleteSharedPage}>
+            <i className="material-icons right">person_add</i>
+            {this.isOwner()
+              ? "Stop Sharing"
+              : "Leave Page"
+            }
+          </button>
+        </>
       );
     } else if (this.props.match.params.type !== undefined) {
       //No Options
     } else {
       return (
-        <div>
-
-
-          <button className="page-options waves-effect waves-light btn globalbtn"
+        <>
+          <button className={classNameParams}
             onClick={this.createSharedPage}>
             <i className="material-icons left">info</i>
             <i className="material-icons right">person_add</i>
             {"Share Page"}
           </button>
           <p className="page-options-tooltiptext"> to share file with other MeTILDA users</p>
-        </div>
+        </>
       );
     }
   }
@@ -619,23 +631,30 @@ class CreatePitchArt extends React.Component<
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, windowWidth } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
     const callbacks = { listenForData: this.listenForData.bind(this) };
 
+    let cloudUploadButtonParams = "UploadFile waves-effect waves-light btn globalbtn"
+    let versionButtonParams = "versions waves-effect waves-light btn globalbtn"
+    if ((windowWidth / window.innerHeight) < 1.1) { // need to come up with a better check
+      cloudUploadButtonParams = "waves-effect waves-light btn globalbtn"
+      versionButtonParams = "waves-effect waves-light btn globalbtn"
+    }
+
     return (
       <div>
         <Header />
         {isLoading && spinner()}
-        <div className="CreatePitchArt">
+        <Box style={{ display: "flex", paddingLeft: "5%", paddingRight: "5%" }}>
           <ReactFileReader
             fileTypes={[".wav"]}
             multipleFiles={false}
             handleFiles={this.fileSelected}
           >
-            <button className="UploadFile waves-effect waves-light btn globalbtn">
+            <button className={cloudUploadButtonParams}>
               <i className="material-icons left">info</i>
               <i className="material-icons right">cloud_upload</i>
               Upload File to cloud
@@ -644,7 +663,7 @@ class CreatePitchArt extends React.Component<
           </ReactFileReader>
 
           <div className="pitchArt-version">
-            <button className="versions waves-effect waves-light btn globalbtn" onClick={this.loadPitchArtVersions}>
+            <button className={versionButtonParams} onClick={this.loadPitchArtVersions}>
               <i className="material-icons left">info</i>
               <i className="material-icons right">history</i>
               Versions
@@ -654,7 +673,8 @@ class CreatePitchArt extends React.Component<
 
           <div className="version-overlay"></div>
           <div>{this.renderPageOptions()}</div>
-
+        </Box>
+        <div className="CreatePitchArt">
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
               <div id="metilda-drop-down-back-button">
