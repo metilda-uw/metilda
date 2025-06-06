@@ -47,9 +47,7 @@ class PlayerBar extends React.Component<Props> {
 
                         </div>
                         <div className="metilda-audio-analysis-volume-control-col-2 vert-center m-a-8">
-                            <div className="metilda-audio-analysis-volume-btn">
-                                <MuteUnmute />
-                            </div>
+                            <MuteUnmute className="metilda-audio-analysis-volume-btn"/>
                             <Volume />
                             
                         </div>
