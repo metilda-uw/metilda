@@ -11,7 +11,6 @@ import { spinnerIcon } from "../../../Utils/SpinnerIcon";
 import { onDownloadFiles, previewFileWrapper } from "../Utils";
 import { FaDownload } from "react-icons/fa";
 import Modal from 'react-modal'
-import { cacheApiResponse, getCachedApiResponse } from "../../../Utils/cacheUtils";
 
 interface ViewAndGradeAssignmentProps {
     gradedStatus: "graded" | "not_graded";
@@ -39,22 +38,6 @@ export function ViewAndGradeAssignment({ gradedStatus, deadline }: ViewAndGradeA
                 if (!isValid) return;
             });
 
-            const cacheKey = `submissions_${assignmentId}`;
-            const cachedData = await getCachedApiResponse(cacheKey);
-
-            if (cachedData) {
-                setSubmissions(cachedData);
-                const initialGrades = {};
-                cachedData.forEach(submission => {
-                    initialGrades[submission.user_id] = {
-                        score: submission.score ?? "",
-                        comment: submission.comment ?? ""
-                    };
-                });
-                setGrades(initialGrades);
-                setLoading(false);
-                return;
-            }
 
             // Fetch data if not cached
             const formData = new FormData();
@@ -79,9 +62,6 @@ export function ViewAndGradeAssignment({ gradedStatus, deadline }: ViewAndGradeA
                     };
                 });
                 setGrades(initialGrades);
-
-                // Cache the data
-                await cacheApiResponse(cacheKey, data);
             } catch {
                 setErrorMessage("Error loading assignment submissions. Please try again later.");
             } finally {
@@ -177,7 +157,7 @@ export function ViewAndGradeAssignment({ gradedStatus, deadline }: ViewAndGradeA
         return <div>Authentication Error, please do not use URL for direct access.</div>;
     }
     return (
-        <div className="container" style={{ marginTop: '3px', width: '90%' }}>
+        <div className="container" style={{ margin: '2%', width: '90%' }}>
             <div className="title-name">{gradedStatus === 'graded' ? "Graded" : "Ungraded"} Submissions</div>
             {loading ? spinnerIcon() : submissions.length === 0 ? (
                 <p>No submissions found.</p>
@@ -226,7 +206,7 @@ export function ViewAndGradeAssignment({ gradedStatus, deadline }: ViewAndGradeA
                                                     <img
                                                         src={filePreview}
                                                         alt="Image Preview"
-                                                        style={{ maxWidth: "100%", height: "auto", marginTop: "10px" }}
+                                                        style={{ maxWidth: "100%", height: "500px", marginTop: "10px" }}
                                                         onError={(e) => (e.currentTarget.style.display = "none")}
                                                     />
                                                 ) : /\.pdf$/i.test(filePreviewName) ? (

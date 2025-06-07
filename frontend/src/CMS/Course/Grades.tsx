@@ -149,11 +149,12 @@ function Grades() {
     return (
         <div>
             <Header></Header>
+            
             <div className="main-layout">
                 <Sidebar courseId={courseId}></Sidebar>
                 <div className="height-column"></div>
-                <div className="main-view-container">
-                    <div className="main-view" style={{ display: 'inline-grid', height: 'fit-content', margin: "5%", width: "-webkit-fill-available" }}>
+                <div className="main-view">
+                    <div style={{ display: 'inline-grid', height: 'fit-content', margin: "5%", width: "-webkit-fill-available" }}>
                         <>
                             <div className="section assignments-section" style={{ width: "auto" }}>
                                 <h3 className="section-title">Assignments</h3>
@@ -163,7 +164,8 @@ function Grades() {
                                     <p className="error-message">{errorAssignments}</p>
                                 ) : assignmentListString ? (
                                     JSON.parse(assignmentListString).map((x) => (
-                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                        <div className={`list-item ${openItems["assignment"][x.id] ? 'open' : ''}`}>
+                                        <div key={x.id} style={{ width: '100%', float: 'left' }}>
                                             <div
                                                 className={`section-heading ${openItems["assignment"][x.id] ? 'open' : ''}`}
                                                 onClick={() => toggleDropdown("assignment", x.id)}
@@ -198,6 +200,7 @@ function Grades() {
                                                 </div>
                                             )}
                                         </div>
+                                        </div>
                                     ))
                                 ) : (
                                     <p>No assignments available.</p>
@@ -213,7 +216,8 @@ function Grades() {
                                     <p className="error-message">{errorQuizzes}</p>
                                 ) : quizList ? (
                                     JSON.parse(quizList).map((x) => (
-                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                        <div  className={`list-item ${openItems["quiz"][x.id] ? 'open' : ''}`}>
+                                        <div key={x.id} style={{ width: '100%', float: 'left' }}>
                                             <div
                                                 className={`section-heading ${openItems["quiz"][x.id] ? 'open' : ''}`}
                                                 onClick={() => toggleDropdown("quiz", x.id)}
@@ -248,6 +252,7 @@ function Grades() {
                                                 </div>
                                             )}
                                         </div>
+                                        </div>
                                     ))
                                 ) : (
                                     <p>No quizzes available.</p>
@@ -263,7 +268,8 @@ function Grades() {
                                     <p className="error-message">{errorOthers}</p>
                                 ) : otherListString ? (
                                     JSON.parse(otherListString).map((x) => (
-                                        <div key={x.id} className="list-item" style={{ width: '100%', float: 'left' }}>
+                                        <div className={`list-item ${openItems["other"][x.id] ? 'open' : ''}`}>
+                                        <div key={x.id} style={{ width: '100%', float: 'left' }}>
                                             <div
                                                 className={`section-heading ${openItems["other"][x.id] ? 'open' : ''}`}
                                                 onClick={() => toggleDropdown("other", x.id)}
@@ -297,6 +303,7 @@ function Grades() {
                                                     <Visualization category={x} />
                                                 </div>
                                             )}
+                                        </div>
                                         </div>
                                     ))
                                 ) : (

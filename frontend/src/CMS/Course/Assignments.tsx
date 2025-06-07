@@ -8,7 +8,6 @@ import { useParams } from "react-router-dom";
 import "./GeneralStyles.scss";
 import { verifyTeacherCourse } from "../AuthUtils";
 import { spinnerIcon } from "../../Utils/SpinnerIcon";
-import { cacheApiResponse, getCachedApiResponse } from "../../Utils/cacheUtils";
 
 function Assignments() {
     const user = useContext(AuthUserContext) as any;
@@ -21,13 +20,6 @@ function Assignments() {
     useEffect(() => {
         async function fetchData() {
             const cacheKey = `assignments_${courseId}`;
-            const cachedData = await getCachedApiResponse(cacheKey);
-
-            if (cachedData) {
-                setAssignments(cachedData);
-                setLoading(false);
-                return;
-            }
             await verifyTeacherCourse(user.email, courseId, setVeri);
             if (!veri) return;
 
@@ -43,7 +35,6 @@ function Assignments() {
                 });
                 const data = await response.json();
                 data.sort((b, a) => new Date(b.deadline).getTime() - new Date(a.deadline).getTime());
-                await cacheApiResponse(cacheKey, data);
                 setAssignments(data);
                 setError(null);
             } catch (error) {

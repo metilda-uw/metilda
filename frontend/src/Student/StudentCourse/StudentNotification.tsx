@@ -23,7 +23,7 @@ function StudentNotification() {
         await verifyStudentCourse(user.email, courseId, setVeri);
         if (!veri) return;
         const formData = new FormData();
-        formData.append('student_mail_id', 'amulyahn6@gmail.com');
+        formData.append('student_mail_id', user.email);
         formData.append("course_id", courseId);
 
         try {

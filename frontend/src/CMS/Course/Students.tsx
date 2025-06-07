@@ -30,9 +30,9 @@ function Students() {
                     headers: { Accept: "application/json" },
                     body: formData
                 }).then(x => x.json())
-                .then(x => x.map(obj => obj[0] + ',' + obj[1]))
-                .then(x => x.join(';'))
-                .then(setStudentListString);
+                    .then(x => x.map(obj => obj[0] + ',' + obj[1]))
+                    .then(x => x.join(';'))
+                    .then(setStudentListString);
                 setErrorMessage('');
             } catch (error) {
                 setErrorMessage('Error loading students. Please try again later.');
@@ -51,36 +51,41 @@ function Students() {
             <Header />
             <div className="main-layout">
                 <Sidebar courseId={courseId} />
-                <div className="students-content">
-                    <div className="students-card">
-                        <div className="students-title">Enrolled Students</div>
-                        {errorMessage && <div className="students-error">{errorMessage}</div>}
-                        
-                        <table className="students-table">
-                            <thead>
-                                <tr>
-                                    <th>Avatar</th>
-                                    <th>Student Name</th>
-                                    <th>Email</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {studentList.map(x => {
-                                    const [email, name] = x.split(',');
-                                    return (
-                                        <tr key={email}>
-                                            <td>
-                                                <div className="students-row">
-                                                    <div className="students-avatar">{getInitials(name)}</div>
-                                                </div>
-                                            </td>
-                                            <td>{name}</td>
-                                            <td>{email}</td>
+                <div className="height-column"></div>
+                <div className="main-view">
+                    <div className="info-list">
+                        <div className="title-name">Enrolled Students</div>
+                        <div className="students-content">
+                            <div className="students-card">
+                                {errorMessage && <div className="students-error">{errorMessage}</div>}
+
+                                <table className="students-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Avatar</th>
+                                            <th>Student Name</th>
+                                            <th>Email</th>
                                         </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                                    </thead>
+                                    <tbody>
+                                        {studentList.map(x => {
+                                            const [email, name] = x.split(',');
+                                            return (
+                                                <tr key={email}>
+                                                    <td>
+                                                        <div className="students-row">
+                                                            <div className="students-avatar">{getInitials(name)}</div>
+                                                        </div>
+                                                    </td>
+                                                    <td>{name}</td>
+                                                    <td>{email}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

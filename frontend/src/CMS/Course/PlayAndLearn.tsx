@@ -121,7 +121,6 @@ const PlayLearn = () => {
             });
     
             const data = await response.json();
-            console.log(JSON.stringify(data))
             if (JSON.stringify(data).includes("success")) {
                 alert("Activity created successfully!");
                 fetchActivities();

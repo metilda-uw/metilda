@@ -12,7 +12,6 @@ import { verifyTeacherCourse } from "../../AuthUtils";
 import { spinnerIcon } from "../../../Utils/SpinnerIcon";
 import { ViewAndGradeAssignment } from "./ViewAndGradeAssignment";
 import { NotSubmittedList } from "./NotSubmittedList";
-import { cacheApiResponse, getCachedApiResponse } from "../../../Utils/cacheUtils";
 
 export function Assignment() {
     const user = useContext(AuthUserContext) as any;
@@ -49,16 +48,6 @@ export function Assignment() {
             if (!veri) return;
 
             const cacheKey = `assignment_${courseId}_${assignmentId}`;
-            const data = await getCachedApiResponse(cacheKey);
-            console.log("out"+ JSON.stringify(data))
-            if (data) {
-                console.log("in")
-                setAssignmentData(data);
-                setLoading(false);
-                setPosted(data.posted)
-                setErrorMessage(null);
-                return;
-            }
 
             const formData = new FormData();
             formData.append('user', user.email);
@@ -85,8 +74,6 @@ export function Assignment() {
                     not_submitted_count: data.not_submitted_count
                 };
 
-                // Cache the data
-                await cacheApiResponse(cacheKey, formattedData);
                 setAssignmentData(formattedData);
                 setPosted(data.posted)
                 getFile(firebase, (files) => setAssignmentData(prev => ({ ...prev, files })), `/cms/assignment/file/read/${courseId}/assignment/${assignmentId}`);
@@ -176,7 +163,7 @@ export function Assignment() {
                                         <div></div>
                                         <Link className="create-assignment-button" to={`/content-management/course/${courseId}/assignment/${assignmentId}/update`}>Update assignment</Link>
                                         {
-                                            posted == false && <button className="create-assignment-button" style={{border: "2px solid #007bff"}} onClick={handlePostScores} disabled={postingScores}>{postingScores ? "Posting..." : "Post Scores"}</button>
+                                            posted == false && <button className="create-assignment-button" style={{border: "2px solid #4a148c"}} onClick={handlePostScores} disabled={postingScores}>{postingScores ? "Posting..." : "Post Scores"}</button>
                                         }
 
                                     </div>

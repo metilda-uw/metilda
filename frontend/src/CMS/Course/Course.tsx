@@ -122,7 +122,7 @@ function Course() {
         formData.append('available', newAvailable);
         formData.append('schedule', newSchedule);
 
-        localStorage.setItem('course_name', newName);
+        localStorage.setItem('course_name', 'Basics of BlackFoot');
         try {
             await fetch('/cms/courses/update', {
                 method: "POST",

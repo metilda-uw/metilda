@@ -29,7 +29,7 @@ export function Visualization({ category }: VisualizationProps) {
     const clusterData = sortedDataPoints.filter(item => item.cluster === cluster);
 
     // Check if the cluster has 3 or more data points
-    const hasEnoughData = clusterData.length >= 3;
+    const hasEnoughData = clusterData.length >= 1;
 
     return {
       type: 'scatter',

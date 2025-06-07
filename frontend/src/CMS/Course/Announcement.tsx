@@ -9,7 +9,6 @@ import "./GeneralStyles.scss";
 import { verifyTeacherCourse } from "../AuthUtils";
 import { spinnerIcon } from "../../Utils/SpinnerIcon";
 import Modal from 'react-modal'
-import { cacheApiResponse, getCachedApiResponse, clearCachedResponse } from "../../Utils/cacheUtils";
 import { Editor } from 'react-draft-wysiwyg'
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { EditorState, convertToRaw } from "draft-js";
@@ -33,12 +32,6 @@ function Announcement() {
 
     const fetchAnnouncements = async () => {
         const cacheKey = `announcement1_${courseId}`;
-        const cachedData = await getCachedApiResponse(cacheKey);
-        if (cachedData) {
-            setAnnouncements(cachedData?.announcements || []);
-            setLoading(false);
-            return;
-        }
         const formData = new FormData();
         formData.append('user_id', 't_cx@gmail.com');  // user_id as part of FormData
         formData.append('course_id', courseId); // course_id as part of FormData
@@ -57,7 +50,6 @@ function Announcement() {
                 setError(body?.error || "Failed to fetch announcements.");
             } else {
                 setAnnouncements(body?.announcements || []);
-                await cacheApiResponse(cacheKey, body);
             }
         } catch (err) {
             setError("An error occurred while fetching announcements.");
@@ -96,7 +88,6 @@ function Announcement() {
                 setError(null);
                 window.alert("Announcement created successfully!");
                 setShowModal(false);
-                clearCachedResponse(`announcement_${courseId}`)
 
                 fetchAnnouncements();
 

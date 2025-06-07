@@ -62,7 +62,26 @@ function StudentCalendar() {
                 }
 
                 const data = await response.json();
-                setDeadlines(data);
+
+                const convertToLocalTime = (isoString) => {
+                    if (!isoString) return null;
+                    const date = new Date(isoString);
+                    return date.toLocaleString(); // You can customize locale and options here
+                };
+
+                const convertedData = {
+                    assignments: data.assignments.map(item => ({
+                        ...item,
+                        deadline: convertToLocalTime(item.deadline),
+                    })),
+                    quizzes: data.quizzes.map(item => ({
+                        ...item,
+                        deadline: convertToLocalTime(item.deadline),
+                        start: convertToLocalTime(item.start),
+                    })),
+                };
+
+                setDeadlines(convertedData);
             } catch (error) {
                 console.error("Error fetching deadlines:", error);
             }
@@ -97,28 +116,28 @@ function StudentCalendar() {
     };
 
     const tileClassName = ({ date }: { date: Date }) => {
-    const isHoliday = holidays.some(
-        (holiday) => new Date(holiday.date).toDateString() === date.toDateString()
-    );
+        const isHoliday = holidays.some(
+            (holiday) => new Date(holiday.date).toDateString() === date.toDateString()
+        );
 
-    const isAssignmentDeadline = deadlines.assignments.some(
-        (assignment) => new Date(assignment.deadline).toDateString() === date.toDateString()
-    );
+        const isAssignmentDeadline = deadlines.assignments.some(
+            (assignment) => new Date(assignment.deadline).toDateString() === date.toDateString()
+        );
 
-    const isQuizStart = deadlines.quizzes.some(
-        (quiz) => new Date(quiz.start).toDateString() === date.toDateString()
-    );
+        const isQuizStart = deadlines.quizzes.some(
+            (quiz) => new Date(quiz.start).toDateString() === date.toDateString()
+        );
 
-    const isQuizDeadline = deadlines.quizzes.some(
-        (quiz) => new Date(quiz.deadline).toDateString() === date.toDateString()
-    );
+        const isQuizDeadline = deadlines.quizzes.some(
+            (quiz) => new Date(quiz.deadline).toDateString() === date.toDateString()
+        );
 
-    if (isHoliday) return "holiday";
-    if (isAssignmentDeadline) return "assignment-deadline";
-    if (isQuizStart) return "quiz-start";
-    if (isQuizDeadline) return "quiz-deadline";
-    return null;
-};
+        if (isHoliday) return "holiday";
+        if (isAssignmentDeadline) return "assignment-deadline";
+        if (isQuizStart) return "quiz-start";
+        if (isQuizDeadline) return "quiz-deadline";
+        return null;
+    };
 
 
     if (!veri) {
@@ -142,6 +161,20 @@ function StudentCalendar() {
                                         ? `${date[0].toDateString()} - ${date[1].toDateString()}`
                                         : date.toDateString()}
                                 </div>
+                                <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <div style={{ width: '20px', height: '20px', backgroundColor: '#006edc', border: '1px solid black' }}></div>
+                                            <span>Current Date</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <div style={{ width: '20px', height: '20px', backgroundColor: '#ffcccc', border: '1px solid black' }}></div>
+                                            <span>Holiday</span>
+                                        </div>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                            <div style={{ width: '20px', height: '20px', backgroundColor: '#add8e6', border: '1px solid black' }}></div>
+                                            <span>Course Info</span>
+                                        </div>
+                                    </div>
 
                                 {selectedHoliday ? (
                                     <div className="holiday-info">
@@ -155,13 +188,13 @@ function StudentCalendar() {
                                         <ul>
                                             {selectedDeadlines.assignments.map((assignment) => (
                                                 <li key={assignment.id}>
-                                                    <strong>Assignment:</strong> <Link to={`/student-view/course/${courseId}/assignment/${assignment.id}`} className="content-link" style={{color: 'blue'}}>{assignment.name}</Link> <br />
+                                                    <strong>Assignment:</strong> <Link to={`/student-view/course/${courseId}/assignment/${assignment.id}`} className="content-link" style={{ color: 'blue' }}>{assignment.name}</Link> <br />
                                                     <strong>Deadline:</strong> {new Date(assignment.deadline).toLocaleString()}
                                                 </li>
                                             ))}
                                             {selectedDeadlines.quizzes.map((quiz) => (
                                                 <li key={quiz.id}>
-                                                    <strong>Quiz:</strong> <Link to={`/student-view/course/${courseId}/quiz/${quiz.id}`} className="content-link" style={{color: 'blue'}}>{quiz.name}</Link> <br />
+                                                    <strong>Quiz:</strong> <Link to={`/student-view/course/${courseId}/quiz/${quiz.id}`} className="content-link" style={{ color: 'blue' }}>{quiz.name}</Link> <br />
                                                     <strong>Start:</strong> {new Date(quiz.start).toLocaleString()} <br />
                                                     <strong>Deadline:</strong> {new Date(quiz.deadline).toLocaleString()}
                                                 </li>

@@ -206,7 +206,7 @@ function StudentGrades() {
                             ) : (
                                 assignmentListString
                                     ? JSON.parse(assignmentListString).map((x) => (
-                                        <div key={x.assignment_id} className="list-item">
+                                        <div key={x.assignment_id} className={`list-item ${openItems["assignment"][x.assignment_id] ? 'open' : ''}`}>
                                             <div
                                                 className={`section-heading ${openItems["assignment"][x.assignment_id] ? 'open' : ''}`}
                                                 onClick={() => toggleDropdown("assignment", x.assignment_id)}
@@ -267,7 +267,7 @@ function StudentGrades() {
                                 (
                                     quizList
                                         ? JSON.parse(quizList).map((x) => (
-                                            <div key={x.quiz_id} className="list-item">
+                                            <div key={x.quiz_id} className={`list-item ${openItems["quiz"][x.quiz_id] ? 'open' : ''}`}>
                                                 <div
                                                     className={`section-heading ${openItems["quiz"][x.quiz_id] ? 'open' : ''}`}
                                                     onClick={() => toggleDropdown("quiz", x.quiz_id)}
@@ -328,7 +328,7 @@ function StudentGrades() {
                                 (
                                     otherListString
                                         ? JSON.parse(otherListString).map((x) => (
-                                            <div key={x.other_id} className="list-item">
+                                            <div key={x.other_id} className={`list-item ${openItems["other"][x.other_id] ? 'open' : ''}`}>
                                                 <div
                                                     className={`section-heading ${openItems["other"][x.other_id] ? 'open' : ''}`}
                                                     onClick={() => toggleDropdown("other", x.other_id)}

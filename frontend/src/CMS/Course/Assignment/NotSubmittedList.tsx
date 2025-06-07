@@ -5,7 +5,6 @@ import { useParams } from "react-router-dom";
 import "../GeneralStyles.scss";
 import { verifyTeacherCourse } from "../../AuthUtils";
 import { spinnerIcon } from "../../../Utils/SpinnerIcon";
-import { cacheApiResponse, getCachedApiResponse } from "../../../Utils/cacheUtils";
 
 export function NotSubmittedList() {
     const user = useContext(AuthUserContext) as any;
@@ -22,15 +21,6 @@ export function NotSubmittedList() {
                 if (!isValid) return;
             });
 
-            const cacheKey = `not_submitted_students_${assignmentId}`;
-            const cachedData = await getCachedApiResponse(cacheKey);
-
-            if (cachedData) {
-                setNotSubmittedStudents(cachedData);
-                setLoading(false);
-                return;
-            }
-
             // Fetch data if not cached
             const formData = new FormData();
             formData.append("assignment_id", assignmentId);
@@ -45,9 +35,6 @@ export function NotSubmittedList() {
 
                 const data = await response.json();
                 setNotSubmittedStudents(data.not_submitted_students);
-
-                // Cache the data
-                await cacheApiResponse(cacheKey, data.not_submitted_students);
             } catch {
                 setErrorMessage("Error loading students who haven't submitted. Please try again later.");
             } finally {
@@ -65,7 +52,7 @@ export function NotSubmittedList() {
     }
 
     return (
-        <div className="container" style={{ margin: "3%", width: "100%" }}>
+        <div className="container" style={{ margin: "2%", width: "100%" }}>
             <div className="title-name" style={{textAlign: "center"}}>Not Submitted Students</div>
             {loading ? (
                 spinnerIcon()

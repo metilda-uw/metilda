@@ -82,7 +82,6 @@ class Header extends Component<HeaderProps, State> {
           <div className="nav-menu-item">
             <Link to="/documentation">Documentation</Link>
           </div>
-          <div className="course_name">Course: {this.state.courseName}</div>
           <div className="nav-user-icon">
             <div className="nav-menu-item">
               <FaUserCircle size={24} className="cursor-pointer" />

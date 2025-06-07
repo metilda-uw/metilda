@@ -154,7 +154,7 @@ function ContentManagement() {
                 ) : (
                     courseList.map(x =>
                         <div className="list-item" key={x}>
-                            <Link className="content-link list-item-title" to={'/content-management/course/' + x.split(',')[0]}>{x.split(',')[1]}</Link>
+                            <Link className="content-link list-item-title" to={'/content-management/course/' + x.split(',')[0]} onClick={()=>{localStorage.setItem('course_name', x.split(',')[1])}}>{x.split(',')[1]}</Link>
                         </div>
                     )
                 )}
