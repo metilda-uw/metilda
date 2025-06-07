@@ -1,5 +1,15 @@
 import { css } from 'styled-components';
-export const container = css`
+
+export interface AIMSProps {
+  disabled?: boolean;
+  skew?: number;
+  polar?: boolean;
+  centralAngle?: number;
+  backgroundColor?: string;
+  centerRadius?: string; 
+}
+
+export const container = css<AIMSProps>`
   cursor: ${({disabled}) => `${disabled ? 'default': 'pointer'}`};
   width: 200%;
   height: 200%;
