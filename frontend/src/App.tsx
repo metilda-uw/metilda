@@ -47,13 +47,17 @@ import StudentCourses from "./Student/StudentCourses";
 import StudentSyllabus from "./Student/StudentCourse/StudentSyllabus";
 import StudentLessons from "./Student/StudentCourse/StudentLessons";
 import StudentGrades from "./Student/StudentCourse/StudentGrades";
+import StudentPlayLearn from "./Student/StudentCourse/StudentPlayLearn";
 import StudentCourse from "./Student/StudentCourse/StudentCourse";
+import StudentCalendar from "./Student/StudentCourse/StudentCalendar";
 import Discussion from "./CMS/Course/Discussion";
+import PlayAndLearn from "./CMS/Course/PlayAndLearn";
 // import Word from "./Components/collections/Word";
 import { Topic } from "./CMS/Course/Discussion/Topic";
 import { CreatePost } from "./CMS/Course/Discussion/CreatePost";
 import { Post } from "./CMS/Course/Discussion/Post";
 import StudentDiscussion from "./Student/StudentCourse/StudentDiscussion";
+import StudentNotification from "./Student/StudentCourse/StudentNotification";
 import { StudentTopic } from "./Student/StudentCourse/Discussion/StudentTopic";
 import { StudentCreatePost } from "./Student/StudentCourse/Discussion/StudentCreatePost";
 import { StudentPost } from "./Student/StudentCourse/Discussion/StudentPost";
@@ -65,6 +69,7 @@ import GradesAssignmentSubmissionDetail from "./CMS/Course/Grade/GradesAssignmen
 import GradesGradable from "./CMS/Course/Grade/GradesGradable";
 import GradesGradableDetail from "./CMS/Course/Grade/GradesGradableDetail";
 import Assignments from "./CMS/Course/Assignments";
+import Announcement from "./CMS/Course/Announcement";
 import { Assignment } from "./CMS/Course/Assignment/Assignment";
 import StudentAssignments from "./Student/StudentCourse/StudentAssignments";
 import { StudentAssignment } from "./Student/StudentCourse/Assignment/StudentAssignment";
@@ -170,11 +175,12 @@ const App = () => (
       <Route exact path="/content-management/course/:id/lessons" component={Lessons} />
       <Route exact path="/content-management/course/:id/lessons/:lesson_id" component={Lesson} />
       <Route exact path="/content-management/course/:id/discussion" component={Discussion} />
+      <Route exact path="/content-management/course/:id/play_and_learn" component={PlayAndLearn} />
       <Route exact path="/content-management/course/:id/discussion/topic/:topic_id" component={Topic} />
       <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/create" component={CreatePost} />
       <Route exact path="/content-management/course/:id/discussion/topic/:topic_id/post/:post_id" component={Post} />
-      <Route exact path="/content-management/course/:id/assignments" component={Assignments} />
-      <Route exact path="/content-management/course/:id/assignments/create" component={CreateAssignment} />
+      <Route exact path="/content-management/course/:id/assignment" component={Assignments} />
+      <Route exact path="/content-management/course/:id/assignment/create" component={CreateAssignment} />
       <Route exact path="/content-management/course/:id/assignment/:assignment_id/update" component={UpdateAssignment} />
       <Route exact path="/content-management/course/:id/assignment/:assignment_id" component={Assignment} />
       <Route exact path="/content-management/course/:id/quiz" component={Quizzes} />
@@ -189,6 +195,7 @@ const App = () => (
       <Route exact path="/content-management/course/:id/grades/quiz/:quiz_id" component={GradesQuiz} />
       <Route exact path="/content-management/course/:id/grades/quiz/:quiz_id/question/:question_id" component={GradesQuizQuestion} />
       <Route exact path="/content-management/course/:id/grades/quiz/:quiz_id/question/:question_id/student/:student_id" component={GradesQuizQuestionSubmission} />
+      <Route exact path="/content-management/course/:id/announcement" component={Announcement} />
 
       <Route exact path="/student-view" component={StudentCourses} />
       <Route exact path="/student-view/course/:id" component={StudentCourse} />
@@ -196,16 +203,19 @@ const App = () => (
       <Route exact path="/student-view/course/:id/lessons" component={StudentLessons} />
       <Route exact path="/student-view/course/:id/lessons/:lesson_id" component={StudentLesson} />
       <Route exact path="/student-view/course/:id/discussion" component={StudentDiscussion} />
+      <Route exact path="/student-view/course/:id/notification" component={StudentNotification} />
       <Route exact path="/student-view/course/:id/discussion/topic/:topic_id" component={StudentTopic} />
       <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/create" component={StudentCreatePost} />
       <Route exact path="/student-view/course/:id/discussion/topic/:topic_id/post/:post_id" component={StudentPost} />
-      <Route exact path="/student-view/course/:id/assignments" component={StudentAssignments} />
+      <Route exact path="/student-view/course/:id/assignment" component={StudentAssignments} />
       <Route exact path="/student-view/course/:id/assignment/:assignment_id" component={StudentAssignment} />
       <Route exact path="/student-view/course/:id/assignment/:assignment_id/submission" component={StudentAssignmentSubmissionDetail} />
       <Route exact path="/student-view/course/:id/quiz" component={StudentQuizzes} />
       <Route exact path="/student-view/course/:id/quiz/:quiz_id" component={StudentQuiz} />
       <Route exact path="/student-view/course/:id/quiz/:quiz_id/question/:question_id/:index" component={StudentQuizQuestion} />
       <Route exact path="/student-view/course/:id/grades" component={StudentGrades} />
+      <Route exact path="/student-view/course/:id/play_and_learn" component={StudentPlayLearn} />
+      <Route exact path="/student-view/course/:id/calendar" component={StudentCalendar} />
 
     </div>
   </Router>

@@ -1,107 +1,87 @@
-// #metilda-navbar {
-//     text-align: left;
-//     display: flex;
-//     margin-left: 24px;
-// }
-
-// #metilda-navbar .app-logo {
-//     font-size: 32px;
-// }
-
-// .metilda-navbar-item {
-//     margin-right: 16px;
-// }
-
-// #metilda-navbar {
-//     text-align: left;
-//     display: flex;
-//     margin-left: 24px;
-//   }
-
-//   #metilda-navbar .app-logo {
-//     font-size: 32px;
-//   }
-
-//   .metilda-navbar-item {
-//     margin-right: 16px;
-//   }
-
-// .main_Navbar {
-//   background-color: #ee6e73;
-// }
-
-// .menu-container {
-//   text-align: center;
-// }
-
-// nav {
-//   ul {
-//     list-style: none;
-//     padding-left: 0;
-//     margin-top: 0;
-//     margin-bottom: 0;
-//     a {
-//       color: #000000;
-//     }
-//   }
-// }
-
-//$color-blue: #00aeef;
-//$color-blue-dark: #0d2035;
-$submenu-width: 180px;
-
 .nav {
-  display: inline-block;
-  background: #ee6e73;
-  //color: #000000;
+  display: flex;
+  background: #4a148c;
   text-align: left;
   position: sticky;
   top: 0;
   z-index: 1000;
-
-  a {
-    color: #000000;
-    display: block;
-    padding: 8 8px;
-    line-height: inherit;
-    cursor: pointer;
-  }
+  padding: 10px 20px;
 }
 
 .nav-menu {
-  //line-height: 30px 30px;
-  font-weight: 700;
-  //text-transform: inherit;
+  display: flex;
+  align-items: center;
+  width: 100%;
 }
 
 .nav-menu-item {
-  display: inline-block;
+  color: white;
+  padding: 0px 15px 0 15px;
   position: relative;
-
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 400;
+  transition: background 0.3s ease-in-out;
+  
   &:hover {
-    background-color: rgb(216, 94, 94);
+    background-color: white;
+    color: #4a148c;
   }
 }
 
-.nav-menu-item:hover {
-  .nav-submenu {
-    display: flex;
-    flex-direction: column;
-  }
+.nav-menu-item a {
+  text-decoration: none;
+  color: inherit;
+  font-weight: 500;
+}
+
+.nav-menu-item.active a {
+  font-weight: bold;
+  border-bottom: 3px solid #0073e6;
+  color: white;
+}
+
+.nav-user-icon {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  padding-right: 16px;
 }
 
 .nav-submenu {
   display: none;
-  width: $submenu-width;
-  font-weight: 400;
-  text-transform: none;
   position: absolute;
-  background-color: #e96d71;
+  top: 100%;
+  right: 0;
+  left: unset;
+  background-color: white;
+  width: 180px;
+  flex-direction: column;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.nav-menu-item:hover .nav-submenu {
+  display: flex;
 }
 
 .nav-submenu-item {
+  color: #4a148c;
+  padding: 10px;
+  transition: background 0.3s;
+  
   &:hover {
-    background: rgba(#000, 0.1);
-    //display: block;
+    background: rgba(0, 0, 0, 0.1);
   }
+}
+
+.nav-submenu-item a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+.course_name {
+  font-size: large;
+    width: 25%;
+    text-align: center;
+    color: antiquewhite;
 }

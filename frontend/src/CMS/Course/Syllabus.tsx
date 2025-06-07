@@ -1,4 +1,4 @@
-import React, { createRef }from "react"
+import React, { createRef } from "react"
 import { useState, useContext, useEffect } from "react";
 import Header from "../../Components/header/Header";
 import { AuthUserContext, withAuthorization } from "../../Session";
@@ -10,6 +10,7 @@ import FirebaseContext from "../../Firebase/context";
 import "./GeneralStyles.scss";
 import { onDownloadFiles } from "./Utils";
 import { verifyTeacherCourse } from "../AuthUtils";
+import { FaDownload } from "react-icons/fa";
 
 function Syllabus() {
     const firebase = useContext(FirebaseContext);
@@ -23,17 +24,17 @@ function Syllabus() {
 
     const uploadHandler = async (para_files: any) => {
         try {
-          await uploadFileWrapper(para_files, setFiles, firebase, courseId, 'syllabus',files.length?files[0].path:'');
+            await uploadFileWrapper(para_files, setFiles, firebase, courseId, 'syllabus', files.length ? files[0].path : '');
         } catch (ex) {
-          console.log(ex);
+            console.log(ex);
         }
         window.location.reload()
     }
 
     useEffect(() => {
-        verifyTeacherCourse(user.email,courseId,setVeri)
+        verifyTeacherCourse(user.email, courseId, setVeri)
         getFile(firebase, setFiles, `/file/read/${courseId}/syllabus`)
-    },[])
+    }, [])
 
 
     if (!veri) {
@@ -51,9 +52,19 @@ function Syllabus() {
                             Hidden Download Link
                         </a>
 
-                        {/* <div>Files: {JSON.stringify(files)}</div> */}
-                        <div><b>Syllabus file:</b> <u className="download-link" onClick={()=>onDownloadFiles(files,downloadRef,firebase)}>{files.length ? files[0].name : null}</u></div>
-                        {/* <img src={imgSrc} alt="No image"></img> */}
+                        <div className="syllabus-div">
+                            <b>Syllabus File:</b>
+                            <div style={{fontSize: '15px'}}>
+                            {files.length ? (
+                                <div className="download-link" onClick={() => onDownloadFiles(files, downloadRef, firebase)}>
+                                <FaDownload style={{ marginRight: "6px", color: "blueviolet" }} /> {files[0].name}
+                                </div>
+                            ) : (
+                                <span style={{ marginLeft: '8px', color: 'gray' }}>No file available</span>
+                            )}
+                            </div>
+                        </div>
+
                     </div>
                     <div>
                         <ReactFileReader

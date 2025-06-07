@@ -61,5 +61,3 @@ def verify_student_course():
                 return jsonify({}),403
 
     return jsonify({'result':'verified'})
-
-    

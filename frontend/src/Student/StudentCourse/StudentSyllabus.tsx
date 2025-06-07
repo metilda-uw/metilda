@@ -1,4 +1,4 @@
-import React, { createRef }from "react"
+import React, { createRef } from "react"
 import { useState, useContext, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../Components/header/Header";
@@ -8,10 +8,11 @@ import Modal from 'react-modal'
 import Sidebar from "./StudentSidebar";
 import { useParams } from "react-router-dom";
 import { FirebaseContext } from "../../Firebase";
-import { getFile} from "../../CMS/Course/Utils";
+import { getFile } from "../../CMS/Course/Utils";
 import { onDownloadFiles } from "../../CMS/Course/Utils";
 import "../../CMS/Course/GeneralStyles.scss"
 import { verifyStudentCourse } from "../../CMS/AuthUtils";
+import { FaDownload } from "react-icons/fa";
 
 function StudentSyllabus() {
     const firebase = useContext(FirebaseContext);
@@ -23,9 +24,9 @@ function StudentSyllabus() {
 
 
     useEffect(() => {
-        verifyStudentCourse(user.email,courseId,setVeri)
-        getFile(firebase,setFiles,`/file/read/${courseId}/syllabus`)
-    },[])
+        verifyStudentCourse(user.email, courseId, setVeri)
+        getFile(firebase, setFiles, `/file/read/${courseId}/syllabus`)
+    }, [])
 
 
     if (!veri) {
@@ -44,7 +45,22 @@ function StudentSyllabus() {
                         </a>
 
                         {/* <div>Files: {JSON.stringify(files)}</div> */}
-                        <div><b>Syllabus file:</b> <u className="download-link" onClick={()=>onDownloadFiles(files,downloadRef,firebase)}>{files.length ? files[0].name : null}</u></div>
+
+
+                        <div className="syllabus-div">
+                            <b>Syllabus File:</b>
+                            <div style={{ fontSize: '15px' }}>
+                                {files.length ? (
+                                    <div className="download-link" onClick={() => onDownloadFiles(files, downloadRef, firebase)}>
+                                        <FaDownload style={{ marginRight: "6px", color: "blueviolet" }} /> {files[0].name}
+                                    </div>
+                                ) : (
+                                    <span style={{ marginLeft: '8px', color: 'gray' }}>No file available</span>
+                                )}
+                            </div>
+                        </div>
+
+
                     </div>
                 </div>
             </div>

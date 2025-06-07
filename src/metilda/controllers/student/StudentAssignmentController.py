@@ -2,13 +2,21 @@ from flask import request, jsonify
 from metilda import app
 from uuid import uuid4
 from datetime import datetime,timezone
-
+from metilda.cache import cache
+import json
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
 
+def clear_student_assignment_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "assignment" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
+        
+
 @app.route('/student-view/assignments', methods=["POST"])
+@cache.memoize(500)
 def student_read_assignments():
     with Postgres() as connection:
         query = 'select id,name,available,deadline,description,max_grade from assignments where course=%s and available=true'
@@ -23,7 +31,160 @@ def student_read_assignments():
         'max_grade':arr[5]
     },result)))
 
+@app.route('/student-view/activities', methods=["POST"]) 
+@cache.memoize(500)
+def get_activity_content():
+    # Extract course number from the request body
+    course_id = request.form['course']
+
+    with Postgres() as connection:
+        # Query to get the max level from lessons for the given course_id
+        query = '''
+            SELECT MAX(level) 
+            FROM lessons 
+            WHERE course = %s AND available = TRUE
+        '''
+        args = (course_id,)
+        max_level_result = connection.execute_select_query(query, args)
+        
+        if not max_level_result or max_level_result[0][0] is None:
+            return jsonify({"error": "No lessons found for this course"}), 404
+        
+        max_level = max_level_result[0][0]
+
+        # Query to fetch activities with difficulty_level <= max_level
+        query = '''
+            SELECT activity_number, word, image_url, matching_word
+            FROM activity_content
+            WHERE course_no = %s AND difficulty_level <= %s
+        '''
+        args = (course_id, max_level)
+        activities = connection.execute_select_query(query, args)
+
+    # Process the fetched activities into the required JSON format
+    activity_result = {}
+    for activity_number, word, image_url, matching_word in activities:
+        if activity_number not in activity_result:
+            activity_result[activity_number] = {}
+
+        # Determine whether to send image_url or matching_word
+        if image_url:
+            activity_result[activity_number][word] = {
+                "value": image_url,
+                "type": "url"
+            }
+        elif matching_word:
+            activity_result[activity_number][word] = {
+                "value": matching_word,
+                "type": "matching_word"
+            }
+
+    # Return the JSON response with ensure_ascii=False to preserve special characters
+    return app.response_class(
+        response=json.dumps(activity_result, ensure_ascii=False),
+        mimetype='application/json'
+    )
+
+@app.route('/student-view/assignment_grades', methods=["POST"])
+@cache.memoize(500)
+def student_get_assignment_grades():
+    # Get the user's course input
+    course_id = request.form['course']
+    current_user_email = request.form.get("user")  # Email of the logged-in user
+
+    with Postgres() as connection:
+        # Fetch assignments for the course
+        assignments_query = '''
+            SELECT id, name, available, deadline, description, max_grade, weight 
+            FROM assignments 
+            WHERE course = %s AND posted = TRUE
+        '''
+        assignments = connection.execute_select_query(assignments_query, (course_id,))
+
+        if assignments is None:
+            return jsonify({"error": "Error retrieving assignments"}), 500
+
+        if not assignments:
+            return "", 200
+
+        # Extract assignment IDs
+        assignment_ids = tuple(assignment[0] for assignment in assignments)
+
+        if not assignment_ids:
+            return jsonify({"error": "No valid assignment IDs found"}), 404
+
+        # Fetch grades for these assignments using IN clause
+        grades_query = '''
+            SELECT gradable_id, grade, user_id
+            FROM gradable_grades 
+            WHERE gradable_id IN %s
+        '''
+        grades = connection.execute_select_query(grades_query, (assignment_ids,))
+
+        if grades is None:
+            return jsonify({"error": "No grades found for these assignments"}), 404
+        
+        if not grades:
+            return "", 200
+
+        # Organize grades by assignment ID
+        assignment_scores = {}
+        for gradable_id, grade, user_id in grades:
+            if grade != -1:  # Ignore invalid grades
+                if gradable_id not in assignment_scores:
+                    assignment_scores[gradable_id] = []
+                assignment_scores[gradable_id].append((grade, user_id))
+
+        # Prepare the result with additional metrics
+        result = []
+        gradable_ids = {gradable_id for gradable_id, _, _ in grades}
+        for assignment in assignments:
+            assignment_id, name, available, deadline, description, max_grade, weight = assignment
+            if assignment_id in gradable_ids:
+                scores = [score for score, _ in assignment_scores.get(assignment_id, [])]
+
+                user_grade=0
+                
+                # Calculate metrics if there are valid scores
+                if scores:
+                    lowest_score = min(scores)
+                    average_score = sum(scores) / len(scores)
+                    highest_score = max(scores)
+
+                    # Calculate the current user's percentile if email is provided
+                    user_grade = next(
+                        (grade for grade, uid in assignment_scores.get(assignment_id, []) if uid == current_user_email),
+                        None
+                    )
+
+                    if user_grade is not None:
+                        sorted_scores = sorted(scores)
+                        percentile_rank = (sorted_scores.index(user_grade) / len(sorted_scores)) * 100
+                    else:
+                        percentile_rank = None
+                else:
+                    lowest_score = average_score = highest_score = percentile_rank = None
+
+                # Add assignment details to the result
+                result.append({
+                    'assignment_id': assignment_id,
+                    'name': name,
+                    'available': available,
+                    'deadline': deadline,
+                    'description': description,
+                    'user_grade': round(user_grade, 2) if user_grade is not None else None,
+                    'max_grade': round(max_grade, 2) if max_grade is not None else None,
+                    'weight': round(weight, 2) if weight is not None else None,
+                    'lowest_score': round(lowest_score, 2) if lowest_score is not None else None,
+                    'average_score': round(average_score, 2) if average_score is not None else None,
+                    'highest_score': round(highest_score, 2) if highest_score is not None else None,
+                    'percentile': round(percentile_rank, 2) if percentile_rank is not None else None
+                })
+    return jsonify(result)
+
+
 @app.route('/student-view/assignments/read', methods=["POST"])
+@cache.memoize(500)
 def student_read_assignment():
     with Postgres() as connection:
         query = 'select name,available,deadline,description,max_grade from assignments where id=%s'
@@ -41,6 +202,7 @@ def student_read_assignment():
 
 
 @app.route('/student-view/assignment/file/read/<string:course>/<string:type>/<string:assignment>', methods=["GET"])
+@cache.memoize(500)
 def student_assignment_get_file(course,type,assignment):
     with Postgres() as connection:
         query = 'select * from assignment_files where course=%s and type=%s and assignment=%s'
@@ -53,6 +215,7 @@ def student_assignment_get_file(course,type,assignment):
 
 
 @app.route('/student-view/assignment/submission/file/read/<string:user>/<string:assignment>', methods=["GET"])
+@cache.memoize(500)
 def student_assignment_get_submission_file(user,assignment):
     with Postgres() as connection:
         query = 'select * from assignment_submission_files where user_id=%s and assignment=%s'
@@ -69,6 +232,7 @@ def student_assignment_submission_create_file():
         args = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'], 
                 request.form['file_size'],request.form['assignment'],int(request.form['course']))
         connection.execute_insert_query(query, args, False)
+        clear_student_assignment_cache()
     return jsonify({})
 
 @app.route('/student-view/assignment/submission/file/delete', methods=["POST"])
@@ -78,10 +242,12 @@ def student_assignment_submission_delete_file():
             query = 'delete from assignment_submission_files where path=%s'
             args=(request.form['old_path'],)
             connection.execute_update_query(query, args)
+            clear_student_assignment_cache()
     return jsonify({})
 
 
 @app.route('/student-view/assignment/submission/read', methods=["POST"])
+@cache.memoize(500)
 def student_read_submission():
     with Postgres() as connection:
         query = 'select time,content,grade,max_grade,comment from assignment_submissions where user_id=%s and assignment=%s'
@@ -102,21 +268,23 @@ def student_read_submission():
     return jsonify(res)
 
 @app.route('/student-view/assignment/submission/create', methods=["POST"])
-def student_create_submission():
+def student_assignment_create_submission():
     with Postgres() as connection:
         id=str(uuid4())
         query = 'insert into assignment_submissions(id,assignment,user_id,time,content,grade,max_grade) values(%s,%s,%s,%s,%s,%s,%s)'
         args = (id,request.form['assignment'],request.form['user'],datetime.now(timezone.utc),
                 request.form['content'],-1.0,request.form['max_grade'])
         connection.execute_insert_query(query, args, False)
+        clear_student_assignment_cache()
 
     return jsonify({})
 
 @app.route('/student-view/assignment/submission/update', methods=["POST"])
-def student_update_submission():
+def student_assignment_update_submission():
     with Postgres() as connection:
         query = 'update assignment_submissions set content=%s,time=%s,grade=%s,comment=%s where user_id=%s and assignment=%s'
         args = (request.form['content'],datetime.now(timezone.utc),-1.0,'',request.form['user'],request.form['assignment'])
         connection.execute_update_query(query, args)
+        clear_student_assignment_cache()
 
     return jsonify({})

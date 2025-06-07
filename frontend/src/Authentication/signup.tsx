@@ -5,7 +5,7 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../constants/routes";
 import Select from "react-select";
 import ReactGA from "react-ga";
-import TermsOfUseContent  from "./terms_of_use_content";
+import TermsOfUseContent from "./terms_of_use_content";
 
 export interface Props {
   firebase: any;
@@ -51,62 +51,78 @@ class SignUpFormBase extends React.Component<Props, State> {
     event.preventDefault();
     const { username, email, passwordOne, institution } = this.state;
     try {
-        const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
-        this.setState({
-          uid: authUser.user.uid
-        });
-        ReactGA.set({
-          userId: this.state.uid
-        });
-        ReactGA.event({
-          category: "Sign Up",
-          action: "User pressed sign up button",
-          transport: "beacon"
-        });
-        const formData = new FormData();
-        formData.append("user_id", email);
-        formData.append("user_name", username);
-        formData.append("university", institution);
+      const authUser = await this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne);
+      this.setState({
+        uid: authUser.user.uid
+      });
+      ReactGA.set({
+        userId: this.state.uid
+      });
+      ReactGA.event({
+        category: "Sign Up",
+        action: "User pressed sign up button",
+        transport: "beacon"
+      });
+      const formData = new FormData();
+      formData.append("user_id", email);
+      formData.append("user_name", username);
+      formData.append("university", institution);
 
-        const response = await fetch(`/api/create-user`, {
+      const response = await fetch(`/api/create-user`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json"
+        },
+        body: formData
+      });
+      const body = await response.json();
+      for (const researchLanguage of this.state.languageOfResearch) {
+        const recordingData = new FormData();
+        const userId = body.result;
+        recordingData.append("user_id", userId);
+        recordingData.append("language", researchLanguage.value);
+        const result = await fetch(`/api/create-user-research-language`, {
           method: "POST",
           headers: {
-              Accept: "application/json"
+            Accept: "application/json"
           },
-          body: formData
+          body: recordingData
         });
-        const body = await response.json();
-        for (const researchLanguage of this.state.languageOfResearch) {
-          const recordingData = new FormData();
-          const userId = body.result;
-          recordingData.append("user_id", userId);
-          recordingData.append("language", researchLanguage.value);
-          const result =  await fetch(`/api/create-user-research-language`, {
-            method: "POST",
-            headers: {
-            Accept: "application/json"
-            },
-            body: recordingData
-            });
-        }
-        for (const userRole of this.state.role) {
-          const roleData = new FormData();
-          const userId = body.result;
-          roleData.append("user_id", userId);
-          roleData.append("user_role", userRole.value);
-          const result =  await fetch(`/api/create-user-role`, {
-            method: "POST",
-            headers: {
-            Accept: "application/json"
-            },
-            body: roleData
-            });
-        }
-        this.setState({ ...INITIAL_STATE });
-        this.props.history.push(ROUTES.HOME);
-      } catch (ex) {
-        console.log(ex);
       }
+      for (const userRole of this.state.role) {
+        if (userRole.value === 'Student') {
+          localStorage.setItem('user', 'true');
+        } else {
+          localStorage.setItem('user', 'false');
+        }
+        if (userRole.value === 'Teacher') {
+          localStorage.setItem('moderator', 'true');
+        } else {
+          localStorage.setItem('moderator', 'false');
+        }
+        if (userRole.value === 'Admin') {
+          localStorage.setItem('admin', 'true');
+        } else {
+          localStorage.setItem('admin', 'false');
+        }
+
+        const roleData = new FormData();
+        const userId = body.result;
+        roleData.append("user_id", userId);
+        roleData.append("user_role", userRole.value);
+        const result = await fetch(`/api/create-user-role`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json"
+          },
+          body: roleData
+        });
+      }
+      this.setState({ ...INITIAL_STATE });
+      this.props.history.push(ROUTES.HOME);
+    } catch (ex) {
+      console.log(ex);
+    }
   }
 
   onChange = (event: any) => {
@@ -125,15 +141,15 @@ class SignUpFormBase extends React.Component<Props, State> {
     this.setState({ checked: event.target.checked })
 
   handleRoleChange = (option: any) => {
-      this.setState({
-        role: option
-      });
-    }
+    this.setState({
+      role: option
+    });
+  }
   handleLanguageChange = (option: any) => {
-      this.setState({
-        languageOfResearch: option
-      });
-    }
+    this.setState({
+      languageOfResearch: option
+    });
+  }
 
   render() {
     const passwordLength = 10;
@@ -172,9 +188,9 @@ class SignUpFormBase extends React.Component<Props, State> {
     };
     const Checkbox = (props: any) => <input type="checkbox" {...props} />;
     const TermsOfUseLink = () => (
-      
+
       <Link to={ROUTES.TERMS_OF_USE} target="_blank" className="terms_of_use_Link">
-            terms of use
+        terms of use
       </Link>
     );
 
@@ -250,14 +266,14 @@ class SignUpFormBase extends React.Component<Props, State> {
             required
           />
           <span  >
-            By clicking the checkbox, you agree to the {<TermsOfUseLink/>} *
+            By clicking the checkbox, you agree to the {<TermsOfUseLink />} *
           </span>
         </label>
         <button type="submit" className="signup_Submit globalbtn">
           Sign Up
         </button>
         <span className="mandatory_message">
-           Fields marked with * are mandatory
+          Fields marked with * are mandatory
         </span>
       </form>
     );

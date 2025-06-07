@@ -152,7 +152,6 @@ export function StudentAssignment() {
         } catch (ex) {
             console.log(ex);
         }
-        window.location.reload()
     }
 
     if (!veri) {

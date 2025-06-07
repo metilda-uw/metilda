@@ -7,13 +7,14 @@ import { withAuthorization } from "../Session";
 import { AuthUserContext } from "../Session";
 import Modal from 'react-modal'
 import { verifyTeacher } from "./AuthUtils";
+import { spinnerIcon } from "../Utils/SpinnerIcon";
 
 function ContentManagement() {
     const [courseListString, setCourseListString] = useState('')
     const courseList = useMemo(() => courseListString.split(';'), [courseListString])
     const user = (useContext(AuthUserContext) as any)
     const [showModal, setShowModal] = useState(false)
-    
+
     const [newId, setNewId] = useState('')
     const [newName, setNewName] = useState('')
     const [newLanguage, setNewLanguage] = useState('')
@@ -22,10 +23,13 @@ function ContentManagement() {
     const [newSchedule, setNewSchedule] = useState('')
     const [veri, setVeri] = useState(true)
 
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         async function fetchData() {
             await verifyTeacher(user.email, setVeri)
-            if(!veri)
+            if (!veri)
                 return
 
             const formData = new FormData();
@@ -41,13 +45,17 @@ function ContentManagement() {
                     .then(x => x.map(obj => obj[0] + ',' + obj[1]))
                     .then(x => x.join(';'))
                     .then(setCourseListString);
+                setError(null);
             }
             catch (error) {
-                console.log("Fetch failed, see if it is 403 in error console")
+                setError("Failed to load courses. Please try again.");
+            }
+            finally {
+                setLoading(false);
             }
         }
         fetchData()
-    },[])
+    }, [])
 
     Modal.setAppElement('.App')
 
@@ -114,7 +122,7 @@ function ContentManagement() {
     return (
         <div>
             <Header></Header>
-            <div>
+            <div style={{ margin: '5%' }}>
                 <Modal
                     isOpen={showModal}
                     // onAfterOpen={afterOpenModal}
@@ -131,16 +139,24 @@ function ContentManagement() {
                         <div><b>Available:</b> <input type='checkbox' checked={newAvailable === '1' ? true : false} style={{ 'opacity': 100, 'pointerEvents': 'auto', 'position': 'unset' }}
                             onChange={(e) => setNewAvailable(e.target.checked ? '1' : '0')}></input></div>
                         <div><b>Schedule:</b> <input onChange={(e) => setNewSchedule(e.target.value)} required min={0} max={50}></input></div>
-                        <div><button type='submit' className='btn waves-light globalbtn' >Create</button></div>
+                        <div><button type='submit' className='' >Create</button></div>
                         <div><button className='btn waves-light globalbtn' onClick={() => { setShowModal(false); resetStates() }}>Cancel</button></div>
                     </form>
                 </Modal>
             </div>
             <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)}>Create a course</button>
-            <div className="course-list">
-                <div className="title">My Courses</div>
-                {courseList.map(x =>
-                    <div className="list-item" key={x}><Link className="content-link" to={'/content-management/course/' + x.split(',')[0]}>{x.split(',')[1]}</Link></div>
+            <div className="course-list" style={{ marginTop: '3%' }}>
+                <div className="title-name">My Courses</div>
+                {loading ? (
+                    <div>{spinnerIcon()} </div>
+                ) : error ? (
+                    <div className="error">{error}</div>
+                ) : (
+                    courseList.map(x =>
+                        <div className="list-item" key={x}>
+                            <Link className="content-link list-item-title" to={'/content-management/course/' + x.split(',')[0]} onClick={()=>{localStorage.setItem('course_name', x.split(',')[1])}}>{x.split(',')[1]}</Link>
+                        </div>
+                    )
                 )}
             </div>
         </div>

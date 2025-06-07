@@ -95,7 +95,6 @@ export function StudentAssignmentSubmissionDetail() {
                             <div><b>Submission Detail</b></div>
                             <div className="content" dangerouslySetInnerHTML={{ __html: draftToHtml(JSON.parse(content)) }}></div>
                             <div><b>Time:</b> {new Date(prevTime).toLocaleString()}</div>
-                            <div><b>Grade:</b> {prevGrade === -1.0 ? '-' : prevGrade}/{maxGrade} </div>
                             {comment ? <div> <div><b>Grader Comment:</b></div> <div>{comment.split('\n').map((line) => <div>{line}</div>)}</div> </div> : null }
                             <div><b>Deadline:</b> {deadline ? new Date(deadline).toLocaleString(): 'Loading...' }</div>
                             {prevFiles.length ? 

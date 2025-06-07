@@ -5,19 +5,22 @@ import Header from "../Components/header/Header";
 import { withAuthorization } from "../Session";
 import { AuthUserContext } from "../Session";
 import { verifyStudent } from "../CMS/AuthUtils";
+import { spinnerIcon } from "../Utils/SpinnerIcon";
 
 function StudentCourses() {
     const [courseListString, setCourseListString] = useState('')
-    const courseList=useMemo(()=>courseListString.split(';'),[courseListString])
+    const courseList = useMemo(() => courseListString.split(';'), [courseListString])
     const user = (useContext(AuthUserContext) as any)
 
     const [enrollCourse, setEnrollCOurse] = useState('')
     const [veri, setVeri] = useState(true)
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
         async function fetchData() {
-            await verifyStudent(user.email,setVeri)
-            if(!veri)
+            await verifyStudent(user.email, setVeri)
+            if (!veri)
                 return
 
             const formData = new FormData();
@@ -30,14 +33,20 @@ function StudentCourses() {
                     },
                     body: formData
                 }).then(x => x.json())
-                .then(x => x.map(obj => obj[0]+','+obj[1]))
-                .then(x => x.join(';'))
-                .then(setCourseListString);
+                    .then(x => x.map(obj => obj[0] + ',' + obj[1]))
+                    .then(x => x.join(';'))
+                    .then(setCourseListString);
+                setError(null);
             }
-            catch (e) {}
+            catch (error) {
+                setError("Error loading courses")
+            }
+            finally {
+                setLoading(false);
+            }
         }
         fetchData()
-    },[])
+    }, [])
 
     async function onEnroll() {
         const formData = new FormData();
@@ -60,14 +69,23 @@ function StudentCourses() {
     return (
         <div>
             <Header></Header>
-            <div>
-                <div><b>Enroll a course by course ID:</b> <input style={{ 'width': 'auto', 'height':'auto'}} onChange={(e) => setEnrollCOurse(e.target.value)}></input></div>
-                <div><button className='btn waves-light globalbtn' onClick={onEnroll}>Enroll</button></div>
-                <div className="course-list">
-                    <div className="title">My Courses:</div>
-                    {courseList.map(x => 
-                        <div className="list-item" key={x}><Link className="content-link" to={'student-view/course/'+x.split(',')[0]}>{x.split(',')[1]}</Link></div>
-                    )}
+            <div style={{ margin: '5%' }}>
+                <div><b>Enroll a course by course ID:</b> <input style={{ 'width': 'auto', 'height': 'auto' }} onChange={(e) => setEnrollCOurse(e.target.value)}></input>
+                <button className='btn waves-light globalbtn' style={{marginLeft: '2%'}} onClick={onEnroll}>Enroll</button></div>
+                <div className="course-list" style={{marginTop: '2%'}}>
+                    <div className="title-name">My Courses</div>
+                    {loading ? (
+                        <div className="spinner-container">
+                            {spinnerIcon()}
+                        </div>
+                    ) : error ? (
+                        <div className="error-message">{error}</div>
+                    ) :
+                        courseList.map(x =>
+                            <div className="list-item" key={x}>
+                                <Link className="content-link list-item-title" to={'student-view/course/' + x.split(',')[0]}>{x.split(',')[1]}</Link>
+                            </div>
+                        )}
                 </div>
             </div>
         </div>

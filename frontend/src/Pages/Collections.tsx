@@ -352,7 +352,7 @@ export default function Collections() {
             <Modal
               isOpen={renameModalIsOpen}
               style={customStyles}
-              appElement={document.getElementById("root" || undefined)}
+              appElement={document.getElementById("root")}
             >
               <p>Enter a new name: </p>
               <div className="col s4">
@@ -383,7 +383,7 @@ export default function Collections() {
             <Modal
               isOpen={deleteModalIsOpen}
               style={customStyles}
-              appElement={document.getElementById("root" || undefined)}
+              appElement={document.getElementById("root")}
             >
               <p>Are you sure you want to delete "{selectedCollection}"</p>
               <div className="col s4">

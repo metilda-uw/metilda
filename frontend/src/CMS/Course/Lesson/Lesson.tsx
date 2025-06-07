@@ -44,6 +44,8 @@ export function Lesson() {
     const [uploadFiles, setUploadFiles] = useState();
     const [newTitle, setNewTitle] = useState('')
     const [newAvailable, setNewAvailable] = useState('loading')
+    const [level, setLevel] = useState('')
+    const [published, setPublished] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [newPitchArt, setNewPitchArt] = useState('')
     const [veri, setVeri] = useState(true)
@@ -73,6 +75,8 @@ export function Lesson() {
                 setContent(response['content'])
                 setAvailable(response['available'] ? '1' : '0')
                 setNewAvailable(response['available'] ? '1' : '0')
+                setPublished(response['published'])
+                setLevel(response['level'])
                 let temp=[]
                 for (let x in response['content']) {
                     temp.push(0)
@@ -606,7 +610,7 @@ export function Lesson() {
                     <div className="info-list">
                         <div className='title'>{title}</div>
                         <div>{available === 'loading' ? null : <div><b>Available:</b> {available === '1' ? 'Yes' : 'No'}</div>}</div>
-
+                        <div><b>Level:</b> {level}</div>
                         {blockList.length ?
                             <DragDropContext onDragEnd={handleOnDragEnd}>
                                 <Droppable droppableId="blocks">
@@ -997,11 +1001,19 @@ export function Lesson() {
                     </div>
 
                     <div className="float-right">
-                        <div>
-                            <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)} disabled={status !== 'view'}>Update lesson</button>
-                            <button className='btn waves-light globalbtn' onClick={onDeleteLesson} disabled={status !== 'view'}>Delete lesson</button>
+                        <div style={{display: 'flex'}}>
+                            <button className='btn waves-light globalbtn' onClick={() => setShowModal(true)} disabled={status !== 'view'} style={{marginRight: '1%'}}>Update lesson</button>
+                            <button className='btn waves-light globalbtn' onClick={onDeleteLesson} disabled={status !== 'view'} style={{marginRight: '1%'}}>Delete lesson</button>
+                            <div>
+                            {
+                                status==='edit' || status==='edit-block'?
+                                <button className='btn waves-light globalbtn' onClick={() => { onSave();setStatus('view') }} disabled={status!=='edit'}>Save</button>
+                                :
+                                <button className='btn waves-light globalbtn' onClick={() => setStatus('edit')} disabled={(status!=='view')||loading}>Edit</button>
+                            }
                         </div>
-                        <div>
+                        </div>
+                        {/* <div>
                             <button className='btn waves-light globalbtn' onClick={() => { setStatus('create-text') }} disabled={(status !== 'view')||loading}>Create text blocks</button>
                         </div>
                         <div>
@@ -1018,15 +1030,8 @@ export function Lesson() {
                         </div>
                         <div>
                             <button className='btn waves-light globalbtn' onClick={() => { setStatus('create-pitchart') }} disabled={(status !== 'view')||loading}>Create PitchArt blocks</button>
-                        </div>
-                        <div>
-                            {
-                                status==='edit' || status==='edit-block'?
-                                <button className='btn waves-light globalbtn' onClick={() => { onSave();setStatus('view') }} disabled={status!=='edit'}>Save</button>
-                                :
-                                <button className='btn waves-light globalbtn' onClick={() => setStatus('edit')} disabled={(status!=='view')||loading}>Edit</button>
-                            }
-                        </div>
+                        </div> */}
+                        
                     </div>
 
                     <div>

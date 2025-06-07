@@ -1,18 +1,36 @@
-import React from "react"
-import { Link } from "react-router-dom"
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
+import { FaHome, FaBookOpen, FaChalkboardTeacher, FaComments, FaClipboardList, FaQuestionCircle, FaChartBar, FaGamepad, FaCalendarAlt, FaBell } from "react-icons/fa";
 
-export default function Sidebar(args) {
+const Sidebar = ({ courseId }) => {
+    const location = useLocation();
+    const menuItems = [
+        { name: "Course Info", icon: <FaHome />, path: `/student-view/course/${courseId}` },
+        { name: "Syllabus", icon: <FaBookOpen />, path: `/student-view/course/${courseId}/syllabus` },
+        { name: "Lessons", icon: <FaChalkboardTeacher />, path: `/student-view/course/${courseId}/lessons` },
+        { name: "Discussion", icon: <FaComments />, path: `/student-view/course/${courseId}/discussion` },
+        { name: "Assignment", icon: <FaClipboardList />, path: `/student-view/course/${courseId}/assignment` },
+        { name: "Quiz", icon: <FaQuestionCircle />, path: `/student-view/course/${courseId}/quiz` },
+        { name: "Grades", icon: <FaChartBar />, path: `/student-view/course/${courseId}/grades` },
+        { name: "Play & Learn", icon: <FaGamepad />, path: `/student-view/course/${courseId}/play_and_learn` },
+        { name: "Calendar", icon: <FaCalendarAlt />, path: `/student-view/course/${courseId}/calendar` },
+        { name: "Notification", icon: <FaBell />, path: `/student-view/course/${courseId}/notification` },
+    ];
+
     return (
         <div className="sidebar">
             <aside>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']} >Overview</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/syllabus'} >Syllabus</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/' + args['courseId'] + '/lessons'} >Lessons</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/discussion'} >Discussion</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/assignments'} >Assignment</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/quiz'} >Quiz</Link></div>
-                <div className="sidebar-item"><Link to={'/student-view/course/'+args['courseId']+'/grades'} >Grades</Link></div>
+                {menuItems.map((item, index) => (
+                    <div key={index} className={`sidebar-item ${item.name=="Course Info"? location.pathname==item.path ? 'active' : '' :location.pathname.includes(item.path) ? 'active' : ''}`}>
+                        <Link to={item.path} className={`sidebar-link ${item.name=="Course Info"? location.pathname==item.path ? 'active' : '' : location.pathname.includes(item.path) ? 'active' : ''}`}>
+                            {item.icon}
+                            <span className={`sidebar-text ${item.name=="Course Info"? location.pathname==item.path ? 'active' : '' : location.pathname.includes(item.path) ? 'active' : ''}`}>{item.name}</span>
+                        </Link>
+                    </div>
+                ))}
             </aside>
         </div>
-    )
-}
+    );
+};
+
+export default Sidebar;

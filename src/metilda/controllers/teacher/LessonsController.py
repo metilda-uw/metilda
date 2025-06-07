@@ -1,5 +1,6 @@
 from flask import request, jsonify
 from metilda import app
+from metilda.cache import cache
 from uuid import uuid4
 import json
 
@@ -8,6 +9,10 @@ import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from Postgres import Postgres
 
+def clear_teacher_lesson_cache():
+    keys_to_delete = [key for key in cache.cache._cache if "lesson" in key]
+    for key in keys_to_delete:
+        cache.delete(key)
 
 # ----------------Lessons--------------------
 @app.route('/cms/lessons/create', methods=["POST"])
@@ -21,10 +26,12 @@ def create_lesson():
         query = 'insert into lessons(id,name,course,idx,available) values(%s,%s,%s,%s,%s)'
         args = (str(uuid4()),request.form['name'],int(request.form['course']),int(request.form['length']),bool(request.form['available']))
         connection.execute_insert_query(query, args, False)
+        clear_teacher_lesson_cache()
 
     return jsonify({})
 
 @app.route('/cms/lessons', methods=["POST"])
+@cache.memoize(500)
 def read_lessons():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
@@ -39,6 +46,7 @@ def read_lessons():
     return jsonify(result)
 
 @app.route('/cms/lessons/read', methods=["POST"])
+@cache.memoize(500)
 def read_lesson():
     with Postgres() as connection:
         query = 'select user_role from user_role where user_id=%s and verified=true'
@@ -46,7 +54,7 @@ def read_lesson():
         if not connection.execute_select_query(query, args):
             return jsonify({}),403
 
-        query = 'select name,available from lessons where id=%s'
+        query = 'select name,available, level from lessons where id=%s'
         args = (request.form['lesson'],)
         result = connection.execute_select_query(query, args)
 
@@ -59,6 +67,7 @@ def read_lesson():
     return jsonify({
         'name':result[0][0],
         'available':result[0][1],
+        'level': result[0][2],
         'content':list(map(lambda arr:{
             'id':arr[0],
             'idx':arr[1],
@@ -78,6 +87,7 @@ def update_lesson():
         query = 'update lessons set name=%s,available=%s where id=%s'
         args = (request.form['name'],request.form['available'],request.form['lesson'])
         result = connection.execute_update_query(query, args)
+        clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lessons/reorganize', methods=["POST"])
@@ -94,6 +104,7 @@ def reorganize_lessons():
             query = 'update lessons set idx=%s where id=%s'
             args = (data[1],data[0])
             connection.execute_update_query(query, args)
+            clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lessons/delete', methods=["POST"])
@@ -107,6 +118,7 @@ def delete_lesson():
         query = 'delete from lessons where id=%s'
         args=(request.form['lesson'],)
         result = connection.execute_update_query(query, args)
+        clear_teacher_lesson_cache()
     return jsonify({})
 
 # ----------------Lesson block--------------------
@@ -122,6 +134,7 @@ def create_block():
         query = 'insert into lesson_blocks(id,lesson,idx,type,content) values(%s,%s,%s,%s,%s)'
         args = (block_id,request.form['lesson'],int(request.form['index']),request.form['type'],request.form['content'])
         connection.execute_insert_query(query, args, False)
+        clear_teacher_lesson_cache()
 
     return jsonify({'id':block_id})
 
@@ -166,6 +179,7 @@ def update_block():
         query = 'update lesson_blocks set content=%s where id=%s'
         args = (request.form['content'],request.form['block'])
         result = connection.execute_update_query(query, args)
+        clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lesson/blocks/reorganize', methods=["POST"])
@@ -181,6 +195,7 @@ def reorganize_blocks():
             query = 'update lesson_blocks set idx=%s where id=%s'
             args = (block['index'],block['id'])
             connection.execute_update_query(query, args)
+            clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lesson/blocks/delete', methods=["POST"])
@@ -194,6 +209,7 @@ def delete_block():
         query = 'delete from lesson_blocks where id=%s'
         args=(request.form['block'],)
         result = connection.execute_update_query(query, args)
+        clear_teacher_lesson_cache()
     return jsonify({})
 
 
@@ -205,6 +221,7 @@ def lesson_block_create_file():
         args = (request.form['user_id'], request.form['file_name'], request.form['file_path'],request.form['file_type'], 
                 request.form['file_size'],request.form['block'],request.form['course'])
         connection.execute_insert_query(query, args, False)
+        clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lesson/block/file/delete', methods=["POST"])
@@ -214,9 +231,11 @@ def lesson_block_delete_file():
             query = 'delete from lesson_block_files where path=%s'
             args=(request.form['old_path'],)
             connection.execute_update_query(query, args)
+            clear_teacher_lesson_cache()
     return jsonify({})
 
 @app.route('/cms/lesson/block/file/read/<string:course>/<string:type>/<string:block>', methods=["GET"])
+@cache.memoize(500)
 def lesson_block_get_file(course,type,block):
     with Postgres() as connection:
         query = 'select * from lesson_block_files where course=%s and type=%s and block=%s'
