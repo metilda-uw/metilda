@@ -569,7 +569,7 @@ class CreatePitchArt extends React.Component<
   renderPageOptions() {
     const { windowWidth } = this.state
     let classNameParams = "page-options waves-effect waves-light btn globalbtn";
-    if ((windowWidth / window.innerHeight) < 1.1) {
+    if (windowWidth < 1400) {
       classNameParams = "waves-effect waves-light btn globalbtn";
     }
     if (this.props.match.params.type === "share") {
@@ -639,7 +639,7 @@ class CreatePitchArt extends React.Component<
 
     let cloudUploadButtonParams = "UploadFile waves-effect waves-light btn globalbtn"
     let versionButtonParams = "versions waves-effect waves-light btn globalbtn"
-    if ((windowWidth / window.innerHeight) < 1.1) { // need to come up with a better check
+    if (windowWidth < 1400) {
       cloudUploadButtonParams = "waves-effect waves-light btn globalbtn"
       versionButtonParams = "waves-effect waves-light btn globalbtn"
     }
