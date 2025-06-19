@@ -7,7 +7,7 @@ import PitchArt from "./PitchArt";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtToggle from "./PitchArtToggle";
-import { Button, Popover, Backdrop, createTheme } from "@material-ui/core"
+import { Button, Popover, Backdrop, createTheme, Box } from "@material-ui/core"
 
 interface Props {
     firebase: any;
@@ -43,6 +43,10 @@ class PitchArtContainer extends React.Component<Props, State> {
 
     componentDidMount(): void {
       window.addEventListener("resize", this.setWindowWidth)
+    }
+
+    componentWillUnmount(): void {
+      window.removeEventListener("resize", this.setWindowWidth)
     }
 
     handleInputChange(event: SyntheticEvent) {
@@ -95,7 +99,7 @@ class PitchArtContainer extends React.Component<Props, State> {
     renderOptionList = () => {
       // renders the options for the Pitch Art to the left of the pitch art.
       return (
-        <div className="col s5">
+        <div className="col s5" >
           <h6 className="metilda-control-header">Pitch Art</h6>
           <div className="metilda-pitch-art-container-control-list">
             <PitchRange initMinPitch={this.props.pitchArt.minPitch}
@@ -204,34 +208,52 @@ class PitchArtContainer extends React.Component<Props, State> {
     }
 
     renderPopupOptionList = () => {
-      // TODO: 1. Center options within popup
-      // 2. add metildabtn (or whatever it was called in the CSS) styling to the 
-      //    button
+      // TODO: 1. make popup centered on screen
+      // 2. Center options within popup
 
       // creates options menu with same options at above, but will be contained in a pop 
       // up menu accessed via a button.
       // uses renderOptionList inorder to render the options 
       const theme = createTheme()
-      const {anchorEl} = this.state
+      const {anchorEl, windowWidth} = this.state
       const open = Boolean(this.state.anchorEl)
       return (
-      <>
-        <h4 className="col s7">Pitch Art</h4>
-        <Button className="col s7" onClick={this.handlePopupClick}>Pitch Art Options</Button>
-        <Backdrop 
-          open={open}
-          style={{ zIndex: theme.zIndex.modal }}
-        >
-          <Popover 
-            id={'popover'} 
-            open={open} 
-            anchorEl={anchorEl} 
-            onClose={this.handlePopupClose}
+        <>
+          <h4 className="col s7">Pitch Art</h4>
+          <Box style={{
+            width: windowWidth,
+            paddingLeft: "5%",
+            paddingRight: "5%",
+            paddingBottom: "20px"
+          }}>
+            <button
+              className="col s7 btn globalbtn"
+              style={{ width: windowWidth * .8 }}
+              onClick={this.handlePopupClick}
+            >
+              Pitch Art Options
+            </button>
+          </Box>
+          <Backdrop
+            open={open}
+            style={{ zIndex: theme.zIndex.modal }}
           >
-            {this.renderOptionList()}
-          </Popover>
-        </Backdrop>
-      </>
+            <Popover
+              id={'popover'}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center'
+              }}
+              onClose={this.handlePopupClose}
+            >
+              <div style={{ paddingLeft: '30px', paddingTop: '20px' }}>
+                {this.renderOptionList()}
+              </div>
+            </Popover>
+          </Backdrop>
+        </>
       )
     }
 
@@ -242,7 +264,7 @@ class PitchArtContainer extends React.Component<Props, State> {
             {(windowWidth <= 1000) ? this.renderPopupOptionList() : <></>}
             <div>
                 {(windowWidth > 1000) ? this.renderOptionList() : <></>}
-                <div className="col s7">
+                <div className="col s7" style={{ paddingTop: "15px"}}>
                     <PitchArt
                         width={this.props.width}
                         height={this.props.height}
