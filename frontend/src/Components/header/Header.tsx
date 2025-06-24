@@ -18,7 +18,7 @@ import { connect } from "react-redux";
 import { AppState } from "../../store";
 import * as constants from "../../constants";
 import Tooltip from '@material-ui/core/Tooltip';
-import { AppBar, Button, Collapse, Drawer, IconButton, Menu, MenuItem, Toolbar } from "@material-ui/core";
+import { Box, Button, Collapse, Drawer, IconButton, Toolbar } from "@material-ui/core";
 import  MenuIcon from "@material-ui/icons/Menu"
 
 
@@ -168,8 +168,6 @@ class Header extends Component<HeaderProps, State> {
     
   };
 
-  // will need to have seperate logic for the drawer in order to implment 
-  // the different anchor locations depending on screen size. 
   handleClick = (anchor: string) => (event : any) => {
     this.setState({...this.state,  [anchor] : !this.state[anchor] });
   };
@@ -328,58 +326,71 @@ class Header extends Component<HeaderProps, State> {
   renderSidebarNavButtons = () => {
     const {exploreAnchor, accountAnchor, notificationAnchor} = this.state
     return (
-      <>
-        <Button component={Link} to="/home">Home</Button>
-        <Button component={Link} to="/pitchartwizard" className={this.state.dispalyCreatePitchArtTab ? "" : "disabled-link"}>
+      <Box 
+        display='flex' 
+        mt={2} mb={2} 
+        flexDirection='column' 
+        width='90%' 
+        justifyContent='center' 
+        margin='0 auto'
+        style={{ gap: '8px' }}
+      >
+        <Button variant='contained' component={Link} to="/home">Home</Button>
+        <Button variant='contained' component={Link} to="/pitchartwizard" className={this.state.dispalyCreatePitchArtTab ? "" : "disabled-link"}>
           Create Pitch Art
         </Button>
-        <Button onClick={this.handleClick('exploreAnchor')}>Explore</Button>
-          <Collapse in={Boolean(exploreAnchor)} timeout='auto' unmountOnExit>
+        <Button variant='contained' onClick={this.handleClick('exploreAnchor')}>Explore</Button>
+          <Collapse className="Collapse" in={Boolean(exploreAnchor)} timeout='auto' unmountOnExit>
             <Button component={Link} to='/learn/words/syllables'>Learn</Button>
             <Button component={Link} to='/collections'>Collections</Button>
             <Button component={Link} to='/peldaview'>PELDA</Button>
           </Collapse>
-        <Button onClick={this.handleClick('accountAnchor')}>My Account</Button>
-          <Collapse in={Boolean(accountAnchor)} unmountOnExit>
+        <Button variant='contained' onClick={this.handleClick('accountAnchor')}>My Account</Button>
+          <Collapse className="Collapse" in={Boolean(accountAnchor)} unmountOnExit>
             <Button component={Link} to='/history'>History</Button>
             <Button component={Link} to='/my-files'>My Files</Button>
             <Button component={Link} to='/manage-account'>Manage Account</Button>
             <Button component={Link} to='/signout'>Sign Out</Button>
           </Collapse>
-        <Button component={Link} to="/converter">Converter</Button>
-        <Button component={Link} to="/feedback">Feedback</Button>
+        <Button variant='contained' component={Link} to="/converter">Converter</Button>
+        <Button variant='contained' component={Link} to="/feedback">Feedback</Button>
         {this.state.isAdmin && (
-            <Button component={Link} to="/manage-users">Manage Users</Button>
+            <Button variant='contained' component={Link} to="/manage-users">Manage Users</Button>
         )}
-        <Button component={Link} to="/documentation">Documentation</Button>
-        <Button onClick={this.handleClick('notificationAnchor')}>Notifications {this.state.isMessagesLoaded &&
+        <Button variant='contained' component={Link} to="/documentation">Documentation</Button>
+        <Button variant='contained' onClick={this.handleClick('notificationAnchor')}>Notifications {this.state.isMessagesLoaded &&
           <Badge badgeContent={this.state.numberOfNewMessages}
             color="primary"
             className="notification-badge">
             <MailIcon color="action" />
           </Badge>
         }</Button>
-        <Collapse in={Boolean(notificationAnchor)} unmountOnExit>
+        <Collapse className="Collapse" in={Boolean(notificationAnchor)} unmountOnExit>
           <Button component={Link} to='/notifications'>Messages</Button>
           <Button onClick={this.renderSendMessageOverlay}>Send Message</Button>
         </Collapse>
-      </>
+      </Box>
     )
   }
 
-  // Anchor for the Drawer will be dependent on screen size (from top 
-  // for anything smaller than a tablet)
   render() {
     const {windowWidth, openDrawer} = this.state
+    const drawerWidth : string = (windowWidth > 600) ? '250px' : '100%'
     return (
       <div>
         <nav className="nav">
           <ul className="nav-menu">
-            {(windowWidth >= 1000) ? this.renderNavButtons() : <></>}
-            {(windowWidth < 1000) ? (<>
+            {(windowWidth >= 1060) ? this.renderNavButtons() : <></>}
+            {(windowWidth < 1060) ? (<>
               <Toolbar>
                 <IconButton aria-label='menu' onClick={this.toggleDrawer(true)}><MenuIcon /></IconButton>
-                <Drawer anchor={'top'} open={openDrawer} onClose={this.toggleDrawer(false)}>
+                <div>MeTILDA</div>
+                <Drawer 
+                  anchor={(windowWidth < 600) ? 'top' : 'left'} 
+                  open={openDrawer} 
+                  onClose={this.toggleDrawer(false)}
+                  PaperProps={{ style: { width: drawerWidth} }}
+                >
                   {this.renderSidebarNavButtons()}
                 </Drawer>
               </Toolbar>
