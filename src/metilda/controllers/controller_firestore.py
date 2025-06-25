@@ -190,6 +190,24 @@ def get_question_value(qid):
     except Exception as e:
         return jsonify({'error': str(e)})
 
+# Get basic question information and number of answers per question
+@app.route('/api/getQuestionAnswerCounts', methods=["GET"])
+def get_question_answer_counts():
+    try:
+        with Postgres() as question:
+            postgres_select_query = """
+            SELECT q.qid, q.questionvalue, COUNT(DISTINCT a.aid) FROM questions q
+            LEFT JOIN answers a ON q.qid = a.qid
+            GROUP BY q.qid
+            ORDER BY q.qid ASC;
+            """
+            filter_values = ()
+            results = question.execute_select_query(postgres_select_query, (filter_values,))
+        return jsonify({'result': results})
+
+    except Exception as e:
+        return jsonify({'error': str(e)})
+
 # Add new question 
 @app.route('/api/addQuestion', methods=["POST"])
 def addQuestion():
@@ -362,6 +380,20 @@ def getAnswers():
         postgres_select_query = """ 
         SELECT * 
         FROM ANSWERS
+        """
+        filter_values = ()
+        results = answer.execute_select_query(postgres_select_query, (filter_values,))
+    return jsonify({'result': results})
+
+@app.route('/api/getAnswerCounts', methods=["GET"])
+def getAnswerCounts():
+    with Postgres() as answer:
+        postgres_select_query = """ 
+        SELECT q.qid, o.oid, COUNT(a.oid) as answer_count FROM questions q
+        CROSS JOIN public.options o
+        LEFT JOIN answers a ON q.qid = a.qid AND a.oid = o.oid
+        GROUP BY q.qid, o.oid
+        ORDER BY q.qid, o.oid ASC;
         """
         filter_values = ()
         results = answer.execute_select_query(postgres_select_query, (filter_values,))

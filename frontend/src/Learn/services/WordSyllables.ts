@@ -12,7 +12,7 @@ const getInitializer: RequestInit = {
 const getWordsBySyllableCount = async (numSyllables?: number, accentIndex?: number) => {
     let getUrl: string = baseUrl;
 
-    if (typeof numSyllables !== "undefined") {
+    if ((typeof numSyllables !== "undefined") && (!isNaN(numSyllables))) {
         getUrl += "?numSyllables=" + numSyllables;
     }
 

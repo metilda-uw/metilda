@@ -117,7 +117,8 @@ label{
 }
 
 .globalbtn {
-  padding: 10px 20px; /* Adjust values as needed */
+  // Below padding was causing uncentered text issues in the buttons.
+  // padding: 10px 20px; /* Adjust values as needed */
   white-space: nowrap; /* Prevent text from wrapping */
 }
 
