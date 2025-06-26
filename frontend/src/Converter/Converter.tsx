@@ -25,6 +25,14 @@ function Converter(){
     const [activeFromScaleInput, setActiveFromScaleInput] = useState(null);
     const [fromScaleValuesArray, setFromScaleValuesArray] = useState([null, null, null, null]);
     const [toScaleValuesArray, setToScaleValuesArray] = useState([null, null, null, null]);
+
+    // State for responsive design based on screen size
+    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+    useEffect(() => {
+      const resizeHandler = () => setWindowWidth(window.innerWidth)
+      window.addEventListener("resize", resizeHandler)
+    }, [])
     
     /**
      * Method to handle user input
@@ -308,7 +316,10 @@ function Converter(){
                                     value={fromScaleValuesArray[0]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(0)}
-                                    style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}>
@@ -321,7 +332,10 @@ function Converter(){
                                     value={fromScaleValuesArray[1]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(1)}
-                                    style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}>
@@ -334,7 +348,10 @@ function Converter(){
                                     value={fromScaleValuesArray[2]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(2)}
-                                    style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}>
@@ -347,7 +364,10 @@ function Converter(){
                                     value={fromScaleValuesArray[3]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(3)}
-                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}>
@@ -408,6 +428,9 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[0]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[0])}</span>
                                 </div>
@@ -417,6 +440,9 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[1]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[1])}</span>
                                 </div>
@@ -426,6 +452,9 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[2]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[2])}</span>
                                 </div>
@@ -435,6 +464,9 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[3]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[3])}</span>
                                 </div>
