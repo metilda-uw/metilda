@@ -12,8 +12,7 @@ class AudioImg extends Component {
         this.state = {
             isLoaded: false,
             imgObj: null,
-            verticalLines: this.props.verticalLines || [],
-            lineColor: this.props.lineColor || 'yellow',
+            verticalLines: this.props.verticalLines || []
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
@@ -273,7 +272,7 @@ class AudioImg extends Component {
               top: imageTop + 'px',
               height: imageHeight + 'px', // Adjust height as needed
               width: '2px', // Line thickness
-              background: this.props.lineColor, // Line color
+              background: 'yellow', // Line color
               cursor: 'ew-resize', // Cursor style
             }}
             onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging
