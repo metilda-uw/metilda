@@ -10,7 +10,8 @@ import EafsForMyFiles from "./EafsForMyFiles";
 import ImagesForMyFiles from "./ImagesForMyFiles";
 import SharedUsersForMyFiles from "./SharedUsersForMyFiles"
 import Modal from "react-modal";
-import { Radio, RadioGroup, FormControlLabel } from "@material-ui/core"
+import { Radio, RadioGroup, FormControlLabel, Box, Button, IconButton } from "@material-ui/core"
+import InfoIcon from '@material-ui/icons/Info';
 
 export interface MyFilesProps {
   firebase: any;
@@ -38,6 +39,8 @@ interface State {
   shareViewUserId: any;
   shareViewPermission: string;
   editUserPermission: string;
+  windowWidth: number;
+  infoOpenID: number | null;
 }
 
 interface FileEntity {
@@ -92,15 +95,22 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       shareViewModal: false,
       shareViewUserId: 1988,
       shareViewPermission: "view",
-      editUserPermission: "view"
+      editUserPermission: "view",
+      windowWidth: window.innerWidth,
+      infoOpenID: null
     };
   }
 
   componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     this.getUserFiles();
   }
   componentDidUpdate() {
     console.log(this.state);
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   getUserFiles = async () => {
@@ -206,6 +216,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       isGetImagesClicked: true,
       selectedFileName: fileName,
       selectedFileId: fileId,
+      infoOpenID: null
     });
   };
 
@@ -214,6 +225,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       isGetEafsClicked: true,
       selectedFileName: fileName,
       selectedFileId: fileId,
+      infoOpenID: null
     });
   };
 
@@ -222,16 +234,21 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       isSharedUsersClicked: true,
       selectedFileId: fileId,
       selectedFileName: fileName,
-      editUserPermission: permission
+      editUserPermission: permission,
+      infoOpenID: null
     })
   }
 
   renderTableHeader() {
-    const headerNames = [
+    const { windowWidth } = this.state
+    const headerNames = (windowWidth >= 600) ? [
       "File Name",
       "File Size",
       "Created At",
       "Options"
+    ] : [
+      "File Name",
+      "Info"
     ];
     const headers = [];
     headers.push(
@@ -256,6 +273,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
   }
 
   renderTableData() {
+    const {windowWidth} = this.state
     return this.state.files.map((file, index) => {
       return (
         <tr key={index}>
@@ -280,83 +298,175 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
             </td>
           )}
           <td>{file.name}</td>
-          <td>
-            {file.type === "Upload" && (
-              <p id="sizeParagraph"> {(file.size / 1024).toFixed(2)} KB</p>
-            )}
-            {file.type === "Folder" && <p id="sizeParagraph">-</p>}
-          </td>
-          <td>{file.createdAt}</td>
-          <td>
-            {file.type === "Upload" && (
-              <button
-                className="file-folder-options waves-effect waves-light btn globalbtn"
-                title="Get images for the file"
-                onClick={() => this.handleGetImages(file.id, file.name)}
-              >
-                <i className="material-icons right">image</i>
-                Get Images
-              </button>
-            )}
-            {file.type === "Folder" && (
-              <button
-                className="file-folder-options waves-effect waves-light btn globalbtn"
-                onClick={() => this.openFolder(file)}
-              >
-                <i className="material-icons right">folder_open</i>
-                Open Folder
-              </button>
-            )}
-            {file.type === "Upload" && (
-              <>
-                <button
-                  className="file-folder-options waves-effect waves-light btn globalbtn"
-                  title="Get EAFs for the file"
-                  onClick={() => this.handleGetEafs(file.id, file.name)}
+          {(windowWidth >= 600) ? (
+            <>
+              <td>
+                {file.type === "Upload" && (
+                  <p id="sizeParagraph"> {(file.size / 1024).toFixed(2)} KB</p>
+                )}
+                {file.type === "Folder" && <p id="sizeParagraph">-</p>}
+              </td>
+              <td>{file.createdAt}</td>
+              <td>
+                {file.type === "Upload" && (
+                  <button
+                    className="file-folder-options waves-effect waves-light btn globalbtn"
+                    title="Get images for the file"
+                    onClick={() => this.handleGetImages(file.id, file.name)}
+                  >
+                    <i className="material-icons right">image</i>
+                    Get Images
+                  </button>
+                )}
+                {file.type === "Folder" && (
+                  <button
+                    className="file-folder-options waves-effect waves-light btn globalbtn"
+                    onClick={() => this.openFolder(file)}
+                  >
+                    <i className="material-icons right">folder_open</i>
+                    Open Folder
+                  </button>
+                )}
+                {file.type === "Upload" && (
+                  <>
+                    <button
+                      className="file-folder-options waves-effect waves-light btn globalbtn"
+                      title="Get EAFs for the file"
+                      onClick={() => this.handleGetEafs(file.id, file.name)}
+                    >
+                      <i className="material-icons right">insert_drive_file</i>
+                      Get EAFs
+                    </button>
+                    {
+                      file.permission === "view" && (
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          title="Manage Access"
+                          onClick={() => { this.handleRemoveAccess(file) }}
+                        >
+                          <i className="material-icons right">insert_drive_file</i>
+                          Delete Access
+                        </button>
+                      )
+                    }
+                    {
+                      file.permission !== "view" && (
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          title="Manage Access"
+                          onClick={() => { this.handleGetSharedUsers(file.id, file.name, file.permission) }}
+                        >
+                          <i className="material-icons right">insert_drive_file</i>
+                          Manage Access
+                        </button>
+                      )
+                    }
+                  </>
+                )}
+                {file.type === "Folder" && (
+                  <button
+                    className="file-folder-options waves-effect waves-light btn globalbtn"
+                    title="Move selected audio files to folder"
+                    onClick={() => this.handleMoveFiles(file)}
+                  >
+                    <i className="material-icons right">add_box</i>
+                    Move to Folder
+                  </button>
+                )}
+              </td>
+            </>
+          ) : (
+            <td>
+              <label>
+                <IconButton onClick={() => this.handleInfoClick(file)}><InfoIcon /></IconButton>
+                <Modal
+                  isOpen={(this.state.infoOpenID === file.id)}
+                  onRequestClose={this.handleInfoClose}
+                  style={this.customStyles}
+                  appElement={document.getElementById("root" || undefined)}
                 >
-                  <i className="material-icons right">insert_drive_file</i>
-                  Get EAFs
-                </button>
-                {
-                  file.permission === "view" && (
-                    <button
-                      className="file-folder-options waves-effect waves-light btn globalbtn"
-                      title="Manage Access"
-                      onClick={() => { this.handleRemoveAccess(file) }}
-                    >
-                      <i className="material-icons right">insert_drive_file</i>
-                      Delete Access
-                    </button>
-                  )
-                }
-                {
-                  file.permission !== "view" && (
-                    <button
-                      className="file-folder-options waves-effect waves-light btn globalbtn"
-                      title="Manage Access"
-                      onClick={() => { this.handleGetSharedUsers(file.id, file.name, file.permission) }}
-                    >
-                      <i className="material-icons right">insert_drive_file</i>
-                      Manage Access
-                    </button>
-                  )
-                }
-              </>
-            )}
-            {file.type === "Folder" && (
-              <button
-                className="file-folder-options waves-effect waves-light btn globalbtn"
-                title="Move selected audio files to folder"
-                onClick={() => this.handleMoveFiles(file)}
-              >
-                <i className="material-icons right">add_box</i>
-                Move to Folder
-              </button>
-            )}
-          </td>
+                      {file.type === "Upload" && (
+                        <>
+                          <p>File Size:</p>
+                          <p id="sizeParagraph"> {(file.size / 1024).toFixed(2)} KB</p>
+                        </>
+                      )}
+                      <p>File Created On:</p>
+                      <p>{file.createdAt}</p>
+                  {file.type === 'Upload' && (
+                    <>
+                      <button
+                        className="file-folder-options waves-effect waves-light btn globalbtn"
+                        title="Get images for the file"
+                        onClick={() => this.handleGetImages(file.id, file.name)}
+                      >
+                        <i className="material-icons right">image</i>
+                        Get Images
+                      </button>
+                      <button
+                        className="file-folder-options waves-effect waves-light btn globalbtn"
+                        title="Get EAFs for the file"
+                        onClick={() => this.handleGetEafs(file.id, file.name)}
+                      >
+                        <i className="material-icons right">insert_drive_file</i>
+                        Get EAFs
+                      </button>
+                      {file.permission === "view" && (
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          title="Manage Access"
+                          onClick={() => { this.handleRemoveAccess(file) }}
+                        >
+                          <i className="material-icons right">insert_drive_file</i>
+                          Delete Access
+                        </button>
+                      )}
+                      {file.permission !== "view" && (
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          title="Manage Access"
+                          onClick={() => { this.handleGetSharedUsers(file.id, file.name, file.permission) }}
+                        >
+                          <i className="material-icons right">insert_drive_file</i>
+                          Manage Access
+                        </button>
+                      )}
+                    </>
+                  )}
+                    {file.type === 'Folder' && (
+                      <Box style={{ display: 'flex', flexDirection: 'column' }}>
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          onClick={() => this.openFolder(file)}
+                        >
+                          <i className="material-icons right">folder_open</i>
+                          Open Folder
+                        </button>
+                        <button
+                          className="file-folder-options waves-effect waves-light btn globalbtn"
+                          title="Move selected audio files to folder"
+                          onClick={() => this.handleMoveFiles(file)}
+                        >
+                          <i className="material-icons right">add_box</i>
+                          Move to Folder
+                        </button>
+                      </Box>
+                    )}
+                </Modal>
+              </label>
+            </td>
+          )}
         </tr>
       );
     });
+  }
+
+  handleInfoClick = (file : any) => {
+    this.setState({infoOpenID : file.id}) 
+  }
+
+  handleInfoClose = (event : any) => {
+    this.setState({infoOpenID : null}) 
   }
 
   openFolder = async (file: FileEntity) => {
@@ -365,6 +475,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       selectedFolderName: newFolderName,
       isGetSubFolderClicked: true,
       selectedFileId: file.id,
+      infoOpenID: null
     });
     await this.getUserFiles();
   };
@@ -394,6 +505,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
       }
       await this.setState({
         files: uncheckedFiles,
+        infoOpenID: null
       });
     } catch (ex) {
       console.log(ex);
@@ -600,26 +712,18 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
   };
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, windowWidth } = this.state;
     return (
       <div className="myFilesContainer">
         <div className="one">
           <Header />
           {isLoading && spinner()}
-          {!this.state.isGetSubFolderClicked && (
-            <button
-              className="AddSubfolder waves-effect waves-light btn globalbtn"
-              onClick={this.addSubfolder}
-            >
-              <i className="material-icons right">create_new_folder</i>
-              Add Subfolder
-            </button>
-          )}
           {this.state.isGetSubFolderClicked && (
             <div>
               <button
                 className="FolderBackButton waves-effect waves-light btn globalbtn"
                 onClick={this.subFolderBackButtonClicked}
+                style={{ position: (windowWidth >= 1000) ? 'absolute' : 'static' }}
               >
                 <i className="material-icons right">arrow_back</i>
                 Back
@@ -627,6 +731,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
               <button
                 className="DeleteFolder waves-effect waves-light btn globalbtn"
                 onClick={() => this.deleteFolder()}
+                style={{ position: (windowWidth >= 1000) ? 'absolute' : 'static' }}
               >
                 <i className="material-icons right">delete</i>
                 Delete {this.state.selectedFolderName}
@@ -643,83 +748,100 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
               {!this.state.isGetSubFolderClicked && (
                 <h1 id="myFilesTitle">My Files</h1>
               )}
-              <p>
-                <i>
-                  <b>Note:</b>
-                  1) Select checkboxes for files and click on 'Download Files'
-                  or 'Delete Files' button at the bottom of the page to download
-                  or delete files. <br />
-                  2) Select checkboxes for files and click on the corrosponding
-                  'Move to Folder' button to move files to that subfolder.
-                </i>
-              </p>
+              {!this.state.isGetSubFolderClicked && (
+                <button
+                  className="AddSubfolder waves-effect waves-light btn globalbtn"
+                  onClick={this.addSubfolder}
+                  style={{ position: (windowWidth < 600) ? 'static' : 'absolute' }}
+                >
+                  <i className="material-icons right">create_new_folder</i>
+                  Add Subfolder
+                </button>
+              )}
+              {(windowWidth >= 600) ? (
+                <p>
+                  <i>
+                    <b>Note:</b>
+                    1) Select checkboxes for files and click on 'Download Files'
+                    or 'Delete Files' button at the bottom of the page to download
+                    or delete files. <br />
+                    2) Select checkboxes for files and click on the corrosponding
+                    'Move to Folder' button to move files to that subfolder.
+                  </i>
+                </p>
+              ) : (<></>)}
               <br />
+              <div className="myFilesButtonContainer">
+                <Box style={{
+                  display: (windowWidth < 600) ? 'flex' : 'inline',
+                  flexDirection: (windowWidth < 600) ? 'column' : 'row',
+                }}>
+                  <button
+                    className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={this.downloadFiles}
+                  >
+                    <i className="material-icons right">file_download</i>
+                    Download Files
+                  </button>
+                  <button
+                    className="DownloadFile waves-effect waves-light btn globalbtn"
+                    onClick={() => { this.setState({ shareModal: true }) }}
+                  >
+                    <i className="material-icons right">queue</i>
+                    Share Files
+                  </button>
+                  <Modal
+                    isOpen={this.state.shareModal}
+                    style={this.customStyles}
+                    appElement={document.getElementById("root" || undefined)}
+                  >
+                    <p> Enter email id to share with:</p>
+                    <input
+                      className="share-modal-input"
+                      name="emailId"
+                      onChange={(event) => { this.setState({ shareUserId: event.target.value }) }}
+                      type="text"
+                      required
+                    />
+                    <RadioGroup
+                      row
+                      aria-labelledby="demo-row-radio-buttons-group-label"
+                      name="row-radio-buttons-group"
+                      onChange={(event) => { this.setState({ shareViewPermission: event.target.value }) }}
+                    >
+                      <FormControlLabel value="view" control={<Radio />} label="View" />
+                      <FormControlLabel value="edit" control={<Radio />} label="Edit" />
+                    </RadioGroup>
+                    <div className="share-cancel-save">
+                      <button
+                        className="btn waves-light globalbtn"
+                        onClick={() => { this.setState({ shareModal: false }) }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        className="btn waves-light globalbtn modal-btn"
+                        onClick={this.shareFile}
+                      >
+                        Share
+                      </button>
+                    </div>
+                  </Modal>
+                  <button
+                    className="DeleteFile waves-effect waves-light btn globalbtn"
+                    onClick={this.deleteFiles}
+                  >
+                    <i className="material-icons right">delete</i>
+                    Delete Files
+                  </button>
+                </Box>
+              </div>
               <table id="myFiles">
                 <tbody>
                   <tr>{this.renderTableHeader()}</tr>
                   {this.renderTableData()}
                 </tbody>
               </table>
-              <div className="myFilesButtonContainer">
-                <button
-                  className="DownloadFile waves-effect waves-light btn globalbtn"
-                  onClick={this.downloadFiles}
-                >
-                  <i className="material-icons right">file_download</i>
-                  Download Files
-                </button>
-                <button
-                  className="DownloadFile waves-effect waves-light btn globalbtn"
-                  onClick={() => { this.setState({ shareModal: true }) }}
-                >
-                  <i className="material-icons right">queue</i>
-                  Share Files
-                </button>
-                <Modal
-                  isOpen={this.state.shareModal}
-                  style={this.customStyles}
-                  appElement={document.getElementById("root" || undefined)}
-                >
-                  <p> Enter email id to share with:</p>
-                  <input
-                    className="share-modal-input"
-                    name="emailId"
-                    onChange={(event) => { this.setState({ shareUserId: event.target.value }) }}
-                    type="text"
-                    required
-                  />
-                  <RadioGroup
-                    row
-                    aria-labelledby="demo-row-radio-buttons-group-label"
-                    name="row-radio-buttons-group"
-                    onChange={(event) => { this.setState({ shareViewPermission: event.target.value }) }}
-                  >
-                    <FormControlLabel value="view" control={<Radio />} label="View" />
-                    <FormControlLabel value="edit" control={<Radio />} label="Edit" />
-                  </RadioGroup>
-                  <div className="share-cancel-save">
-                    <button
-                      className="btn waves-light globalbtn"
-                      onClick={() => { this.setState({ shareModal: false }) }}
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      className="btn waves-light globalbtn modal-btn"
-                      onClick={this.shareFile}
-                    >
-                      Share
-                    </button>
-                  </div>
-                </Modal>
-                <button
-                  className="DeleteFile waves-effect waves-light btn globalbtn"
-                  onClick={this.deleteFiles}
-                >
-                  <i className="material-icons right">delete</i>
-                  Delete Files
-                </button>
-              </div>
               <a className="hide" ref={this.downloadRef} target="_blank">
                 Hidden Download Link
               </a>
