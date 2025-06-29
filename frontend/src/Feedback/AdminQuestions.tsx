@@ -7,6 +7,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { NotificationManager } from 'react-notifications';
 import FirebaseContext from "../Firebase/context";
 import axios from 'axios';
+import { Box } from '@material-ui/core';
 
 // Define the structure for a Question object
 export interface Question {
@@ -53,6 +54,14 @@ const AdminQuestions: React.FC = () => {
   const [updatedStatus, setUpdatedStatus] = useState<boolean | null>(null);
   const currentDate = new Date().toLocaleString();
   const createdby = firebase.auth.currentUser.email;
+
+  // State for tracking window width
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
 
   /**
    * Function for fetching all active and inactive questions
@@ -454,6 +463,11 @@ const AdminQuestions: React.FC = () => {
             <div>
               <h3>Existing Roles:</h3>
               <div className="button-group">
+                <Box style={{display: 'flex', 
+                  flexWrap: (windowWidth < 600) ? 'wrap' : 'nowrap', 
+                  width: '90%',
+                  justifyContent: 'center'
+                }}>
                 {allRoles.map((role) => (
                   <button
                     key={role}
@@ -463,6 +477,7 @@ const AdminQuestions: React.FC = () => {
                     {role}
                   </button>
                 ))}
+                </Box>
               </div>
             </div>
 
@@ -607,6 +622,11 @@ const AdminQuestions: React.FC = () => {
             <div className="input-group">
               <h3>Select Roles for the Question:</h3>
               <div className="button-group">
+                <Box style={{display: 'flex', 
+                  flexWrap: (windowWidth < 600) ? 'wrap' : 'nowrap', 
+                  width: '90%',
+                  justifyContent: 'center'
+                }}>
                 {['Admin', 'Student', 'Teacher', 'Linguistic Researcher', 'Other'].map((role) => (
                   <button
                     key={role}
@@ -617,6 +637,7 @@ const AdminQuestions: React.FC = () => {
                     {role}
                   </button>
                 ))}
+                </Box>
               </div>
             </div>
 
@@ -648,18 +669,18 @@ const AdminQuestions: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>#</th>
+              {(windowWidth >= 600) ? (<th>#</th>) : (<></>)}
               <th>Question Value</th>
-              <th>Created By</th>
+              {(windowWidth >= 600) ? (<th>Created By</th>) : (<></>)}
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             {questions.map((question, index) => (
               <tr key={question.qid}>
-                <td>{index + 1}</td>
+                {(windowWidth >= 600) ? (<td>{index + 1}</td>) : (<></>)}
                 <td>{question.questionvalue}</td>
-                <td>{question.createdby}</td>
+                {(windowWidth >= 600) ? (<td>{question.createdby}</td>) : (<></>)}
                 <td>
                   <button onClick={() => handleViewDetails(question)}>View</button>
                   <button onClick={() => handleOpenEditPopup(question, 'value')}>Edit Value</button>
