@@ -858,11 +858,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const tapGainNode = audioContext.createGain();
     tapGainNode.connect(audioContext.destination);
 
-    // const tapTimes = verticalLines.map((line) => {
-    //   const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-    //   return time;
-    // });
-
     const tapTimes = verticalLines.map((line) => {
       const delay = 1;
       // Map the x-coordinate to a time in the audio
