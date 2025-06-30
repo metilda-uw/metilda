@@ -5,6 +5,7 @@ import AdminAnswer from './AdminAnswer';
 import AdminComment from './AdminCommets';
 import AdminOption from './AdminOptions';
 import AdminQuestion from './AdminQuestions';
+import AdminAnalysis from './AdminAnalysis';
 
 // This is to format whatthe admin can view and used to access all the different pages
 const AdminView: React.FC = () => {
@@ -20,6 +21,8 @@ const AdminView: React.FC = () => {
         return <AdminComment />;
       case 'options':
         return <AdminOption />;
+      case 'Analysis':
+        return <AdminAnalysis />;
       default:
         return <div>Select a section to view.</div>;
     }
@@ -33,6 +36,7 @@ const AdminView: React.FC = () => {
         <button onClick={() => setActiveSection('answers')}>Answers</button>
         <button onClick={() => setActiveSection('comments')}>Comments</button>
         <button onClick={() => setActiveSection('options')}>Options</button>
+        <button onClick={() => setActiveSection('Analysis')}>Analysis</button>
       </div>
       <div className="section-container">{renderSection()}</div>
     </div>

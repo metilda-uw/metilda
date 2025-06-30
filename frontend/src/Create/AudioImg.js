@@ -12,13 +12,14 @@ class AudioImg extends Component {
         this.state = {
             isLoaded: false,
             imgObj: null,
-            verticalLines: this.props.verticalLines || [],
+            verticalLines: this.props.verticalLines || []
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
         this.metildaAudioAnalysisImageRef = React.createRef();
         this.isSelecting = false;
     }
+    
 
     timeCoordToImageCoord(t) {
         let startOffset = this.props.imageWidth * this.props.xminPerc;
@@ -259,7 +260,6 @@ class AudioImg extends Component {
         const imageElement = this.metildaAudioAnalysisImageRef.current;
         const imageHeight = imageElement ? imageElement.clientHeight : 0;
         const imageTop = imageElement ? imageElement.offsetTop : 0;
-
         if (typeOfBeat !== 'Rhythm') return null;
       
         return verticalLines.map((line) => (

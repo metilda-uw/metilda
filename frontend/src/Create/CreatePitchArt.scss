@@ -26,7 +26,7 @@
 
 .metilda-audio-analysis-image {
   border: 1px solid black;
-  width: 653px;
+  width: 723px;
 }
 
 .metilda-audio-analysis-input {
@@ -312,4 +312,21 @@
 #button-drop-down-image-side-by-side {
   display: flex;
   flex-direction: row;
+}
+
+.metilda-audio-analysis-volume-control-col-2 {
+  border: 1px solid black;
+  height: 45px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.m-a-8 {
+  margin: 8px;
+}
+
+.metilda-audio-analysis-volume-btn {
+  margin: 0px 8px;
 }

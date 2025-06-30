@@ -790,6 +790,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
+
   playBeats = () => {
     const { verticalLines, soundLength } = this.state;
 
@@ -858,8 +859,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     tapGainNode.connect(audioContext.destination);
 
     const tapTimes = verticalLines.map((line) => {
+      const delay = 1;
+      // Map the x-coordinate to a time in the audio
       const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      return time;
+      if (time > 5) {
+        return time - 4 - delay
+      }
+      else {
+        return time - delay
+      }
     });
 
     audioElement.currentTime = 0;
