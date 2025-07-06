@@ -1,8 +1,6 @@
 
 import React, { useRef, useState, useEffect } from "react";
-import {controls, Media, Player} from "react-media-player";
-
-const {PlayPause, SeekBar, MuteUnmute, Volume,} = controls;
+import "./PlayerBar.css"; 
 
 interface Props {
     audioUrl: string;
@@ -102,23 +100,34 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
             {isMuted ? "Unmute" : "Mute"}
         </button>
 
-        <input
+        {/* Seek Bar */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Progress:</label>
+          <input
             type="range"
+            className="audio-slider"
             min="0"
             max={duration}
             value={progress}
             step="0.1"
             onChange={handleSeek}
-        />
+          />
+        </div>
 
-        <input
+        {/* Volume Slider */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Volume:</label>
+          <input
             type="range"
+            className="audio-slider"
             min="0"
             max="1"
             step="0.01"
             value={volume}
             onChange={handleVolumeChange}
-        />
+          />
+        </div>
+
 
         <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
           <label htmlFor="speedSelect" style={{ fontWeight: 'bold' }}>Speed:</label>
@@ -126,15 +135,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
             id="speedSelect"
             value={playbackRate}
             onChange={handleSpeedChange}
-            style={{
-              display: 'inline-block',
-              padding: '4px 8px',
-              border: '1px solid #ccc',
-              borderRadius: '4px',
-              backgroundColor: 'white',
-              color: 'black',
-              appearance: 'auto', 
-            }}
+            className="audio_speed"
           >
             <option value="0.5">0.5x</option>
             <option value="0.75">0.75x</option>
