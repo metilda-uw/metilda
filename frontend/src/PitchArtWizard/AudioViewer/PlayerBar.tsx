@@ -1,5 +1,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faVolumeUp, faVolumeDown, faVolumeOff } from "@fortawesome/free-solid-svg-icons";
 import "./PlayerBar.css"; 
 
 interface Props {
@@ -8,42 +10,64 @@ interface Props {
 
 const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const volumeRef = useRef<HTMLDivElement>(null);
+
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1); // from 0 to 1
+  const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [progress, setProgress] = useState(0); // in seconds
   const [duration, setDuration] = useState(0); // in seconds
   const [playbackRate, setPlaybackRate] = useState(1.0);
 
   useEffect(() => {
-        const audio = audioRef.current;
-        if (!audio) return;
+    const audio = audioRef.current;
+    if (!audio) return;
 
-        const handleTimeUpdate = () => setProgress(audio.currentTime);
-        const handleLoadedMetadata = () => setDuration(audio.duration);
-        const handleEnded = () => {
-            setIsPlaying(false);
-            audio.currentTime = 0; 
-        };
+    const handleTimeUpdate = () => setProgress(audio.currentTime);
+    const handleLoadedMetadata = () => setDuration(audio.duration);
+    const handleEnded = () => {
+      setIsPlaying(false);
+      audio.currentTime = 0; 
+    };
 
-        audio.addEventListener("timeupdate", handleTimeUpdate);
-        audio.addEventListener("loadedmetadata", handleLoadedMetadata);
-        audio.addEventListener("ended", handleEnded);
+    audio.addEventListener("timeupdate", handleTimeUpdate);
+    audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+    audio.addEventListener("ended", handleEnded);
 
-        return () => {
-            audio.removeEventListener("timeupdate", handleTimeUpdate);
-            audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
-            audio.removeEventListener("ended", handleEnded);
-        };
-    }, []);
+    return () => {
+      audio.removeEventListener("timeupdate", handleTimeUpdate);
+      audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+      audio.removeEventListener("ended", handleEnded);
+    };
+  }, []);
 
-    useEffect(() => {
-        const audio = audioRef.current;
-        if (audio) {
-        audio.playbackRate = playbackRate;
-        }
-    }, [playbackRate]);
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.playbackRate = playbackRate;
+      }
+  }, [playbackRate]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        volumeRef.current &&
+        !volumeRef.current.contains(event.target as Node)
+      ) {
+        setShowVolumeSlider(false);
+      }
+    };
+
+    if (showVolumeSlider) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showVolumeSlider]);
 
   const togglePlayPause = () => {
     const audio = audioRef.current;
@@ -55,14 +79,6 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
       audio.play();
     }
     setIsPlaying(!isPlaying);
-  };
-
-  const toggleMute = () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    audio.muted = !isMuted;
-    setIsMuted(!isMuted);
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -89,64 +105,61 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
 
 
   return (
-    <div className="custom-player">
+      <div className="player-container">
         <audio ref={audioRef} src={audioUrl} preload="metadata" />
 
-        <button onClick={togglePlayPause}>
-            {isPlaying ? "Pause" : "Play"}
+        <button className="no-margin" onClick={togglePlayPause}>
+          {isPlaying ? "Pause" : "Play"}
         </button>
 
-        <button onClick={toggleMute}>
-            {isMuted ? "Unmute" : "Mute"}
-        </button>
+        <div className="volume-control">
+           <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="volume-icon">
+              <FontAwesomeIcon
+                  icon={
+                    volume === 0 ? faVolumeOff :
+                    volume < 0.5 ? faVolumeDown :
+                    faVolumeUp
+                  }
+                />
+            </button>
 
-        {/* Seek Bar */}
-        <div style={{ marginBottom: '12px' }}>
-          <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Progress:</label>
-          <input
-            type="range"
-            className="audio-slider"
-            min="0"
-            max={duration}
-            value={progress}
-            step="0.1"
-            onChange={handleSeek}
-          />
+          {showVolumeSlider && (
+            <input
+              type="range"
+              className="volume-slider"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={handleVolumeChange}
+            />
+          )}
         </div>
 
-        {/* Volume Slider */}
-        <div style={{ marginBottom: '12px' }}>
-          <label style={{ fontSize: '14px', fontWeight: 'bold' }}>Volume:</label>
-          <input
-            type="range"
-            className="audio-slider"
-            min="0"
-            max="1"
-            step="0.01"
-            value={volume}
-            onChange={handleVolumeChange}
-          />
-        </div>
+        <input
+          type="range"
+          className="audio-slider"
+          min="0"
+          max={duration}
+          value={progress}
+          step="0.1"
+          onChange={handleSeek}
+        />
 
-
-        <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <label htmlFor="speedSelect" style={{ fontWeight: 'bold' }}>Speed:</label>
-          <select
-            id="speedSelect"
-            value={playbackRate}
-            onChange={handleSpeedChange}
-            className="audio_speed"
-          >
-            <option value="0.5">0.5x</option>
-            <option value="0.75">0.75x</option>
-            <option value="1">1x</option>
-            <option value="1.25">1.25x</option>
-            <option value="1.5">1.5x</option>
-            <option value="2">2x</option>
-          </select>
-        </div>
-    </div>
-  );
-};
+        <select
+          value={playbackRate}
+          onChange={handleSpeedChange}
+          className="audio-speed"
+        >
+          <option value="0.5">0.5x</option>
+          <option value="0.75">0.75x</option>
+          <option value="1">1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+      </div>
+    );
+  };
 
 export default PlayerBar;
