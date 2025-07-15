@@ -103,6 +103,8 @@ interface State {
   draggingIndex: number;
   isDragging: boolean;
   verticalLines: VerticalLine[];
+  sidebarCollapsed?: boolean;
+  isMobileView?: boolean;
 }
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
@@ -218,6 +220,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       isDragging: false,
       verticalLines: [],
       userEmail: '',
+      sidebarCollapsed: false,
     };
     this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -248,6 +251,19 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   getSpeaker = (): Speaker => {
     return this.props.speakers[this.props.speakerIndex];
   }
+
+  mediaQueryList: MediaQueryList | null = null;
+
+
+  handleMediaQueryChange = (e: MediaQueryListEvent | MediaQueryList) => {
+  const isMobile = e.matches;
+  this.setState({
+    isMobileView: isMobile,
+    sidebarCollapsed: isMobile, 
+  });
+};
+
+
 
   componentDidMount() {
     const uploadId = this.getSpeaker().uploadId;
@@ -283,6 +299,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         controller.props.setAudioUrl(audioUrl); // Set the audio URL in CreatePitchArt
 
       });
+
+      //sidebar logic
+      this.mediaQueryList = window.matchMedia('(max-width: 1024px)');
+      this.mediaQueryList.addEventListener('change', this.handleMediaQueryChange);
+      this.handleMediaQueryChange(this.mediaQueryList);
+  }
+
+    componentWillUnmount() {
+    this.mediaQueryList?.removeEventListener('change', this.handleMediaQueryChange);
   }
 
   setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
@@ -966,6 +991,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     });
   };
 
+  toggleSidebar = () => {
+      this.setState((prevState) => ({ sidebarCollapsed: !prevState.sidebarCollapsed }));
+    };
+
   render() {
     const { typeOfBeat } = this.state;
     const { verticalLines } = this.state;
@@ -992,31 +1021,41 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     return (
       <div className="AudioAnalysis">
-        <div className="row">
-          <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
-            <h6 className="metilda-control-header">
-              Speaker {this.props.speakerIndex + 1}
-            </h6>
-            <UploadAudio
-              initFileName={uploadId}
-              setUploadId={this.setUploadId}
-              userFiles={this.props.files}
-              firebase={this.props.firebase}
-            />
-            <PitchRange
-              initMinPitch={this.props.minPitch}
-              initMaxPitch={this.props.maxPitch}
-              applyPitchRange={this.applyPitchRange}
-            />
-            {this.renderSpeakerControl()}
-            <button
-              className="waves-effect waves-light btn globalbtn"
-              onClick={this.toggleTypeOfBeat}
-            >
-              {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
-            </button>
-          </div>
-          <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
+        <div className="audio-analysis-container">
+          <div className={`audio-sidebar ${this.state.sidebarCollapsed ? 'collapsed' : ''}`}>
+           { this.state.isMobileView && (<button className="sidebar-toggle" onClick={this.toggleSidebar}>
+                  ☰
+            </button>)}
+            {!this.state.sidebarCollapsed && (
+              <div className="speaker-panel">
+                  <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
+                      <h6 className="metilda-control-header">
+                        Speaker {this.props.speakerIndex + 1}
+                      </h6>
+                      <UploadAudio
+                        initFileName={uploadId}
+                        setUploadId={this.setUploadId}
+                        userFiles={this.props.files}
+                        firebase={this.props.firebase}
+                      />
+                      <PitchRange
+                        initMinPitch={this.props.minPitch}
+                        initMaxPitch={this.props.maxPitch}
+                        applyPitchRange={this.applyPitchRange}
+                      />
+                      {this.renderSpeakerControl()}
+                      <button
+                        className="waves-effect waves-light btn globalbtn"
+                        onClick={this.toggleTypeOfBeat}
+                      >
+                        {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
+                      </button>
+                    </div>
+                </div>
+              )}
+            </div>
+            <div className="audio-main">
+              <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
               {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
@@ -1095,7 +1134,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                     Play Taps
                   </button>
                   <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
-                    Play Audio + Taps
+                    Play Speech + Taps
                   </button>
                 </div>
                 <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
@@ -1103,8 +1142,122 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               </div>
             }
           </div>
+            </div>
 
         </div>
+        {/* <div className="row"> */}
+          {/* <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
+            <h6 className="metilda-control-header">
+              Speaker {this.props.speakerIndex + 1}
+            </h6>
+            <UploadAudio
+              initFileName={uploadId}
+              setUploadId={this.setUploadId}
+              userFiles={this.props.files}
+              firebase={this.props.firebase}
+            />
+            <PitchRange
+              initMinPitch={this.props.minPitch}
+              initMaxPitch={this.props.maxPitch}
+              applyPitchRange={this.applyPitchRange}
+            />
+            {this.renderSpeakerControl()}
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              onClick={this.toggleTypeOfBeat}
+            >
+              {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
+            </button>
+          </div> */}
+          {/* <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
+            <div className="metilda-audio-analysis-image-container">
+              {nonAudioImg}
+              {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
+              {uploadId && (
+                <AudioImg
+                  key={this.state.imageUrl}
+                  uploadId={uploadId}
+                  speakerIndex={this.props.speakerIndex}
+                  src={this.state.imageUrl}
+                  ref="audioImage"
+                  imageWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                  xminPerc={DEFAULT.MIN_IMAGE_XPERC}
+                  xmaxPerc={DEFAULT.MAX_IMAGE_XPERC}
+                  audioIntervalSelected={this.audioIntervalSelected}
+                  audioIntervalSelectionCanceled={this.audioIntervalSelectionCanceled}
+                  onAudioImageLoaded={this.onAudioImageLoaded}
+                  showImgMenu={this.showImgMenu}
+                  minAudioX={this.state.minAudioX}
+                  maxAudioX={this.state.maxAudioX}
+                  minAudioTime={this.state.minAudioTime}
+                  maxAudioTime={this.state.maxAudioTime}
+                  beats={this.state.typeOfBeat === "Rhythm" ? this.state.beats : []}
+                  tmin={this.state.minAudioTime}
+                  tmax={this.state.maxAudioTime}
+                  spectrogramWidth={DEFAULT.AUDIO_IMG_WIDTH}
+                  typeOfBeat={this.state.typeOfBeat}
+                  onVerticalLinesUpdate={this.handleVerticalLinesUpdate} // Pass callback
+                  verticalLines={verticalLines}
+                />
+              )}
+            </div>
+            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+            <div >
+              <TargetPitchBar
+                letters={this.props.speakers}
+                files={this.props.files}
+                minAudioX={this.state.minAudioX}
+                maxAudioX={this.state.maxAudioX}
+                minAudioTime={this.state.minAudioTime}
+                maxAudioTime={this.state.maxAudioTime}
+                targetPitchSelected={this.targetPitchSelected}
+                speakerIndex={this.props.speakerIndex}
+                firebase={this.props.firebase}
+                typeOfBeat={this.state.typeOfBeat}
+              />
+              {typeOfBeat == 'Rhythm' &&
+                <button
+                  className="waves-effect waves-light btn globalbtn"
+                  onClick={this.saveRhythm}
+                >
+                  Save Rhythm
+                </button>
+              }
+            </div>
+            {
+              typeOfBeat == 'Rhythm' &&
+              <div className="vertical-lines-container">
+                <div
+                  className="vertical-lines-indicator"
+                  style={{
+                    position: "relative",
+                    width: `${DEFAULT.AUDIO_IMG_WIDTH}px`,
+                    height: "30px",
+                    backgroundColor: "#f8f8f8",
+                    border: "5px solid #ccc",
+                    marginTop: "10px",
+                    marginLeft: "auto",
+                    marginRight: "auto",
+                  }}
+                >
+                  {this.renderVerticalLineDots()}
+                </div>
+
+                <div style={{ marginBottom: "5px", textAlign: "center" }}>
+                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
+                    Play Taps
+                  </button>
+                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
+                    Play Speech + Taps
+                  </button>
+                </div>
+                <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
+
+              </div>
+            }
+          </div> */}
+
+        {/* </div> */}
       </div>
     );
   }
