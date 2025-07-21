@@ -112,7 +112,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
           {isPlaying ? "Pause" : "Play"}
         </button>
 
-        <div className="volume-control">
+        <div className="volume-control" ref={volumeRef}>
            <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="volume-icon">
               <FontAwesomeIcon
                   icon={
@@ -126,7 +126,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl }) => {
           {showVolumeSlider && (
             <input
               type="range"
-              className="volume-slider"
+              className="volume-slider vertical"
               min="0"
               max="1"
               step="0.01"
