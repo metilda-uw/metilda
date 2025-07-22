@@ -19,6 +19,7 @@ interface State {
   studentRecordings: RecordingEntity[];
   students: StudentEntity[];
   selectedStudentName: string;
+  windowWidth: number;
 }
 
 interface StudentEntity {
@@ -40,8 +41,17 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
       isLoading: false,
       studentRecordings: [],
       students: [],
-      selectedStudentName: ""
+      selectedStudentName: "",
+      windowWidth: window.innerWidth
     };
+  }
+
+  componentDidMount(): void {
+    window.addEventListener("resize", this.setWindowWidth)
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   async componentWillReceiveProps(nextProps: StudentRecordingsProps) {
@@ -114,7 +124,7 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
 }
 
   render() {
-    const {isLoading} = this.state;
+    const {isLoading, windowWidth} = this.state;
     const {showStudentRecordings} = this.props;
     const className = `${showStudentRecordings
       ? "transition"
@@ -123,7 +133,9 @@ export class StudentRecordings extends React.Component <StudentRecordingsProps, 
       <div className={className}>
           {isLoading && spinner()}
           <button className="BackButton waves-effect waves-light btn globalbtn"
-          onClick={this.props.studentRecordingsBackButtonClicked}>
+          onClick={this.props.studentRecordingsBackButtonClicked}
+          style={{ position: (windowWidth < 600) ? 'static' : 'absolute' }}
+          >
             <i className="material-icons right">arrow_back</i>
               Back
           </button>

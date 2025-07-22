@@ -33,10 +33,11 @@ import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
 import PitchRange from "../PitchArtWizard/AudioViewer/PitchRange";
 import PitchArtToggle from "../PitchArtWizard/PitchArtViewer/PitchArtToggle";
-import { Slider } from "@material-ui/core";
+import { Box, Slider } from "@material-ui/core";
 import { createMuiTheme } from "@material-ui/core/styles";
 import { ThemeProvider } from "@material-ui/styles";
 import wordSyllableService from "./services/WordSyllables";
+import Modal from "react-modal";
 
 const { PlayPause, SeekBar } = controls;
 
@@ -74,6 +75,8 @@ interface State {
   pitchValue: number;
   speedValue: number;
   resetDone: boolean;
+  windowWidth: number;
+  controlsModal: boolean;
 }
 const styles = (theme: Theme) =>
   createStyles({
@@ -112,6 +115,22 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
 });
 
 export class WordSyllableReview extends React.Component<Props, State> {
+  customStyles = {
+    overlay: {
+      position: "fixed",
+      zIndex: 100
+    },
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
+
   static get AUDIO_IMG_WIDTH(): number {
     return 653;
   }
@@ -160,9 +179,12 @@ export class WordSyllableReview extends React.Component<Props, State> {
       pitchValue: 0,
       speedValue: 1,
       resetDone: false,
+      windowWidth: window.innerWidth,
+      controlsModal: false
     };
   }
   componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     this.setState({ loading: true });
     const values: queryString.ParsedQuery<string> = queryString.parse(
       this.props.location.search
@@ -220,6 +242,10 @@ export class WordSyllableReview extends React.Component<Props, State> {
   }
   componentWillUnmount() {
     this.resetSlider(this.state.activeWordIndex);
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   resetSlider = async (wordIndex: number) => {
@@ -715,6 +741,123 @@ export class WordSyllableReview extends React.Component<Props, State> {
     });
   };
 
+  handleControlMenuClick = () => {
+    this.setState({controlsModal : true}) 
+  }
+
+  handleControlMenuClose = () => {
+    this.setState({controlsModal : false}) 
+  }
+
+  renderWordList = () => {
+
+    return (
+<>
+        <h6 className="metilda-control-header">Word List</h6>
+        <div id="metilda-word-list">
+          <ul className="collection">
+            {this.state.words.map((word, index) => (
+              <li
+                key={"metilda-word-" + index}
+                className={
+                  "collection-item " +
+                  (index === this.state.activeWordIndex ? "active" : "")
+                }
+                onClick={() => this.wordClicked(index)}
+              >
+                {word.uploadId}
+              </li>
+            ))}
+          </ul>
+        </div>
+</>
+    )
+  }
+
+  renderControls = (muiTheme) => {
+    const {windowWidth} = this.state
+    return (
+      <Box >
+        {(windowWidth > 1200) ? (this.renderWordList()) : (<></>)}
+        <div className="metilda-pitch-art-container-control-list">
+          <PitchRange
+            initMinPitch={this.state.minPitch}
+            initMaxPitch={this.state.maxPitch}
+            applyPitchRange={this.applyPitchRange}
+          />
+        </div>
+        <h6 className="metilda-control-header">Previous Recordings</h6>
+        {this.renderPreviousRecordings()}
+        <h6 className="metilda-control-header">Pitch Art</h6>
+        <div className="metilda-pitch-art-container-control-list col s12">
+          <PitchArtPrevPitchValueToggle
+            handleInputChange={this.handleInputChange}
+            showPrevPitchValueLists={this.state.showPrevPitchValueLists}
+          />
+        </div>
+        <div className="row metilda-pitch-art-container-control-toggle-list">
+          <PitchArtToggle
+            label="Show Sample Pitch Tracking"
+            inputName="showRedDot"
+            isSelected={this.state.showRedDot}
+            offText="Hide"
+            onText="Show"
+            onChange={this.toggleChanged}
+          />
+        </div>
+        <div className="col metilda-pitch-art-container-control-toggle-list">
+          <Typography
+            align="left"
+            color={"textPrimary"}
+            id="discrete-slider-small-steps"
+            gutterBottom
+          >
+            Pitch Level
+          </Typography>
+          <ThemeProvider theme={muiTheme}>
+            <Slider
+              defaultValue={0}
+              aria-labelledby="discrete-slider-small-steps"
+              valueLabelDisplay="auto"
+              step={10}
+              marks={true}
+              min={-50}
+              max={50}
+              onChange={(event, value) =>
+                this.onSliderChangePitch(value as number)
+              }
+              value={this.state.pitchValue}
+            />
+          </ThemeProvider>
+          <Typography
+            align="left"
+            color={"textPrimary"}
+            id="discrete-slider-small-steps"
+            gutterBottom
+          >
+            Speed Level
+          </Typography>
+          <ThemeProvider theme={muiTheme}>
+            <Slider
+              defaultValue={1}
+              aria-labelledby="discrete-slider-small-steps"
+              valueLabelDisplay="auto"
+              step={0.5}
+              marks={true}
+              min={0.5}
+              max={2}
+              onChange={(event, value) =>
+                this.onSliderChangeSpeed(value as number)
+              }
+              value={this.state.speedValue}
+            />
+          </ThemeProvider>
+          {(windowWidth <= 1200) ? (this.renderWordList()) : (<></>)}
+        </div>
+      </Box>
+    )
+  }
+
   render() {
     if (this.state.loading) {
       return <div className="metilda-page-content">Loading...</div>;
@@ -745,105 +888,30 @@ export class WordSyllableReview extends React.Component<Props, State> {
         },
       },
     });
+
+    // breakpoint is 1200 for sake of testing because pitch art container 
+    // breaks placement of any centered items, can't see modal on phone width
+    const {windowWidth} = this.state
+    const rowOrCol = (windowWidth < 1200) ? 'col' : 'row'
     return (
       <div>
         {this.recordingConfirmationModal()}
         {this.saveRecordingModal()}
         {this.deleteRecordingModal()}
-        <div className="metilda-page-content">
-          <div className="row">
+        <div className="metilda-page-content" style={{width:(windowWidth < 1200) ? '95%' : '1016px'}}>
+          <div className={rowOrCol}>
             <div className="col s4">
-              <h6 className="metilda-control-header">Word List</h6>
-              <div id="metilda-word-list">
-                <ul className="collection">
-                  {this.state.words.map((word, index) => (
-                    <li
-                      key={"metilda-word-" + index}
-                      className={
-                        "collection-item " +
-                        (index === this.state.activeWordIndex ? "active" : "")
-                      }
-                      onClick={() => this.wordClicked(index)}
-                    >
-                      {word.uploadId}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="metilda-pitch-art-container-control-list">
-                <PitchRange
-                  initMinPitch={this.state.minPitch}
-                  initMaxPitch={this.state.maxPitch}
-                  applyPitchRange={this.applyPitchRange}
-                />
-              </div>
-              <h6 className="metilda-control-header">Previous Recordings</h6>
-              {this.renderPreviousRecordings()}
-              <h6 className="metilda-control-header">Pitch Art</h6>
-              <div className="metilda-pitch-art-container-control-list col s12">
-                <PitchArtPrevPitchValueToggle
-                  handleInputChange={this.handleInputChange}
-                  showPrevPitchValueLists={this.state.showPrevPitchValueLists}
-                />
-              </div>
-              <div className="row metilda-pitch-art-container-control-toggle-list">
-                <PitchArtToggle
-                  label="Show Sample Pitch Tracking"
-                  inputName="showRedDot"
-                  isSelected={this.state.showRedDot}
-                  offText="Hide"
-                  onText="Show"
-                  onChange={this.toggleChanged}
-                />
-              </div>
-              <div className="col metilda-pitch-art-container-control-toggle-list">
-                <Typography
-                  align="left"
-                  color={"textPrimary"}
-                  id="discrete-slider-small-steps"
-                  gutterBottom
-                >
-                  Pitch Level
-                </Typography>
-                <ThemeProvider theme={muiTheme}>
-                  <Slider
-                    defaultValue={0}
-                    aria-labelledby="discrete-slider-small-steps"
-                    valueLabelDisplay="auto"
-                    step={10}
-                    marks={true}
-                    min={-50}
-                    max={50}
-                    onChange={(event, value) =>
-                      this.onSliderChangePitch(value as number)
-                    }
-                    value={this.state.pitchValue}
-                  />
-                </ThemeProvider>
-                <Typography
-                  align="left"
-                  color={"textPrimary"}
-                  id="discrete-slider-small-steps"
-                  gutterBottom
-                >
-                  Speed Level
-                </Typography>
-                <ThemeProvider theme={muiTheme}>
-                  <Slider
-                    defaultValue={1}
-                    aria-labelledby="discrete-slider-small-steps"
-                    valueLabelDisplay="auto"
-                    step={0.5}
-                    marks={true}
-                    min={0.5}
-                    max={2}
-                    onChange={(event, value) =>
-                      this.onSliderChangeSpeed(value as number)
-                    }
-                    value={this.state.speedValue}
-                  />
-                </ThemeProvider>
-              </div>
+              {(windowWidth < 1200) ? (
+              <>
+              <button onClick={this.handleControlMenuClick}>open controls</button>
+              <Modal
+                  isOpen={this.state.controlsModal}
+                  onRequestClose={this.handleControlMenuClose}
+                  style={this.customStyles}>
+              {this.renderControls(muiTheme)}
+              </Modal>
+              </>
+              ) : (<>{this.renderControls(muiTheme)}</>)}
             </div>
             {this.state.isLoadingPitchResults && spinner()}
             <div className="col s8">

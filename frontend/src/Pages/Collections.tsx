@@ -11,6 +11,7 @@ import Header from "../Components/header/Header";
 import CollectionView from "../Components/collections/CollectionView";
 
 import Modal from "react-modal";
+import { Box } from "@material-ui/core";
 
 const customStyles = {
   content: {
@@ -54,6 +55,13 @@ export default function Collections() {
   const [renameCollection, setRenameCollection] = useState("");
 
   const [deleteModalIsOpen, setDeleteModalIsOpen] = useState(false);
+
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
 
   // call the collections api to get a list of collections
   // occurs on first render & when collectionsUpdated is changed
@@ -322,33 +330,44 @@ export default function Collections() {
         <div className="page-collections-select">
           <p>Select a collection:</p>
           {isError && <p>{error}</p>}
-          <form className="form-collections-view-delete">
+          <form
+            className="form-collections-view-delete"
+            style={{ 
+              flexDirection: (windowWidth < 775) ? 'column' : 'row',
+              padding: (windowWidth < 775) ? '0px' : '10px'
+            }}
+          >
             <Select
               className="collections-dropdown"
               placeholder={selectedCollection}
               value={"Select a collection"}
               options={getCollectionOptions()}
               onChange={onCollectionSelectChange}
+              styles={{ container: (prior) => ({
+                ...prior,
+                width: (windowWidth < 775) ? '90%' : '25%'})
+              }}
             />
-            <button
-              onClick={handleViewCollection}
-              className="collections-delete-view btn waves-light globalbtn"
-            >
-              View Collection
-            </button>
-
-            <button
-              onClick={setDeleteModalIsOpenToTrue}
-              className="collections-delete-view btn waves-light globalbtn"
-            >
-              Delete Collection
-            </button>
-            <button
-              onClick={setRenameModalIsOpenToTrue}
-              className="collections-delete-view btn waves-light globalbtn"
-            >
-              Rename Collection
-            </button>
+            <Box style={{ display: 'flex', flexDirection: 'row' }}>
+              <button
+                onClick={handleViewCollection}
+                className="collections-delete-view btn waves-light globalbtn"
+              >
+                {(windowWidth >= 775) ? 'View Collection' : 'View'}
+              </button>
+              <button
+                onClick={setDeleteModalIsOpenToTrue}
+                className="collections-delete-view btn waves-light globalbtn"
+              >
+                {(windowWidth >= 775) ? 'Delete Collection' : 'Delete'}
+              </button>
+              <button
+                onClick={setRenameModalIsOpenToTrue}
+                className="collections-delete-view btn waves-light globalbtn"
+              >
+                {(windowWidth >= 775) ? 'Rename Collection' : 'Rename'}
+              </button>
+            </Box>
             <Modal
               isOpen={renameModalIsOpen}
               style={customStyles}
@@ -411,6 +430,10 @@ export default function Collections() {
           <form
             onSubmit={handleCreateCollection}
             className="form-collections-create"
+            style={{ 
+              flexDirection: (windowWidth < 775) ? 'column' : 'row',
+              justifyContent: (windowWidth < 775) ? 'center' : 'left',
+            }}
           >
             <p>Name:</p>
             <input
@@ -421,6 +444,7 @@ export default function Collections() {
               type="text"
               placeholder="Collection Name"
               required
+              style={{ width: (windowWidth < 775) ? '90%' : 'auto'}}
             />
             <p className="form-collections-create-describe">Description:</p>
             <input
@@ -430,6 +454,7 @@ export default function Collections() {
               onChange={onDescriptionChange}
               type="text"
               placeholder="Collection Description"
+              style={{ width: (windowWidth < 775) ? '90%' : 'auto'}}
             />
             <button
               type="submit"

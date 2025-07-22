@@ -2,8 +2,19 @@ import React, {Component} from 'react';
 import './UploadAudio.css'
 import M from 'materialize-css/dist/js/materialize.min.js'
 
-class UploadAudio extends Component {
-    state = {};
+interface UploadAudioProps {
+    initFileName?: string;
+    userFiles?: Array<{ name: string, path: string, index: number, type: string }>;
+    setUploadId?: (name: string, path: string, index: number, type: string) => void;
+    firebase?: any;
+}
+
+interface UploadAudioState {
+    updateCounter?: number;
+    selectedFileName?: string;
+}
+
+class UploadAudio extends Component <UploadAudioProps, UploadAudioState> {
 
     constructor(props) {
         super(props);
@@ -85,7 +96,7 @@ class UploadAudio extends Component {
                             value={selectedIndex}
                             name="audioFileName"
                             onChange={this.sendFormSubmit}>
-                        <option value={'-1'} disabled="disabled">Choose audio file</option>
+                        <option value={'-1'} disabled={true}>Choose audio file</option>
                         {availableFilesList}
                     </select>
                 </div>

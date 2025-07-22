@@ -2,10 +2,82 @@ import React, { Component } from 'react';
 
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
-import * as ImgAreaSelect from '../Lib/imgareaselect/scripts/jquery.imgareaselect.js';
+import '../Lib/imgareaselect/scripts/jquery.imgareaselect';
 
-class AudioImg extends Component {
-    state = {};
+// type definitions in order to get imgAreaSelect to work with typescript
+declare global {
+    interface JQuery {
+      imgAreaSelect(options?: ImgAreaSelectOptions): JQuery;
+    }
+  }
+
+  interface ImgAreaSelectOptions {
+    instance?: boolean;
+    isSelecting?: boolean;
+    handles?: boolean;
+    classPrefix?: string;
+    resizable?: boolean;
+    movable?: boolean;
+    parent?: string;
+    minHeight?: number;
+    maxWidth?: number;
+    show?: boolean;
+    onInit?: () => void;
+    onSelectStart?: (img: HTMLImageElement, loc: ImgAreaSelectSelection) => void;
+    onSelectChange?: (img: HTMLImageElement, loc: ImgAreaSelectSelection) => void;
+    onSelectEnd?: (img: HTMLImageElement, loc: ImgAreaSelectSelection) => void;
+}
+
+interface ImgAreaSelectSelection {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+}
+
+interface ImgAreaSelectInstance {
+    update?(): void;
+    setOptions?(options: ImgAreaSelectOptions): void;
+    getOptions?(): ImgAreaSelectOptions;
+    setSelection?(x1: number, y1: number, x2: number, y2: number, noPosition?: boolean): void;
+    cancelSelection?(): void;
+    remove?(): void;
+}
+
+interface AudioImgProps {
+    uploadId?: string;
+    verticalLines?: Array<{ id: string, x: number }>;
+    imageWidth?: number;
+    xminPerc?: number;
+    xmaxPerc?: number;
+    minAudioTime?: number;
+    maxAudioTime?: number;
+    minAudioX?: number;
+    maxAudioX?: number;
+    tmin?: number;
+    tmax?: number;
+    spectrogramWidth?: number;
+    speakerIndex?: number;
+    typeOfBeat?: string;
+    beats?: number[];
+    src?: string;
+    audioIntervalSelected?: (start: number, end: number, verticalLines: Array<{ id: string, x: number }>) => void;
+    audioIntervalSelectionCanceled?: () => void;
+    showImgMenu?: (x: number, y: number) => void;
+    onVerticalLinesUpdate?: (verticalLines: Array<{ id: string, x: number }>) => void;
+    onAudioImageLoaded?: (cancelSelection: () => void, selectAudioInterval: (t1: number, t2: number) => void) => void;
+}
+
+interface AudioImgState {
+    isLoaded?: boolean;
+    imgObj?: any;
+    verticalLines?: Array<{ id: string, x: number }>;
+}
+
+class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
+    
+    isSelecting: boolean; // present in both AudioImgProps and ImgAreaSelectOptions could be problematic
+    metildaAudioAnalysisImageRef: React.RefObject<HTMLImageElement>;
 
     constructor(props) {
         super(props);
@@ -90,7 +162,7 @@ class AudioImg extends Component {
 
         const audioImgId = this.audioImgId();
 
-        let imgObj = $el.imgAreaSelect({
+        let imgObj: ImgAreaSelectInstance = $el.imgAreaSelect({
             instance: true,
             handles: true,
             classPrefix: audioImgId,

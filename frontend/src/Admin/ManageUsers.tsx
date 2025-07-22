@@ -21,6 +21,9 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
+import InfoIcon from '@material-ui/icons/Info';
+import Modal from "react-modal";
+import { Box } from "@material-ui/core";
 
 export interface ManageUsersProps {
   firebase: any;
@@ -35,6 +38,8 @@ interface State {
   deleteUserModal: boolean;
   deletedUserId: any;
   editedUser: any;
+  windowWidth: number;
+  infoOpenID: string | null
 }
 
 interface UserEntity {
@@ -93,6 +98,21 @@ const DialogTitle = withStyles(styles)((props: DialogTitleProps) => {
 });
 
 export class ManageUsers extends React.Component<ManageUsersProps, State> {
+  customStyles = {
+    overlay: {
+      position: "fixed",
+      zIndex: 100
+    },
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
   constructor(props: ManageUsersProps) {
     super(props);
 
@@ -105,10 +125,18 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
       deleteUserModal: false,
       deletedUserId: "",
       editedUser: null,
+      windowWidth: window.innerWidth,
+      infoOpenID: null
     };
   }
+
   componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     this.getUsers();
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   getUsers = async () => {
@@ -221,19 +249,33 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
     this.setState({
       deleteUserModal: true,
       deletedUserId: userId,
+      infoOpenID: null,
     });
   };
 
+  handleInfoClick = (user : any) => {
+    this.setState({infoOpenID : user.id}) 
+  }
+
+  handleInfoClose = (event : any) => {
+    this.setState({infoOpenID : null}) 
+  }
+
   renderTableHeader() {
+    const { windowWidth } = this.state
     if (this.state.users.length > 0) {
-      const headerNames = [
-        " Name",
+      const headerNames = (windowWidth >= 600) ? [
+        "Name",
         "Email",
         "Role",
         "Research Language",
         "University",
         "Last Login",
         "Modify",
+      ] : [
+        "Name",
+        "Email",
+        "Info"
       ];
       const headers = [];
       for (let i = 0; i < headerNames.length; i++) {
@@ -244,37 +286,81 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
   }
 
   renderTableData() {
+    const { windowWidth } = this.state
     return this.state.users.map((user, index) => {
       return (
         <tr key={index}>
-          <td>{user.name}</td>
-          <td>{user.id}</td>
-          <td>{user.role}</td>
-          <td>{user.researchLanguage}</td>
-          <td>{user.university}</td>
-          <td>{user.lastLogin}</td>
-          <td>
-            <button
-              className="EditUser btn-floating btn-small waves-effect waves-light globalbtn"
-              onClick={() =>
-                this.editUser(
-                  user.name,
-                  user.id,
-                  user.role,
-                  user.researchLanguage,
-                  user.university
-                )
-              }
-            >
-              <i className="material-icons right">edit</i>
-            </button>
-            <button
-              className="DeleteUser btn-floating btn-small waves-effect waves-light globalbtn"
-              onClick={() => this.handleClickDeleteUser(user.id)}
-            >
-              <i className="material-icons right">delete</i>
-            </button>
-          </td>
+          {(windowWidth >= 600) ? (
+            <>
+              <td>{user.name}</td>
+              <td>{user.id}</td>
+              <td>{user.role}</td>
+              <td>{user.researchLanguage}</td>
+              <td>{user.university}</td>
+              <td>{user.lastLogin}</td>
+              <td>
+                <button
+                  className="EditUser btn-floating btn-small waves-effect waves-light globalbtn"
+                  onClick={() =>
+                    this.editUser(
+                      user.name,
+                      user.id,
+                      user.role,
+                      user.researchLanguage,
+                      user.university
+                    )
+                  }
+                >
+                  <i className="material-icons right">edit</i>
+                </button>
+                <button
+                  className="DeleteUser btn-floating btn-small waves-effect waves-light globalbtn"
+                  onClick={() => this.handleClickDeleteUser(user.id)}
+                >
+                  <i className="material-icons right">delete</i>
+                </button>
+              </td>
+            </>
+          ) : (
+            <>
+              <td style={{ fontSize: '11px' }}>{user.name}</td>
+              <td style={{ fontSize: '11px' }}>{user.id}</td>
+              <td>
+                <IconButton onClick={() => this.handleInfoClick(user)}><InfoIcon /></IconButton>
+                <Modal
+                  isOpen={(this.state.infoOpenID === user.id)}
+                  onRequestClose={this.handleInfoClose}
+                  style={this.customStyles}
+                  appElement={document.getElementById("root" || undefined)}
+                >
+                  <div>Role: {user.role}</div>
+                  <div>Research Language: {user.researchLanguage}</div>
+                  <div>University: {user.university}</div>
+                  <div>Last Login: {user.lastLogin}</div>
+                  <button
+                    className="EditUser btn-floating btn-small waves-effect waves-light globalbtn"
+                    onClick={() =>
+                      this.editUser(
+                        user.name,
+                        user.id,
+                        user.role,
+                        user.researchLanguage,
+                        user.university
+                      )
+                    }
+                  >
+                    <i className="material-icons right">edit</i>
+                  </button>
+                  <button
+                    className="DeleteUser btn-floating btn-small waves-effect waves-light globalbtn"
+                    onClick={() => this.handleClickDeleteUser(user.id)}
+                  >
+                    <i className="material-icons right">delete</i>
+                  </button>
+                </Modal>
+              </td>
+            </>
+          )}
         </tr>
       );
     });
@@ -322,6 +408,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
     this.setState({
       editedUser: newUser,
       isEditUserClicked: true,
+      infoOpenID: null,
     });
   };
 
@@ -358,6 +445,24 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
         {this.deleteUserModal()}
         {isLoading && spinner()}
         <h1 id="usersTitle">MeTILDA Users </h1>
+        <Box style={{ paddingBottom: '20px' }}>
+          <button
+            onClick={this.addUser}
+            className="AddUser waves-effect waves-light btn globalbtn"
+            style={{ position: 'static' }}
+          >
+            <i className="material-icons right">add</i>
+            Add User
+          </button>
+          <button
+            onClick={this.authorizeUser}
+            className="AuthorizeUser waves-effect waves-light btn globalbtn"
+            style={{ position: 'static' }}
+          >
+            <i className="material-icons right">add</i>
+            Authorize User
+          </button>
+        </Box>
         <table id="allUsers">
           <tbody>
             <tr>{this.renderTableHeader()}</tr>
@@ -368,20 +473,6 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
         {this.state.users.length > 0 && (
           <div className="manageUsersButtonContainer"></div>
         )}
-        <button
-          onClick={this.addUser}
-          className="AddUser waves-effect waves-light btn globalbtn"
-        >
-          <i className="material-icons right">add</i>
-          Add User
-        </button>
-        <button
-          onClick={this.authorizeUser}
-          className="AuthorizeUser waves-effect waves-light btn globalbtn"
-        >
-          <i className="material-icons right">add</i>
-          Authorize User
-        </button>
         <CreateUser
           addUserClicked={this.state.isCreateUserClicked}
           addUserBackButtonClicked={this.addUserBackButtonClicked}

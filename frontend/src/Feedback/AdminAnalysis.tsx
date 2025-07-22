@@ -3,7 +3,7 @@
   * by users.
   */
 
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
 import { NotificationManager } from 'react-notifications' // notifications for API success/fail
 import axios from 'axios' // for requests to flask API
 import Select from '@material-ui/core/Select'
@@ -172,19 +172,24 @@ const AdminAnalysis: React.FC = () => {
     if (selectedQuestion !== null) {
       const aresult = answerAverages.find((answ) => answ.qid === selectedQuestion)
       return (
-        <Box sx={{
-          justifyContent: 'center',
-          display: 'flex',
-        }}>
-          <Box sx={{ paddingRight: '5vw' }}>
-            <h2>Total responses: {answerTotals.find((answ) => answ.qid === selectedQuestion).qAnswerTotal}</h2>
+        <>
+          <Box sx={{
+            justifyContent: 'center',
+            display: 'flex',
+          }}>
+            <Box sx={{ paddingRight: '5vw' }}>
+              <h2>Total responses: {answerTotals.find((answ) => answ.qid === selectedQuestion).qAnswerTotal}</h2>
+            </Box>
+            {aresult !== undefined ? (
+              <h2>Average response: {aresult.qAvg}</h2>
+            ) : (
+              <h2>Average response: {"N/A"}</h2>
+            )}
           </Box>
-          {aresult !== undefined ? (
-            <h2>Average response: {aresult.qAvg}</h2>
-          ) : (
-            <h2>Average response: {"N/A"}</h2>
-          )}
-        </Box>
+          {(screenWidth < 600) ? answerData.map((count, index) =>
+            <p>{answerLabels[index]}: {count}</p>
+          ) : (<></>)}
+        </>
       )
     } else { return null }
   }
@@ -237,7 +242,7 @@ const AdminAnalysis: React.FC = () => {
         justifyContent: 'center',
         display: 'flex'
       }}>
-        <Box sx={{ width: 500 }}>
+        <Box sx={{ width: (screenWidth >= 600) ? '500px' : '90%' }}>
           <FormControl fullWidth>
             <InputLabel id="question-select-label">Please select a feedback question:</InputLabel>
             <Select
@@ -245,22 +250,27 @@ const AdminAnalysis: React.FC = () => {
               id='question-selection'
               onChange={handleQuestionSelect}
               value={selectedQuestion ? selectedQuestion : ''} // show selected question if not null
+              style={{ fontSize: (screenWidth < 600) ? '11px' : 'auto' }}
             >
               {questionList.map((qList) => (
-                <MenuItem value={qList.qid} key={qList.qid}>{qList.qName}</MenuItem>
+                <MenuItem
+                  value={qList.qid}
+                  key={qList.qid}
+                  style={{ fontSize: (screenWidth < 600) ? '11px' : 'auto' }}
+                >{qList.qName}</MenuItem>
               ))}
             </Select>
           </FormControl>
         </Box>
       </Box>
-      {(screenWidth < window.innerHeight && answerTotals.length > 0) ? (
+      {(screenWidth < 1000 && answerTotals.length > 0) ? (
         <>
           <QuestionStats />
           <Box sx={{
             justifyContent: 'center',
             display: 'flex'
           }}>
-            {QuestionBarGraph()}
+            {(screenWidth >= 600) ? (QuestionBarGraph()) : (<></>)}
           </Box>
         </>
       ) : (
