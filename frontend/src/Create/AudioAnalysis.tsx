@@ -1186,7 +1186,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                     Play Taps
                   </button>
                   <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
-                    Play Audio + Taps
+                    Play Speech + Taps
                   </button>
                 </div>
                 <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
