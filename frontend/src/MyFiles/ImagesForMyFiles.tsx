@@ -27,6 +27,7 @@ interface State {
   images: ImageEntity[];
   selectedImageName: string;
   selectedImageId: number | null;
+  windowWidth: number;
 }
 
 interface AnalysisEntity {
@@ -51,7 +52,8 @@ State > {
       isImageClicked: false,
       images: [],
       selectedImageName: "",
-      selectedImageId: null
+      selectedImageId: null,
+      windowWidth: window.innerWidth
     };
   }
 
@@ -91,6 +93,14 @@ State > {
         isLoading: false,
       });
     }
+  }
+
+  componentDidMount(): void {
+    window.addEventListener("resize", this.setWindowWidth)
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   handleCheckboxChange = (event: any) => {
@@ -189,7 +199,7 @@ State > {
     }
 
   render() {
-    const {isLoading} = this.state;
+    const {isLoading, windowWidth} = this.state;
     const {showImages} = this.props;
     const className = `${showImages
       ? "imageTransition"
@@ -198,7 +208,9 @@ State > {
       <div className={className}>
         {isLoading && spinner()}
         <button className="BackButton waves-effect waves-light btn globalbtn"
-        onClick={this.props.imagesBackButtonClicked}>
+        onClick={this.props.imagesBackButtonClicked}
+        style={{position: (windowWidth < 600) ? 'static' : 'absolute'}}
+        >
           <i className="material-icons right">arrow_back</i>
           Back
         </button>

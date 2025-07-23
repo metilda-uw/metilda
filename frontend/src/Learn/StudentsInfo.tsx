@@ -2,6 +2,7 @@ import React from "react";
 import {withAuthorization} from "../Session";
 import {spinner} from "../Utils/LoadingSpinner";
 import StudentRecordings from "./StudentRecordings";
+import Modal from "react-modal";
 import "./StudentsInfo.scss";
 
 export interface StudentsInfoProps {
@@ -16,6 +17,8 @@ interface State {
   selectedStudentName: string;
   selectedStudentEmail: string;
   isViewRecordingsClicked: boolean;
+  windowWidth: number;
+  infoOpenID: string | null
 }
 
 interface StudentEntity {
@@ -25,6 +28,21 @@ interface StudentEntity {
 }
 
 export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
+  customStyles = {
+    overlay: {
+      position: "fixed",
+      zIndex: 100
+    },
+    content: {
+      margin: 0,
+      top: "50%",
+      left: "50%",
+      right: "auto",
+      bottom: "auto",
+      marginRight: "-50%",
+      transform: "translate(-50%, -50%)",
+    },
+  };
   constructor(props: StudentsInfoProps) {
     super(props);
 
@@ -33,11 +51,14 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
       students: [],
       selectedStudentName: "",
       selectedStudentEmail: "",
-      isViewRecordingsClicked: false
+      isViewRecordingsClicked: false,
+      windowWidth: window.innerWidth,
+      infoOpenID: null
     };
   }
 
   async componentDidMount() {
+      window.addEventListener("resize", this.setWindowWidth)
       const response = await fetch(`/api/get-all-students`, {
             method: "GET",
             headers: {
@@ -60,6 +81,10 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
         });
   }
 
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
+  }
+
   getStudentRecordings(selectedStudentName: string, selectedStudentEmail: string) {
     this.setState({
       isViewRecordingsClicked: true,
@@ -75,7 +100,16 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
   }
 
  renderTableHeader() {
-    const headerNames = ["Student Name", "Student email", "Last login" , "Student recordings"];
+    const {windowWidth} = this.state
+    const headerNames = (windowWidth >= 600) ? [
+      "Student Name", 
+      "Student email", 
+      "Last login", 
+      "Student recordings"
+    ] : [
+      "Student Name",
+      "Recordings/Info"
+    ];
     const headers = [];
     for (let i = 0; i < headerNames.length; i++) {
           headers.push(<th key={i}>{headerNames[i].toUpperCase()}</th>);
@@ -83,19 +117,47 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
     return headers;
   }
 
+  handleInfoClick = (student) => {
+    this.setState({infoOpenID: student.name})
+  }
+
+  handleInfoClose = () => {
+    this.setState({infoOpenID: null})
+  }
+
   renderTableData() {
+    const {windowWidth} = this.state
     return this.state.students.map((student, index) => {
         return (
         <tr key={index}>
            <td>{student.name}</td>
-           <td>{student.email}</td>
-           <td>{student.lastLogin}</td>
+           {(windowWidth >= 600) ? <td>{student.email}</td> : <></>}
+           {(windowWidth >= 600) ? <td>{student.lastLogin}</td> : <></>}
            <td>
                 <button className="DeleteFile waves-effect waves-light btn globalbtn" title="Get images for the file"
                  onClick={() => (this.getStudentRecordings(student.name, student.email))}>
-                    <i className="material-icons right">image</i>
+                    {(windowWidth >= 600) ? <i className="material-icons right">image</i> : <></>}
                     View Recordings
                 </button>
+                {(windowWidth < 600) ? (
+                <>
+                <button className="waves-effect waves-light btn globalbtn"
+                  onClick={() => (this.handleInfoClick(student))}
+                >
+                    Info
+                </button>
+                <Modal
+                  isOpen = {(this.state.infoOpenID === student.name)}
+                  onRequestClose={this.handleInfoClose}
+                  style={this.customStyles}
+                  appElement={document.getElementById("root" || undefined)}
+                >
+                  <div>Student Name: {student.name}</div>
+                  <div>Email: {student.email}</div>
+                  <div>Last Login: {student.lastLogin}</div>
+                </Modal>
+                </>
+                ) : (<></>)}
             </td>
         </tr>
      );
@@ -103,7 +165,7 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
 }
 
   render() {
-    const {isLoading} = this.state;
+    const {isLoading, windowWidth} = this.state;
     const {showStudentsInfo} = this.props;
     const className = `${showStudentsInfo
       ? "transition"
@@ -112,7 +174,9 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
       <div className={className}>
           {isLoading && spinner()}
           <button className="BackButton waves-effect waves-light btn globalbtn"
-          onClick={this.props.studentsInfoBackButtonClicked}>
+          onClick={this.props.studentsInfoBackButtonClicked}
+          style={{ position: (windowWidth < 600) ? 'static' : 'absolute' }}
+          >
             <i className="material-icons right">arrow_back</i>
               Back
           </button>

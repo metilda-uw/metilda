@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import PropTypes from "prop-types";
 
 import { Link } from "react-router-dom";
@@ -27,6 +27,13 @@ function CollectionView({
   const [currentFilter, setCurrentFilter] = useState("all");
   const [filter, setFilter] = useState("all");
   const inputWords = Object.values(words);
+
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
 
   const filterList = [
     "all",
@@ -92,8 +99,9 @@ function CollectionView({
   filteredWords = filterWordsBasedOnVersion();
   return (
     <div className="page-collections-view">
+      {(windowWidth < 1000) ? <p>Filter the {selectedCollection} collection by:</p> : <></>}  
       <div className="page-collections-view-filter">
-        <p>Filter the {selectedCollection} collection by:</p>
+        {(windowWidth >= 1000) ? <p>Filter the {selectedCollection} collection by:</p> : <></>}  
         {filterList.map((f) => (
           <button
             key={f}
@@ -107,8 +115,9 @@ function CollectionView({
             {f}
           </button>
         ))}
-        <p>Currently showing {filteredWords.length} items.</p>
+        {(windowWidth >= 1300) ? <p>Currently showing {filteredWords.length} items.</p> : <></>}  
       </div>
+      {(windowWidth < 1300) ? <p>Currently showing {filteredWords.length} items.</p> : <></>}  
 
       <div className="row collections-view-wordcards">
         <ul>

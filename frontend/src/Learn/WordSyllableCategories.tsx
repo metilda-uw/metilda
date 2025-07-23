@@ -21,6 +21,7 @@ interface State {
   isTeacher: boolean;
   imageSrcList: string[];
   imagesLoaded: boolean;
+  windowWidth: number;
 }
 interface Props extends RouteComponentProps {
   firebase: any;
@@ -35,10 +36,12 @@ class WordSyllableCategories extends React.Component<Props, State> {
       isTeacher: false,
       imageSrcList: [],
       imagesLoaded: false,
+      windowWidth: window.innerWidth
     };
   }
 
   async componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     const roles = ["Teacher", "Admin"];
     roles.forEach(async (role: any) => {
       const query = "?user-role=" + role;
@@ -75,6 +78,10 @@ class WordSyllableCategories extends React.Component<Props, State> {
           });
         });
     }
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -217,6 +224,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
 
   render() {
     const numSyllables: number = this.getNumSyllables();
+    const { windowWidth } = this.state
 
     let imageContent;
 
@@ -224,7 +232,10 @@ class WordSyllableCategories extends React.Component<Props, State> {
       imageContent = (
         <div className="row">
           <div className="col s6">
-            <div className="col s12 pitch-art-img-list">
+            <div 
+              className="col s12 pitch-art-img-list"
+              style={{ flexWrap: (windowWidth < 600) ? 'wrap' : 'nowrap' }}
+            >
               {this.state.imageSrcList.map((item, index) => {
                 const photo = require("." + item);
 
@@ -260,7 +271,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
         </div>
       );
     } else if (isNaN(numSyllables)) {
-      imageContent = <div>Pick a Syllable Number...</div>;
+      imageContent = <div>Pick a Syllable Number...</div>
     } else {
       imageContent = <div>Loading...</div>;
     }
@@ -268,21 +279,28 @@ class WordSyllableCategories extends React.Component<Props, State> {
     return (
       <div>
         <Header />
+        <div className="metilda-page-header" >
+          <h5 style={{textAlign: 'center'}}>Blackfoot Words</h5>
+        </div>
         {this.state.isTeacher && (
           <button
             onClick={this.displayStudents}
             className="ViewStudentsRecordings waves-effect waves-light btn globalbtn"
+            style={{ position: (windowWidth < 600) ? 'static' : 'fixed'}}
           >
             View Students
           </button>
         )}
-        <div className="metilda-page-header">
-          <h5>Blackfoot Words</h5>
-        </div>
-        <div className="metilda-page-content">
+        <div className="metilda-page-content"
+          style={{ width: (windowWidth < 600) ? '100%' : '1016px' }}>
           <div className="row syllable-selection-row">
             <div className="col s4">
-              <div id="syllable-selection" className="col s12">
+              <div 
+                id="syllable-selection" 
+                className="col s12"
+                style={{ display: (windowWidth >= 600) ? 'flex' : 'block',
+                textAlign: 'center'}}
+              >
                 <p className="inline-btns-label">Number of syllables</p>
                 <form className="inline-btns">
                   <Link to="/learn/words/syllables?numSyllables=2">

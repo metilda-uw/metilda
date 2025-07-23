@@ -23,6 +23,14 @@ const AdminAnswer: React.FC = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<Answer | null>(null);
   const [answerToDelete, setAnswerToDelete] = useState<Answer | null>(null);
 
+  // State for tracking window width
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
+
   // Fetch answers from API
   // Each answers qid and oid is replaced with their QuestionValue and OptionValue for easy readablity when displayed 
   const fetchAnswers = async () => {
@@ -181,8 +189,8 @@ const AdminAnswer: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Answered By</th>
+              {(windowWidth >= 600) ? (<th>#</th>) : (<></>)}
+              {(windowWidth >= 600) ? (<th>Answered By</th>) : (<></>)}
               <th>Question Value</th>
               <th>Option Value</th>
               <th>Actions</th>
@@ -191,8 +199,8 @@ const AdminAnswer: React.FC = () => {
           <tbody>
             {answers.map((answer, index) => (
               <tr key={answer.aid}>
-                <td>{index + 1}</td>
-                <td>{answer.answeredby}</td>
+                {(windowWidth >= 600) ? (<td>{index + 1}</td>) : (<></>)}
+                {(windowWidth >= 600) ? (<td>{answer.answeredby}</td>) : (<></>)}
                 <td>{answer.questionValue}</td>
                 <td>{answer.optionValue}</td>
                 <td>

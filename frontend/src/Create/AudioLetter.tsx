@@ -1,6 +1,16 @@
 import React, {Component} from 'react';
 
-class AudioLetter extends Component {
+export interface AudioLetterProps {
+  isSelected?: boolean;
+  isWordSep?: boolean;
+  index?: number;
+  leftX?: number;
+  rightX?: number;
+  letter?: string;
+  onClick?: (e: React.MouseEvent<HTMLDivElement>) => void;
+}
+
+class AudioLetter extends Component<AudioLetterProps> {
   state = {};
 
   render() {
@@ -14,13 +24,13 @@ class AudioLetter extends Component {
     }
 
     return (
-      <div id={this.props.index} className={"metilda-transcribe-letter" + extraClass}
+      <div id={(this.props.index).toString()} className={"metilda-transcribe-letter" + extraClass}
            onClick={this.props.onClick}
            style={{left: leftX, width: rightX - leftX}}>
           <p>{letter}</p>
       </div>
     );
   }
-}
+} 
 
 export default AudioLetter;

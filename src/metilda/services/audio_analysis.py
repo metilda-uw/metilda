@@ -23,7 +23,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 def draw_spectrogram(ax, spectrogram, dynamic_range=70):
     X, Y = spectrogram.x_grid(), spectrogram.y_grid()
     sg_db = 10 * np.log10(spectrogram.values)
-    ax.pcolormesh(X, Y, sg_db, vmin=sg_db.max() - dynamic_range, cmap='afmhot')  
+    ax.pcolormesh(X, Y, sg_db, vmin=sg_db.max() - dynamic_range, cmap='Greys')  
     ax.set_ylim([spectrogram.ymin, spectrogram.ymax])
     ax.set_xlabel("time [s]")
     ax.set_ylabel("frequency [Hz]")
@@ -34,8 +34,8 @@ def draw_pitch(ax, pitch, min_pitch, max_pitch):
     # replace unvoiced samples by NaN to not plot
     pitch_values = pitch.selected_array['frequency']
     pitch_values[pitch_values==0] = np.nan
-    ax.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='w')
-    ax.plot(pitch.xs(), pitch_values, 'o', markersize=2)
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='black')
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=2, color='black')
     ax.grid(False)
     ax.set_ylim(min_pitch, max_pitch)
     ax.set_ylabel("fundamental frequency [Hz]")
@@ -63,7 +63,7 @@ def audio_analysis_image(upload_path,
 
     # Draw waveform
     ax1.set_xscale
-    ax1.plot(snd.xs(), snd.values.T)
+    ax1.plot(snd.xs(), snd.values.T, color='black')
     ax1.set_xlim([snd.xmin, snd.xmax])
     ax1.set_xticklabels([])
     ax1.set_ylabel("amplitude")

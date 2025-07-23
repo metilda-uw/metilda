@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import "./login.scss";
@@ -20,19 +20,33 @@ interface State {
   [key: string]: any;
 }
 
-const SignInPage = () => (
-  <div className="login_Page">
+const SignInPage = () => {
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
+
+  return (
+  <div className="login_Page"
+    style={{
+        alignItems: (windowWidth < 1000) ? 'center' : 'auto',
+        display: (windowWidth < 1000) ? 'flex' : 'inline',
+        flexDirection: 'column'
+      }}
+    >
     <h3> Welcome to MeTILDA!!</h3>
-    <div className="signin__Form">
+    <div className="signin__Form" style={{ width: (windowWidth < 1000) ? '90%' : '48%'}}>
       <h3>Sign In</h3>
       <SignInForm />
       <PasswordForgetLink />
     </div>
-    <div className="signup__Form">
+    <div className="signup__Form" style={{ width: (windowWidth < 1000) ? '90%' : '48%'}}>
       <SignUpPage />
     </div>
   </div>
-);
+)};
 
 const INITIAL_STATE = {
   email: "",

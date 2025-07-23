@@ -1005,6 +1005,15 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
                 Open
               </FileReaderInput>
             </button>
+            <button
+              className="TargetPitchBar-save-analysis btn globalbtn waves-effect waves-light m-r-16"
+              type="submit"
+              name="action"
+              disabled={speaker.letters.length === 0}
+              onClick={this.saveAnalysis}
+            >
+              Save
+            </button>
           </div>
         </div>
       </div>

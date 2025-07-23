@@ -69,13 +69,18 @@ const SendMessagePopUp = (props) => {
     const [maxRecieversAlert, displayMaxRecieversAlert] = useState(false);
     const [selectedUsers, setSelectedUsers] = useState([]);
     const [message, setMessage] = useState("");
+    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
 
-    
     const users = props && props.usersData;
     const firebase = props.firebase;
     const timestamp = firebase.timestamp;
 
     let tooltipContent = activeTab == 0 ? constants.SEND_MSG_TOOLTIP_CONTENT : constants.SEND_EMAIL_TOOLTIP_CONTENT;
+
+    useEffect(() => {
+      const resizeHandler = () => setWindowWidth(window.innerWidth)
+      window.addEventListener("resize", resizeHandler)
+    }, [])
 
     const attachLinkModal = () =>{
         return (
@@ -255,21 +260,22 @@ const SendMessagePopUp = (props) => {
         <>
         {attachLinkModal()}
         <Dialog
-            fullWidth={true}
-            maxWidth="sm"
-            open={openMessagePopUp}
-            onClose={closeSendMessagePopUp}
-            aria-labelledby="form-dialog-title"
-            className="send-msg-modal"
+          fullWidth={true}
+          maxWidth="sm"
+          open={openMessagePopUp}
+          onClose={closeSendMessagePopUp}
+          aria-labelledby="form-dialog-title"
+          className="send-msg-modal"
         >
+          {(windowWidth > 600) ? (<>
             <DialogTitle
-                id="alert-dialog-title"
-                onClose={closeSendMessagePopUp}
+              id="alert-dialog-title"
+              onClose={closeSendMessagePopUp}
             >
-                <p>{tabs[activeTab].heading}</p>
+              <p>{tabs[activeTab].heading}</p>
             </DialogTitle>
+          </>) : (<></>)}
             <DialogContent>
-                
                 {maxRecieversAlert && <p> The maximum number of recipients allowed is {constants.MAXIMUN_RECIPIENTS_ALLOWED}.</p>}
                 <div className="Info-tooltip-container">
                   <Tooltip className="Info-tooltip right" title={<p className="tooltip-content">{tooltipContent}</p>}
@@ -287,8 +293,9 @@ const SendMessagePopUp = (props) => {
                     </div>
                     {users.length == 0 ? <p> Loading</p>:
                     <div className="tab-content">
+                        {(windowWidth < 600) ? <h3>Select User:</h3> : <></>}
                         <div className="users-dropdown">
-                        <label htmlFor="user-list" className="select-label">Select User:</label>
+                        {(windowWidth > 600) ? <label htmlFor="user-list" className="select-label">Select User:</label> : <></>}
                         {activeTab == 0 ? 
                             <Select className="users-list"
                             // value={users.find((user) => user.value === selectedUser)}
@@ -317,10 +324,10 @@ const SendMessagePopUp = (props) => {
                         
                     </div>   
                   }
-                  <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
                 </div>
             </DialogContent>
             <DialogActions>
+                <button className="attach-link waves-effect waves-light btn globalbtn left" onClick={showAttachLinkModal}>Attach Link</button>
                 <button className="sendMsg waves-effect waves-light btn globalbtn" onClick={sendMessage}>Send</button>
             </DialogActions>
         </Dialog>

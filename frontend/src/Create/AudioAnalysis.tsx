@@ -33,6 +33,7 @@ import * as DEFAULT from "../constants/create";
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
+import { Backdrop, Box, Popover, createTheme } from "@material-ui/core";
 
 export interface AudioAnalysisProps {
   speakerIndex: number;
@@ -103,6 +104,8 @@ interface State {
   draggingIndex: number;
   isDragging: boolean;
   verticalLines: VerticalLine[];
+  windowWidth: number;
+  anchorEl: HTMLButtonElement | null
 }
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
@@ -218,6 +221,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       isDragging: false,
       verticalLines: [],
       userEmail: '',
+      windowWidth: window.innerWidth,
+      anchorEl: null
     };
     this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
@@ -249,7 +254,24 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     return this.props.speakers[this.props.speakerIndex];
   }
 
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
+  }
+
+  setAnchorEl = (event: React.MouseEvent<HTMLButtonElement> | null) => {
+    this.setState({ anchorEl: event ? event.currentTarget : null })
+  }
+
+  handlePopupClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    this.setAnchorEl(event)
+  }
+
+  handlePopupClose = () => {
+    this.setAnchorEl(null)
+  }
+
   componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     const uploadId = this.getSpeaker().uploadId;
     if (!uploadId) {
       return;
@@ -283,6 +305,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         controller.props.setAudioUrl(audioUrl); // Set the audio URL in CreatePitchArt
 
       });
+  }
+
+  componentWillUnmount(): void {
+    window.removeEventListener("resize", this.setWindowWidth)
   }
 
   setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
@@ -960,11 +986,91 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             height: '6px',
             backgroundColor: 'red',
             borderRadius: '50%',
-          }}
+      }}
         />
       );
     });
   };
+
+  renderOptions = (uploadId : string) => {
+    return (
+      <>
+        <h6 className="metilda-control-header">
+          Speaker {this.props.speakerIndex + 1}
+        </h6>
+        <UploadAudio
+          initFileName={uploadId}
+          setUploadId={this.setUploadId}
+          userFiles={this.props.files}
+          firebase={this.props.firebase}
+        />
+        <PitchRange
+          initMinPitch={this.props.minPitch}
+          initMaxPitch={this.props.maxPitch}
+          applyPitchRange={this.applyPitchRange}
+        />
+        {this.renderSpeakerControl()}
+        <button
+          className="waves-effect waves-light btn globalbtn"
+          onClick={this.toggleTypeOfBeat}
+        >
+          {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
+        </button>
+      </>
+    )
+  }
+
+  renderPopupOptions = (uploadId : string) => {
+      // TODO: Switch to rythym and completeZoomOut should be 
+      // outside popup menu
+      const theme = createTheme()
+      const {anchorEl, windowWidth} = this.state
+      const open = Boolean(this.state.anchorEl)
+
+      return (
+        <>
+          <Box style={{
+            display: 'flex',
+            width: windowWidth * .7,
+            paddingLeft: "5%",
+            paddingRight: "5%",
+            paddingBottom: "20px"
+          }}>
+            <button
+              className="col s7 btn globalbtn"
+              style={{ width: windowWidth * .7}}
+              onClick={this.handlePopupClick}
+            >
+              Speaker Options
+            </button>
+          </Box>
+          <Backdrop
+            open={open}
+            style={{ zIndex: theme.zIndex.modal }}
+          >
+            <Popover
+              id={'popover'}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center'
+              }}
+              onClose={this.handlePopupClose}
+            >
+              <div style={{
+                paddingLeft: '30px',
+                paddingTop: '20px',
+                paddingRight: '30px',
+                paddingBottom: '20px'
+              }}>
+                {this.renderOptions(uploadId)}
+              </div>
+            </Popover>
+          </Backdrop>
+        </>
+      )
+  }
 
   render() {
     const { typeOfBeat } = this.state;
@@ -990,31 +1096,16 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       nonAudioImg = <AudioImgLoading />;
     }
 
+    let { windowWidth } = this.state
+    let rowOrNot = 'row'
+    if ( windowWidth <= 1000 ) { rowOrNot = '' }
+
     return (
       <div className="AudioAnalysis">
-        <div className="row">
+        {(windowWidth <= 1000) ? this.renderPopupOptions(uploadId) : <></>}
+        <div className={rowOrNot}>
           <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
-            <h6 className="metilda-control-header">
-              Speaker {this.props.speakerIndex + 1}
-            </h6>
-            <UploadAudio
-              initFileName={uploadId}
-              setUploadId={this.setUploadId}
-              userFiles={this.props.files}
-              firebase={this.props.firebase}
-            />
-            <PitchRange
-              initMinPitch={this.props.minPitch}
-              initMaxPitch={this.props.maxPitch}
-              applyPitchRange={this.applyPitchRange}
-            />
-            {this.renderSpeakerControl()}
-            <button
-              className="waves-effect waves-light btn globalbtn"
-              onClick={this.toggleTypeOfBeat}
-            >
-              {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
-            </button>
+            {(windowWidth > 1000) ? this.renderOptions(uploadId) : <></>}
           </div>
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
@@ -1103,7 +1194,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
               </div>
             }
           </div>
-
         </div>
       </div>
     );

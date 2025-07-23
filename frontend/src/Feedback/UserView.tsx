@@ -5,6 +5,7 @@ import { NotificationManager } from 'react-notifications';
 import axios from 'axios';
 import { useHistory } from 'react-router-dom';
 import FirebaseContext from "../Firebase/context";
+import { Box } from '@material-ui/core';
 
 interface Question {
   qid: number;
@@ -33,6 +34,13 @@ const Feedback: React.FC = () => {
   const QUESTIONS_PER_PAGE = 4;
   const firebase = useContext(FirebaseContext);
   const [roles, setRoles] = useState<string[]>([]);
+
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
 
   useEffect(() => {
     const fetchRolesData = async () => {
@@ -236,7 +244,7 @@ const Feedback: React.FC = () => {
 
             {/* For textflag false (options) */}
             {question.textflag === false && (
-              <div className="options">
+              <div className="options" style={{flexDirection: (windowWidth < 600) ? 'column' : 'row'}}>
                 {options.map((option) => (
                   <button
                     key={option.oid}
@@ -250,7 +258,6 @@ const Feedback: React.FC = () => {
                 ))}
               </div>
             )}
-
             {/* For textflag true (comments) */}
             {question.textflag === true && (
               <div className="text-input">

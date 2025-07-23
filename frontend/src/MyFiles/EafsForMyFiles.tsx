@@ -27,6 +27,7 @@ interface State {
   eafs: EafEntity[];
   selectedEafName: string;
   selectedEafId: number | null;
+  windowWidth: number;
 }
 
 export class EafsForMyFiles extends React.Component < EafsForMyFilesProps,
@@ -42,7 +43,8 @@ State > {
       checkAllEaf: false,
       eafs: [],
       selectedEafName: "",
-      selectedEafId: null
+      selectedEafId: null,
+      windowWidth: window.innerWidth,
     };
   }
 
@@ -71,6 +73,14 @@ State > {
       });
       console.log()
     }
+  }
+
+  componentDidMount(): void {
+    window.addEventListener("resize", this.setWindowWidth)
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   getAnalysesForImage = async (eafId: number, eafName: string) => {
@@ -114,7 +124,14 @@ State > {
   }
 
   renderEafHeader() {
-    const headerNames = ["File Name", "Created At", "View File Content"];
+    const {windowWidth} = this.state
+    const headerNames = (windowWidth >= 600) ? [
+      "File Name",
+      "Created At", 
+      "View File Content"
+    ] : [
+      "File Name", "File Info"
+    ];
     const headers = [];
     headers.push(<th key="checkBoxHeader">
     {<label><input className="checkBoxForAllFiles" type="checkbox"
@@ -128,6 +145,7 @@ State > {
   }
 
   renderEafData() {
+    const {windowWidth} = this.state
     return this.state.eafs.map((eaf, index) => {
       return (
       <tr key={index}>
@@ -135,7 +153,7 @@ State > {
          checked={eaf.checked} onChange={this.handleCheckboxChangeEaf}
          value={index}/><span/></label></td>
          <td>{eaf.name}</td>
-         <td>{eaf.createdAt}</td>
+         {(windowWidth >= 600) ? <td>{eaf.createdAt}</td> : <></>}
           <td>
               <button className="GetImages waves-effect waves-light btn globalbtn" title="View the content of the file"
                onClick={() => this.viewEaf(eaf)}>
@@ -202,6 +220,7 @@ State > {
   }
 
   viewEaf = async (eaf: EafEntity) => {
+    const {windowWidth} = this.state
     let eafData: string = "";
     try {
       // Download file from cloud
@@ -224,6 +243,7 @@ State > {
         const dataElement = document.getElementById("eafContent");
         if (dataElement != null ) {
           dataElement.innerText = eafData;
+          if (windowWidth < 600) { dataElement.innerText += "\nCreated At: " + eaf.createdAt }
         }
       }
     }
@@ -236,8 +256,28 @@ State > {
     }
   }
 
+  renderEafDataContainer() {
+    return (
+        <div id="eafDataContainer" className="hide">
+          <p id="eafData">
+            <button className="CloseFile waves-effect waves-light btn globalbtn" onClick={this.closeEafFile}>
+              <i className="material-icons">
+                close
+              </i>
+            </button>
+            <h1 id="eafFileTitle">File Content</h1>
+            <pre id="eafContent" style={{
+              wordWrap: 'break-word',
+              overflowWrap: 'break-word',
+              whiteSpace: 'pre-wrap'
+            }}></pre>
+          </p>
+        </div>
+    )
+  }
+
   render() {
-    const {isLoading} = this.state;
+    const {isLoading, windowWidth} = this.state;
     const {showEafs} = this.props;
     const className = `${showEafs
       ? "eafTransition"
@@ -256,8 +296,9 @@ State > {
         </div>}
         {this.state.eafs.length > 0 &&
         <div> <br/> <br/>
-          <h1 id="eafTitle">Annotaion Files for Audio: {this.props.fileName}</h1><br/>
+          <h1 id="eafTitle">Annotation Files for Audio: {this.props.fileName}</h1><br/>
         </div>}
+        {(windowWidth < 1200) ? this.renderEafDataContainer() : <></>}
         {this.state.eafs.length > 0 &&
         <div className="eafContainer">
           <table id="myFiles">
@@ -282,17 +323,7 @@ State > {
                     Hidden Download Link
         </a>
         </div>}
-        <div id="eafDataContainer" className="hide">
-          <p id="eafData">
-            <button className="CloseFile waves-effect waves-light btn globalbtn" onClick={this.closeEafFile}>
-              <i className="material-icons">
-                close
-              </i>
-            </button>
-            <h1 id="eafFileTitle">File Content</h1>
-            <p id="eafContent"></p>
-          </p>
-        </div>
+        {(windowWidth >= 1200) ? this.renderEafDataContainer() : <></>}
       </div>
     );
   }
