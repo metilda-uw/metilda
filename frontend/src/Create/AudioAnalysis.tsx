@@ -842,15 +842,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency of the tap sound
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out the tap sound
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Frequency of the tap sound
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
 
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2); // Duration of the tap sound
+      oscillator.stop(audioCtx.currentTime + 0.06); // Duration of the tap sound
     };
 
     tapTimes.forEach((time) => {
@@ -922,19 +922,20 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
-    const audioCtx = new (window.AudioContext || window.AudioContext)();
+    // const audioCtx = new (window.AudioContext || window.AudioContext)();
+    const audioCtx = audioContext
     const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+    const gainNode = tapGainNode || audioCtx.createGain();
 
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2);
+    oscillator.stop(audioCtx.currentTime + 0.06);
   };
 
   saveRhythm = async () => {
