@@ -35,6 +35,8 @@ import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
 import { Backdrop, Box, Popover, createTheme } from "@material-ui/core";
 
+import { useImageSelection } from './hooks/useImageSelection'; 
+
 export interface AudioAnalysisProps {
   speakerIndex: number;
   speakers: Speaker[];
@@ -107,6 +109,8 @@ interface State {
   windowWidth: number;
   anchorEl: HTMLButtonElement | null
 }
+
+const { imageIntervalSelected, imageIntervalToTimeInterval } = useImageSelection();
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   /**
@@ -224,7 +228,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       windowWidth: window.innerWidth,
       anchorEl: null
     };
-    this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
     this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
     this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
@@ -236,14 +240,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
     this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
     this.wordSplitClicked = this.wordSplitClicked.bind(this);
-    this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
     this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
     this.manualPitchChange = this.manualPitchChange.bind(this);
     this.addPitch = this.addPitch.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
     this.toggleTypeOfBeat = this.toggleTypeOfBeat.bind(this);
     this.saveRhythm = this.saveRhythm.bind(this);
-
   }
 
   setVerticalLines = (newLines) => {
@@ -341,7 +343,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     // Compute the new time scale
     let ts;
     if (leftX !== undefined && rightX !== undefined) {
-      ts = this.imageIntervalToTimeInterval(leftX, rightX);
+      ts = imageIntervalToTimeInterval(leftX, rightX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
     } else {
       ts = [this.state.minAudioTime, this.state.maxAudioTime];
     }
@@ -425,42 +427,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.state.closeImgSelectionCallback();
   }
 
-  imageIntervalSelected(
-    leftX: number,
-    rightX: number,
-    manualPitch?: number,
-    isWordSep: boolean = false,
-    tsOverride?: number[]) {
-    const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
-
-    if (manualPitch !== undefined) {
-      this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
-      return;
-    }
-
-    if (isWordSep) {
-      this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
-      return;
-    }
-
-    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
-      + "?t0=" + ts[0]
-      + "&t1=" + ts[1]
-      + "&max-pitch=" + this.props.maxPitch
-      + "&min-pitch=" + this.props.minPitch, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
-      );
-  }
-
   pitchArtRangeClicked() {
-    const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+    const ts = imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
 
     fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
       + "?max-pitch="
@@ -482,17 +450,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   averagePitchArtClicked() {
-    this.imageIntervalSelected(
-      this.state.minSelectX,
-      this.state.maxSelectX);
-  }
-
-  wordSplitClicked() {
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      undefined,
-      true);
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } }
+      );
+    }
+
+  wordSplitClicked() {
+    imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX,
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch : undefined, isWordSep: true,}
+    );
   }
 
   manualPitchChange(index: number, newPitch: number) {
@@ -515,17 +488,19 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return;
       }
 
+
       if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
         try {
           const values = manualPitchStr.split(",");
           const t0: number = parseFloat(values[0]);
           const t1: number = parseFloat(values[1]);
-          this.imageIntervalSelected(
+          imageIntervalSelected(
             -1,
             -1,
-            undefined,
-            undefined,
-            [t0, t1]);
+            { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+            { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+            {manualPitch: undefined, isWordSep: undefined, tsOverride: [t0, t1]},
+            );
           return;
         } catch {
           // do nothing
@@ -550,11 +525,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       }
     }
 
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      manualPitch);
-  }
+      { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+      { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch: manualPitch},
+    );
+    }
 
   onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
     this.setState({
@@ -628,17 +606,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       minAudioTime: tmin,
       maxAudioTime: tmax,
     });
-  }
-
-  imageIntervalToTimeInterval(x1: number, x2: number) {
-    const dt = this.state.maxAudioTime - this.state.minAudioTime;
-    const dx = this.state.maxAudioX - this.state.minAudioX;
-    const u0 = x1 / dx;
-    const u1 = x2 / dx;
-
-    const t0 = this.state.minAudioTime + (u0 * dt);
-    const t1 = this.state.minAudioTime + (u1 * dt);
-    return [t0, t1];
   }
 
   selectionIntervalClicked() {
