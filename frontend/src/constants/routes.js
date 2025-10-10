@@ -14,3 +14,4 @@ export const THANKYOU = "/thankyou";
 export const CONVERTER = "/converter";
 export const DOCUMENTATION = "/documentation";
 export const NOTIFICATIONS = "/notifications";
+export const TERMS_AND_CONDITIONS = "/TermsAndConditions";
