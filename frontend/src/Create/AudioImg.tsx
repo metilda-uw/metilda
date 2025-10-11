@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import $ from "jquery";
 import '../Lib/imgareaselect/css/imgareaselect-default.css';
 import '../Lib/imgareaselect/scripts/jquery.imgareaselect';
+import { AUDIO_IMG_HEIGHT, AUDIO_IMG_WIDTH } from '../constants/create';
 
 // type definitions in order to get imgAreaSelect to work with typescript
 declare global {
@@ -46,7 +47,7 @@ interface ImgAreaSelectInstance {
 
 interface AudioImgProps {
     uploadId?: string;
-    verticalLines?: Array<{ id: string, x: number }>;
+    verticalLines?: Array<{ id: string, time: number }>;
     imageWidth?: number;
     xminPerc?: number;
     xmaxPerc?: number;
@@ -61,17 +62,17 @@ interface AudioImgProps {
     typeOfBeat?: string;
     beats?: number[];
     src?: string;
-    audioIntervalSelected?: (start: number, end: number, verticalLines: Array<{ id: string, x: number }>) => void;
+    audioIntervalSelected?: (start: number, end: number, verticalLines: Array<{ id: string, time: number }>) => void;
     audioIntervalSelectionCanceled?: () => void;
     showImgMenu?: (x: number, y: number) => void;
-    onVerticalLinesUpdate?: (verticalLines: Array<{ id: string, x: number }>) => void;
+    onVerticalLinesUpdate?: (verticalLines: Array<{ id: string, time: number }>) => void;
     onAudioImageLoaded?: (cancelSelection: () => void, selectAudioInterval: (t1: number, t2: number) => void) => void;
 }
 
 interface AudioImgState {
     isLoaded?: boolean;
     imgObj?: any;
-    verticalLines?: Array<{ id: string, x: number }>;
+    verticalLines?: Array<{ id: string, time: number }>;
 }
 
 class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
@@ -88,6 +89,8 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         };
 
         this.timeCoordToImageCoord = this.timeCoordToImageCoord.bind(this);
+        this.xCoordToTime = this.xCoordToTime.bind(this);
+        this.timeToXCoord = this.timeToXCoord.bind(this);
         this.metildaAudioAnalysisImageRef = React.createRef();
         this.isSelecting = false;
     }
@@ -113,6 +116,24 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         return x0
     }
 
+    // Convert audio time (seconds) to an X coordinate (pixels)
+    timeToXCoord = (time: number): number => {
+        const { minAudioTime, maxAudioTime } = this.props;
+        const timePerc = (time - minAudioTime) / (maxAudioTime - minAudioTime); // 0 → 1
+        const usablePerc = this.props.xmaxPerc - this.props.xminPerc;
+        const xPerc = this.props.xminPerc + timePerc * usablePerc;
+        return xPerc * this.props.imageWidth;
+    };
+
+    // Convert X coordinate (pixels) back to audio time (seconds)
+    xCoordToTime = (x: number): number => {
+        const { minAudioTime, maxAudioTime } = this.props;
+        const perc = x / this.props.imageWidth;
+        const usablePerc = this.props.xmaxPerc - this.props.xminPerc;
+        const normPerc = (perc - this.props.xminPerc) / usablePerc;
+        return minAudioTime + normPerc * (maxAudioTime - minAudioTime);
+    };
+
     componentWillUnmount() {
         if (this.state.imgObj) {
             this.state.imgObj.remove();
@@ -127,7 +148,7 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         this.setState(prevState => ({
             verticalLines: prevState.verticalLines.map(line => ({
                 ...line,
-                x: this.timeCoordToImageCoord(line.x) // Adjust position based on zoom
+                time: this.timeCoordToImageCoord(line.time) // Adjust position based on zoom
             }))
         }));
     }
@@ -263,7 +284,7 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
             
                     // Get vertical lines in the selected area
                     const selectedLines = audioImage.state.verticalLines.filter(line => 
-                        line.x >= loc.x1 && line.x <= loc.x2
+                        line.time >= audioImage.xCoordToTime(loc.x1) && line.time <= audioImage.xCoordToTime(loc.x2)
                     );
             
                     audioImage.props.audioIntervalSelected(selectedStart, selectedEnd, selectedLines);
@@ -280,17 +301,19 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         if (this.isSelecting) return; // Prevent interaction while selecting
         if (event.which === 1) { // Left click
             if (this.props.typeOfBeat === 'Rhythm') {
-                this.toggleVerticalLine(event.pageX);
+                const rect = this.metildaAudioAnalysisImageRef.current.getBoundingClientRect();
+                const relativeX = event.clientX - rect.left;
+                this.toggleVerticalLine(this.xCoordToTime(relativeX));
             }
         } else if (event.which === 3) { // Right click
             this.props.showImgMenu(event.pageX, event.pageY);
         }
     };
 
-    toggleVerticalLine = (xPos) => {
+    toggleVerticalLine = (xtime) => {
         this.setState((prevState) => {
           const existingLineIndex = prevState.verticalLines.findIndex(
-            (line) => Math.abs(line.x - xPos) < 5
+            (line) => Math.abs(line.time - xtime) < 0.005
           );
       
           let updatedLines;
@@ -301,7 +324,8 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
             );
           } else {
             // Add a new line
-            const newLine = { id: `line-${Date.now()}`, x: xPos };
+            console.log("X %:", xtime / AUDIO_IMG_WIDTH, "X ", xtime);
+            const newLine = { id: `line-${Date.now()}`, time: xtime };
             updatedLines = [...prevState.verticalLines, newLine];
           }
       
@@ -315,7 +339,7 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         this.setState((prevState) => {
           const updatedLines = prevState.verticalLines.map((line) => {
             if (line.id === id) {
-              return { ...line, x: event.pageX }; // Update x position
+              return { ...line, time: this.xCoordToTime(event.pageX) }; // Update time
             }
             return line;
           });
@@ -334,23 +358,27 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         const imageTop = imageElement ? imageElement.offsetTop : 0;
         if (typeOfBeat !== 'Rhythm') return null;
       
-        return verticalLines.map((line) => (
-          <div
-            key={line.id}
-            className="draggable-line"
-            style={{
-              left: line.x + 'px', // Use x position from state
-              position: 'absolute',
-              top: imageTop + 'px',
-              height: imageHeight + 'px', // Adjust height as needed
-              width: '2px', // Line thickness
-              background: 'yellow', // Line color
-              cursor: 'ew-resize', // Cursor style
-            }}
-            onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging
-            onDoubleClick={() => this.toggleVerticalLine(line.x)} // Enable double-click to remove
-          />
-        ));
+        return verticalLines.map((line) => {
+            if (line.time >= this.props.minAudioTime && line.time <= this.props.maxAudioTime) {
+                return (
+                    <div
+                        key={line.id}
+                        className="draggable-line"
+                        style={{
+                        left: this.timeToXCoord(line.time) + 'px', // Use x position from state
+                        position: 'absolute',
+                        top: imageTop + 'px',
+                        height: imageHeight + 'px', // Adjust height as needed
+                        width: '2px', // Line thickness
+                        background: 'yellow', // Line color
+                        cursor: 'ew-resize', // Cursor style
+                        }}
+                        onMouseDown={(e) => this.startDragging(e, line.id)} // Enable dragging
+                        onDoubleClick={() => this.toggleVerticalLine(line.time)} // Enable double-click to remove
+                    />
+                );
+            }
+        });
       };
 
 
@@ -366,13 +394,24 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
     render() {
         const { src } = this.props;
         return (
-            <div onContextMenu={(e) => e.preventDefault()}>
-                <div id={this.audioImgId()} />
-                <img id="metilda-audio-analysis-image"
-                    ref={this.metildaAudioAnalysisImageRef}
-                    className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
-                    src={src} />
-                {this.renderVerticalLines()}
+            <div onContextMenu={(e) => e.preventDefault()} style={{ position: 'relative', display: 'inline-block' }}>
+                <div id={this.audioImgId()} style={{ position: 'relative' }} >
+                    <img id="metilda-audio-analysis-image"
+                        ref={this.metildaAudioAnalysisImageRef}
+                        className={"metilda-audio-analysis-image " + (this.state.isLoaded ? "" : "hide")}
+                        src={src} 
+                        onClick={(e) => {
+                            const rect = (e.target as HTMLImageElement).getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            console.log("Clicked coords:", x, y);
+                            console.log("time: ", this.xCoordToTime(x));
+                            console.log("X %:", x / AUDIO_IMG_WIDTH);
+                            console.log("Y %:", y / AUDIO_IMG_HEIGHT);
+                        }}
+                        />
+                    {this.renderVerticalLines()}
+                </div>
 
             </div>
         );

@@ -76,8 +76,35 @@ export const useImageSelection = () => {
       .then((data) => config.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false));
   };
 
+  // Convert audio time (seconds) -> image-local X pixel (relative to the full image)
+  const timeToImageX = (time: number, props) => {
+    const startOffset = props.imageWidth * props.xminPerc;
+    if (time <= props.minAudioTime) return startOffset + props.minAudioX - props.minAudioX * 0; // startOffset
+    if (time >= props.maxAudioTime) return startOffset + (props.maxAudioX - props.minAudioX);
+
+    const dt = props.maxAudioTime - props.minAudioTime;
+    const u0 = (time - props.minAudioTime) / dt;
+    const dx = props.maxAudioX - props.minAudioX;
+    return startOffset + u0 * dx;
+  }
+
+// Convert image-local X pixel -> audio time (seconds)
+  const imageXToTime = (x: number, props) => {
+    const startOffset = props.imageWidth * props.xminPerc;
+    const dx = props.maxAudioX - props.minAudioX;
+    if (x <= startOffset) return props.minAudioTime;
+    if (x >= startOffset + dx) return props.maxAudioTime;
+    const u = (x - startOffset) / dx;
+    return props.minAudioTime + u * (props.maxAudioTime - props.minAudioTime);
+  }
+
+
   return {
     imageIntervalToTimeInterval,
-    imageIntervalSelected
+    imageIntervalSelected,
+    timeToImageX,
+    imageXToTime
   };
 };
+
+

@@ -70,7 +70,7 @@ export interface AudioAnalysisProps {
 
 interface VerticalLine {
   id: string;
-  x: number;
+  time: number;
 }
 
 interface State {
@@ -110,7 +110,7 @@ interface State {
   anchorEl: HTMLButtonElement | null
 }
 
-const { imageIntervalSelected, imageIntervalToTimeInterval } = useImageSelection();
+const { imageIntervalSelected, imageIntervalToTimeInterval, timeToImageX, imageXToTime } = useImageSelection();
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   /**
@@ -747,9 +747,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         if (rhythmDoc.exists) {
           const rhythmData = rhythmDoc.data();
 
+          //TODO: Check backwards compatibility
           const verticalLines = rhythmData.verticalLines.map((line) => ({
             id: line.id || `line-${Date.now()}`, // Ensure each line has a unique ID
-            x: line.x, // Ensure x is a number
+            time: line.time || (line.x && timeToImageX(line.x, this.props)), // Ensure time is a number
           }));
 
           // Update verticalLines state directly in this component
@@ -794,18 +795,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     const tapTimes = verticalLines.map((line) => {
       // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      if (time > 5) {
-        return time - 4
-      }
-      else {
-        return time
+      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
+        return line.time - this.state.minAudioTime;
       }
     });
 
+    const audioCtx = new (window.AudioContext || window.AudioContext)();
+
     // Function to play a single tap sound
     const playTap = () => {
-      const audioCtx = new (window.AudioContext || window.AudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
@@ -823,7 +821,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     tapTimes.forEach((time) => {
       setTimeout(() => {
         playTap();
-      }, time * 1000); // Convert seconds to milliseconds
+      }, time * 1000- 50); // Convert seconds to milliseconds. The time to play the tap sound slightly earlier to sync better with audio
     });
   };
 
@@ -853,13 +851,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     const tapTimes = verticalLines.map((line) => {
       const delay = 1;
-      // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      if (time > 5) {
-        return time - 4 - delay
-      }
-      else {
-        return time - delay
+      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
+        return line.time - this.state.minAudioTime;
       }
     });
 
@@ -872,8 +865,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       const currentTime = audioElement.currentTime;
 
       for (let i = 0; i < tapTimes.length; i++) {
-        if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
-          // Play the tap sound using AudioContext for precise timing
+        if (currentTime >= tapTimes[i]- 0.05 && !triggeredTaps.has(i)) {
+          // Play the tap sound using AudioContext for precise timing and 50ms early trigger to sync better with audio
           this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
           triggeredTaps.add(i);
         }
@@ -889,7 +882,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
-    // const audioCtx = new (window.AudioContext || window.AudioContext)();
     const audioCtx = audioContext
     const oscillator = audioCtx.createOscillator();
     const gainNode = tapGainNode || audioCtx.createGain();
@@ -902,7 +894,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.06);
+    oscillator.stop(audioCtx.currentTime + 0.02);
   };
 
   saveRhythm = async () => {
@@ -940,7 +932,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   renderVerticalLineDots = () => {
     return this.state.verticalLines.map((line) => {
       const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
-      const mappedX = ((line.x / indicatorWidth) * 100) - 67;
+      const mappedX = ((timeToImageX(line.time, this.props) / indicatorWidth) * 100) - 67;
 
       return (
         <div
@@ -1078,7 +1070,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
-              {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
+              {this.maybeRenderImgMenu()}
               {uploadId && (
                 <AudioImg
                   key={this.state.imageUrl}
