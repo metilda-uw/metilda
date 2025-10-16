@@ -79,6 +79,11 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
     
     isSelecting: boolean; // present in both AudioImgProps and ImgAreaSelectOptions could be problematic
     metildaAudioAnalysisImageRef: React.RefObject<HTMLImageElement>;
+    mouseDownTime: number = 0;
+    mouseMoved: boolean = false;
+    dragStartX: number = 0;
+    dragMoved: boolean = false;
+    dragStartTime: number = 0;
 
     constructor(props) {
         super(props);
@@ -298,16 +303,36 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
     }
 
     onMouseDown = (event) => {
-        if (this.isSelecting) return; // Prevent interaction while selecting
-        if (event.which === 1) { // Left click
+        if (this.isSelecting) return;
+        if (event.which !== 1) {
+            if (event.which === 3) this.props.showImgMenu(event.pageX, event.pageY);
+            return;
+        }
+
+        // Record that mouse was pressed (for detecting drag vs click)
+        this.mouseDownTime = Date.now();
+        this.mouseMoved = false;
+
+        const onMouseMove = () => (this.mouseMoved = true);
+        const onMouseUp = (e) => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+
+            const clickDuration = Date.now() - this.mouseDownTime;
+
+            // If mouse moved significantly or held down >250ms, treat as drag selection
+            if (this.mouseMoved || clickDuration > 250) return;
+
+            // Otherwise, treat as a normal click to add/remove vertical line
             if (this.props.typeOfBeat === 'Rhythm') {
                 const rect = this.metildaAudioAnalysisImageRef.current.getBoundingClientRect();
-                const relativeX = event.clientX - rect.left;
+                const relativeX = e.clientX - rect.left;
                 this.toggleVerticalLine(this.xCoordToTime(relativeX));
             }
-        } else if (event.which === 3) { // Right click
-            this.props.showImgMenu(event.pageX, event.pageY);
-        }
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
     };
 
     toggleVerticalLine = (xtime) => {
@@ -334,22 +359,21 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
           return { verticalLines: updatedLines };
         });
       };
-      
+
       handleDrag = (event, id) => {
+        const rect = this.metildaAudioAnalysisImageRef.current.getBoundingClientRect();
+        const relativeX = event.clientX - rect.left;
+        const newTime = this.xCoordToTime(relativeX);
+
         this.setState((prevState) => {
-          const updatedLines = prevState.verticalLines.map((line) => {
-            if (line.id === id) {
-              return { ...line, time: this.xCoordToTime(event.pageX) }; // Update time
-            }
-            return line;
-          });
-      
-          // Notify parent component to update state
-          this.props.onVerticalLinesUpdate(updatedLines);
-          return { verticalLines: updatedLines };
+            const updatedLines = prevState.verticalLines.map((line) =>
+            line.id === id ? { ...line, time: newTime } : line
+            );
+
+            this.props.onVerticalLinesUpdate(updatedLines);
+            return { verticalLines: updatedLines };
         });
-      };
-    
+    };
 
     renderVerticalLines = () => {
         const { verticalLines, typeOfBeat } = this.props;
@@ -367,8 +391,8 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
                         style={{
                         left: this.timeToXCoord(line.time) + 'px', // Use x position from state
                         position: 'absolute',
-                        top: imageTop + 'px',
-                        height: imageHeight + 'px', // Adjust height as needed
+                        top: (imageTop + 7) + 'px', // 7px accounts for image start offset
+                        height: (imageHeight - 48) + 'px', // Adjust height as needed. 48px accounts for image coordinate display
                         width: '2px', // Line thickness
                         background: 'yellow', // Line color
                         cursor: 'ew-resize', // Cursor style
@@ -381,15 +405,36 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         });
       };
 
-
       startDragging = (event, id) => {
         event.preventDefault();
-        document.onmousemove = (e) => this.handleDrag(e, id);
-        document.onmouseup = () => {
-          document.onmousemove = null;
-          document.onmouseup = null;
+        this.dragStartX = event.pageX;
+        this.dragStartTime = Date.now();
+        this.dragMoved = false;
+
+        const onMouseMove = (e) => {
+            const distance = Math.abs(e.pageX - this.dragStartX);
+            if (distance > 3) { // movement threshold to detect drag
+            this.dragMoved = true;
+            this.handleDrag(e, id);
+            }
         };
-      };
+
+        const onMouseUp = (e) => {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+
+            const clickDuration = Date.now() - this.dragStartTime;
+
+            if (!this.dragMoved && clickDuration < 250) {
+                // treat as a click → toggle the line
+                this.toggleVerticalLine(this.xCoordToTime(this.dragStartX));
+            }
+        };
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+        };
+
 
     render() {
         const { src } = this.props;
