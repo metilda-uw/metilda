@@ -929,35 +929,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     }
   };
 
-  renderVerticalLineDots = () => {
-    const { verticalLines } = this.state;
-    const { minAudioTime, maxAudioTime } = this.state; 
-
-    return verticalLines.map((line) => {
-      // Get time as percentage of total duration
-      const percentage = ((line.time - minAudioTime) / (maxAudioTime - minAudioTime)) * 100;
-      if (percentage < 0 || percentage > 100) {
-        return null; // Skip lines outside the visible range
-      }
-
-      return (
-        <div
-          key={line.id}
-          style={{
-            position: 'absolute',
-            left: `${percentage}%`,
-            top: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '6px',
-            height: '6px',
-            backgroundColor: 'red',
-            borderRadius: '50%',
-          }}
-        />
-      );
-    });
-  };
-
   renderOptions = (uploadId : string) => {
     return (
       <>
@@ -1118,6 +1089,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 speakerIndex={this.props.speakerIndex}
                 firebase={this.props.firebase}
                 typeOfBeat={this.state.typeOfBeat}
+                verticalLines={this.state.verticalLines}
               />
               {typeOfBeat == 'Rhythm' &&
                 <button
@@ -1131,22 +1103,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             {
               typeOfBeat == 'Rhythm' &&
               <div className="vertical-lines-container">
-                <div
-                  className="vertical-lines-indicator"
-                  style={{
-                    position: "relative",
-                    width: `${DEFAULT.AUDIO_WIDTH}px`,
-                    height: "30px",
-                    backgroundColor: "#f8f8f8",
-                    border: "5px solid #ccc",
-                    marginTop: "10px",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                  }}
-                >
-                  {this.renderVerticalLineDots()}
-                </div>
-
                 <div style={{ marginBottom: "5px", textAlign: "center" }}>
                   <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
                     Play Taps
