@@ -327,7 +327,15 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
             if (this.props.typeOfBeat === 'Rhythm') {
                 const rect = this.metildaAudioAnalysisImageRef.current.getBoundingClientRect();
                 const relativeX = e.clientX - rect.left;
-                this.toggleVerticalLine(this.xCoordToTime(relativeX));
+
+                // Compute valid spectrogram bounds
+                const minX = this.props.xminPerc * this.props.imageWidth;
+                const maxX = this.props.xmaxPerc * this.props.imageWidth;
+
+                // Only allow toggle if click lies within visible waveform
+                if (relativeX >= minX && relativeX <= maxX) {
+                    this.toggleVerticalLine(this.xCoordToTime(relativeX));
+                }
             }
         };
 
@@ -420,15 +428,24 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         };
 
         const onMouseUp = (e) => {
+            const rect = this.metildaAudioAnalysisImageRef.current.getBoundingClientRect();
+            const relativeX = e.clientX - rect.left;
+
+            // Compute valid spectrogram bounds
+            const minX = this.props.xminPerc * this.props.imageWidth;
+            const maxX = this.props.xmaxPerc * this.props.imageWidth;
+
+            // Only allow toggle if click lies within visible waveform
+            if (relativeX < minX || relativeX > maxX) {
+                this.setState((prevState) => {
+                    const updatedLines = prevState.verticalLines.filter(line => line.id !== id);
+                    this.props.onVerticalLinesUpdate(updatedLines);
+                    return { verticalLines: updatedLines };
+                });
+            }
+
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
-
-            const clickDuration = Date.now() - this.dragStartTime;
-
-            if (!this.dragMoved && clickDuration < 250) {
-                // treat as a click → toggle the line
-                this.toggleVerticalLine(this.xCoordToTime(this.dragStartX));
-            }
         };
 
         document.addEventListener('mousemove', onMouseMove);

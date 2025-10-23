@@ -78,15 +78,19 @@ export const useImageSelection = () => {
 
   // Convert audio time (seconds) -> image-local X pixel (relative to the full image)
   const timeToImageX = (time: number, props) => {
-    const startOffset = props.imageWidth * props.xminPerc;
-    if (time <= props.minAudioTime) return startOffset + props.minAudioX - props.minAudioX * 0; // startOffset
-    if (time >= props.maxAudioTime) return startOffset + (props.maxAudioX - props.minAudioX);
+    const { imageWidth, xminPerc, minAudioTime, maxAudioTime, minAudioX, maxAudioX } = props;
 
-    const dt = props.maxAudioTime - props.minAudioTime;
-    const u0 = (time - props.minAudioTime) / dt;
-    const dx = props.maxAudioX - props.minAudioX;
-    return startOffset + u0 * dx;
-  }
+    const startOffset = imageWidth * xminPerc;
+    const totalTime = maxAudioTime - minAudioTime;
+    const totalX = maxAudioX - minAudioX;
+
+    if (time <= minAudioTime) return startOffset + minAudioX;
+    if (time >= maxAudioTime) return startOffset + maxAudioX;
+
+    const ratio = (time - minAudioTime) / totalTime;
+    return startOffset + minAudioX + ratio * totalX;
+  };
+
 
 // Convert image-local X pixel -> audio time (seconds)
   const imageXToTime = (x: number, props) => {

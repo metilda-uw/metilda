@@ -6,6 +6,7 @@ export const SPEAKER_LIMIT = 4;
 export const MIN_IMAGE_XPERC = 351.0 / 2800.0;
 export const MAX_IMAGE_XPERC = 2513.0 / 2800.0;
 export const AUDIO_IMG_WIDTH = 653;
+export const AUDIO_WIDTH = AUDIO_IMG_WIDTH - AUDIO_IMG_WIDTH * MIN_IMAGE_XPERC - AUDIO_IMG_WIDTH * (1 - MAX_IMAGE_XPERC);
 export const AUDIO_IMG_HEIGHT = 300;
 export const SYLLABLE_TEXT = "";
 export const SEPARATOR_TEXT = "";

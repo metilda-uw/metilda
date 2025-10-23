@@ -930,23 +930,29 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   renderVerticalLineDots = () => {
-    return this.state.verticalLines.map((line) => {
-      const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
-      const mappedX = ((timeToImageX(line.time, this.props) / indicatorWidth) * 100) - 67;
+    const { verticalLines } = this.state;
+    const { minAudioTime, maxAudioTime } = this.state; 
+
+    return verticalLines.map((line) => {
+      // Get time as percentage of total duration
+      const percentage = ((line.time - minAudioTime) / (maxAudioTime - minAudioTime)) * 100;
+      if (percentage < 0 || percentage > 100) {
+        return null; // Skip lines outside the visible range
+      }
 
       return (
         <div
           key={line.id}
           style={{
             position: 'absolute',
-            left: `${mappedX}%`,
+            left: `${percentage}%`,
             top: '50%',
-            transform: 'translate(-90%, -60%)',
+            transform: 'translate(-50%, -50%)',
             width: '6px',
             height: '6px',
             backgroundColor: 'red',
             borderRadius: '50%',
-      }}
+          }}
         />
       );
     });
@@ -1129,7 +1135,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                   className="vertical-lines-indicator"
                   style={{
                     position: "relative",
-                    width: `${DEFAULT.AUDIO_IMG_WIDTH}px`,
+                    width: `${DEFAULT.AUDIO_WIDTH}px`,
                     height: "30px",
                     backgroundColor: "#f8f8f8",
                     border: "5px solid #ccc",
