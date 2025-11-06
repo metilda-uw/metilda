@@ -15,6 +15,7 @@ import { spinner } from "../Utils/LoadingSpinner";
 import ReactGA from "react-ga";
 import ReactFileReader from "react-file-reader";
 import { NotificationManager } from "react-notifications";
+import { useEffect } from "react";
 
 export interface PeldaViewProps {
   speakers: Speaker[];
@@ -101,6 +102,7 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
   }
 
   componentDidMount() {
+    alert("⚠️ PELDA is currently under construction. Please check back later!");
     this.getUserFiles();
   }
 
@@ -1464,6 +1466,10 @@ export class PeldaView extends React.Component<PeldaViewProps, State> {
     });
     this.getUserFiles();
   };
+
+
+
+
 
   render() {
     const { isLoading } = this.state;
