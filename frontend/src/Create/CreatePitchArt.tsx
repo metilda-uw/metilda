@@ -70,7 +70,7 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
 }
 interface VerticalLine {
   id: string;
-  x: number;
+  time: number;
 }
 interface State {
   files: any[];

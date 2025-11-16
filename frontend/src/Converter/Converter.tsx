@@ -50,8 +50,9 @@ function Converter(){
             setFromScaleName(scaleOptions[3]);
         }
 
-        const eventData = e;
-        setFromScaleValue(e.target.value);
+        const newValues = [...fromScaleValuesArray];
+        newValues[activeFromScaleInput] = e.target.value;
+        setFromScaleValuesArray(newValues);
 
         clearTimeout(fromTimer);
         e.persist();
@@ -271,6 +272,12 @@ function Converter(){
         }
     }
 
+    const handleReset = () => {
+        setFromScaleValuesArray(["", "", "", ""]);
+        setToScaleValuesArray(["", "", "", ""]);
+        setActiveFromScaleInput(null);
+        };
+
     return (
         <div className="metilda-conversions">
             <Header></Header>
@@ -482,6 +489,27 @@ function Converter(){
             <div className="user-note">
                 {(noteText != '') &&  <p className="note-text">{noteText}</p>}
             </div>
+            <div className="converter-controls" style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <button
+                        onClick={handleReset}
+                        className="reset-button"
+                        style={{
+                        backgroundColor: '#c62828',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 20px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        transition: '0.3s'
+                        }}
+                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#b71c1c')}
+                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#c62828')}
+                    >
+                        Reset
+                    </button>
+                </div>
             <div>
                 <body>
                 <b className="b">Tooltips</b>

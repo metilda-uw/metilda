@@ -310,6 +310,7 @@ class SignUpFormBase extends React.Component<Props, State> {
     } = this.state;
     const roleOptions = [
       { value: "Linguistic Researcher", label: "Linguistic Researcher" },
+      { value: "Community Language Worker", label: "Community Language Worker" },
       { value: "Teacher", label: "Teacher" },
       { value: "Student", label: "Student" },
       { value: "Other", label: "Other" },
@@ -318,6 +319,7 @@ class SignUpFormBase extends React.Component<Props, State> {
       { value: "Blackfoot", label: "Blackfoot" },
       { value: "English", label: "English" },
       { value: "French", label: "French" },
+      { value: "Japanese", label: "Japanese" },
       { value: "Other", label: "Other" },
     ];
 
@@ -387,7 +389,7 @@ class SignUpFormBase extends React.Component<Props, State> {
           value={institution}
           onChange={this.onChange}
           type="text"
-          placeholder="University/Institution"
+          placeholder="University/Institution/Tribal Affiliation (enrolled or descendant)"
         />
         <Select isMulti
           className="language_Options"
@@ -413,9 +415,6 @@ class SignUpFormBase extends React.Component<Props, State> {
             onChange={this.handleCheckboxChange}
             required
           />
-          <span  >
-            By clicking the checkbox, you agree to the {<TermsOfUseLink/>} *
-          </span>
         </label>
         <button type="submit" className="signup_Submit globalbtn">
           Sign Up

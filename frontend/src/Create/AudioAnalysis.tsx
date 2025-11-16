@@ -35,6 +35,8 @@ import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
 import { Backdrop, Box, Popover, createTheme } from "@material-ui/core";
 
+import { useImageSelection } from './hooks/useImageSelection'; 
+
 export interface AudioAnalysisProps {
   speakerIndex: number;
   speakers: Speaker[];
@@ -68,7 +70,7 @@ export interface AudioAnalysisProps {
 
 interface VerticalLine {
   id: string;
-  x: number;
+  time: number;
 }
 
 interface State {
@@ -107,6 +109,8 @@ interface State {
   windowWidth: number;
   anchorEl: HTMLButtonElement | null
 }
+
+const { imageIntervalSelected, imageIntervalToTimeInterval, timeToImageX, imageXToTime } = useImageSelection();
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   /**
@@ -224,7 +228,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       windowWidth: window.innerWidth,
       anchorEl: null
     };
-    this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
     this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
     this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
@@ -236,14 +240,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
     this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
     this.wordSplitClicked = this.wordSplitClicked.bind(this);
-    this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
     this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
     this.manualPitchChange = this.manualPitchChange.bind(this);
     this.addPitch = this.addPitch.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
     this.toggleTypeOfBeat = this.toggleTypeOfBeat.bind(this);
     this.saveRhythm = this.saveRhythm.bind(this);
-
   }
 
   setVerticalLines = (newLines) => {
@@ -341,7 +343,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     // Compute the new time scale
     let ts;
     if (leftX !== undefined && rightX !== undefined) {
-      ts = this.imageIntervalToTimeInterval(leftX, rightX);
+      ts = imageIntervalToTimeInterval(leftX, rightX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
     } else {
       ts = [this.state.minAudioTime, this.state.maxAudioTime];
     }
@@ -425,42 +427,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.state.closeImgSelectionCallback();
   }
 
-  imageIntervalSelected(
-    leftX: number,
-    rightX: number,
-    manualPitch?: number,
-    isWordSep: boolean = false,
-    tsOverride?: number[]) {
-    const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
-
-    if (manualPitch !== undefined) {
-      this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
-      return;
-    }
-
-    if (isWordSep) {
-      this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
-      return;
-    }
-
-    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
-      + "?t0=" + ts[0]
-      + "&t1=" + ts[1]
-      + "&max-pitch=" + this.props.maxPitch
-      + "&min-pitch=" + this.props.minPitch, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
-      );
-  }
-
   pitchArtRangeClicked() {
-    const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+    const ts = imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
 
     fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
       + "?max-pitch="
@@ -482,17 +450,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   averagePitchArtClicked() {
-    this.imageIntervalSelected(
-      this.state.minSelectX,
-      this.state.maxSelectX);
-  }
-
-  wordSplitClicked() {
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      undefined,
-      true);
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } }
+      );
+    }
+
+  wordSplitClicked() {
+    imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX,
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch : undefined, isWordSep: true,}
+    );
   }
 
   manualPitchChange(index: number, newPitch: number) {
@@ -515,17 +488,19 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return;
       }
 
+
       if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
         try {
           const values = manualPitchStr.split(",");
           const t0: number = parseFloat(values[0]);
           const t1: number = parseFloat(values[1]);
-          this.imageIntervalSelected(
+          imageIntervalSelected(
             -1,
             -1,
-            undefined,
-            undefined,
-            [t0, t1]);
+            { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+            { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+            {manualPitch: undefined, isWordSep: undefined, tsOverride: [t0, t1]},
+            );
           return;
         } catch {
           // do nothing
@@ -550,11 +525,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       }
     }
 
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      manualPitch);
-  }
+      { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+      { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch: manualPitch},
+    );
+    }
 
   onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
     this.setState({
@@ -628,17 +606,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       minAudioTime: tmin,
       maxAudioTime: tmax,
     });
-  }
-
-  imageIntervalToTimeInterval(x1: number, x2: number) {
-    const dt = this.state.maxAudioTime - this.state.minAudioTime;
-    const dx = this.state.maxAudioX - this.state.minAudioX;
-    const u0 = x1 / dx;
-    const u1 = x2 / dx;
-
-    const t0 = this.state.minAudioTime + (u0 * dt);
-    const t1 = this.state.minAudioTime + (u1 * dt);
-    return [t0, t1];
   }
 
   selectionIntervalClicked() {
@@ -780,9 +747,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         if (rhythmDoc.exists) {
           const rhythmData = rhythmDoc.data();
 
+          //TODO: Check backwards compatibility
           const verticalLines = rhythmData.verticalLines.map((line) => ({
             id: line.id || `line-${Date.now()}`, // Ensure each line has a unique ID
-            x: line.x, // Ensure x is a number
+            time: line.time || (line.x && timeToImageX(line.x, this.props)), // Ensure time is a number
           }));
 
           // Update verticalLines state directly in this component
@@ -827,36 +795,33 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     const tapTimes = verticalLines.map((line) => {
       // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      if (time > 5) {
-        return time - 4
-      }
-      else {
-        return time
+      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
+        return line.time - this.state.minAudioTime;
       }
     });
 
+    const audioCtx = new (window.AudioContext || window.AudioContext)();
+
     // Function to play a single tap sound
     const playTap = () => {
-      const audioCtx = new (window.AudioContext || window.AudioContext)();
       const oscillator = audioCtx.createOscillator();
       const gainNode = audioCtx.createGain();
 
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency of the tap sound
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out the tap sound
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Frequency of the tap sound
+      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
 
       oscillator.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2); // Duration of the tap sound
+      oscillator.stop(audioCtx.currentTime + 0.06); // Duration of the tap sound
     };
 
     tapTimes.forEach((time) => {
       setTimeout(() => {
         playTap();
-      }, time * 1000); // Convert seconds to milliseconds
+      }, time * 1000- 50); // Convert seconds to milliseconds. The time to play the tap sound slightly earlier to sync better with audio
     });
   };
 
@@ -886,13 +851,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
 
     const tapTimes = verticalLines.map((line) => {
       const delay = 1;
-      // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-      if (time > 5) {
-        return time - 4 - delay
-      }
-      else {
-        return time - delay
+      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
+        return line.time - this.state.minAudioTime;
       }
     });
 
@@ -905,8 +865,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       const currentTime = audioElement.currentTime;
 
       for (let i = 0; i < tapTimes.length; i++) {
-        if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
-          // Play the tap sound using AudioContext for precise timing
+        if (currentTime >= tapTimes[i]- 0.05 && !triggeredTaps.has(i)) {
+          // Play the tap sound using AudioContext for precise timing and 50ms early trigger to sync better with audio
           this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
           triggeredTaps.add(i);
         }
@@ -922,19 +882,19 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   };
 
   playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
-    const audioCtx = new (window.AudioContext || window.AudioContext)();
+    const audioCtx = audioContext
     const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
+    const gainNode = tapGainNode || audioCtx.createGain();
 
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+    oscillator.type = 'sine';
+    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
 
     oscillator.connect(gainNode);
     gainNode.connect(audioCtx.destination);
     oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2);
+    oscillator.stop(audioCtx.currentTime + 0.02);
   };
 
   saveRhythm = async () => {
@@ -967,29 +927,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       console.error("Error saving/deleting rhythm:", error);
       NotificationManager.error("Failed to save/delete rhythm.");
     }
-  };
-
-  renderVerticalLineDots = () => {
-    return this.state.verticalLines.map((line) => {
-      const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
-      const mappedX = ((line.x / indicatorWidth) * 100) - 67;
-
-      return (
-        <div
-          key={line.id}
-          style={{
-            position: 'absolute',
-            left: `${mappedX}%`,
-            top: '50%',
-            transform: 'translate(-90%, -60%)',
-            width: '6px',
-            height: '6px',
-            backgroundColor: 'red',
-            borderRadius: '50%',
-      }}
-        />
-      );
-    });
   };
 
   renderOptions = (uploadId : string) => {
@@ -1110,7 +1047,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
-              {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
+              {this.maybeRenderImgMenu()}
               {uploadId && (
                 <AudioImg
                   key={this.state.imageUrl}
@@ -1152,6 +1089,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 speakerIndex={this.props.speakerIndex}
                 firebase={this.props.firebase}
                 typeOfBeat={this.state.typeOfBeat}
+                verticalLines={this.state.verticalLines}
               />
               {typeOfBeat == 'Rhythm' &&
                 <button
@@ -1165,28 +1103,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
             {
               typeOfBeat == 'Rhythm' &&
               <div className="vertical-lines-container">
-                <div
-                  className="vertical-lines-indicator"
-                  style={{
-                    position: "relative",
-                    width: `${DEFAULT.AUDIO_IMG_WIDTH}px`,
-                    height: "30px",
-                    backgroundColor: "#f8f8f8",
-                    border: "5px solid #ccc",
-                    marginTop: "10px",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                  }}
-                >
-                  {this.renderVerticalLineDots()}
-                </div>
-
                 <div style={{ marginBottom: "5px", textAlign: "center" }}>
                   <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
                     Play Taps
                   </button>
                   <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
-                    Play Audio + Taps
+                    Play Speech + Taps
                   </button>
                 </div>
                 <audio id="audio-player" src={this.state.audioUrl} preload="auto" />

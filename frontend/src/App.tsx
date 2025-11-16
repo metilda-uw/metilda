@@ -3,8 +3,10 @@ import "./App.scss";
 
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
+import { Redirect, Switch } from "react-router-dom";
 import "firebase/auth";
 import "firebase/firestore";
+import firebase from "firebase/app";
 import ReactGA from "react-ga";
 
 import { withAuthentication } from "./Session";
@@ -21,6 +23,7 @@ import Landing from "./Authentication/landing";
 import signUp from "./Authentication/signup";
 import signIn from "./Authentication/login";
 import signOut from "./Authentication/signout";
+import TermsAndConditions from "./Authentication/TermsAndConditions";
 import passwordForget from "./Authentication/password_forget";
 import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
@@ -93,6 +96,59 @@ const history = createBrowserHistory();
 // );
 // renderingPerformanceObserver.observe({ entryTypes: ["mark", "measure"] });
 
+const HomeGate = (props: any) => {
+  const [ok, setOk] = React.useState<null | boolean>(null);
+
+  // normalize email for doc id
+  const emailKey = (u: firebase.User | null) =>
+  u?.email ? u.email.trim().toLowerCase() : null; 
+  
+  React.useEffect(() => {
+    const unsub = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        setOk(false); // not signed in -> redirect to T&C (which will bounce to sign-in)
+        return;
+      }
+      try {
+        const db = firebase.firestore();
+
+        // Latest T&C (order by currentTncVersion descending)
+        const tncSnap = await db
+          .collection("TermsAndConditions")
+          .orderBy("currentTncVersion", "desc")
+          .limit(1)
+          .get({ source: "server" });
+
+        const currentVersion = tncSnap.empty
+          ? 1
+          : Math.trunc(Number(tncSnap.docs[0].get("currentTncVersion")));
+
+        // User's accepted version
+        const userSnap = await db.doc(`users/${emailKey(user)}`).get({ source: "server" });
+        const acceptedRaw = userSnap.exists ? userSnap.get("acceptedTncVersion") : undefined;
+        const acceptedVersion = Math.trunc(Number(acceptedRaw));
+
+        const isAccepted =
+          Number.isFinite(currentVersion) &&
+          Number.isFinite(acceptedVersion) &&
+          acceptedVersion === currentVersion;
+
+        setOk(isAccepted);
+      } catch (e) {
+        console.error("HomeGate check failed:", e);
+        setOk(false);
+      }
+    });
+
+    return () => unsub();
+  }, []);
+
+  if (ok === null) return null;
+
+  // If accepted, render Home; else go to T&C
+  return ok ? <Home {...props} /> : <Redirect to={ROUTES.TERMS_AND_CONDITIONS} />;
+};
+
 const App = () => (
   <Router history={history}>
     <div className="App">
@@ -100,6 +156,8 @@ const App = () => (
       <Route exact={true} path={ROUTES.LANDING} component={Landing} />
       <Route exact={true} path={ROUTES.SIGN_UP} component={signUp} />
       <Route exact={true} path={ROUTES.SIGN_IN} component={signIn} />
+      <Route exact={true} path={ROUTES.TERMS_AND_CONDITIONS} component={TermsAndConditions} />
+      <Route exact={true} path={ROUTES.HOME} component={HomeGate} />  
       <Route
         exact={true}
         path={ROUTES.PASSWORD_FORGET}
@@ -118,7 +176,6 @@ const App = () => (
       <Route exact={true} path={ROUTES.DOCUMENTATION} component={DocumentationContent} />
       {/* <Route exact path="/collections/:id" component={LearnNew} /> */}
       <Route exact path="/learnnew/:collection/:id" component={LearnNew} />
-      <Route path="/home" component={Home} />
       <Route path="/manage-users" component={ManageUsers} />
       <Route path="/pitchartwizard/:type?/:id?" component={CreatePitchArt} />
       <Route path="/peldaview" component={PeldaView} />
