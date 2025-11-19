@@ -41,6 +41,7 @@ import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
 import UpdateSyllable from "./UpdateSyllable";
 import './TargetPitchBar.scss';
+import * as DEFAULT from "../constants/create";
 
 //import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
 
@@ -81,6 +82,7 @@ export interface TargetPitchBarProps {
     lastUploadedLetters: Letter[]
   ) => void;
   setSpeaker: (speakerIndex: number, speaker: Speaker) => void;
+  verticalLines: { id: string; time: number }[];
 }
 
 interface State {
@@ -922,6 +924,35 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
       }
   };
 
+  renderVerticalLineDots = () => {
+    const { verticalLines } = this.props;
+    const { minAudioTime, maxAudioTime } = this.props;
+
+    return verticalLines.map((line) => {
+      // Get time as percentage of total duration
+      const percentage = ((line.time - minAudioTime) / (maxAudioTime - minAudioTime)) * 100;
+      if (percentage < 0 || percentage > 100) {
+        return null; // Skip lines outside the visible range
+      }
+
+      return (
+        <div
+          key={line.id}
+          style={{
+            position: 'absolute',
+            left: `${percentage}%`,
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '6px',
+            height: '6px',
+            backgroundColor: 'red',
+            borderRadius: '50%',
+          }}
+        />
+      );
+    });
+  };
+
   render() {
     const controller = this;
     const letters = this.scaleIntervals();
@@ -935,34 +966,51 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
         {this.editSyllableModal()}
         {this.removeLetterEventModal()}
         <div className="metilda-control-container metilda-target-pitch-bar">
-          <div className="metilda-audio-analysis-image-col-1">
-            <span>{typeOfBeat}</span> {/* Display the active type */}
+          <div className="metilda-audio-analysis-image-col-1" style={{ width: "78.29px" }}> {/* Fixed width for the label column to align with the image */}
+            <span  >{typeOfBeat}</span> {/* Display the active type */}
           </div>
-          <div
-            className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container"
-            ref={this.metildaSyllableBarRef}
-            onMouseDown={this.handleMouseDown}
-          >
-            <div ref={this.selectionOverlay} className="selection"></div>
-            {letters.map(function (item, index) {
-              if (!item.isShown) {
-                return;
-              }
-  
-              return (
-                <AudioLetter
-                  key={index}
-                  index={index}
-                  letter={item.syllable}
-                  leftX={item.leftX}
-                  rightX={item.rightX}
-                  isSelected={index === controller.state.selectedIndex}
-                  isWordSep={item.isWordSep}
-                  onClick={() => controller.targetPitchSelected(index)}
-                />
-              );
-            })}
-          </div>
+          {
+                        typeOfBeat == 'Rhythm' &&
+                        <div className="vertical-lines-container" style={{ width: "514px" }}> {/* Fixed width to match audio width */}
+                          <div
+                            className="vertical-lines-indicator"
+                            style={{
+                              position: "relative",
+                              height: "30px",
+                              backgroundColor: "#f8f8f8",
+                              border: "5px solid #ccc",
+                            }}
+                          >
+                            {this.renderVerticalLineDots()}
+                          </div>
+                        </div>
+          }
+          {typeOfBeat === "Melody" && (
+            <div
+              className="metilda-audio-analysis-image-col-2 metilda-audio-analysis-letter-container"
+              ref={this.metildaSyllableBarRef}
+              onMouseDown={this.handleMouseDown}
+            >
+              <div ref={this.selectionOverlay} className="selection"></div>
+              {letters.map(function (item, index) {
+                if (!item.isShown) {
+                  return;
+                }
+    
+                return (
+                  <AudioLetter
+                    key={index}
+                    index={index}
+                    letter={item.syllable}
+                    leftX={item.leftX}
+                    rightX={item.rightX}
+                    isSelected={index === controller.state.selectedIndex}
+                    isWordSep={item.isWordSep}
+                    onClick={() => controller.targetPitchSelected(index)}
+                  />
+                );
+              })}
+            </div>)}
         </div>
   
         <div className="TargetPitchBarElements">

@@ -1,65 +1,113 @@
-.Acknowledgements {
-  color: brown;
-  text-align: left;
-  bottom: 20px;
-  width: 100%;
-}
-
-.Acknowledgements h6 {
-  text-decoration: underline;
-}
-
-h3 {
-  text-align: center;
-  color: brown;
+/* ===== Container ===== */
+.home {
+  background: #fffaf3; 
+  border: 1px solid #e0c9a6;
   font-family: 'Trebuchet MS', Helvetica, sans-serif;
+  color: #5c4033;
 }
 
-p {
+.user-guide {
+  margin: 20px 0px;
+}
+/* ===== Headings ===== */
+.home h1 {
   text-align: center;
+  color: #5c4033;
+  font-size: 2rem;
+  margin-top: 0;
+}
+
+.user-guide h3 {
+  text-align: left;
+  color: #7a5230;
+  font-weight: bold;
   letter-spacing: 1px;
-  font-family: 'Trebuchet MS', Helvetica, sans-serif;
-  padding: 0px 20px;
-  color: brown;
+  margin: 20px 10px;
 }
 
-.list {
+/* ===== Paragraphs ===== */
+.home p {
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+  margin-bottom: 16px;
+  color: #5c4033;
+}
+
+.home .para {
   text-align: left;
   margin-left: 25px;
-  color: brown;
-}
-.subList {
-  text-align: left;
-  margin-left: 30px;
-  color: brown; 
-  margin-top: unset;
-  display:list-item;
-  margin-bottom:unset;
 }
 
- 
-.para {
-  text-align: left;
+.user-guide .para {
   margin-left: 25px;
-  color: brown; 
-
 }
 
-.subList li {
+/* ===== Lists ===== */
+.home .list,
+.home .subList {
+  text-align: left;
+  margin-left: 20px;
+  padding-left: 5px;
+}
+
+.home p > ul {
+  list-style-position: inside;
+  margin-left: 20px;
+}
+
+.home .list li {
+  margin: 6px 0;
+  line-height: 1.5;
   position: relative;
-  padding-left: 25px; /* Adjust the padding as needed */
+  padding-left: 0px;
 }
 
-.subList li::before {
-  content: '';
+.home .list li::before {
+  position: absolute;
+  left: 0;
+  color: #a36a3f; 
+  font-weight: bold;
+}
+
+.home .subList li {
+  position: relative;
+  padding-left: 20px;
+  margin: 4px 0;
+}
+
+.home .subList li::before {
   position: absolute;
   left: 0;
   top: 50%;
-  transform: translateY(-50%); /* making it go upwards */
-  width: 5px; /* Adjust the size of the circle */
-  height: 5px; /* Adjust the size of the circle */
-  border: 2px solid brown; /* Adjust the border color and thickness */
+  transform: translateY(-50%);
+  width: 6px;
+  height: 6px;
+  border: 1.8px solid #a36a3f;
   border-radius: 50%;
-  box-sizing: border-box;
-  background-color: transparent; /* Make the circle hollow */
+  background-color: transparent;
+}
+
+/* ===== Section Styling ===== */
+.home hr {
+  border: 0;
+  height: 1px;
+  background: linear-gradient(to right, #d3b792, #5c4033, #d3b792);
+  margin: 25px 0;
+}
+
+.home b {
+  color: brown;
+}
+
+/* ===== Acknowledgements Section ===== */
+.home .Acknowledgements {
+  color: #5c4033;
+  text-align: left;
+  margin-top: 30px;
+}
+
+.home .Acknowledgements h6 {
+  text-decoration: underline;
+  color: #7a5230;
+  margin-bottom: 10px;
 }
