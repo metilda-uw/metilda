@@ -89,7 +89,6 @@ const INITIAL_STATE = {
   role: [],
   uid: "",
   languageOfResearch: [],
-  //checked: false,
   isEmailConfirmationModalOpen:false,
   verificationCode:""
 };
@@ -334,13 +333,6 @@ class SignUpFormBase extends React.Component<Props, State> {
       }),
       input: (styles: any) => ({ ...styles, padding: "0px", margin: "0px" }),
     };
-    const Checkbox = (props: any) => <input type="checkbox" {...props} />;
-    const TermsOfUseLink = () => (
-      
-      <Link to={ROUTES.TERMS_OF_USE} target="_blank" className="terms_of_use_Link">
-            terms of use
-      </Link>
-    );
 
     return (
       <>
@@ -408,14 +400,6 @@ class SignUpFormBase extends React.Component<Props, State> {
           styles={colourStyles}
           onChange={this.handleRoleChange}
         />
-        <label className="terms_of_use">
-          <Checkbox
-            className="TermsOfUseCheckBox"
-            checked={this.state.checked}
-            onChange={this.handleCheckboxChange}
-            required
-          />
-        </label>
         <button type="submit" className="signup_Submit globalbtn">
           Sign Up
         </button>
