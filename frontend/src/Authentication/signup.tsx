@@ -89,7 +89,7 @@ const INITIAL_STATE = {
   role: [],
   uid: "",
   languageOfResearch: [],
-  checked: false,
+  //checked: false,
   isEmailConfirmationModalOpen:false,
   verificationCode:""
 };
