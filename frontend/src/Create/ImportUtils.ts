@@ -719,7 +719,8 @@ export const chooseColor = (speakers, isLineColor) => {
 }
 
 export const canUserVisitCreatePitchArtpPage = (currentUserRole) => {
-  if(currentUserRole === constants.ADMIN_ROLE || currentUserRole === constants.TEACHER_ROLE || currentUserRole === constants.RESEARCHER_ROLE){
+  if(currentUserRole === constants.ADMIN_ROLE || currentUserRole === constants.TEACHER_ROLE || currentUserRole === constants.RESEARCHER_ROLE || 
+      currentUserRole === constants.OTHER_ROLE || currentUserRole === constants.STUDENT_ROLE){
     return true;
   }
   return false;

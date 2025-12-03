@@ -92,7 +92,8 @@ class Header extends Component<HeaderProps, State> {
           isAdmin: true,
           dispalyCreatePitchArtTab:true,
         });
-      }else if(this.props.currentUserRole === constants.TEACHER_ROLE || this.props.currentUserRole === constants.RESEARCHER_ROLE){
+      }else if(this.props.currentUserRole === constants.TEACHER_ROLE || this.props.currentUserRole === constants.RESEARCHER_ROLE 
+                  || this.props.currentUserRole === constants.STUDENT_ROLE || this.props.currentUserRole === constants.OTHER_ROLE){ // All roles can access Create Pitch Art
         this.setState({
           dispalyCreatePitchArtTab:true,
         });
@@ -160,7 +161,8 @@ class Header extends Component<HeaderProps, State> {
       }
     }
     userRole = this.props.currentUserRole;
-    if(userRole === constants.ADMIN_ROLE || userRole === constants.TEACHER_ROLE || userRole === constants.RESEARCHER_ROLE){
+    if(userRole === constants.ADMIN_ROLE || userRole === constants.TEACHER_ROLE || userRole === constants.RESEARCHER_ROLE || 
+          userRole === constants.STUDENT_ROLE || userRole === constants.OTHER_ROLE){ // All roles can access Create Pitch Art
       this.setState({
         dispalyCreatePitchArtTab:true
       })
