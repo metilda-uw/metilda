@@ -35,7 +35,7 @@ class DocumentationContent extends React.Component {
          <h3>Pitch Art</h3>
          <p className="para">
              Fish, Naatosi. 2018. Fish, Naatosi I., "PEDAGOGY OF PITCH IN L2 BLACKFOOT" (2018). Undergraduate Theses, Professional Papers, and Capstone Artifacts. 193.
-             <a href="https://scholarworks.umt.edu/utpp/193/" className="terms_of_use_Link">Paper Link</a> 
+             <a href="https://scholarworks.umt.edu/utpp/193/" className="terms_of_use_Link"> Paper Link</a> 
           </p>
          
          <p className="para">
