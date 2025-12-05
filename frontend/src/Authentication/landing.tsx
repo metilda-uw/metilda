@@ -29,7 +29,7 @@ export class Landing extends React.Component<Props> {
         </button>
         <p />
         {/* beauitfy this  */}
-        <p className="list">
+        <p className="para">
           <b>MeTILDA:</b>
           <li>was developed based on the Blackfoot language, however, the goal is to accommodate any language that uses pitch and needs a visual aid to represent pitch movement.</li>
           <li>enables users to create Pitch Art in one application without having to use multiple tools.</li>

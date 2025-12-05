@@ -697,6 +697,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           showAllAudio={this.showAllClicked}
           isSoundLengthLarge={isSoundLengthLarge}
           onClick={() => this.showImgMenu(-1, -1)}
+          typeOfBeat={this.state.typeOfBeat}
         />
       );
     }

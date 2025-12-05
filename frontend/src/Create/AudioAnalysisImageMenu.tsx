@@ -25,10 +25,12 @@ export interface AudioAnalysisImageMenuProps {
     newAvgPitch: () => void;
     newRangePitch: () => void;
     showAllAudio: () => void;
+    typeOfBeat?: string;
 }
 
 export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysisImageMenuProps> {
     render() {
+        const isRhythm = this.props.typeOfBeat === "Rhythm";
         const theme = {
             pieMenu: {
                 container: css`z-index: 10;`,
@@ -56,7 +58,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                         centerY={`${this.props.imgMenuY}px`}
                     >
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.splitWord)}
-                               disabled={!this.props.isSelectionActive}
+                               disabled={!this.props.isSelectionActive || isRhythm}
                                backgroundColor="darkgrey"
                                className="AudioAnalysisImageMenu-option-split">
                             <div className="menu-icon-top">
@@ -77,7 +79,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                             </div>
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newManualPitch)}
-                               disabled={!this.props.isSelectionActive}
+                               disabled={!this.props.isSelectionActive || isRhythm}
                                backgroundColor="darkgrey"
                                className="AudioAnalysisImageMenu-option-manual">
                             <div className="menu-icon-bottom-right">
@@ -89,7 +91,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                             </div>
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newAvgPitch)}
-                               disabled={!this.props.isSelectionActive}
+                               disabled={!this.props.isSelectionActive || isRhythm}
                                backgroundColor="lightgrey"
                                className="AudioAnalysisImageMenu-option-average">
                             <div className="menu-icon-bottom">
@@ -106,7 +108,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                             </div>
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newRangePitch)}
-                               disabled={!this.props.isSelectionActive}
+                               disabled={!this.props.isSelectionActive || isRhythm}
                                backgroundColor="darkgrey"
                                className="AudioAnalysisImageMenu-option-range">
                             <div className="menu-icon-bottom-left">
