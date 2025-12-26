@@ -900,10 +900,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   render() {
     const { typeOfBeat } = this.state;
     const { verticalLines } = this.state;
-    const audioProperties = {
-      minAudioTime: this.state.minAudioTime,
-      maxAudioTime: this.state.maxAudioTime,
-    }
 
     const uploadId = this.getSpeaker().uploadId;
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];

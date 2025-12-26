@@ -11,24 +11,25 @@ interface VerticalLine {
 
 interface Props {
     audioUrl: string;
-    typeOfBeat: string;
-    verticalLines: VerticalLine[];
+    typeOfBeat?: string;
+    verticalLines?: VerticalLine[];
     minAudioTime: number;
     maxAudioTime: number;
 }
 
-const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat, verticalLines,minAudioTime, maxAudioTime }) => {
+const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat='Melody', verticalLines=[],minAudioTime, maxAudioTime }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
 
 
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(1); // from 0 to 1
   const [showVolumeSlider, setShowVolumeSlider] = useState(false);
   const [progress, setProgress] = useState(0); // in seconds
   const [duration, setDuration] = useState(0); // in seconds
   const [playbackRate, setPlaybackRate] = useState(1.0);
+  const [tapSpeed, setTapSpeed] = useState(1.0);
+
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -147,7 +148,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat, verticalLines,minAud
       tapTimes.forEach((time) => {
         setTimeout(() => {
           playTap();
-        }, time * 1000- 50); // Convert seconds to milliseconds. The time to play the tap sound slightly earlier to sync better with audio
+        }, (time/tapSpeed)* 1000); // Convert seconds to milliseconds.
       });
     };
 
@@ -261,7 +262,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat, verticalLines,minAud
           <select
             value={playbackRate}
             onChange={handleSpeedChange}
-            className="audio-speed"
+            className="speed-control"
           >
             <option value="0.5">0.5x</option>
             <option value="0.75">0.75x</option>
@@ -274,6 +275,19 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat, verticalLines,minAud
         {
           typeOfBeat == 'Rhythm' &&
           <div className="player-row player-beat-controls">
+            <select
+              value={tapSpeed}
+              onChange={(e) => setTapSpeed(parseFloat(e.target.value))}
+              className="speed-control"
+            >
+              <option value="0.5">Tap 0.5x</option>
+              <option value="0.75">Tap 0.75x</option>
+              <option value="1">Tap 1x</option>
+              <option value="1.25">Tap 1.25x</option>
+              <option value="1.5">Tap 1.5x</option>
+              <option value="2">Tap 2x</option>
+            </select>
+
             <div style={{ marginBottom: "3px", textAlign: "center" }}>
               <button className="waves-effect waves-light btn globalbtn" onClick={playBeats}>
                 Play Taps

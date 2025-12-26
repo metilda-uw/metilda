@@ -40,7 +40,7 @@
 .audio-slider:hover {
   background: #bbb; }
 
-.audio-speed {
+.speed-control {
   display: inline-block;
   margin: 8px;
   padding: 4px 8px;
