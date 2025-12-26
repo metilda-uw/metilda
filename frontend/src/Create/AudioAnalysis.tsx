@@ -785,119 +785,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
-
-  playBeats = () => {
-    const { verticalLines, soundLength } = this.state;
-
-    if (!verticalLines.length) {
-      console.warn("No beats to play.");
-      return;
-    }
-
-    const tapTimes = verticalLines.map((line) => {
-      // Map the x-coordinate to a time in the audio
-      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
-        return line.time - this.state.minAudioTime;
-      }
-    });
-
-    const audioCtx = new (window.AudioContext || window.AudioContext)();
-
-    // Function to play a single tap sound
-    const playTap = () => {
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // Frequency of the tap sound
-      gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
-
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.06); // Duration of the tap sound
-    };
-
-    tapTimes.forEach((time) => {
-      setTimeout(() => {
-        playTap();
-      }, time * 1000- 50); // Convert seconds to milliseconds. The time to play the tap sound slightly earlier to sync better with audio
-    });
-  };
-
-  playAudioWithTaps = () => {
-    const { verticalLines, audioUrl, soundLength } = this.state;
-
-    if (!verticalLines.length) {
-      console.warn("No beats to play.");
-      return;
-    }
-
-    if (!audioUrl) {
-      console.warn("Audio URL not set!");
-      return;
-    }
-
-    let audioElement = document.getElementById('audio-player') as HTMLAudioElement;
-    if (!audioElement) {
-      audioElement = new Audio(audioUrl);
-      audioElement.id = 'audio-player';
-      document.body.appendChild(audioElement);
-    }
-
-    const audioContext = new (window.AudioContext || window.AudioContext)();
-    const tapGainNode = audioContext.createGain();
-    tapGainNode.connect(audioContext.destination);
-
-    const tapTimes = verticalLines.map((line) => {
-      const delay = 1;
-      if (line.time >= this.state.minAudioTime && line.time <= this.state.maxAudioTime) {
-        return line.time - this.state.minAudioTime;
-      }
-    });
-
-    audioElement.currentTime = 0;
-    audioElement.play();
-
-    const triggeredTaps = new Set();
-
-    const handleTimeUpdate = () => {
-      const currentTime = audioElement.currentTime;
-
-      for (let i = 0; i < tapTimes.length; i++) {
-        if (currentTime >= tapTimes[i]- 0.05 && !triggeredTaps.has(i)) {
-          // Play the tap sound using AudioContext for precise timing and 50ms early trigger to sync better with audio
-          this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
-          triggeredTaps.add(i);
-        }
-      }
-    };
-
-    audioElement.addEventListener('timeupdate', handleTimeUpdate);
-
-    audioElement.addEventListener('ended', () => {
-      audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-      triggeredTaps.clear();
-    });
-  };
-
-  playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
-    const audioCtx = audioContext
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = tapGainNode || audioCtx.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(0.4, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05); // Fade out the tap sound
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.02);
-  };
-
   saveRhythm = async () => {
     const { verticalLines } = this.state;
     const { speakerIndex, firebase } = this.props;
@@ -1013,6 +900,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   render() {
     const { typeOfBeat } = this.state;
     const { verticalLines } = this.state;
+    const audioProperties = {
+      minAudioTime: this.state.minAudioTime,
+      maxAudioTime: this.state.maxAudioTime,
+    }
 
     const uploadId = this.getSpeaker().uploadId;
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
@@ -1077,7 +968,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 />
               )}
             </div>
-            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+              {uploadId && 
+              <PlayerBar
+                key={this.state.audioUrl} 
+                audioUrl={this.state.audioUrl} 
+                typeOfBeat={typeOfBeat}
+                verticalLines={this.state.verticalLines}
+                minAudioTime={this.state.minAudioTime}
+                maxAudioTime={this.state.maxAudioTime}
+                />}
             <div >
               <TargetPitchBar
                 letters={this.props.speakers}
@@ -1101,21 +1000,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 </button>
               }
             </div>
-            {
-              typeOfBeat == 'Rhythm' &&
-              <div className="vertical-lines-container">
-                <div style={{ marginBottom: "5px", textAlign: "center" }}>
-                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
-                    Play Taps
-                  </button>
-                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
-                    Play Speech + Taps
-                  </button>
-                </div>
-                <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
-
-              </div>
-            }
           </div>
         </div>
       </div>
