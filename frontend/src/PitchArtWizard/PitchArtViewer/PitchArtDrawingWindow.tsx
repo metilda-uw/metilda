@@ -183,7 +183,7 @@ export class PitchArtDrawingWindow extends React.Component<
 
     this.graphWidth = 10;
     this.borderWidth = 15;
-    this.smallCircleRadius = 16;
+    this.smallCircleRadius = 8;
     this.largeCircleRadius = 18;
     this.circleStrokeWidth = 10;
     this.accentedCircleRadius = 30;
