@@ -39,6 +39,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
+import PitchArtContextMenu from "./PitchArtContextMenu";
 
 export interface PitchArtDrawingWindowProps {
   speakers: Speaker[];
@@ -85,6 +86,19 @@ interface State {
   currentImageName: string;
   allAnalysisIds: any[];
   [key: string]: any;
+
+   // Context menu
+  contextMenuVisible: boolean;
+  contextMenuX: number;
+  contextMenuY: number;
+  contextMenuSpeakerIndex: number | null;
+  contextMenuLetterIndex: number | null;
+
+  // Secondary accent
+  secondaryAccent: {
+    speakerIndex: number;
+    letterIndex: number;
+  };
 }
 
 export interface ColorScheme {
@@ -166,6 +180,12 @@ export class PitchArtDrawingWindow extends React.Component<
       showNewImageModal: false,
       allAnalysisIds: [],
       currentImageName: "",
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+      contextMenuSpeakerIndex: null,
+      contextMenuLetterIndex: null,
+      secondaryAccent: null,
     };
     this.saveImage = this.saveImage.bind(this);
     this.playPitchArt = this.playPitchArt.bind(this);
@@ -656,6 +676,22 @@ export class PitchArtDrawingWindow extends React.Component<
     );
   };
 
+  addSecondaryAccent = () => {
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+  
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) {
+        return;
+    }
+  
+    this.setState({
+        secondaryAccent: {
+            speakerIndex: contextMenuSpeakerIndex,
+            letterIndex: contextMenuLetterIndex
+        },
+        contextMenuVisible: false
+    });
+  };
+
   render() {
     const windowConfig = {
       innerHeight: this.innerHeight,
@@ -747,8 +783,27 @@ export class PitchArtDrawingWindow extends React.Component<
             accentedCircleRadius={this.accentedCircleRadius}
             setPointerEnabled={this.setPointerEnabled}
             isLearn={this.props.isLearn}
+            onOpenContextMenu={(x, y, speakerIndex, letterIndex) =>
+              this.setState({
+                contextMenuVisible: true,
+                contextMenuX: x,
+                contextMenuY: y,
+                contextMenuSpeakerIndex: speakerIndex,
+                contextMenuLetterIndex: letterIndex,
+              })
+            }
+            secondaryAccent={this.state.secondaryAccent}
           />
         </Stage>
+
+        {this.state.contextMenuVisible && (
+          <PitchArtContextMenu
+              x={this.state.contextMenuX}
+              y={this.state.contextMenuY}
+              onAddSecondaryAccent={this.addSecondaryAccent}
+              onClose={() => this.setState({ contextMenuVisible: false })}
+            />
+          )}
         <a className="hide" ref={this.downloadRef}>
           Hidden Download Link
         </a>

@@ -2,6 +2,8 @@ import "./home.scss";
 import * as React from "react";
 import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
+import { Link } from "react-router-dom";
+import {  Button } from "@material-ui/core";
 
 class Home extends React.Component {
   render() {
@@ -136,7 +138,7 @@ class Home extends React.Component {
           </li>
           </ul>
         </p>
-        
+        <p>For Additional Information on Referrences, please visit <Button variant='outlined' component={Link} to="/documentation">Documentation</Button></p>
         {/* TODO: Add citation for MeTILDA */}
       </div>
     );

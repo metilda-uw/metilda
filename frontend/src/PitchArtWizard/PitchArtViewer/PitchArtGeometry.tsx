@@ -31,12 +31,29 @@ interface Props {
     accentedCircleRadius: number;
     setPointerEnabled: (isEnabled: boolean) => (void);
     isLearn?: boolean;
+    onOpenContextMenu: (
+        x: number,
+        y: number,
+        speakerIndex: number,
+        letterIndex: number
+        ) => void;
+    secondaryAccent?: { speakerIndex: number; letterIndex: number } | null;
+
 }
 
 export default class PitchArtGeometry extends React.Component<Props> {
     constructor(props: Props) {
         super(props);
+        this.state = {
+            contextMenuVisible: false,
+            contextMenuX: 0,
+            contextMenuY: 0,
+            contextMenuSpeakerIndex: null,
+            contextMenuLetterIndex: null,
+            secondaryAccent: null
+        };
     }
+
 
     renderLayer = (speaker: Speaker, speakerIndex: number) => {
         if (this.props.isLearn){
@@ -201,43 +218,73 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 currLinePoints.push(x);
                 currLinePoints.push(y);
                 pointPairs.push([x, y]);
+                const isSecondaryAccent =
+                        this.props.secondaryAccent?.speakerIndex === speakerIndex &&
+                        this.props.secondaryAccent?.letterIndex === i;
                 lineCircles.push(
-                    <Circle key={i + circleFill + circleStroke}
-                            x={x}
-                            y={y}
-                            fill={circleFill}
-                            stroke={circleStroke}
-                            strokeWidth={this.props.circleStrokeWidth}
-                            radius={circleRadius}
-                            onClick={() => this.props.playSound(currPitch)}
-                            onMouseEnter={() => this.props.setPointerEnabled(true)}
-                            onMouseLeave={() => this.props.setPointerEnabled(false)}
-                            draggable={speaker.letters[i].isManualPitch}
-                            dragDistance={5}
-                            dragBoundFunc={
-                                function(pos) {
-                                    // @ts-ignore
-                                    if (!this.isDragging()) {
-                                        return pos;
-                                    }
-    
-                                    const newPitch = coordConverter.rectCoordsToVertValue(pos.y);
-                                    return {
+                    <React.Fragment key={`${speakerIndex}-${i}`}>
+                        <Circle key={i + circleFill + circleStroke}
+                                x={x}
+                                y={y}
+                                fill={circleFill}
+                                stroke={circleStroke}
+                                strokeWidth={this.props.circleStrokeWidth}
+                                radius={circleRadius}
+                                onClick={(e) => {
+                                    if (e.evt.button === 2) return;
+                                    this.props.playSound(currPitch);
+                                }}
+                                onMouseEnter={() => this.props.setPointerEnabled(true)}
+                                onMouseLeave={() => this.props.setPointerEnabled(false)}
+                                draggable={speaker.letters[i].isManualPitch}
+                                dragDistance={5}
+                                dragBoundFunc={
+                                    function(pos) {
                                         // @ts-ignore
-                                        x: this.getAbsolutePosition().x,
-                                        y: coordConverter.vertValueToRectCoords(newPitch)
-                                    };
+                                        if (!this.isDragging()) {
+                                            return pos;
+                                        }
+        
+                                        const newPitch = coordConverter.rectCoordsToVertValue(pos.y);
+                                        return {
+                                            // @ts-ignore
+                                            x: this.getAbsolutePosition().x,
+                                            y: coordConverter.vertValueToRectCoords(newPitch)
+                                        };
+                                    }
                                 }
-                            }
-                            onDragEnd={
-                                function() {
-                                    // @ts-ignore
-                                    const yPos: number = this.getPosition().y;
-                                    const newPitch = coordConverter.rectCoordsToVertValue(yPos);
-                                    controller.props.setLetterPitch(speakerIndex, i, newPitch);
+                                onDragEnd={
+                                    function() {
+                                        // @ts-ignore
+                                        const yPos: number = this.getPosition().y;
+                                        const newPitch = coordConverter.rectCoordsToVertValue(yPos);
+                                        controller.props.setLetterPitch(speakerIndex, i, newPitch);
+                                    }
                                 }
-                            }
-                    />);
+                                onContextMenu={(e) => {
+                                    e.evt.preventDefault();
+                                    e.evt.stopPropagation();
+
+                                    const stage = e.target.getStage();
+                                    if (!stage) return;
+                                        // Get the absolute stage position in the page
+                                        const stageRect = stage.container().getBoundingClientRect();
+                                        // Calculate coordinates relative to the stage
+                                        const pos = {
+                                            x: e.evt.clientX + window.scrollX ,
+                                            y: e.evt.clientY + window.scrollY ,
+                                        };
+                                        this.props.onOpenContextMenu(
+                                            pos.x,
+                                            pos.y,
+                                            speakerIndex,
+                                            i
+                                        );
+                                }}
+                        />
+                        {isSecondaryAccent && this.secondaryAccentPoint(x, y)}
+                    </React.Fragment>
+                );
             }
     
             if (currLinePoints.length > 0) {
@@ -296,6 +343,21 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 {outlineCircles}
             </Group>
         );
+    }
+
+    secondaryAccentPoint = (x: number, y: number) =>{
+        const outlineCircles = [0, 1].map((index) =>
+            <Circle key={index}
+                x={x}
+                y={y}
+                stroke={"#e38748"}
+                radius={this.props.accentedCircleRadius + index * 8}
+            />);
+        return (
+                <Group>
+                    {outlineCircles}
+                </Group>
+            );
     }
 
     render() {
