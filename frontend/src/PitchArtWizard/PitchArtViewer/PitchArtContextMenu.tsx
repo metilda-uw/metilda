@@ -4,6 +4,7 @@ interface Props {
     x: number;
     y: number;
     onAddSecondaryAccent: () => void;
+    onRemoveSecondaryAccent: () => void;
     onClose: () => void;
 }
 
@@ -28,6 +29,15 @@ export default class PitchArtContextMenu extends React.Component<Props> {
                     onClick={this.props.onAddSecondaryAccent}
                 >
                     Add secondary accent
+                </div>
+                <div
+                    style={{ padding: "6px 12px", cursor: "pointer" }}
+                    onClick={() => {
+                        this.props.onRemoveSecondaryAccent();
+                        this.props.onClose();
+                    }}
+                >
+                    Remove secondary accent
                 </div>
             </div>
         );

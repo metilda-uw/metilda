@@ -211,6 +211,17 @@ export class PitchArtDrawingWindow extends React.Component<
     this.fontSize = 16;
   }
 
+  componentDidMount() {
+    const stage = this.stageRef.current;
+    if (!stage) return;
+
+    const container = stage.getStage().container();
+
+    container.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+  }
+
   downloadImage = () => {
     // @ts-ignore
     const dataURL = this.stageRef.current!.getStage().toDataURL();
@@ -692,6 +703,14 @@ export class PitchArtDrawingWindow extends React.Component<
     });
   };
 
+  onRemoveSecondaryAccent = () => {
+        this.setState({
+            secondaryAccent: null,
+            contextMenuVisible: false
+        });
+    };
+
+
   render() {
     const windowConfig = {
       innerHeight: this.innerHeight,
@@ -801,6 +820,7 @@ export class PitchArtDrawingWindow extends React.Component<
               x={this.state.contextMenuX}
               y={this.state.contextMenuY}
               onAddSecondaryAccent={this.addSecondaryAccent}
+              onRemoveSecondaryAccent={this.onRemoveSecondaryAccent}
               onClose={() => this.setState({ contextMenuVisible: false })}
             />
           )}

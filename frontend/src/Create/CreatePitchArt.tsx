@@ -143,7 +143,7 @@ class CreatePitchArt extends React.Component<
         maxTime: DEFAULT.MAX_ANALYSIS_TIME,
         showAccentPitch: false,
         showSyllableText: false,
-        showVerticallyCentered: false,
+        showVerticallyCentered: true,
         showPitchArtLines: true,
         showLargeCircles: true,
         showTimeNormalization: true,
