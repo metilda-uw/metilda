@@ -7,7 +7,8 @@ import PitchArt from "./PitchArt";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtToggle from "./PitchArtToggle";
-import { Button, Popover, Backdrop, createTheme, Box } from "@material-ui/core"
+import { Popover, Backdrop, createTheme, Box } from "@material-ui/core"
+import * as DEFAULT from "../../constants/create";
 
 interface Props {
     firebase: any;
@@ -36,13 +37,13 @@ class PitchArtContainer extends React.Component<Props, State> {
         super(props);
         this.state = {
           windowWidth: window.innerWidth,
-          anchorEl: null
+          anchorEl: null,
         }
         this.handleInputChange = this.handleInputChange.bind(this);
     }
 
     componentDidMount(): void {
-      window.addEventListener("resize", this.setWindowWidth)
+      window.addEventListener("resize", this.setWindowWidth);
     }
 
     componentWillUnmount(): void {
@@ -96,15 +97,37 @@ class PitchArtContainer extends React.Component<Props, State> {
       this.setState({ anchorEl: event ? event.currentTarget : null })
     }
 
+    lockPitchRange = () => {
+        const min = this.props.pitchArt.minPitch;
+        const max = Math.min(this.props.pitchArt.maxPitch, 500);
+
+        this.props.updatePitchArtValue("lockedMinPitch", min);
+        this.props.updatePitchArtValue("lockedMaxPitch", max);
+        this.props.updatePitchArtValue("isPitchRangeLocked", true);
+    };
+
+    unlockPitchRange = () => {
+      this.props.updatePitchArtValue("isPitchRangeLocked", false);
+    };
+
     renderOptionList = () => {
       // renders the options for the Pitch Art to the left of the pitch art.
+
+      const isLocked = this.props.pitchArt.isPitchRangeLocked;
+      const effectiveMaxPitch = isLocked ? this.props.pitchArt.lockedMaxPitch : this.props.pitchArt.maxPitch;
+
       return (
         <div className="col s5" >
           <h6 className="metilda-control-header">Pitch Art</h6>
           <div className="metilda-pitch-art-container-control-list">
             <PitchRange initMinPitch={this.props.pitchArt.minPitch}
-              initMaxPitch={this.props.pitchArt.maxPitch}
-              applyPitchRange={this.applyPitchRange} />
+              initMaxPitch={effectiveMaxPitch}
+              applyPitchRange={this.applyPitchRange} 
+              isLocked={this.props.pitchArt.isPitchRangeLocked} 
+              lockPitchRange = {this.lockPitchRange}
+              unlockPitchRange= {this.unlockPitchRange}
+              isPitchRangeLocked = {this.props.pitchArt.isPitchRangeLocked}
+              />
             <TimeRange initMinTime={this.props.pitchArt.minTime}
               initMaxTime={this.props.pitchArt.maxTime}
               applyTimeRange={this.applyTimeRange} />

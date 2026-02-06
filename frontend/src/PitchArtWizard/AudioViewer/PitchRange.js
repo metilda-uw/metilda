@@ -7,87 +7,37 @@ class PitchRange extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      minPitch: null,
-      maxPitch: null,
+      offset: 425, // maxPitch - minPitch
       errors: [],
-      isMinDirty: false,
-      isMaxDirty: false,
+      isDirty: false,
     };
-    this.minPitchRef = React.createRef();
-    this.maxPitchRef = React.createRef();
     this.submitMaxPitch = this.submitMaxPitch.bind(this);
-    this.handleInputChange = this.handleInputChange.bind(this);
   }
+
   componentDidUpdate(prevProps) {
-
-    if (this.props.initMinPitch !== prevProps.initMinPitch || this.props.initMaxPitch !== prevProps.initMaxPitch) {
-      this.setState({
-        minPitch: null,
-        maxPitch: null,
-        errors: [],
-        isMinDirty: false,
-        isMaxDirty: false,
-      });
+      if (
+        this.props.initMinPitch !== prevProps.initMinPitch ||
+        this.props.initMaxPitch !== prevProps.initMaxPitch
+      ) {
+        this.setState({
+          offset: this.props.initMaxPitch - this.props.initMinPitch,
+          errors: [],
+          isDirty: false,
+        });
+      }
     }
-  }
 
-  submitMaxPitch(event) {
-    if (this.state.errors.length > 0) {
-      return;
-    }
+  submitMaxPitch() {
+    if (this.state.errors.length > 0) return;
+
+    const min = this.props.initMinPitch;
+    const max = Math.min(min + this.state.offset, 500);
+
+    this.props.applyPitchRange(min, max);
 
     this.setState({
-      minPitch: null,
-      maxPitch: null,
-      errors: [],
-      isMinDirty: false,
-      isMaxDirty: false,
+      isDirty: false,
     });
-    this.props.applyPitchRange(
-      parseFloat(this.minPitchRef.current.value),
-      parseFloat(this.maxPitchRef.current.value)
-    );
-  }
-
-  validateInput = () => {
-    const minPitch = this.minPitchRef.current.value;
-    const maxPitch = this.maxPitchRef.current.value;
-
-    const errors = [];
-    const invalidValues = [minPitch, maxPitch].filter(
-      (value) => isNaN(value) || value <= 0.0
-    );
-    if (invalidValues.length > 0) {
-      errors.push("Pitch must be a positive number");
-    }
-
-    this.setState({ errors: errors });
-
-    return errors.length === 0;
-  };
-
-  handleInputChange(event) {
-    console.log("before validating the input ");
-    this.validateInput();
-
-    const name = event.target.name;
-
-    // console.log("name of the event is " + name);
-
-    let num = parseFloat(event.target.value);
-
-    if (isNaN(num) || num <= 0) {
-      this.setState({ [name]: "" });
-      return;
-    }
-
-    this.setState({ [name]: num });
-
-    if (name === "minPitch") {
-      this.setState({ isMinDirty: true });
-    } else if (name === "maxPitch") {
-      this.setState({ isMaxDirty: true });
-    }
   }
 
   enterPressed = (event) => {
@@ -98,70 +48,68 @@ class PitchRange extends Component {
   };
 
   render() {
-    let minValue = this.props.initMinPitch;
-    if (this.state.isMinDirty) {
-      minValue = this.state.minPitch;
-    }
-
-    let maxValue = this.props.initMaxPitch;
-    if (this.state.isMaxDirty) {
-      maxValue = this.state.maxPitch;
-    }
+    const minPitch = this.props.initMinPitch;
+    const maxPitch = minPitch + this.state.offset;
 
     return (
       <div className="metilda-audio-analysis-controls-list-item col s12">
         <label className="group-label">Adjust Pitch (Vertical) Axis</label>
-        <span className="pitch-range-err-list">
-          {this.state.errors.map((item, index) => (
-            <p key={index} className="pitch-range-err-list-item">
-              {item}
-            </p>
-          ))}
-        </span>
+
         <div className="metilda-audio-analysis-controls-list-item-row">
-          <label>
-            <input
-              name="minPitch"
-              id="minPitch"
-              ref={this.minPitchRef}
-              value={minValue}
-              onChange={(event) => this.handleInputChange(event)}
-              onKeyPress={(event) => this.enterPressed(event)}
-              placeholder="min Hz"
-              className="validate pitch-range-input"
-              pattern="(\d+)(\.\d+)?"
-              required={true}
-              type="text"
-            />
-          </label>
-          <div>
-            <p>to</p>
-          </div>
-          <label>
-            <input
-              name="maxPitch"
-              id="maxPitch"
-              ref={this.maxPitchRef}
-              value={maxValue}
-              onChange={(event) => this.handleInputChange(event)}
-              onKeyPress={(event) => this.enterPressed(event)}
-              placeholder="max Hz"
-              className="validate pitch-range-input"
-              pattern="(\d+)(\.\d+)?"
-              required={true}
-              type="text"
-            />
-          </label>
-          <p>Hz</p>
-          </div>
+          <label className="group-label">Pitch Range Offset</label>
+
+          <input
+            type="range"
+            min={0}
+            max={425}
+            step={1}
+            value={this.state.offset}
+            disabled = {this.props.isLocked}
+            onChange={(e) =>
+              this.setState({
+                offset: Number(e.target.value),
+                isDirty: true,
+              })
+            }
+          />
+
+          <p>
+            Range: <strong>{minPitch} Hz</strong> →{" "}
+            <strong>{maxPitch} Hz</strong>
+            <br />
+            Offset: {this.state.offset} Hz
+          </p>
+        </div>
+
         <div>
           <button
             className="waves-effect waves-light btn globalbtn"
             type="submit"
-            onClick={(event) => this.submitMaxPitch(event)}
+            disabled={!this.state.isDirty || this.props.isLocked}
+            onClick={this.submitMaxPitch}
           >
             Apply
           </button>
+        </div>
+
+        <div style={{ gap: "10px", marginTop: "10px" }}>
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              onClick={this.props.lockPitchRange}
+              disabled={this.props.isPitchRangeLocked}
+              type="button"
+              >
+                Lock Range
+            </button>
+        
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              onClick={this.props.unlockPitchRange}
+              disabled={!this.props.isPitchRangeLocked}
+              type="button"
+              >
+               Unlock
+            </button>
         </div>
       </div>
     );
