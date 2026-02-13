@@ -80,6 +80,12 @@ export interface PitchArtDrawingWindowProps {
   ref: any;
 }
 
+type MergedIndexesMap = {
+  [letterIndex: number]: {
+    anchorSpeakerIndex: number;
+  };
+};
+
 interface State {
   activePlayIndex: number;
   showNewImageModal: boolean;
@@ -99,6 +105,7 @@ interface State {
     speakerIndex: number;
     letterIndex: number;
   };
+  mergedIndexes: MergedIndexesMap;
 }
 
 export interface ColorScheme {
@@ -186,6 +193,7 @@ export class PitchArtDrawingWindow extends React.Component<
       contextMenuSpeakerIndex: null,
       contextMenuLetterIndex: null,
       secondaryAccent: null,
+      mergedIndexes: {},
     };
     this.saveImage = this.saveImage.bind(this);
     this.playPitchArt = this.playPitchArt.bind(this);
@@ -710,6 +718,42 @@ export class PitchArtDrawingWindow extends React.Component<
         });
     };
 
+  isIndexMerged = (letterIndex: number) => {
+    return this.state.mergedIndexes[letterIndex] !== undefined;
+  };
+
+  mergeCurrentIndex = () => {
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) return;
+
+    // if anchor speaker doesn't have that index, do nothing
+    const anchorHasIndex =
+      !!this.props.speakers[contextMenuSpeakerIndex]?.letters?.[contextMenuLetterIndex];
+    if (!anchorHasIndex) {
+      this.setState({ contextMenuVisible: false });
+      return;
+    }
+
+    this.setState((prev) => ({
+      mergedIndexes: {
+        ...prev.mergedIndexes,
+        [contextMenuLetterIndex]: { anchorSpeakerIndex: contextMenuSpeakerIndex },
+      },
+      contextMenuVisible: false,
+    }));
+  };
+
+  unmergeCurrentIndex = () => {
+    const { contextMenuLetterIndex } = this.state;
+    if (contextMenuLetterIndex === null) return;
+
+    this.setState((prev) => {
+      const next = { ...prev.mergedIndexes };
+      delete next[contextMenuLetterIndex];
+      return { mergedIndexes: next, contextMenuVisible: false };
+    });
+  };
+
 
   render() {
     const windowConfig = {
@@ -812,6 +856,7 @@ export class PitchArtDrawingWindow extends React.Component<
               })
             }
             secondaryAccent={this.state.secondaryAccent}
+            mergedIndexes={this.state.mergedIndexes}
           />
         </Stage>
 
@@ -822,6 +867,9 @@ export class PitchArtDrawingWindow extends React.Component<
               onAddSecondaryAccent={this.addSecondaryAccent}
               onRemoveSecondaryAccent={this.onRemoveSecondaryAccent}
               onClose={() => this.setState({ contextMenuVisible: false })}
+              isMerged={this.isIndexMerged(this.state.contextMenuLetterIndex)}
+              onMergeIndex={this.mergeCurrentIndex}
+              onUnmergeIndex={this.unmergeCurrentIndex}
             />
           )}
         <a className="hide" ref={this.downloadRef}>

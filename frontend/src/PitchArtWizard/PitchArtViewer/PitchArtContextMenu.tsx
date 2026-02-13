@@ -6,6 +6,9 @@ interface Props {
     onAddSecondaryAccent: () => void;
     onRemoveSecondaryAccent: () => void;
     onClose: () => void;
+    isMerged: boolean;
+    onMergeIndex: () => void;
+    onUnmergeIndex: () => void;
 }
 
 export default class PitchArtContextMenu extends React.Component<Props> {
@@ -24,6 +27,29 @@ export default class PitchArtContextMenu extends React.Component<Props> {
                 }}
                 onMouseLeave={this.props.onClose}
             >
+                {!this.props.isMerged ? (
+                    <div
+                        style={{ padding: "6px 12px", cursor: "pointer" }}
+                        onClick={() => {
+                        this.props.onMergeIndex();
+                        this.props.onClose();
+                        }}
+                    >
+                        Merge index across speakers
+                    </div>
+                    ) : (
+                    <div
+                        style={{ padding: "6px 12px", cursor: "pointer" }}
+                        onClick={() => {
+                        this.props.onUnmergeIndex();
+                        this.props.onClose();
+                        }}
+                    >
+                        Unmerge index
+                    </div>
+                )}
+
+                <div style={{ borderTop: "1px solid #eee", margin: "6px 0" }} />
                 <div
                     style={{ padding: "6px 12px", cursor: "pointer" }}
                     onClick={this.props.onAddSecondaryAccent}

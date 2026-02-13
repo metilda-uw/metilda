@@ -38,7 +38,11 @@ interface Props {
         letterIndex: number
         ) => void;
     secondaryAccent?: { speakerIndex: number; letterIndex: number } | null;
-
+    mergedIndexes: {
+        [letterIndex: number]: {
+            anchorSpeakerIndex: number;
+        };
+    };
 }
 
 export default class PitchArtGeometry extends React.Component<Props> {
@@ -54,110 +58,144 @@ export default class PitchArtGeometry extends React.Component<Props> {
         };
     }
 
+    getSharedCoordConverter = () => {
+        const allPitchValues: RawPitchValue[] = this.props.speakers
+            .flatMap((sp) => sp.letters || [])
+            .filter((l) => l && !l.isWordSep);
 
-    renderLayer = (speaker: Speaker, speakerIndex: number) => {
+        return new PitchArtCoordConverter(
+            this.props.windowConfig,
+            allPitchValues,
+            this.props.showVerticallyCentered,
+            this.props.showTimeNormalization,
+            this.props.showPerceptualScale
+        );
+    };
+
+    private buildSpeakerConverters() {
+        return this.props.speakers.map((sp) => {
+            const pitchValues: RawPitchValue[] = (sp.letters || []).filter((l) => l && !l.isWordSep);
+            return new PitchArtCoordConverter(
+            this.props.windowConfig,
+            pitchValues,
+            this.props.showVerticallyCentered,
+            this.props.showTimeNormalization,
+            this.props.showPerceptualScale
+            );
+        });
+    }
+
+    renderLayer = (speaker: Speaker, speakerIndex: number, converters: PitchArtCoordConverter[]) => {
         if (this.props.isLearn){
             const circleRadius = this.props.showLargeCircles
             ? this.props.largeCircleRadius
             : this.props.smallCircleRadius;
     
-        const syllables = speaker.letters.map((letter) => letter.syllable);
-        const points = [];
-    
-        // Determine coordinates based on specific syllable patterns
-        if (JSON.stringify(syllables) === JSON.stringify(['ON', 'NI'])) {
-            points.push({ x: 100, y: 100 }); // Accented
-            points.push({ x: 600, y: 500 });
-        } else if (JSON.stringify(syllables) === JSON.stringify(['ISS', 'KA'])) {
-            points.push({ x: 100, y: 100 }); // Left
-            points.push({ x: 600, y: 500 }); // Right
-        } else if (JSON.stringify(syllables) === JSON.stringify(['AAK', 'IIWA'])) {
-            points.push({ x: 100, y: 250 }); // Left
-            points.push({ x: 600, y: 150 }); // Right
-        } else if (JSON.stringify(syllables) === JSON.stringify(['A', 'WAK', 'AASIWA'])) {
-            points.push({ x: 60, y: 200 });  // Left circle, closer to the top-left
-            points.push({ x: 300, y: 350 }); // Middle circle, centered better
-            points.push({ x: 500, y: 400 });
-        } else if (JSON.stringify(syllables) === JSON.stringify(['MA', 'KO', 'YI'])) {
-            points.push({ x: 100, y: 350 }); // Left
-            points.push({ x: 400, y: 200 }); // Top-middle accented
-            points.push({ x: 600, y: 450 }); // Bottom-right
-        } else if (JSON.stringify(syllables) === JSON.stringify(['PO', 'NO', 'KAWA'])) {
-            points.push({ x: 100, y: 450 }); // Left
-            points.push({ x: 300, y: 420 }); // Middle (slightly lower)
-            points.push({ x: 450, y: 350 });
-        } else if (JSON.stringify(syllables) === JSON.stringify(['NIK', 'SO', 'KO', 'WAKSI'])) {
-            points.push({ x: 50, y: 100 });  // Point 1 (Accented)
-            points.push({ x: 230, y: 212 }); // Point 2
-            points.push({ x: 410, y: 324 }); // Point 3
-            points.push({ x: 590, y: 364 }); // Point 4
-        } else if (JSON.stringify(syllables) === JSON.stringify(['SAAH', 'KO', 'MAA', 'PIWA'])) {
-            points.push({ x: 50, y: 200 });  // Point 1
-            points.push({ x: 180, y: 100 }); // Point 2 (Accented)
-            points.push({ x: 350, y: 300 }); // Point 3
-            points.push({ x: 530, y: 370 }); // Point 4
-        } else if (JSON.stringify(syllables) === JSON.stringify(['NOT', 'TO', 'AN', 'A'])) {
-            points.push({ x: 50, y: 230 });  // Point 1
-            points.push({ x: 200, y: 150 }); // Point 2
-            points.push({ x: 350, y: 100 }); // Point 3 (Accented)
-            points.push({ x: 550, y: 350 }); // Point 4
-        }
-        const linePoints = points.reduce((acc, point) => [...acc, point.x, point.y], []);
+            const syllables = speaker.letters.map((letter) => letter.syllable);
+            const points = [];
+        
+            // Determine coordinates based on specific syllable patterns
+            if (JSON.stringify(syllables) === JSON.stringify(['ON', 'NI'])) {
+                points.push({ x: 100, y: 100 }); // Accented
+                points.push({ x: 600, y: 500 });
+            } else if (JSON.stringify(syllables) === JSON.stringify(['ISS', 'KA'])) {
+                points.push({ x: 100, y: 100 }); // Left
+                points.push({ x: 600, y: 500 }); // Right
+            } else if (JSON.stringify(syllables) === JSON.stringify(['AAK', 'IIWA'])) {
+                points.push({ x: 100, y: 250 }); // Left
+                points.push({ x: 600, y: 150 }); // Right
+            } else if (JSON.stringify(syllables) === JSON.stringify(['A', 'WAK', 'AASIWA'])) {
+                points.push({ x: 60, y: 200 });  // Left circle, closer to the top-left
+                points.push({ x: 300, y: 350 }); // Middle circle, centered better
+                points.push({ x: 500, y: 400 });
+            } else if (JSON.stringify(syllables) === JSON.stringify(['MA', 'KO', 'YI'])) {
+                points.push({ x: 100, y: 350 }); // Left
+                points.push({ x: 400, y: 200 }); // Top-middle accented
+                points.push({ x: 600, y: 450 }); // Bottom-right
+            } else if (JSON.stringify(syllables) === JSON.stringify(['PO', 'NO', 'KAWA'])) {
+                points.push({ x: 100, y: 450 }); // Left
+                points.push({ x: 300, y: 420 }); // Middle (slightly lower)
+                points.push({ x: 450, y: 350 });
+            } else if (JSON.stringify(syllables) === JSON.stringify(['NIK', 'SO', 'KO', 'WAKSI'])) {
+                points.push({ x: 50, y: 100 });  // Point 1 (Accented)
+                points.push({ x: 230, y: 212 }); // Point 2
+                points.push({ x: 410, y: 324 }); // Point 3
+                points.push({ x: 590, y: 364 }); // Point 4
+            } else if (JSON.stringify(syllables) === JSON.stringify(['SAAH', 'KO', 'MAA', 'PIWA'])) {
+                points.push({ x: 50, y: 200 });  // Point 1
+                points.push({ x: 180, y: 100 }); // Point 2 (Accented)
+                points.push({ x: 350, y: 300 }); // Point 3
+                points.push({ x: 530, y: 370 }); // Point 4
+            } else if (JSON.stringify(syllables) === JSON.stringify(['NOT', 'TO', 'AN', 'A'])) {
+                points.push({ x: 50, y: 230 });  // Point 1
+                points.push({ x: 200, y: 150 }); // Point 2
+                points.push({ x: 350, y: 100 }); // Point 3 (Accented)
+                points.push({ x: 550, y: 350 }); // Point 4
+            }
+            const linePoints = points.reduce((acc, point) => [...acc, point.x, point.y], []);
 
-        const lineCircles = points.map((point, i) => (
-            <React.Fragment key={`point-${i}`}>
-                <Circle
-                    x={point.x}
-                    y={point.y}
-                    fill={this.props.colorSchemes[speakerIndex].praatDotFillColor}
+            const lineCircles = points.map((point, i) => (
+                <React.Fragment key={`point-${i}`}>
+                    <Circle
+                        x={point.x}
+                        y={point.y}
+                        fill={this.props.colorSchemes[speakerIndex].praatDotFillColor}
+                        stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}
+                        strokeWidth={this.props.circleStrokeWidth}
+                        radius={circleRadius}
+                        onClick={() => this.props.playSound(speaker.letters[i]?.pitch || 0)}
+                        draggable={speaker.letters[i]?.isManualPitch}
+                    />
+                    <Text
+                        x={point.x - this.props.fontSize / 2} // Center the text horizontally
+                        y={point.y + circleRadius * 1.5} // Position below the circle
+                        fontSize={this.props.fontSize}
+                        text={speaker.letters[i]?.syllable || ''}
+                        fill="#000" // Syllable text color set to black
+                    />
+                </React.Fragment>
+            ));
+            const line = (
+                <Line
+                    key={`line-${speakerIndex}`}
+                    points={linePoints}
                     stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}
-                    strokeWidth={this.props.circleStrokeWidth}
-                    radius={circleRadius}
-                    onClick={() => this.props.playSound(speaker.letters[i]?.pitch || 0)}
-                    draggable={speaker.letters[i]?.isManualPitch}
+                    strokeWidth={this.props.graphWidth}
+                    lineJoin="round"
                 />
-                <Text
-                    x={point.x - this.props.fontSize / 2} // Center the text horizontally
-                    y={point.y + circleRadius * 1.5} // Position below the circle
-                    fontSize={this.props.fontSize}
-                    text={speaker.letters[i]?.syllable || ''}
-                    fill="#000" // Syllable text color set to black
-                />
-            </React.Fragment>
-        ));
-        const line = (
-            <Line
-                key={`line-${speakerIndex}`}
-                points={linePoints}
-                stroke={this.props.colorSchemes[speakerIndex].lineStrokeColor}
-                strokeWidth={this.props.graphWidth}
-                lineJoin="round"
-            />
-        );
-        return (
-            <Layer key={speakerIndex}>
-                {line}
-                {lineCircles}
-            </Layer>
-        );
+            );
+            return (
+                <Layer key={speakerIndex}>
+                    {line}
+                    {lineCircles}
+                </Layer>
+            );
         }
         else{
             const pitches = speaker.letters.map((item) => item.pitch);
             const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
-    
             const circleRadius = this.props.showLargeCircles ?
                 this.props.largeCircleRadius : this.props.smallCircleRadius;
+            const coordConverter = converters[speakerIndex];
 
-            const pitchValues: RawPitchValue[] = speaker.letters.filter((data) => !data.isWordSep);
-    
-            const coordConverter = new PitchArtCoordConverter(
-                this.props.windowConfig,
-                pitchValues,
-                this.props.showVerticallyCentered,
-                this.props.showTimeNormalization,
-                this.props.showPerceptualScale
-            );
-    
+            const getAnchorXY = (letterIndex: number) => {
+            const mergeInfo = this.props.mergedIndexes?.[letterIndex];
+            if (!mergeInfo) return null;
+
+            const anchorIdx = mergeInfo.anchorSpeakerIndex;
+            const anchorSpeaker = this.props.speakers?.[anchorIdx];
+            const anchorLetter = anchorSpeaker?.letters?.[letterIndex];
+
+            // if anchor doesn't have that index, skip merge
+            if (!anchorLetter || anchorLetter.isWordSep) return null;
+
+            const anchorConv = converters[anchorIdx];
+            return {
+                x: anchorConv.horzIndexToRectCoords(anchorLetter.t0),
+                y: anchorConv.vertValueToRectCoords(anchorLetter.pitch),
+                anchorIdx,
+            };
+        };
             const points = [];
             const pointPairs = [];
             const lineCircles = [];
@@ -180,9 +218,20 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 }
     
                 const currPitch = speaker.letters[i].pitch;
-                const x = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
-                const y = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);
-    
+                let x = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
+                let y = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);
+
+                const anchor = getAnchorXY(i);
+                if (anchor && speakerIndex !== anchor.anchorIdx) {
+                    x = anchor.x;
+                    y = anchor.y;
+                }
+                // const lineX = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
+                // const lineY = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);   
+
+                // currLinePoints.push(lineX, lineY);
+                // pointPairs.push([lineX, lineY]);
+
                 // The 'align' property is not working with the current version of
                 // react-konva that's used. As a result, we're manually shifting
                 // the text to be centered.
@@ -213,10 +262,11 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     }
                 }
     
-                points.push(x);
-                points.push(y);
-                currLinePoints.push(x);
-                currLinePoints.push(y);
+                // points.push(x);
+                // points.push(y);
+                // currLinePoints.push(x);
+                // currLinePoints.push(y);
+                currLinePoints.push(x, y);
                 pointPairs.push([x, y]);
                 const isSecondaryAccent =
                         this.props.secondaryAccent?.speakerIndex === speakerIndex &&
@@ -361,10 +411,11 @@ export default class PitchArtGeometry extends React.Component<Props> {
     }
 
     render() {
+        const converter = this.buildSpeakerConverters();
         return (
             <React.Fragment>
                 {
-                    this.props.speakers.map((item, index) => this.renderLayer(item, index))
+                    this.props.speakers.map((item, index) => this.renderLayer(item, index,converter))
                 }
             </React.Fragment>
         );
