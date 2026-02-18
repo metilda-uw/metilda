@@ -248,6 +248,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
                       "?accentIndex=" +
                       index
                     }
+                    aria-label={`View pitch pattern ${index + 1} for ${numSyllables}-syllable words`}
                   >
                     <img
                       src={photo}
@@ -261,7 +262,7 @@ class WordSyllableCategories extends React.Component<Props, State> {
                           this.state.imageSrcList.length
                         )
                       }
-                      alt=""
+                      alt={`Pitch pattern ${index + 1} for ${numSyllables}-syllable words`}
                     />
                   </Link>
                 );
@@ -302,45 +303,54 @@ class WordSyllableCategories extends React.Component<Props, State> {
                 textAlign: 'center'}}
               >
                 <p className="inline-btns-label">Number of syllables</p>
-                <form className="inline-btns">
+                <form
+                  className="inline-btns"
+                  aria-label="Select number of syllables"
+                >
                   <Link to="/learn/words/syllables?numSyllables=2">
-                    <p>
-                      <div onChange={(evt) => this.onChangeValue(evt)}>
+                    <div onChange={(evt) => this.onChangeValue(evt)}>
+                      <label htmlFor="numSyllables-2">
                         <input
+                          id="numSyllables-2"
                           name="numSyllables"
                           type="radio"
                           value="2"
                           checked={numSyllables === 2}
+                          readOnly
                         />
                         <span>2</span>
-                      </div>
-                    </p>
+                      </label>
+                    </div>
                   </Link>
                   <Link to="/learn/words/syllables?numSyllables=3">
-                    <p>
-                      <div onChange={(evt) => this.onChangeValue(evt)}>
+                    <div onChange={(evt) => this.onChangeValue(evt)}>
+                      <label htmlFor="numSyllables-3">
                         <input
+                          id="numSyllables-3"
                           name="numSyllables"
                           type="radio"
                           value="3"
                           checked={numSyllables === 3}
+                          readOnly
                         />
                         <span>3</span>
-                      </div>
-                    </p>
+                      </label>
+                    </div>
                   </Link>
                   <Link to="/learn/words/syllables?numSyllables=4">
-                    <p>
-                      <div onChange={(evt) => this.onChangeValue(evt)}>
+                    <div onChange={(evt) => this.onChangeValue(evt)}>
+                      <label htmlFor="numSyllables-4">
                         <input
+                          id="numSyllables-4"
                           name="numSyllables"
                           type="radio"
                           value="4"
                           checked={numSyllables === 4}
+                          readOnly
                         />
                         <span>4</span>
-                      </div>
-                    </p>
+                      </label>
+                    </div>
                   </Link>
                 </form>
               </div>
@@ -358,3 +368,4 @@ class WordSyllableCategories extends React.Component<Props, State> {
 }
 const authCondition = (authUser: any) => !!authUser;
 export default withAuthorization(authCondition)(WordSyllableCategories as any);
+

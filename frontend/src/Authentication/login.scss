@@ -17,7 +17,7 @@
 .signup_Submit,
 .signin_Submit {
   width: 100%;
-  background-color: #ee6e73;
+  background-color: #ee6e73 !important;
   color: white;
   padding: 14px 20px;
   margin: 8px 0;
@@ -28,7 +28,7 @@
 
 .signup_Submit:hover,
 .signin_Submit:hover {
-  background-color: #e0363c;
+  background-color: #e0363c !important;
 }
 
 .login_Page {

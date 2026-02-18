@@ -238,7 +238,7 @@ class Header extends Component<HeaderProps, State> {
               } */}
         </li>
         <li className="nav-menu-item">
-          <a>Explore</a>
+          <a role="button" tabIndex={0}>Explore</a>
           <Submenu
           navLinks={[
           {
@@ -257,7 +257,7 @@ class Header extends Component<HeaderProps, State> {
           />
         </li>
         <li className="nav-menu-item">
-          <a>My Account</a>
+          <a role="button" tabIndex={0}>My Account</a>
           <Submenu
             navLinks={[
               {
@@ -297,7 +297,7 @@ class Header extends Component<HeaderProps, State> {
         </li>
             <li className="nav-menu-item right">
                 {/* <Link to="/notifications">Notifications</Link> */}
-                <a>Notifications {this.state.isMessagesLoaded && 
+                <a role="button" tabIndex={0}>Notifications {this.state.isMessagesLoaded && 
                 <Badge badgeContent={this.state.numberOfNewMessages}
                   color="primary"
                   className="notification-badge">
@@ -380,23 +380,25 @@ class Header extends Component<HeaderProps, State> {
     const drawerWidth : string = (windowWidth > 600) ? '250px' : '100%'
     return (
       <div>
-        <nav className="nav">
+        <nav className="nav" aria-label="Main navigation">
           <ul className="nav-menu">
             {(windowWidth >= 1060) ? this.renderNavButtons() : <></>}
-            {(windowWidth < 1060) ? (<>
-              <Toolbar>
-                <IconButton aria-label='menu' onClick={this.toggleDrawer(true)}><MenuIcon /></IconButton>
-                <div>MeTILDA</div>
-                <Drawer 
-                  anchor={(windowWidth < 600) ? 'top' : 'left'} 
-                  open={openDrawer} 
-                  onClose={this.toggleDrawer(false)}
-                  PaperProps={{ style: { width: drawerWidth} }}
-                >
-                  {this.renderSidebarNavButtons()}
-                </Drawer>
-              </Toolbar>
-            </>) : (<></>)}
+            {(windowWidth < 1060) ? (
+              <li className="nav-menu-mobile-item">
+                <Toolbar>
+                  <IconButton aria-label='Open navigation menu' onClick={this.toggleDrawer(true)}><MenuIcon /></IconButton>
+                  <div className="metilda-logo-text">MeTILDA</div>
+                  <Drawer 
+                    anchor={(windowWidth < 600) ? 'top' : 'left'} 
+                    open={openDrawer} 
+                    onClose={this.toggleDrawer(false)}
+                    PaperProps={{ style: { width: drawerWidth} }}
+                  >
+                    {this.renderSidebarNavButtons()}
+                  </Drawer>
+                </Toolbar>
+              </li>
+            ) : (<></>)}
           </ul>
         </nav>
       </div>

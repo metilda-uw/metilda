@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faVolumeUp, faVolumeDown, faVolumeOff } from "@fortawesome/free-solid-svg-icons";
@@ -226,7 +225,15 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat='Melody', verticalLin
           </button>
 
           <div className="volume-control" ref={volumeRef}>
-            <button onClick={() => setShowVolumeSlider(!showVolumeSlider)} className="volume-icon">
+            <button
+              onClick={() => setShowVolumeSlider(!showVolumeSlider)}
+              className="volume-icon"
+              aria-label={
+                volume === 0 ? "Volume: muted" :
+                volume < 0.5 ? "Volume: low" :
+                "Volume: high"
+              }
+            >
                 <FontAwesomeIcon
                     icon={
                       volume === 0 ? faVolumeOff :
@@ -245,6 +252,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat='Melody', verticalLin
                 step="0.01"
                 value={volume}
                 onChange={handleVolumeChange}
+                aria-label="Volume"
               />
             )}
           </div>
@@ -257,12 +265,14 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat='Melody', verticalLin
             value={progress}
             step="0.1"
             onChange={handleSeek}
+            aria-label="Audio playback position"
           />
 
           <select
             value={playbackRate}
             onChange={handleSpeedChange}
             className="speed-control"
+            aria-label="Playback speed"
           >
             <option value="0.5">0.5x</option>
             <option value="0.75">0.75x</option>
@@ -279,6 +289,7 @@ const PlayerBar: React.FC<Props> = ({ audioUrl, typeOfBeat='Melody', verticalLin
               value={tapSpeed}
               onChange={(e) => setTapSpeed(parseFloat(e.target.value))}
               className="speed-control"
+              aria-label="Tap playback speed"
             >
               <option value="0.5">Tap 0.5x</option>
               <option value="0.75">Tap 0.75x</option>

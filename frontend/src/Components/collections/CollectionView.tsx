@@ -120,25 +120,25 @@ function CollectionView({
       {(windowWidth < 1300) ? <p>Currently showing {filteredWords.length} items.</p> : <></>}  
 
       <div className="row collections-view-wordcards">
-        <ul>
+        <ul className="collection-word-list">
           {filteredWords.map((word: {}) => (
-            canUserVisitCreatePitchArtpPage(currentUserRole) ?
-            <Link
-              to={`/pitchartwizard/${selectedCollectionUuid}/${word["id"]}`}
-              key={word["id"]}
-            >
-              <WordCard
-                word={word}
-                selectedCollectionUuid={selectedCollectionUuid}
-                key={word["id"]}
-              ></WordCard>
-            </Link>
-            :
-            <WordCard
-                word={word}
-                selectedCollectionUuid={selectedCollectionUuid}
-                key={word["id"]}
-              ></WordCard>
+            <li key={word["id"]} className="collection-word-list-item">
+              {canUserVisitCreatePitchArtpPage(currentUserRole) ?
+                <Link
+                  to={`/pitchartwizard/${selectedCollectionUuid}/${word["id"]}`}
+                >
+                  <WordCard
+                    word={word}
+                    selectedCollectionUuid={selectedCollectionUuid}
+                  ></WordCard>
+                </Link>
+                :
+                <WordCard
+                  word={word}
+                  selectedCollectionUuid={selectedCollectionUuid}
+                ></WordCard>
+              }
+            </li>
           ))}
         </ul>
       </div>
