@@ -37,12 +37,13 @@ interface Props {
         speakerIndex: number,
         letterIndex: number
         ) => void;
-    secondaryAccent?: { speakerIndex: number; letterIndex: number } | null;
+    secondaryAccentBySpeaker?: { [speakerIndex: number]: number };
     mergedIndexes: {
         [letterIndex: number]: {
             anchorSpeakerIndex: number;
         };
     };
+    hiddenSpeakerIndices?: number[];
 }
 
 export default class PitchArtGeometry extends React.Component<Props> {
@@ -53,8 +54,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
             contextMenuX: 0,
             contextMenuY: 0,
             contextMenuSpeakerIndex: null,
-            contextMenuLetterIndex: null,
-            secondaryAccent: null
+            contextMenuLetterIndex: null
         };
     }
 
@@ -226,15 +226,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     x = anchor.x;
                     y = anchor.y;
                 }
-                // const lineX = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
-                // const lineY = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);   
-
-                // currLinePoints.push(lineX, lineY);
-                // pointPairs.push([lineX, lineY]);
-
-                // The 'align' property is not working with the current version of
-                // react-konva that's used. As a result, we're manually shifting
-                // the text to be centered.
                 const konvaFontSizeAsPixels = this.props.fontSize * 0.65;
                 const text = speaker.letters[i].syllable;
     
@@ -262,15 +253,10 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     }
                 }
     
-                // points.push(x);
-                // points.push(y);
-                // currLinePoints.push(x);
-                // currLinePoints.push(y);
                 currLinePoints.push(x, y);
                 pointPairs.push([x, y]);
                 const isSecondaryAccent =
-                        this.props.secondaryAccent?.speakerIndex === speakerIndex &&
-                        this.props.secondaryAccent?.letterIndex === i;
+                        (this.props.secondaryAccentBySpeaker && this.props.secondaryAccentBySpeaker[speakerIndex] === i) === true;
                 lineCircles.push(
                     <React.Fragment key={`${speakerIndex}-${i}`}>
                         <Circle key={i + circleFill + circleStroke}
@@ -395,27 +381,32 @@ export default class PitchArtGeometry extends React.Component<Props> {
         );
     }
 
-    secondaryAccentPoint = (x: number, y: number) =>{
+    secondaryAccentPoint = (x: number, y: number) => {
         const outlineCircles = [0, 1].map((index) =>
             <Circle key={index}
                 x={x}
                 y={y}
                 stroke={"#e38748"}
                 radius={this.props.accentedCircleRadius + index * 8}
+                listening={false}
             />);
         return (
-                <Group>
-                    {outlineCircles}
-                </Group>
-            );
+            <Group listening={false}>
+                {outlineCircles}
+            </Group>
+        );
     }
 
     render() {
         const converter = this.buildSpeakerConverters();
+        const hidden = this.props.hiddenSpeakerIndices || [];
         return (
             <React.Fragment>
                 {
-                    this.props.speakers.map((item, index) => this.renderLayer(item, index,converter))
+                    this.props.speakers
+                        .map((item, index) => ({ item, index }))
+                        .filter(({ index }) => !hidden.includes(index))
+                        .map(({ item, index }) => this.renderLayer(item, index, converter))
                 }
             </React.Fragment>
         );

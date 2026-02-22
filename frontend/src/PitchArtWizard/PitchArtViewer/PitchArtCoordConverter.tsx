@@ -46,13 +46,16 @@ class PitchArtCoordConverter {
       const timeIndex = this.pitchValues.map((item) => item.t0).indexOf(time);
       timePerc = timeIndex / (this.pitchValues.length - 1);
     } else {
+      // Use actual data time span so art stays in view and remains proportional to real time
       const first = this.pitchValues[0].t0;
-      // const totalDuration = this.pitchValues[this.pitchValues.length - 1].t0 - this.pitchValues[0].t0;
-      // Update totalDuration to be the time set in the windowConfig
-      const totalDuration = this.config.tMax - this.config.tMin;
-      // word starts at 0 - timePerc = (time - this.pitchValues[0].t0) / totalDuration;
-      // adjust timePerc so Pitch Art matches exact timing in recording
-      timePerc = (time - first) / totalDuration;
+      const last = this.pitchValues[this.pitchValues.length - 1].t0;
+      const dataDuration = last - first;
+      if (dataDuration <= 0) {
+        timePerc = 0.0;
+      } else {
+        timePerc = (time - first) / dataDuration;
+        timePerc = Math.max(0, Math.min(1, timePerc));
+      }
     }
 
     const pointDx = timePerc * this.config.innerWidth;

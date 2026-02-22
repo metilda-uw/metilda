@@ -114,13 +114,14 @@ class PitchArtContainer extends React.Component<Props, State> {
       // renders the options for the Pitch Art to the left of the pitch art.
 
       const isLocked = this.props.pitchArt.isPitchRangeLocked;
+      const effectiveMinPitch = isLocked ? this.props.pitchArt.lockedMinPitch : this.props.pitchArt.minPitch;
       const effectiveMaxPitch = isLocked ? this.props.pitchArt.lockedMaxPitch : this.props.pitchArt.maxPitch;
 
       return (
         <div className="col s5" >
           <h6 className="metilda-control-header">Pitch Art</h6>
           <div className="metilda-pitch-art-container-control-list">
-            <PitchRange initMinPitch={this.props.pitchArt.minPitch}
+            <PitchRange initMinPitch={effectiveMinPitch}
               initMaxPitch={effectiveMaxPitch}
               applyPitchRange={this.applyPitchRange} 
               isLocked={this.props.pitchArt.isPitchRangeLocked} 
@@ -128,9 +129,9 @@ class PitchArtContainer extends React.Component<Props, State> {
               unlockPitchRange= {this.unlockPitchRange}
               isPitchRangeLocked = {this.props.pitchArt.isPitchRangeLocked}
               />
-            <TimeRange initMinTime={this.props.pitchArt.minTime}
+            {/* <TimeRange initMinTime={this.props.pitchArt.minTime}
               initMaxTime={this.props.pitchArt.maxTime}
-              applyTimeRange={this.applyTimeRange} />
+              applyTimeRange={this.applyTimeRange} /> */}
             <div className="row metilda-pitch-art-container-control-toggle-list">
               <PitchArtToggle
                 label="Accent Symbol"
@@ -291,8 +292,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                     <PitchArt
                         width={this.props.width}
                         height={this.props.height}
-                        minPitch={this.props.pitchArt.minPitch}
-                        maxPitch={this.props.pitchArt.maxPitch}
+                        minPitch={this.props.pitchArt.isPitchRangeLocked ? this.props.pitchArt.lockedMinPitch : this.props.pitchArt.minPitch}
+                        maxPitch={this.props.pitchArt.isPitchRangeLocked ? this.props.pitchArt.lockedMaxPitch : this.props.pitchArt.maxPitch}
                         minTime={this.props.pitchArt.minTime}
                         maxTime={this.props.pitchArt.maxTime}
                         uploadId={this.props.uploadId}
