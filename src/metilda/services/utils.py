@@ -18,7 +18,9 @@ def isSound(fileName):
 def resizeImage(image):
    """ Down-scaling the image to 500x500 pixels """
    img = Image.open(image)
-   img.thumbnail((500,500), Image.ANTIALIAS)
+   # ANTIALIAS removed in Pillow 10; LANCZOS is the replacement
+   resample = getattr(Image, "LANCZOS", Image.Resampling.LANCZOS)
+   img.thumbnail((500, 500), resample)
    img.save(image, "PNG", quality=88)
 
 def deleteCachedImages(directory, prefix):
