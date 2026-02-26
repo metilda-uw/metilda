@@ -59,7 +59,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                     >
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.splitWord)}
                                disabled={!this.props.isSelectionActive || isRhythm}
-                               backgroundColor="darkgrey"
+                               backgroundColor="#2bbbad"
                                className="AudioAnalysisImageMenu-option-split">
                             <div className="menu-icon-top">
                                 <FontAwesomeIcon icon={faCut} size="2x"/>
@@ -80,7 +80,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newManualPitch)}
                                disabled={!this.props.isSelectionActive || isRhythm}
-                               backgroundColor="darkgrey"
+                               backgroundColor="#2bbbad"
                                className="AudioAnalysisImageMenu-option-manual">
                             <div className="menu-icon-bottom-right">
                                 <FontAwesomeIcon icon={faCircle}
@@ -109,7 +109,7 @@ export default class AudioAnalysisImageMenu extends React.Component<AudioAnalysi
                         </Slice>
                         <Slice onSelect={() => maybeDo(!this.props.isSelectionActive, this.props.newRangePitch)}
                                disabled={!this.props.isSelectionActive || isRhythm}
-                               backgroundColor="darkgrey"
+                               backgroundColor="#2bbbad"
                                className="AudioAnalysisImageMenu-option-range">
                             <div className="menu-icon-bottom-left">
                                 <FontAwesomeIcon icon={faEllipsisH}

@@ -97,6 +97,9 @@ interface State {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
+    isPitchRangeLocked: boolean;
+    lockedMaxPitch: number,
+    lockedMinPitch: number
   };
   isAChildVersion: boolean;
   parentDocumentId: string;
@@ -143,14 +146,17 @@ class CreatePitchArt extends React.Component<
         maxTime: DEFAULT.MAX_ANALYSIS_TIME,
         showAccentPitch: false,
         showSyllableText: false,
-        showVerticallyCentered: false,
+        showVerticallyCentered: true,
         showPitchArtLines: true,
         showLargeCircles: true,
         showTimeNormalization: true,
         showPitchScale: false,
         showPerceptualScale: true,
         showPitchArtImageColor: true,
-        showMetildaWatermark: false
+        showMetildaWatermark: false,
+        isPitchRangeLocked: false,
+        lockedMaxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
+        lockedMinPitch: DEFAULT.MIN_ANALYSIS_PITCH
       },
       isAChildVersion: false,
       parentDocumentId: '',
@@ -176,6 +182,7 @@ class CreatePitchArt extends React.Component<
       });
       this.getUserFiles();
     }
+    this.loadUserPitchArtSettings();
     // event listener for window resize
     window.addEventListener("resize", this.setWindowWidth)
   }
@@ -308,11 +315,29 @@ class CreatePitchArt extends React.Component<
     this.props.replaceSpeakers(newSpeakers as Speaker[]);
     // deep copy
     let currentPitchArtUpdatedData = JSON.parse(JSON.stringify(currentPitchArtData));
+    const { isPitchRangeLocked, lockedMinPitch, lockedMaxPitch } = this.state.pitchArt;
+    currentPitchArtUpdatedData.pitchArt = {
+      ...currentPitchArtUpdatedData.pitchArt,
+      isPitchRangeLocked,
+      lockedMinPitch,
+      lockedMaxPitch,
+    };
     if (parentDocumentData != null) {
       parentDocumentData = JSON.parse(JSON.stringify(parentDocumentData));
       currentPitchArtData = JSON.parse(JSON.stringify(currentPitchArtData));
       currentPitchArtUpdatedData = createCommonPitchArtDocument(parentDocumentData.data, currentPitchArtData);
     }
+
+    if (currentPitchArtUpdatedData.pitchArt?.isPitchRangeLocked === undefined) {
+      currentPitchArtUpdatedData.pitchArt.isPitchRangeLocked = false;
+    }
+    if (currentPitchArtUpdatedData.pitchArt?.lockedMinPitch === undefined) {
+      currentPitchArtUpdatedData.pitchArt.lockedMinPitch = DEFAULT.MIN_ANALYSIS_PITCH;
+    }
+    if (currentPitchArtUpdatedData.pitchArt?.lockedMaxPitch === undefined) {
+      currentPitchArtUpdatedData.pitchArt.lockedMaxPitch = DEFAULT.MAX_ANALYSIS_PITCH;
+    }
+
 
     this.setState({ ...currentPitchArtUpdatedData },
       () => { this.getUserFiles(); });
@@ -327,20 +352,143 @@ class CreatePitchArt extends React.Component<
 
   }
 
+  getUserPitchArtSettingsRef = () => {
+    const email = this.props.firebase.auth.currentUser?.email;
+    if (!email) return null;
+    return this.props.firebase.firestore
+      .collection("users")
+      .doc(email)
+      .collection("settings")
+      .doc("pitchArt");
+  };
+
+
+  persistUserPitchArtSettingsPatch = async (patch: any) => {
+    if (this.props.match.params.type !== undefined) return;
+
+    const ref = this.getUserPitchArtSettingsRef();
+    if (!ref) return;
+
+    try {
+      await ref.set(patch, { merge: true });
+    } catch (e) {
+      console.error("Failed to persist user pitchArt settings:", e);
+    }
+  };
+
+  loadUserPitchArtSettings = async () => {
+    if (this.props.match.params.type !== undefined) return; // skip share pages
+
+    const ref = this.getUserPitchArtSettingsRef();
+    if (!ref) return;
+
+    try {
+      const snap = await ref.get();
+      const data = snap.data();
+
+      if (!data) return;
+
+      // Apply universal settings into local state
+      this.setState((prev) => ({
+        ...prev,
+        pitchArt: {
+          ...prev.pitchArt,
+          isPitchRangeLocked: !!data.isPitchRangeLocked,
+          lockedMinPitch:
+            typeof data.lockedMinPitch === "number"
+              ? data.lockedMinPitch
+              : prev.pitchArt.lockedMinPitch,
+          lockedMaxPitch:
+            typeof data.lockedMaxPitch === "number"
+              ? data.lockedMaxPitch
+              : prev.pitchArt.lockedMaxPitch,
+        },
+      }));
+    } catch (e) {
+      console.error("Failed to load user pitchArt settings:", e);
+    }
+  };
+
+  persistPitchArtPatch = (patch: any) => {
+    if (this.props.match.params.type !== undefined) return;
+
+    const collectionId = this.props.currentCollectionId;
+    const docId = this.props.currentPitchArtDocumentData?.id;
+
+    if (!collectionId || !docId) return;
+
+    this.props.firebase.firestore
+      .collection(collectionId)
+      .doc(docId)
+      .update(patch)
+      .catch((e) => console.error("Failed to persist pitchArt patch:", e));
+  };
+
+
   updatePitchArtValue = (inputName: string, inputValue: any) => {
     this.setState((prevState) => {
-      if (inputName === "state") {
-        return inputValue;
-      } else {
-        const state = prevState;
-        state.pitchArt[inputName] = inputValue;
-        if (this.props.match.params.type !== undefined) {
-          this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
-        }
-        return state;
+      // Build next state immutably
+      const nextPitchArt = {
+        ...prevState.pitchArt,
+        [inputName]: inputValue,
+      };
+
+      const nextState = {
+        ...prevState,
+        pitchArt: nextPitchArt,
+      };
+
+      if (this.props.match.params.type !== undefined) {
+        this.props.firebase.updateSharedPage(
+          nextState,
+          this.props.match.params.type,
+          this.props.match.params.id
+        );
+        return nextState;
       }
+
+      if (
+        inputName === "isPitchRangeLocked" ||
+        inputName === "lockedMinPitch" ||
+        inputName === "lockedMaxPitch"
+      ) {
+        this.persistUserPitchArtSettingsPatch({
+          [inputName]: inputValue,
+        });
+        return nextState;
+      }
+
+      // 2) If min/max changed WHILE locked -> also update universal locked min/max
+      if (
+        (inputName === "minPitch" || inputName === "maxPitch") &&
+        nextPitchArt.isPitchRangeLocked
+      ) {
+        const clampedMin =
+          typeof nextPitchArt.minPitch === "number" ? nextPitchArt.minPitch : prevState.pitchArt.minPitch;
+
+        const clampedMaxRaw =
+          typeof nextPitchArt.maxPitch === "number" ? nextPitchArt.maxPitch : prevState.pitchArt.maxPitch;
+
+        const clampedMax = Math.min(clampedMaxRaw, 500);
+
+        this.persistUserPitchArtSettingsPatch({
+          lockedMinPitch: clampedMin,
+          lockedMaxPitch: clampedMax,
+        });
+
+        nextState.pitchArt.lockedMinPitch = clampedMin;
+        nextState.pitchArt.lockedMaxPitch = clampedMax;
+      } else {
+        // Non-lock fields: keep persisting to the pitch art document like you already do
+        this.persistPitchArtPatch({
+          [`pitchArt.${inputName}`]: inputValue,
+        });
+      }
+
+      return nextState;
     });
-  }
+  };
+
 
   updateAudioPitch = (index: number, minPitch: number, maxPitch: number) => {
     this.setState((prevState) => {
@@ -702,7 +850,7 @@ class CreatePitchArt extends React.Component<
                 pitchArt={this.state.pitchArt}
                 updatePitchArtValue={this.updatePitchArtValue}
                 data={this.state}
-                callBacks={callbacks}
+                callBacks={callbacks}               
               />
             </div>
           </div>

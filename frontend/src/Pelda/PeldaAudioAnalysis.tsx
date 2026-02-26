@@ -778,7 +778,12 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                                         : []
                                 }
                             </div>
-                            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl}/>}
+                            {uploadId && <PlayerBar 
+                                            key={this.state.audioUrl} 
+                                            audioUrl={this.state.audioUrl}
+                                            minAudioTime={this.state.minAudioTime}
+                                            maxAudioTime={this.state.maxAudioTime}
+                                            />}
                         </div>
                         <div className="checkboxes">
                             <label>

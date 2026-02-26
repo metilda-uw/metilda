@@ -954,6 +954,8 @@ export class WordSyllableReview extends React.Component<Props, State> {
                     this.minPitchArtTime(),
                     this.maxPitchArtTime()
                   )}
+                  minAudioTime={this.minPitchArtTime()}
+                  maxAudioTime={this.maxPitchArtTime()}
                 />
                 <div className="pitch-art-controls-container">
                   <button

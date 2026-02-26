@@ -12,3 +12,25 @@
     margin-bottom: -8px;
     font-size: 14px;
 }
+
+.player-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-main-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.audio-slider {
+  flex: 1;
+}
+
+.player-beat-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
