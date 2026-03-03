@@ -38,6 +38,7 @@ import { timeStamp } from "console";
 import { AppActions } from "../store/appActions";
 import * as constants from "../constants";
 import { canUserVisitCreatePitchArtpPage } from './ImportUtils';
+import Box from "@material-ui/core/Box";
 
 
 
@@ -69,7 +70,7 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
 }
 interface VerticalLine {
   id: string;
-  x: number;
+  time: number;
 }
 interface State {
   files: any[];
@@ -96,12 +97,15 @@ interface State {
     showPerceptualScale: boolean;
     showPitchArtImageColor: boolean;
     showMetildaWatermark: boolean;
+    isPitchRangeLocked: boolean;
+    lockedMaxPitch: number,
+    lockedMinPitch: number
   };
   isAChildVersion: boolean;
   parentDocumentId: string;
   verticalLines: VerticalLine[];
   audioUrl: string; // New state for the audio URL
-
+  windowWidth: number;
 }
 
 class CreatePitchArt extends React.Component<
@@ -142,19 +146,23 @@ class CreatePitchArt extends React.Component<
         maxTime: DEFAULT.MAX_ANALYSIS_TIME,
         showAccentPitch: false,
         showSyllableText: false,
-        showVerticallyCentered: false,
+        showVerticallyCentered: true,
         showPitchArtLines: true,
         showLargeCircles: true,
         showTimeNormalization: true,
         showPitchScale: false,
         showPerceptualScale: true,
         showPitchArtImageColor: true,
-        showMetildaWatermark: false
+        showMetildaWatermark: false,
+        isPitchRangeLocked: false,
+        lockedMaxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
+        lockedMinPitch: DEFAULT.MIN_ANALYSIS_PITCH
       },
       isAChildVersion: false,
       parentDocumentId: '',
       verticalLines: [],
       audioUrl: '',
+      windowWidth: window.innerWidth,
     };
     this.loadPitchArtVersions = this.loadPitchArtVersions.bind(this);
     this.removeVersionsModal = this.removeVersionsModal.bind(this);
@@ -174,6 +182,9 @@ class CreatePitchArt extends React.Component<
       });
       this.getUserFiles();
     }
+    this.loadUserPitchArtSettings();
+    // event listener for window resize
+    window.addEventListener("resize", this.setWindowWidth)
   }
   componentDidUpdate(prevProps) {
 
@@ -189,6 +200,10 @@ class CreatePitchArt extends React.Component<
       // URL parameters have changed, trigger a reload
       this.listenForData(newType, newId);
     }
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   setAudioUrl = (url: string) => {
@@ -300,11 +315,29 @@ class CreatePitchArt extends React.Component<
     this.props.replaceSpeakers(newSpeakers as Speaker[]);
     // deep copy
     let currentPitchArtUpdatedData = JSON.parse(JSON.stringify(currentPitchArtData));
+    const { isPitchRangeLocked, lockedMinPitch, lockedMaxPitch } = this.state.pitchArt;
+    currentPitchArtUpdatedData.pitchArt = {
+      ...currentPitchArtUpdatedData.pitchArt,
+      isPitchRangeLocked,
+      lockedMinPitch,
+      lockedMaxPitch,
+    };
     if (parentDocumentData != null) {
       parentDocumentData = JSON.parse(JSON.stringify(parentDocumentData));
       currentPitchArtData = JSON.parse(JSON.stringify(currentPitchArtData));
       currentPitchArtUpdatedData = createCommonPitchArtDocument(parentDocumentData.data, currentPitchArtData);
     }
+
+    if (currentPitchArtUpdatedData.pitchArt?.isPitchRangeLocked === undefined) {
+      currentPitchArtUpdatedData.pitchArt.isPitchRangeLocked = false;
+    }
+    if (currentPitchArtUpdatedData.pitchArt?.lockedMinPitch === undefined) {
+      currentPitchArtUpdatedData.pitchArt.lockedMinPitch = DEFAULT.MIN_ANALYSIS_PITCH;
+    }
+    if (currentPitchArtUpdatedData.pitchArt?.lockedMaxPitch === undefined) {
+      currentPitchArtUpdatedData.pitchArt.lockedMaxPitch = DEFAULT.MAX_ANALYSIS_PITCH;
+    }
+
 
     this.setState({ ...currentPitchArtUpdatedData },
       () => { this.getUserFiles(); });
@@ -319,20 +352,143 @@ class CreatePitchArt extends React.Component<
 
   }
 
+  getUserPitchArtSettingsRef = () => {
+    const email = this.props.firebase.auth.currentUser?.email;
+    if (!email) return null;
+    return this.props.firebase.firestore
+      .collection("users")
+      .doc(email)
+      .collection("settings")
+      .doc("pitchArt");
+  };
+
+
+  persistUserPitchArtSettingsPatch = async (patch: any) => {
+    if (this.props.match.params.type !== undefined) return;
+
+    const ref = this.getUserPitchArtSettingsRef();
+    if (!ref) return;
+
+    try {
+      await ref.set(patch, { merge: true });
+    } catch (e) {
+      console.error("Failed to persist user pitchArt settings:", e);
+    }
+  };
+
+  loadUserPitchArtSettings = async () => {
+    if (this.props.match.params.type !== undefined) return; // skip share pages
+
+    const ref = this.getUserPitchArtSettingsRef();
+    if (!ref) return;
+
+    try {
+      const snap = await ref.get();
+      const data = snap.data();
+
+      if (!data) return;
+
+      // Apply universal settings into local state
+      this.setState((prev) => ({
+        ...prev,
+        pitchArt: {
+          ...prev.pitchArt,
+          isPitchRangeLocked: !!data.isPitchRangeLocked,
+          lockedMinPitch:
+            typeof data.lockedMinPitch === "number"
+              ? data.lockedMinPitch
+              : prev.pitchArt.lockedMinPitch,
+          lockedMaxPitch:
+            typeof data.lockedMaxPitch === "number"
+              ? data.lockedMaxPitch
+              : prev.pitchArt.lockedMaxPitch,
+        },
+      }));
+    } catch (e) {
+      console.error("Failed to load user pitchArt settings:", e);
+    }
+  };
+
+  persistPitchArtPatch = (patch: any) => {
+    if (this.props.match.params.type !== undefined) return;
+
+    const collectionId = this.props.currentCollectionId;
+    const docId = this.props.currentPitchArtDocumentData?.id;
+
+    if (!collectionId || !docId) return;
+
+    this.props.firebase.firestore
+      .collection(collectionId)
+      .doc(docId)
+      .update(patch)
+      .catch((e) => console.error("Failed to persist pitchArt patch:", e));
+  };
+
+
   updatePitchArtValue = (inputName: string, inputValue: any) => {
     this.setState((prevState) => {
-      if (inputName === "state") {
-        return inputValue;
-      } else {
-        const state = prevState;
-        state.pitchArt[inputName] = inputValue;
-        if (this.props.match.params.type !== undefined) {
-          this.props.firebase.updateSharedPage(this.state, this.props.match.params.type, this.props.match.params.id);
-        }
-        return state;
+      // Build next state immutably
+      const nextPitchArt = {
+        ...prevState.pitchArt,
+        [inputName]: inputValue,
+      };
+
+      const nextState = {
+        ...prevState,
+        pitchArt: nextPitchArt,
+      };
+
+      if (this.props.match.params.type !== undefined) {
+        this.props.firebase.updateSharedPage(
+          nextState,
+          this.props.match.params.type,
+          this.props.match.params.id
+        );
+        return nextState;
       }
+
+      if (
+        inputName === "isPitchRangeLocked" ||
+        inputName === "lockedMinPitch" ||
+        inputName === "lockedMaxPitch"
+      ) {
+        this.persistUserPitchArtSettingsPatch({
+          [inputName]: inputValue,
+        });
+        return nextState;
+      }
+
+      // 2) If min/max changed WHILE locked -> also update universal locked min/max
+      if (
+        (inputName === "minPitch" || inputName === "maxPitch") &&
+        nextPitchArt.isPitchRangeLocked
+      ) {
+        const clampedMin =
+          typeof nextPitchArt.minPitch === "number" ? nextPitchArt.minPitch : prevState.pitchArt.minPitch;
+
+        const clampedMaxRaw =
+          typeof nextPitchArt.maxPitch === "number" ? nextPitchArt.maxPitch : prevState.pitchArt.maxPitch;
+
+        const clampedMax = Math.min(clampedMaxRaw, 500);
+
+        this.persistUserPitchArtSettingsPatch({
+          lockedMinPitch: clampedMin,
+          lockedMaxPitch: clampedMax,
+        });
+
+        nextState.pitchArt.lockedMinPitch = clampedMin;
+        nextState.pitchArt.lockedMaxPitch = clampedMax;
+      } else {
+        // Non-lock fields: keep persisting to the pitch art document like you already do
+        this.persistPitchArtPatch({
+          [`pitchArt.${inputName}`]: inputValue,
+        });
+      }
+
+      return nextState;
     });
-  }
+  };
+
 
   updateAudioPitch = (index: number, minPitch: number, maxPitch: number) => {
     this.setState((prevState) => {
@@ -559,33 +715,37 @@ class CreatePitchArt extends React.Component<
   }
 
   renderPageOptions() {
+    const { windowWidth } = this.state
+    let classNameParams = "page-options waves-effect waves-light btn globalbtn";
+    if (windowWidth < 1400) {
+      classNameParams = "waves-effect waves-light btn globalbtn";
+    }
     if (this.props.match.params.type === "share") {
       return (
-        <button className="page-options waves-effect waves-light btn globalbtn"
-          onClick={this.deleteSharedPage}>
-
-          <i className="material-icons right">person_add</i>
-          {this.isOwner()
-            ? "Stop Sharing"
-            : "Leave Page"
-          }
-        </button>
+        <>
+          <button className={classNameParams}
+            onClick={this.deleteSharedPage}>
+            <i className="material-icons right">person_add</i>
+            {this.isOwner()
+              ? "Stop Sharing"
+              : "Leave Page"
+            }
+          </button>
+        </>
       );
     } else if (this.props.match.params.type !== undefined) {
       //No Options
     } else {
       return (
-        <div>
-
-
-          <button className="page-options waves-effect waves-light btn globalbtn"
+        <>
+          <button className={classNameParams}
             onClick={this.createSharedPage}>
             <i className="material-icons left">info</i>
             <i className="material-icons right">person_add</i>
             {"Share Page"}
           </button>
           <p className="page-options-tooltiptext"> to share file with other MeTILDA users</p>
-        </div>
+        </>
       );
     }
   }
@@ -619,23 +779,30 @@ class CreatePitchArt extends React.Component<
   }
 
   render() {
-    const { isLoading } = this.state;
+    const { isLoading, windowWidth } = this.state;
     const uploadId = this.props.speakers
       .map((item) => this.formatFileName(item.uploadId))
       .join("_");
     const callbacks = { listenForData: this.listenForData.bind(this) };
 
+    let cloudUploadButtonParams = "UploadFile waves-effect waves-light btn globalbtn"
+    let versionButtonParams = "versions waves-effect waves-light btn globalbtn"
+    if (windowWidth < 1400) {
+      cloudUploadButtonParams = "waves-effect waves-light btn globalbtn"
+      versionButtonParams = "waves-effect waves-light btn globalbtn"
+    }
+
     return (
       <div>
         <Header />
         {isLoading && spinner()}
-        <div className="CreatePitchArt">
+        <Box style={{ display: "flex", paddingLeft: "5%", paddingRight: "5%" }}>
           <ReactFileReader
             fileTypes={[".wav"]}
             multipleFiles={false}
             handleFiles={this.fileSelected}
           >
-            <button className="UploadFile waves-effect waves-light btn globalbtn">
+            <button className={cloudUploadButtonParams}>
               <i className="material-icons left">info</i>
               <i className="material-icons right">cloud_upload</i>
               Upload File to cloud
@@ -644,7 +811,7 @@ class CreatePitchArt extends React.Component<
           </ReactFileReader>
 
           <div className="pitchArt-version">
-            <button className="versions waves-effect waves-light btn globalbtn" onClick={this.loadPitchArtVersions}>
+            <button className={versionButtonParams} onClick={this.loadPitchArtVersions}>
               <i className="material-icons left">info</i>
               <i className="material-icons right">history</i>
               Versions
@@ -654,7 +821,8 @@ class CreatePitchArt extends React.Component<
 
           <div className="version-overlay"></div>
           <div>{this.renderPageOptions()}</div>
-
+        </Box>
+        <div className="CreatePitchArt">
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
               <div id="metilda-drop-down-back-button">
@@ -682,7 +850,7 @@ class CreatePitchArt extends React.Component<
                 pitchArt={this.state.pitchArt}
                 updatePitchArtValue={this.updatePitchArtValue}
                 data={this.state}
-                callBacks={callbacks}
+                callBacks={callbacks}               
               />
             </div>
           </div>

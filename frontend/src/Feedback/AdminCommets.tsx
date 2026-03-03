@@ -22,6 +22,14 @@ const AdminComments: React.FC = () => {
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null);
   const [commentToDelete, setCommentToDelete] = useState<Comment | null>(null);
 
+  // State for tracking window width
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
+
   // Fetch comments from the API
   // send out notifications incase of errors
   const fetchComments = async () => {
@@ -159,8 +167,8 @@ const AdminComments: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>#</th>
-              <th>Commented By</th>
+              {(windowWidth >= 600) ? (<th>#</th>) : (<></>)}
+              {(windowWidth >= 600) ? (<th>Commented By</th>) : (<></>)}
               <th>Question Value</th>
               <th>Comment Value</th>
               <th>Actions</th>
@@ -169,8 +177,8 @@ const AdminComments: React.FC = () => {
           <tbody>
             {comments.map((comment, index) => (
               <tr key={comment.cid}>
-                <td>{index + 1}</td>
-                <td>{comment.commentedby}</td>
+                {(windowWidth >= 600) ? (<td>{index + 1}</td>) : (<></>)}
+                {(windowWidth >= 600) ? (<td>{comment.commentedby}</td>) : (<></>)}
                 <td>{comment.questionValue}</td>
                 <td>{comment.commentvalue}</td>
                 <td>

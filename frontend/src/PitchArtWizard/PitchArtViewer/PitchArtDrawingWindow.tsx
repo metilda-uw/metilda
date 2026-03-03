@@ -39,6 +39,7 @@ import Typography from "@material-ui/core/Typography";
 import IconButton from "@material-ui/core/IconButton";
 import CloseIcon from "@material-ui/icons/Close";
 import { NotificationManager } from "react-notifications";
+import PitchArtContextMenu from "./PitchArtContextMenu";
 
 export interface PitchArtDrawingWindowProps {
   speakers: Speaker[];
@@ -79,12 +80,32 @@ export interface PitchArtDrawingWindowProps {
   ref: any;
 }
 
+type MergedIndexesMap = {
+  [letterIndex: number]: {
+    anchorSpeakerIndex: number;
+  };
+};
+
 interface State {
   activePlayIndex: number;
   showNewImageModal: boolean;
   currentImageName: string;
   allAnalysisIds: any[];
   [key: string]: any;
+
+   // Context menu
+  contextMenuVisible: boolean;
+  contextMenuX: number;
+  contextMenuY: number;
+  contextMenuSpeakerIndex: number | null;
+  contextMenuLetterIndex: number | null;
+
+  // Secondary accent per speaker: speakerIndex -> letterIndex
+  secondaryAccentBySpeaker: { [speakerIndex: number]: number };
+  mergedIndexes: MergedIndexesMap;
+
+  // Speaker visibility: indices of speakers whose pitch art is hidden
+  hiddenSpeakerIndices: number[];
 }
 
 export interface ColorScheme {
@@ -166,6 +187,14 @@ export class PitchArtDrawingWindow extends React.Component<
       showNewImageModal: false,
       allAnalysisIds: [],
       currentImageName: "",
+      contextMenuVisible: false,
+      contextMenuX: 0,
+      contextMenuY: 0,
+      contextMenuSpeakerIndex: null,
+      contextMenuLetterIndex: null,
+      secondaryAccentBySpeaker: {},
+      mergedIndexes: {},
+      hiddenSpeakerIndices: [],
     };
     this.saveImage = this.saveImage.bind(this);
     this.playPitchArt = this.playPitchArt.bind(this);
@@ -183,12 +212,23 @@ export class PitchArtDrawingWindow extends React.Component<
 
     this.graphWidth = 10;
     this.borderWidth = 15;
-    this.smallCircleRadius = 16;
+    this.smallCircleRadius = 8;
     this.largeCircleRadius = 18;
     this.circleStrokeWidth = 10;
     this.accentedCircleRadius = 30;
     this.pitchArtSoundLengthSeconds = 0.2;
     this.fontSize = 16;
+  }
+
+  componentDidMount() {
+    const stage = this.stageRef.current;
+    if (!stage) return;
+
+    const container = stage.getStage().container();
+
+    container.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
   }
 
   downloadImage = () => {
@@ -428,6 +468,9 @@ export class PitchArtDrawingWindow extends React.Component<
 
     const tStart = letters.length > 0 ? letters[0].t0 : 0;
     const tEnd = letters.length > 0 ? letters[letters.length - 1].t1 : 0;
+    const totalDuration = tEnd - tStart;
+    const n = letters.length;
+    const showTimeNormalization = this.props.showTimeNormalization;
 
     interface PitchArtNote {
       time: number;
@@ -436,15 +479,22 @@ export class PitchArtDrawingWindow extends React.Component<
       pitch: number;
     }
 
-    const notes = letters.map(function (item, index) {
+    const notes = letters.map((item, index) => {
+      const time = showTimeNormalization && n > 1
+        ? (index / (n - 1)) * totalDuration
+        : item.t0 - tStart;
+      const duration = showTimeNormalization
+        ? Math.min(0.2, totalDuration / Math.max(1, n))
+        : item.t1 - item.t0;
       return {
-        time: item.t0 - tStart,
-        duration: item.t1 - item.t0,
+        time,
+        duration,
         pitch: item.pitch,
         index,
       } as PitchArtNote;
     });
-    notes.push({ time: tEnd, duration: 1, pitch: 1, index: -1 });
+    const endTime = showTimeNormalization && n > 1 ? totalDuration : tEnd - tStart;
+    notes.push({ time: endTime, duration: 1, pitch: 1, index: -1 });
     const controller = this;
 
     // @ts-ignore
@@ -487,6 +537,9 @@ export class PitchArtDrawingWindow extends React.Component<
 
     const tStart = letters.length > 0 ? letters[0].t0 : 0;
     const tEnd = letters.length > 0 ? letters[letters.length - 1].t1 : 0;
+    const totalDuration = tEnd - tStart;
+    const n = letters.length;
+    const showTimeNormalization = this.props.showTimeNormalization;
 
     interface PitchArtNote {
       time: number;
@@ -495,15 +548,22 @@ export class PitchArtDrawingWindow extends React.Component<
       pitch: number;
     }
 
-    const notes = letters.map(function (item, index) {
+    const notes = letters.map((item, index) => {
+      const time = showTimeNormalization && n > 1
+        ? (index / (n - 1)) * totalDuration
+        : item.t0 - tStart;
+      const duration = showTimeNormalization
+        ? Math.min(0.2, totalDuration / Math.max(1, n))
+        : item.t1 - item.t0;
       return {
-        time: item.t0 - tStart,
-        duration: item.t1 - item.t0,
+        time,
+        duration,
         pitch: 100,
         index,
       } as PitchArtNote;
     });
-    notes.push({ time: tEnd, duration: 1, pitch: 1, index: -1 });
+    const endTime = showTimeNormalization && n > 1 ? totalDuration : tEnd - tStart;
+    notes.push({ time: endTime, duration: 1, pitch: 1, index: -1 });
     const controller = this;
 
     // @ts-ignore
@@ -656,6 +716,97 @@ export class PitchArtDrawingWindow extends React.Component<
     );
   };
 
+  addSecondaryAccent = () => {
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) {
+      return;
+    }
+
+    this.setState((prev) => ({
+      secondaryAccentBySpeaker: {
+        ...prev.secondaryAccentBySpeaker,
+        [contextMenuSpeakerIndex]: contextMenuLetterIndex,
+      },
+      contextMenuVisible: false,
+    }));
+  };
+
+  onRemoveSecondaryAccent = () => {
+    const { contextMenuSpeakerIndex } = this.state;
+    if (contextMenuSpeakerIndex === null) return;
+    this.setState((prev) => {
+      const next = { ...prev.secondaryAccentBySpeaker };
+      delete next[contextMenuSpeakerIndex];
+      return { secondaryAccentBySpeaker: next, contextMenuVisible: false };
+    });
+  };
+
+  isIndexMerged = (letterIndex: number) => {
+    return this.state.mergedIndexes[letterIndex] !== undefined;
+  };
+
+  mergeCurrentIndex = () => {
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) return;
+
+    // if anchor speaker doesn't have that index, do nothing
+    const anchorHasIndex =
+      !!this.props.speakers[contextMenuSpeakerIndex]?.letters?.[contextMenuLetterIndex];
+    if (!anchorHasIndex) {
+      this.setState({ contextMenuVisible: false });
+      return;
+    }
+
+    this.setState((prev) => ({
+      mergedIndexes: {
+        ...prev.mergedIndexes,
+        [contextMenuLetterIndex]: { anchorSpeakerIndex: contextMenuSpeakerIndex },
+      },
+      contextMenuVisible: false,
+    }));
+  };
+
+  unmergeCurrentIndex = () => {
+    const { contextMenuLetterIndex } = this.state;
+    if (contextMenuLetterIndex === null) return;
+
+    this.setState((prev) => {
+      const next = { ...prev.mergedIndexes };
+      delete next[contextMenuLetterIndex];
+      return { mergedIndexes: next, contextMenuVisible: false };
+    });
+  };
+
+  hideCurrentSpeaker = () => {
+    const { contextMenuSpeakerIndex } = this.state;
+    if (contextMenuSpeakerIndex === null) return;
+    this.setState((prev) => ({
+      hiddenSpeakerIndices: prev.hiddenSpeakerIndices.includes(contextMenuSpeakerIndex)
+        ? prev.hiddenSpeakerIndices
+        : [...prev.hiddenSpeakerIndices, contextMenuSpeakerIndex],
+      contextMenuVisible: false,
+    }));
+  };
+
+  showAllSpeakers = () => {
+    this.setState({ hiddenSpeakerIndices: [], contextMenuVisible: false });
+  };
+
+  openContextMenuOnBackground = (e: any) => {
+    e.evt.preventDefault();
+    e.evt.stopPropagation();
+    const x = e.evt.clientX + window.scrollX;
+    const y = e.evt.clientY + window.scrollY;
+    this.setState({
+      contextMenuVisible: true,
+      contextMenuX: x,
+      contextMenuY: y,
+      contextMenuSpeakerIndex: null,
+      contextMenuLetterIndex: null,
+    });
+  };
+
   render() {
     const windowConfig = {
       innerHeight: this.innerHeight,
@@ -693,6 +844,7 @@ export class PitchArtDrawingWindow extends React.Component<
               width={this.props.width}
               height={this.props.height}
               fill="white"
+              onContextMenu={this.openContextMenuOnBackground}
             />
             <Line
               points={[
@@ -712,6 +864,7 @@ export class PitchArtDrawingWindow extends React.Component<
               }
               stroke={ colorSchemes[0].windowLineStrokeColor}
               onClick={() => this.imageBoundaryClicked(coordConverter)}
+              onContextMenu={this.openContextMenuOnBackground}
               onMouseEnter={() => this.setPointerEnabled(true)}
               onMouseLeave={() => this.setPointerEnabled(false)}
             />
@@ -747,8 +900,44 @@ export class PitchArtDrawingWindow extends React.Component<
             accentedCircleRadius={this.accentedCircleRadius}
             setPointerEnabled={this.setPointerEnabled}
             isLearn={this.props.isLearn}
+            onOpenContextMenu={(x, y, speakerIndex, letterIndex) =>
+              this.setState({
+                contextMenuVisible: true,
+                contextMenuX: x,
+                contextMenuY: y,
+                contextMenuSpeakerIndex: speakerIndex,
+                contextMenuLetterIndex: letterIndex,
+              })
+            }
+            secondaryAccentBySpeaker={this.state.secondaryAccentBySpeaker}
+            mergedIndexes={this.state.mergedIndexes}
+            hiddenSpeakerIndices={this.state.hiddenSpeakerIndices}
           />
         </Stage>
+
+        {this.state.contextMenuVisible &&
+          (this.state.contextMenuSpeakerIndex !== null || this.state.hiddenSpeakerIndices.length > 0) && (
+          <PitchArtContextMenu
+              x={this.state.contextMenuX}
+              y={this.state.contextMenuY}
+              onAddSecondaryAccent={this.addSecondaryAccent}
+              onRemoveSecondaryAccent={this.onRemoveSecondaryAccent}
+              onClose={() => this.setState({ contextMenuVisible: false })}
+              isMerged={this.isIndexMerged(this.state.contextMenuLetterIndex)}
+              onMergeIndex={this.mergeCurrentIndex}
+              onUnmergeIndex={this.unmergeCurrentIndex}
+              onHideThisSpeaker={this.hideCurrentSpeaker}
+              onShowAllSpeakers={this.showAllSpeakers}
+              contextMenuSpeakerIndex={this.state.contextMenuSpeakerIndex}
+              contextMenuLetterIndex={this.state.contextMenuLetterIndex}
+              hiddenSpeakerIndices={this.state.hiddenSpeakerIndices}
+              hasSecondaryAccentOnThisCircle={
+                this.state.contextMenuSpeakerIndex !== null &&
+                this.state.contextMenuLetterIndex !== null &&
+                this.state.secondaryAccentBySpeaker[this.state.contextMenuSpeakerIndex] === this.state.contextMenuLetterIndex
+              }
+            />
+          )}
         <a className="hide" ref={this.downloadRef}>
           Hidden Download Link
         </a>

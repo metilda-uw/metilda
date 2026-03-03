@@ -25,6 +25,14 @@ function Converter(){
     const [activeFromScaleInput, setActiveFromScaleInput] = useState(null);
     const [fromScaleValuesArray, setFromScaleValuesArray] = useState([null, null, null, null]);
     const [toScaleValuesArray, setToScaleValuesArray] = useState([null, null, null, null]);
+
+    // State for responsive design based on screen size
+    const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+    useEffect(() => {
+      const resizeHandler = () => setWindowWidth(window.innerWidth)
+      window.addEventListener("resize", resizeHandler)
+    }, [])
     
     /**
      * Method to handle user input
@@ -42,8 +50,9 @@ function Converter(){
             setFromScaleName(scaleOptions[3]);
         }
 
-        const eventData = e;
-        setFromScaleValue(e.target.value);
+        const newValues = [...fromScaleValuesArray];
+        newValues[activeFromScaleInput] = e.target.value;
+        setFromScaleValuesArray(newValues);
 
         clearTimeout(fromTimer);
         e.persist();
@@ -263,6 +272,12 @@ function Converter(){
         }
     }
 
+    const handleReset = () => {
+        setFromScaleValuesArray(["", "", "", ""]);
+        setToScaleValuesArray(["", "", "", ""]);
+        setActiveFromScaleInput(null);
+        };
+
     return (
         <div className="metilda-conversions">
             <Header></Header>
@@ -305,10 +320,29 @@ function Converter(){
                             <div>
                                 <input type="number" min="16.35" max="7902.13" step="0.1"
                                     className="from-scale-value"
+                                    value={fromScaleValuesArray[3]}
+                                    onChange={onFromScaleValueChange}
+                                    onFocus={() => handleActiveFromScaleInput(3)}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
+                                />
+                                <span className="from-scale-unit"
+                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}>
+                                    {getUnit(scaleOptions[3])}
+                                </span>
+                            </div>
+                            <div>
+                                <input type="number" min="16.35" max="7902.13" step="0.1"
+                                    className="from-scale-value"
                                     value={fromScaleValuesArray[0]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(0)}
-                                    style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 0 ? "bold" : "normal"}}>
@@ -321,7 +355,10 @@ function Converter(){
                                     value={fromScaleValuesArray[1]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(1)}
-                                    style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 1 ? "bold" : "normal"}}>
@@ -334,24 +371,14 @@ function Converter(){
                                     value={fromScaleValuesArray[2]}
                                     onChange={onFromScaleValueChange}
                                     onFocus={() => handleActiveFromScaleInput(2)}
-                                    style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}
+                                    style={{
+                                      fontWeight: activeFromScaleInput === 3 ? "bold" : "normal",
+                                      width: (windowWidth < 600) ? '70%' : '220px'
+                                    }}
                                 />
                                 <span className="from-scale-unit"
                                     style={{fontWeight: activeFromScaleInput === 2 ? "bold" : "normal"}}>
                                     {getUnit(scaleOptions[2])}
-                                </span>
-                            </div>
-                            <div>
-                                <input type="number" min="16.35" max="7902.13" step="0.1"
-                                    className="from-scale-value"
-                                    value={fromScaleValuesArray[3]}
-                                    onChange={onFromScaleValueChange}
-                                    onFocus={() => handleActiveFromScaleInput(3)}
-                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}
-                                />
-                                <span className="from-scale-unit"
-                                    style={{fontWeight: activeFromScaleInput === 3 ? "bold" : "normal"}}>
-                                    {getUnit(scaleOptions[3])}
                                 </span>
                             </div>
                         </div>
@@ -406,8 +433,23 @@ function Converter(){
                                     <input
                                         type="number"
                                         className="to-scale-value"
+                                        value={toScaleValuesArray[3]}
+                                        readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
+                                    />
+                                    <span className="to-scale-unit">{getUnit(scaleOptions[3])}</span>
+                                </div>
+                                <div>
+                                    <input
+                                        type="number"
+                                        className="to-scale-value"
                                         value={toScaleValuesArray[0]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[0])}</span>
                                 </div>
@@ -417,6 +459,9 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[1]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[1])}</span>
                                 </div>
@@ -426,17 +471,11 @@ function Converter(){
                                         className="to-scale-value"
                                         value={toScaleValuesArray[2]}
                                         readOnly
+                                        style={{
+                                          width: (windowWidth < 600) ? '70%' : '220px'
+                                        }}
                                     />
                                     <span className="to-scale-unit">{getUnit(scaleOptions[2])}</span>
-                                </div>
-                                <div>
-                                    <input
-                                        type="number"
-                                        className="to-scale-value"
-                                        value={toScaleValuesArray[3]}
-                                        readOnly
-                                    />
-                                    <span className="to-scale-unit">{getUnit(scaleOptions[3])}</span>
                                 </div>
                             </div>
                         )
@@ -450,6 +489,27 @@ function Converter(){
             <div className="user-note">
                 {(noteText != '') &&  <p className="note-text">{noteText}</p>}
             </div>
+            <div className="converter-controls" style={{ marginTop: '20px', textAlign: 'center' }}>
+                    <button
+                        onClick={handleReset}
+                        className="reset-button"
+                        style={{
+                        backgroundColor: '#c62828',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        padding: '10px 20px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '14px',
+                        transition: '0.3s'
+                        }}
+                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#b71c1c')}
+                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#c62828')}
+                    >
+                        Reset
+                    </button>
+                </div>
             <div>
                 <body>
                 <b className="b">Tooltips</b>

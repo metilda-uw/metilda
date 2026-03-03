@@ -135,7 +135,8 @@ class PitchArt extends React.Component<Props> {
             <i className="material-icons right">play_circle_filled</i>
             Play Tones
           </button>
-          <button
+          {/* This does the same function as playtone button. Commenting this out after a discussion with stakeholders. */}
+          {/* <button
             className="waves-effect waves-light btn globalbtn metilda-pitch-art-btn"
             disabled={
               this.props.speakers.length !== 1 ||
@@ -145,7 +146,7 @@ class PitchArt extends React.Component<Props> {
           >
             <i className="material-icons right">play_circle_filled</i>
             Play Rhythm
-          </button>
+          </button> */}
         </div>
         <div id="metilda-pitch-art-btn-container">
           <button

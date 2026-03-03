@@ -2,6 +2,16 @@
     width: 80px !important;
 }
 
+.pitch-range-minmax-wrap {
+    max-width: 380px;
+}
+
+.pitch-range-apply-wrap {
+    display: flex;
+    justify-content: center;
+    margin-top: 8px;
+}
+
 .pitch-range-err-list {
     display: flex;
 }
@@ -12,3 +22,25 @@
     margin-bottom: -8px;
     font-size: 14px;
 }
+
+.player-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.player-main-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.audio-slider {
+  flex: 1;
+}
+
+.player-beat-controls {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+

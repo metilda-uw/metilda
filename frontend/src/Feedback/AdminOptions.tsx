@@ -25,6 +25,14 @@ const AdminOptions: React.FC = () => {
   const [isAddOptionPopupVisible, setIsAddOptionPopupVisible] = useState<boolean>(false);
   const firebase = useContext(FirebaseContext);
 
+  // State for tracking window width
+  const [windowWidth, setWindowWidth] = useState<number>(window.innerWidth)
+
+  useEffect(() => {
+    const resizeHandler = () => setWindowWidth(window.innerWidth)
+    window.addEventListener("resize", resizeHandler)
+  }, [])
+
   /**
    *  Function for fetcing all the options
    *  */ 
@@ -248,9 +256,9 @@ const AdminOptions: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th>#</th>
+              {(windowWidth >= 600) ? (<th>#</th>) : (<></>)}
               <th>Option Value</th>
-              <th>Created By</th>
+              {(windowWidth >= 600) ? (<th>Created By</th>) : (<></>)}
               <th>Created Date</th>
               <th>Actions</th>
             </tr>
@@ -258,9 +266,9 @@ const AdminOptions: React.FC = () => {
           <tbody>
             {options.map((option, index) => (
               <tr key={option.oid}>
-                <td>{index + 1}</td>
+                {(windowWidth >= 600) ? (<td>{index + 1}</td>) : (<></>)}
                 <td>{option.optionValue}</td>
-                <td>{option.createdBy}</td>
+                {(windowWidth >= 600) ? (<td>{option.createdBy}</td>) : (<></>)}
                 <td>{new Date(option.createdDate).toLocaleString()}</td>
                 <td>
                   <button onClick={() => handleEditOption(option)}>Edit</button>

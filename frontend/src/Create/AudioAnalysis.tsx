@@ -33,6 +33,9 @@ import * as DEFAULT from "../constants/create";
 import "./UploadAudio.css";
 import "./AudioAnalysis.css";
 import { isTypeFlagSet } from "tslint";
+import { Backdrop, Box, Popover, createTheme } from "@material-ui/core";
+
+import { useImageSelection } from './hooks/useImageSelection'; 
 
 export interface AudioAnalysisProps {
   speakerIndex: number;
@@ -63,12 +66,13 @@ export interface AudioAnalysisProps {
   parentCallBack: (selectedFolderName: string) => void;
   updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
   setAudioUrl: (url: string) => void; // New prop
-  // verticalLines: VerticalLine[]
 }
+
 interface VerticalLine {
   id: string;
-  x: number;
+  time: number;
 }
+
 interface State {
   selectedFolderName: string;
   showImgMenu: boolean;
@@ -95,15 +99,18 @@ interface State {
   wordTranslation: string;
   closeImgSelectionCallback: () => void;
   selectionCallback: (t1: number, t2: number) => void;
-  // needed for the onChange event to work.
   [key: string]: any;
-  beats: number[]; // Stores the time positions of the beats
+  beats: number[]; 
   showDraggableLine: boolean;
   linePositions: number[];
   draggingIndex: number;
   isDragging: boolean;
   verticalLines: VerticalLine[];
+  windowWidth: number;
+  anchorEl: HTMLButtonElement | null
 }
+
+const { imageIntervalSelected, imageIntervalToTimeInterval, timeToImageX, imageXToTime } = useImageSelection();
 
 export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   /**
@@ -218,8 +225,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       isDragging: false,
       verticalLines: [],
       userEmail: '',
+      windowWidth: window.innerWidth,
+      anchorEl: null
     };
-    this.imageIntervalSelected = this.imageIntervalSelected.bind(this);
+
     this.onAudioImageLoaded = this.onAudioImageLoaded.bind(this);
     this.audioIntervalSelected = this.audioIntervalSelected.bind(this);
     this.audioIntervalSelectionCanceled = this.audioIntervalSelectionCanceled.bind(this);
@@ -231,14 +240,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.averagePitchArtClicked = this.averagePitchArtClicked.bind(this);
     this.manualPitchArtClicked = this.manualPitchArtClicked.bind(this);
     this.wordSplitClicked = this.wordSplitClicked.bind(this);
-    this.imageIntervalToTimeInterval = this.imageIntervalToTimeInterval.bind(this);
     this.getAudioConfigForSelection = this.getAudioConfigForSelection.bind(this);
     this.manualPitchChange = this.manualPitchChange.bind(this);
     this.addPitch = this.addPitch.bind(this);
     this.targetPitchSelected = this.targetPitchSelected.bind(this);
     this.toggleTypeOfBeat = this.toggleTypeOfBeat.bind(this);
     this.saveRhythm = this.saveRhythm.bind(this);
-
   }
 
   setVerticalLines = (newLines) => {
@@ -249,7 +256,24 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     return this.props.speakers[this.props.speakerIndex];
   }
 
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
+  }
+
+  setAnchorEl = (event: React.MouseEvent<HTMLButtonElement> | null) => {
+    this.setState({ anchorEl: event ? event.currentTarget : null })
+  }
+
+  handlePopupClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    this.setAnchorEl(event)
+  }
+
+  handlePopupClose = () => {
+    this.setAnchorEl(null)
+  }
+
   componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
     const uploadId = this.getSpeaker().uploadId;
     if (!uploadId) {
       return;
@@ -285,6 +309,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       });
   }
 
+  componentWillUnmount(): void {
+    window.removeEventListener("resize", this.setWindowWidth)
+  }
+
   setUploadId = async (uploadId: string, uploadPath: string, fileIndex: number, fileType: string) => {
     if (fileType !== "Folder") {
       const storageRef = this.props.firebase.uploadFile();
@@ -315,7 +343,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     // Compute the new time scale
     let ts;
     if (leftX !== undefined && rightX !== undefined) {
-      ts = this.imageIntervalToTimeInterval(leftX, rightX);
+      ts = imageIntervalToTimeInterval(leftX, rightX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
     } else {
       ts = [this.state.minAudioTime, this.state.maxAudioTime];
     }
@@ -399,42 +427,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.state.closeImgSelectionCallback();
   }
 
-  imageIntervalSelected(
-    leftX: number,
-    rightX: number,
-    manualPitch?: number,
-    isWordSep: boolean = false,
-    tsOverride?: number[]) {
-    const ts = tsOverride || this.imageIntervalToTimeInterval(leftX, rightX);
-
-    if (manualPitch !== undefined) {
-      this.addPitch(manualPitch, DEFAULT.SYLLABLE_TEXT, ts, true);
-      return;
-    }
-
-    if (isWordSep) {
-      this.addPitch(-1, DEFAULT.SEPARATOR_TEXT, ts, false, true);
-      return;
-    }
-
-    fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/avg`
-      + "?t0=" + ts[0]
-      + "&t1=" + ts[1]
-      + "&max-pitch=" + this.props.maxPitch
-      + "&min-pitch=" + this.props.minPitch, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => this.addPitch(data.avg_pitch, DEFAULT.SYLLABLE_TEXT, ts, false),
-      );
-  }
-
   pitchArtRangeClicked() {
-    const ts = this.imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX);
+    const ts = imageIntervalToTimeInterval(this.state.minSelectX, this.state.maxSelectX, this.state.maxAudioTime, this.state.minAudioTime, this.state.maxAudioX, this.state.minAudioX);
 
     fetch(`/api/audio/${this.getSpeaker().uploadId}/pitch/range`
       + "?max-pitch="
@@ -456,17 +450,22 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   }
 
   averagePitchArtClicked() {
-    this.imageIntervalSelected(
-      this.state.minSelectX,
-      this.state.maxSelectX);
-  }
-
-  wordSplitClicked() {
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      undefined,
-      true);
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } }
+      );
+    }
+
+  wordSplitClicked() {
+    imageIntervalSelected(
+      this.state.minSelectX,
+      this.state.maxSelectX,
+      {maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX  },
+      {addPitch: this.addPitch, getSpeaker: this.getSpeaker, pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch : undefined, isWordSep: true,}
+    );
   }
 
   manualPitchChange(index: number, newPitch: number) {
@@ -489,17 +488,19 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         return;
       }
 
+
       if (manualPitchStr.split("").filter((char) => char === ",").length === 1) {
         try {
           const values = manualPitchStr.split(",");
           const t0: number = parseFloat(values[0]);
           const t1: number = parseFloat(values[1]);
-          this.imageIntervalSelected(
+          imageIntervalSelected(
             -1,
             -1,
-            undefined,
-            undefined,
-            [t0, t1]);
+            { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+            { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+            {manualPitch: undefined, isWordSep: undefined, tsOverride: [t0, t1]},
+            );
           return;
         } catch {
           // do nothing
@@ -524,11 +525,14 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       }
     }
 
-    this.imageIntervalSelected(
+    imageIntervalSelected(
       this.state.minSelectX,
       this.state.maxSelectX,
-      manualPitch);
-  }
+      { maxAudioTime: this.state.maxAudioTime, minAudioTime: this.state.minAudioTime, maxAudioX: this.state.maxAudioX, minAudioX: this.state.minAudioX },
+      { addPitch: this.addPitch, getSpeaker: this.getSpeaker,  pitchConfig: { minPitch: this.props.minPitch, maxPitch: this.props.maxPitch } },
+      {manualPitch: manualPitch},
+    );
+    }
 
   onAudioImageLoaded(cancelCallback: () => void, selectionCallback: (t1: number, t2: number) => void) {
     this.setState({
@@ -602,17 +606,6 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       minAudioTime: tmin,
       maxAudioTime: tmax,
     });
-  }
-
-  imageIntervalToTimeInterval(x1: number, x2: number) {
-    const dt = this.state.maxAudioTime - this.state.minAudioTime;
-    const dx = this.state.maxAudioX - this.state.minAudioX;
-    const u0 = x1 / dx;
-    const u1 = x2 / dx;
-
-    const t0 = this.state.minAudioTime + (u0 * dt);
-    const t1 = this.state.minAudioTime + (u1 * dt);
-    return [t0, t1];
   }
 
   selectionIntervalClicked() {
@@ -704,6 +697,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           showAllAudio={this.showAllClicked}
           isSoundLengthLarge={isSoundLengthLarge}
           onClick={() => this.showImgMenu(-1, -1)}
+          typeOfBeat={this.state.typeOfBeat}
         />
       );
     }
@@ -732,12 +726,12 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
   toggleTypeOfBeat = async () => {
     const newTypeOfBeat = this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody";
     const uploadId = this.getSpeaker().uploadId;
-  
+
     if (!uploadId) {
       console.error("No upload ID found. Cannot toggle type of beat.");
       return;
     }
-  
+
     const melodyUrl = AudioAnalysis.formatImageUrl(
       uploadId,
       this.props.minPitch,
@@ -745,20 +739,21 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       this.state.minAudioTime,
       this.state.maxAudioTime
     );
-  
+
     if (newTypeOfBeat === "Rhythm") {
       try {
         const rhythmRef = this.props.firebase.rhythmDataRef(this.props.userEmail, uploadId);
         const rhythmDoc = await rhythmRef.get();
-  
+
         if (rhythmDoc.exists) {
           const rhythmData = rhythmDoc.data();
-  
+
+          //TODO: Check backwards compatibility
           const verticalLines = rhythmData.verticalLines.map((line) => ({
             id: line.id || `line-${Date.now()}`, // Ensure each line has a unique ID
-            x: line.x, // Ensure x is a number
+            time: line.time || (line.x && timeToImageX(line.x, this.props)), // Ensure time is a number
           }));
-  
+
           // Update verticalLines state directly in this component
           this.setState({ verticalLines });
         } else {
@@ -770,7 +765,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
         NotificationManager.error("Failed to fetch rhythm data.");
       }
     }
-  
+
     this.setState(
       {
         typeOfBeat: newTypeOfBeat,
@@ -790,135 +785,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     this.setState({ verticalLines: lines });
   };
 
-  // Method to play taps corresponding to beats
-  playBeats = () => {
-    const { verticalLines, soundLength } = this.state;
-  
-    if (!verticalLines.length) {
-      console.warn("No beats to play.");
-      return;
-    }
-  
-    // Calculate the time for each vertical line based on its x-coordinate
-    const tapTimes = verticalLines.map((line) => {
-      // Map the x-coordinate to a time in the audio
-      const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength ;
-      if(time > 5){
-        return time - 4
-      } 
-      else{
-        return time
-      }
-    });
-  
-    // Function to play a single tap sound
-    const playTap = () => {
-      const audioCtx = new (window.AudioContext || window.AudioContext)();
-      const oscillator = audioCtx.createOscillator();
-      const gainNode = audioCtx.createGain();
-  
-      oscillator.type = 'square';
-      oscillator.frequency.setValueAtTime(800, audioCtx.currentTime); // Frequency of the tap sound
-      gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1); // Fade out the tap sound
-  
-      oscillator.connect(gainNode);
-      gainNode.connect(audioCtx.destination);
-      oscillator.start();
-      oscillator.stop(audioCtx.currentTime + 0.2); // Duration of the tap sound
-    };
-  
-
-    // Play taps at the calculated times
-    tapTimes.forEach((time) => {
-      setTimeout(() => {
-        playTap();
-      }, time * 1000); // Convert seconds to milliseconds
-    });
-  };
-  // Method to play audio along with tap sounds at the beat positions
-  playAudioWithTaps = () => {
-  const { verticalLines, audioUrl, soundLength } = this.state;
-
-  if (!verticalLines.length) {
-    console.warn("No beats to play.");
-    return;
-  }
-
-  if (!audioUrl) {
-    console.warn("Audio URL not set!");
-    return;
-  }
-
-  // Create or get the audio element
-  let audioElement = document.getElementById('audio-player') as HTMLAudioElement;
-  if (!audioElement) {
-    audioElement = new Audio(audioUrl);
-    audioElement.id = 'audio-player';
-    document.body.appendChild(audioElement);
-  }
-
-  // Initialize the AudioContext for tap sounds
-  const audioContext = new (window.AudioContext || window.AudioContext)();
-  const tapGainNode = audioContext.createGain();
-  tapGainNode.connect(audioContext.destination);
-
-  // Calculate the time for each vertical line based on its x-coordinate
-  const tapTimes = verticalLines.map((line) => {
-    const time = (line.x / DEFAULT.AUDIO_IMG_WIDTH) * soundLength;
-    return time;
-  });
-
-
-  // Reset and play the audio
-  audioElement.currentTime = 0;
-  audioElement.play();
-
-  // Track which taps have been triggered
-  const triggeredTaps = new Set();
-
-  // Add a listener for time updates to trigger taps at the right time
-  const handleTimeUpdate = () => {
-    const currentTime = audioElement.currentTime;
-
-    for (let i = 0; i < tapTimes.length; i++) {
-      if (currentTime >= tapTimes[i] && !triggeredTaps.has(i)) {
-        // Play the tap sound using AudioContext for precise timing
-        this.playTapSound(audioContext, tapGainNode, tapTimes[i]);
-        triggeredTaps.add(i);
-      }
-    }
-  };
-
-  // Attach the event listener
-  audioElement.addEventListener('timeupdate', handleTimeUpdate);
-
-  // Remove the event listener once playback ends
-  audioElement.addEventListener('ended', () => {
-    audioElement.removeEventListener('timeupdate', handleTimeUpdate);
-    triggeredTaps.clear();
-  });
-};
-
-  // Helper method to play the tap sound
-  playTapSound = (audioContext: AudioContext, tapGainNode: GainNode, i: number) => {
-    const audioCtx = new (window.AudioContext || window.AudioContext)();
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gainNode.gain.setValueAtTime(1, audioCtx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 0.2);
-  };
-
   saveRhythm = async () => {
-
     const { verticalLines } = this.state;
     const { speakerIndex, firebase } = this.props;
     const uploadId = this.getSpeaker().uploadId;
@@ -928,50 +795,108 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       return;
     }
 
-    if (verticalLines.length === 0) {
-      NotificationManager.error("No rhythm data to save.");
-      return;
-    }
-
     try {
-      const rhythmData = {
-        audioName: uploadId, // Use the upload ID as the audio name
-        createdDate: new Date().toISOString(),
-        verticalLines,
-      };
-
-      // Save rhythm data to Firebase under the user's email document
       const rhythmRef = firebase.rhythmDataRef(this.props.userEmail, uploadId);
-      await rhythmRef.set(rhythmData);
 
-      NotificationManager.success("Rhythm saved successfully!");
+      if (verticalLines.length === 0) {
+        await rhythmRef.delete();
+        NotificationManager.success("Rhythm data deleted successfully!");
+      } else {
+        const rhythmData = {
+          audioName: uploadId,
+          createdDate: new Date().toISOString(),
+          verticalLines,
+        };
+
+        await rhythmRef.set(rhythmData);
+        NotificationManager.success("Rhythm saved successfully!");
+      }
     } catch (error) {
-      console.error("Error saving rhythm:", error);
-      NotificationManager.error("Failed to save rhythm.");
+      console.error("Error saving/deleting rhythm:", error);
+      NotificationManager.error("Failed to save/delete rhythm.");
     }
   };
-  renderVerticalLineDots = () => {
-    return this.state.verticalLines.map((line) => {
-      const indicatorWidth = DEFAULT.AUDIO_IMG_WIDTH;
-      const mappedX = ((line.x / indicatorWidth) * 100) - 67;
+
+  renderOptions = (uploadId : string) => {
+    return (
+      <>
+        <h6 className="metilda-control-header">
+          Speaker {this.props.speakerIndex + 1}
+        </h6>
+        <UploadAudio
+          initFileName={uploadId}
+          setUploadId={this.setUploadId}
+          userFiles={this.props.files}
+          firebase={this.props.firebase}
+        />
+        <PitchRange
+          useMinMaxInputs
+          initMinPitch={this.props.minPitch}
+          initMaxPitch={this.props.maxPitch}
+          applyPitchRange={this.applyPitchRange}
+        />
+        {this.renderSpeakerControl()}
+        <button
+          className="waves-effect waves-light btn globalbtn"
+          onClick={this.toggleTypeOfBeat}
+        >
+          {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
+        </button>
+      </>
+    )
+  }
+
+  renderPopupOptions = (uploadId : string) => {
+      // TODO: Switch to rythym and completeZoomOut should be 
+      // outside popup menu
+      const theme = createTheme()
+      const {anchorEl, windowWidth} = this.state
+      const open = Boolean(this.state.anchorEl)
 
       return (
-        <div
-          key={line.id}
-          style={{
-            position: 'absolute',
-            left: `${mappedX}%`,
-            top: '50%',
-            transform: 'translate(-90%, -60%)',
-            width: '6px',
-            height: '6px',
-            backgroundColor: 'red',
-            borderRadius: '50%',
-          }}
-        />
-      );
-    });
-  };
+        <>
+          <Box style={{
+            display: 'flex',
+            width: windowWidth * .7,
+            paddingLeft: "5%",
+            paddingRight: "5%",
+            paddingBottom: "20px"
+          }}>
+            <button
+              className="col s7 btn globalbtn"
+              style={{ width: windowWidth * .7}}
+              onClick={this.handlePopupClick}
+            >
+              Speaker Options
+            </button>
+          </Box>
+          <Backdrop
+            open={open}
+            style={{ zIndex: theme.zIndex.modal }}
+          >
+            <Popover
+              id={'popover'}
+              open={open}
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'center',
+                horizontal: 'center'
+              }}
+              onClose={this.handlePopupClose}
+            >
+              <div style={{
+                paddingLeft: '30px',
+                paddingTop: '20px',
+                paddingRight: '30px',
+                paddingBottom: '20px'
+              }}>
+                {this.renderOptions(uploadId)}
+              </div>
+            </Popover>
+          </Backdrop>
+        </>
+      )
+  }
 
   render() {
     const { typeOfBeat } = this.state;
@@ -997,36 +922,21 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
       nonAudioImg = <AudioImgLoading />;
     }
 
+    let { windowWidth } = this.state
+    let rowOrNot = 'row'
+    if ( windowWidth <= 1000 ) { rowOrNot = '' }
+
     return (
       <div className="AudioAnalysis">
-        <div className="row">
+        {(windowWidth <= 1000) ? this.renderPopupOptions(uploadId) : <></>}
+        <div className={rowOrNot}>
           <div className="AudioAnalysis-speaker metilda-audio-analysis-controls-list col s5">
-            <h6 className="metilda-control-header">
-              Speaker {this.props.speakerIndex + 1}
-            </h6>
-            <UploadAudio
-              initFileName={uploadId}
-              setUploadId={this.setUploadId}
-              userFiles={this.props.files}
-              firebase={this.props.firebase}
-            />
-            <PitchRange
-              initMinPitch={this.props.minPitch}
-              initMaxPitch={this.props.maxPitch}
-              applyPitchRange={this.applyPitchRange}
-            />
-            {this.renderSpeakerControl()}
-            <button
-              className="waves-effect waves-light btn globalbtn"
-              onClick={this.toggleTypeOfBeat}
-            >
-              {`Switch to ${this.state.typeOfBeat === "Melody" ? "Rhythm" : "Melody"}`}
-            </button>
+            {(windowWidth > 1000) ? this.renderOptions(uploadId) : <></>}
           </div>
           <div className="AudioAnalysis-analysis metilda-audio-analysis col s7" >
             <div className="metilda-audio-analysis-image-container">
               {nonAudioImg}
-              {typeOfBeat != 'Rhythm' && this.maybeRenderImgMenu()}
+              {this.maybeRenderImgMenu()}
               {uploadId && (
                 <AudioImg
                   key={this.state.imageUrl}
@@ -1055,7 +965,15 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 />
               )}
             </div>
-            {uploadId && <PlayerBar key={this.state.audioUrl} audioUrl={this.state.audioUrl} />}
+              {uploadId && 
+              <PlayerBar
+                key={this.state.audioUrl} 
+                audioUrl={this.state.audioUrl} 
+                typeOfBeat={typeOfBeat}
+                verticalLines={this.state.verticalLines}
+                minAudioTime={this.state.minAudioTime}
+                maxAudioTime={this.state.maxAudioTime}
+                />}
             <div >
               <TargetPitchBar
                 letters={this.props.speakers}
@@ -1068,6 +986,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 speakerIndex={this.props.speakerIndex}
                 firebase={this.props.firebase}
                 typeOfBeat={this.state.typeOfBeat}
+                verticalLines={this.state.verticalLines}
               />
               {typeOfBeat == 'Rhythm' &&
                 <button
@@ -1078,39 +997,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
                 </button>
               }
             </div>
-            {
-              typeOfBeat == 'Rhythm' &&
-              <div className="vertical-lines-container">
-                <div
-                  className="vertical-lines-indicator"
-                  style={{
-                    position: "relative",
-                    width: `${DEFAULT.AUDIO_IMG_WIDTH}px`,
-                    height: "30px",
-                    backgroundColor: "#f8f8f8",
-                    border: "5px solid #ccc",
-                    marginTop: "10px",
-                    marginLeft: "auto",
-                    marginRight: "auto",
-                  }}
-                >
-                  {this.renderVerticalLineDots()}
-                </div>
-
-                <div style={{ marginBottom: "5px", textAlign: "center" }}>
-                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playBeats}>
-                    Play Taps
-                  </button>
-                  <button className="waves-effect waves-light btn globalbtn" onClick={this.playAudioWithTaps} style={{ marginLeft: "10px" }}>
-                    Play Audio + Taps
-                  </button>
-                </div>
-                <audio id="audio-player" src={this.state.audioUrl} preload="auto" />
-
-              </div>
-            }
           </div>
-
         </div>
       </div>
     );

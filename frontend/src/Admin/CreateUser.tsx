@@ -22,6 +22,7 @@ interface State {
   languageOfResearch: any[];
   isLoading: boolean;
   [key: string]: string | boolean| any;
+  windowWidth: number;
 }
 
 const INITIAL_STATE = {
@@ -31,7 +32,8 @@ const INITIAL_STATE = {
   institution: "",
   role: [],
   languageOfResearch: [],
-  isLoading: false
+  isLoading: false,
+  windowWidth: window.innerWidth
 };
 
 export class CreateUser extends React.Component<CreateUserProps, State> {
@@ -40,6 +42,14 @@ export class CreateUser extends React.Component<CreateUserProps, State> {
       super(props);
 
       this.state = { ...INITIAL_STATE };
+  }
+
+  componentDidMount() {
+    window.addEventListener("resize", this.setWindowWidth)
+  }
+
+  setWindowWidth = () => {
+    this.setState({ windowWidth: window.innerWidth })
   }
 
   onSubmit = async (event: any) => {
@@ -159,7 +169,7 @@ render() {
     input: (styles: any) => ({ ...styles, padding: "0px", margin: "0px" }),
   };
 
-  const { isLoading } = this.state;
+  const { isLoading, windowWidth } = this.state;
   const {addUserClicked} = this.props;
   const className = `${addUserClicked
     ? "transition"
@@ -167,13 +177,18 @@ render() {
   return (
     <div className={className}>
     <div className="CreateUserContainer">
-    <button className="BackButton waves-effect waves-light btn globalbtn" onClick={this.backButtonClicked}>
+    <button 
+      className="BackButton waves-effect waves-light btn globalbtn" 
+      onClick={this.backButtonClicked}
+      style={{ position: (windowWidth >= 600) ? 'absolute' : 'static' }}
+    >
           <i className="material-icons right">arrow_back</i>
           Back
     </button>
     <div className="CreateUserSpinner">
     {isLoading && spinner()}
-    <h1 id="newUserTitle">Enter new user details</h1>
+    {(windowWidth >= 600) ? (<h1 id="newUserTitle">Enter new user details</h1>) : 
+              (<h2 id="newUserTitle">Enter new user details</h2>)}
     <form  className="CreateUserForm" onSubmit={this.onSubmit}>
       <input
         className="username"

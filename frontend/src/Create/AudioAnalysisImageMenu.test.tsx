@@ -211,6 +211,8 @@ interface OptionalProps {
     newAvgPitch?: () => void;
     newRangePitch?: () => void;
     showAllAudio?: () => void;
+    typeOfBeat?: string;
+    isSoundLengthLarge?: boolean;
 }
 
 function shallowRender(props: OptionalProps) {
@@ -230,5 +232,7 @@ function makeProps(props: OptionalProps): AudioAnalysisImageMenuProps {
         newAvgPitch: props.newAvgPitch || (() => undefined),
         newRangePitch: props.newRangePitch || (() => undefined),
         showAllAudio: props.showAllAudio || (() => undefined),
+        typeOfBeat: props.typeOfBeat || "",
+        isSoundLengthLarge: props.isSoundLengthLarge || false,
     };
 }
