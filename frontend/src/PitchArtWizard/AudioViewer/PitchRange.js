@@ -2,24 +2,36 @@ import "./PitchRange.css";
 
 import React, { Component } from "react";
 
+const MIN_HZ = 75;
+const MAX_HZ = 500;
+
 class PitchRange extends Component {
   constructor(props) {
       super(props);
 
+      const useMinMaxInputs = props.useMinMaxInputs === true;
       const minMeT = this.hzToMeT(props.initMinPitch);
       const maxMeT = this.hzToMeT(props.initMaxPitch);
 
-      this.state = {
-        offsetMeT: maxMeT - minMeT,
-        errors: [],
-        isDirty: false,
-      };
+      this.state = useMinMaxInputs
+        ? {
+            minHz: Number(props.initMinPitch) || MIN_HZ,
+            maxHz: Number(props.initMaxPitch) || MAX_HZ,
+            errors: [],
+            isDirty: false,
+          }
+        : {
+            offsetMeT: maxMeT - minMeT,
+            errors: [],
+            isDirty: false,
+          };
 
       this.submitMaxPitch = this.submitMaxPitch.bind(this);
+      this.submitMinMaxPitch = this.submitMinMaxPitch.bind(this);
   }
 
-  SLIDER_MIN_HZ = 75;
-  SLIDER_MAX_HZ = 500;
+  SLIDER_MIN_HZ = MIN_HZ;
+  SLIDER_MAX_HZ = MAX_HZ;
 
   getSliderMinMeT = () => this.hzToMeT(this.SLIDER_MIN_HZ);
   getSliderMaxMeT = () => this.hzToMeT(this.SLIDER_MAX_HZ);
@@ -29,14 +41,22 @@ class PitchRange extends Component {
       this.props.initMinPitch !== prevProps.initMinPitch ||
       this.props.initMaxPitch !== prevProps.initMaxPitch
     ) {
-      const minMeT = this.hzToMeT(this.props.initMinPitch);
-      const maxMeT = this.hzToMeT(this.props.initMaxPitch);
-
-      this.setState({
-        offsetMeT: maxMeT - minMeT,
-        errors: [],
-        isDirty: false,
-      });
+      if (this.props.useMinMaxInputs) {
+        this.setState({
+          minHz: Number(this.props.initMinPitch) || MIN_HZ,
+          maxHz: Number(this.props.initMaxPitch) || MAX_HZ,
+          errors: [],
+          isDirty: false,
+        });
+      } else {
+        const minMeT = this.hzToMeT(this.props.initMinPitch);
+        const maxMeT = this.hzToMeT(this.props.initMaxPitch);
+        this.setState({
+          offsetMeT: maxMeT - minMeT,
+          errors: [],
+          isDirty: false,
+        });
+      }
     }
   }
 
@@ -67,15 +87,119 @@ class PitchRange extends Component {
     this.setState({ isDirty: false });
   }
 
+  submitMinMaxPitch() {
+    const errors = [];
+    const minHz = Number(this.state.minHz);
+    const maxHz = Number(this.state.maxHz);
+
+    if (Number.isNaN(minHz) || minHz < MIN_HZ || minHz > MAX_HZ) {
+      errors.push(`Min pitch must be between ${MIN_HZ} and ${MAX_HZ} Hz`);
+    }
+    if (Number.isNaN(maxHz) || maxHz < MIN_HZ || maxHz > MAX_HZ) {
+      errors.push(`Max pitch must be between ${MIN_HZ} and ${MAX_HZ} Hz`);
+    }
+    if (errors.length === 0 && minHz >= maxHz) {
+      errors.push("Min pitch must be less than max pitch");
+    }
+
+    this.setState({ errors });
+    if (errors.length > 0) return;
+
+    this.props.applyPitchRange(minHz, maxHz);
+    this.setState({ isDirty: false });
+  }
+
   enterPressed = (event) => {
-    console.log("loggint he event which is " + event);
     if (event.key === "Enter") {
-      this.submitMaxPitch(event);
+      if (this.props.useMinMaxInputs) {
+        this.submitMinMaxPitch();
+      } else {
+        this.submitMaxPitch(event);
+      }
     }
   };
 
   render() {
-    
+    if (this.props.useMinMaxInputs) {
+      return (
+        <div className="metilda-audio-analysis-controls-list-item col s12 pitch-range-minmax-wrap">
+          <label className="group-label">Pitch Range (Hz)</label>
+          <div
+            className="metilda-audio-analysis-controls-list-item-row-left-align pitch-range-minmax-row"
+            style={{ alignItems: "center", gap: "24px", flexWrap: "nowrap" }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ minWidth: "32px" }}>Min</span>
+              <input
+                aria-label="Min pitch (Hz)"
+                id="pitch-range-min-hz"
+                type="number"
+                min={MIN_HZ}
+                max={MAX_HZ}
+                step={1}
+                className="pitch-range-input"
+                value={this.state.minHz}
+                disabled={this.props.isLocked}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  this.setState({
+                    minHz: v === "" ? "" : Number(v),
+                    isDirty: true,
+                    errors: [],
+                  });
+                }}
+                onKeyDown={this.enterPressed}
+              />
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ minWidth: "32px" }}>Max</span>
+              <input
+                aria-label="Max pitch (Hz)"
+                id="pitch-range-max-hz"
+                type="number"
+                min={MIN_HZ}
+                max={MAX_HZ}
+                step={1}
+                className="pitch-range-input"
+                value={this.state.maxHz}
+                disabled={this.props.isLocked}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  this.setState({
+                    maxHz: v === "" ? "" : Number(v),
+                    isDirty: true,
+                    errors: [],
+                  });
+                }}
+                onKeyDown={this.enterPressed}
+              />
+            </div>
+          </div>
+
+          {this.state.errors.length > 0 && (
+            <div className="pitch-range-err-list">
+              {this.state.errors.map((err, index) => (
+                <p key={index} className="pitch-range-err-list-item">
+                  {err}
+                </p>
+              ))}
+            </div>
+          )}
+          <div className="pitch-range-apply-wrap">
+            <button
+              className="waves-effect waves-light btn globalbtn"
+              type="button"
+              disabled={!this.state.isDirty || this.props.isLocked}
+              onClick={this.submitMinMaxPitch}
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     let sliderValueMeT;
     if (this.props.isPitchRangeLocked && this.props.lockedMaxPitch) {
       // Thumb jumps to locked value
