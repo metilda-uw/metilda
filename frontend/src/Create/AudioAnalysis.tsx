@@ -830,6 +830,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           firebase={this.props.firebase}
         />
         <PitchRange
+          useMinMaxInputs
           initMinPitch={this.props.minPitch}
           initMaxPitch={this.props.maxPitch}
           applyPitchRange={this.applyPitchRange}
