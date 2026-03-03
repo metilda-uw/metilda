@@ -196,6 +196,45 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 anchorIdx,
             };
         };
+
+            // Keep the speaker's overall shape by translating all *unmerged* points
+            // by an offset that aligns this speaker to the current merged anchors.
+            // Merged points remain fixed to their anchor positions.
+            const translation = (() => {
+                const merged = this.props.mergedIndexes || {};
+                const deltas: Array<{ dx: number; dy: number }> = [];
+
+                for (const letterIndexStr of Object.keys(merged)) {
+                    const letterIndex = Number(letterIndexStr);
+                    if (!Number.isFinite(letterIndex)) continue;
+
+                    const mergeInfo = merged[letterIndex];
+                    const anchorIdx = mergeInfo?.anchorSpeakerIndex;
+                    if (anchorIdx === undefined || anchorIdx === null) continue;
+                    if (anchorIdx === speakerIndex) continue;
+
+                    const spLetter = speaker?.letters?.[letterIndex];
+                    const anchorLetter = this.props.speakers?.[anchorIdx]?.letters?.[letterIndex];
+                    if (!spLetter || spLetter.isWordSep) continue;
+                    if (!anchorLetter || anchorLetter.isWordSep) continue;
+
+                    const spConv = converters[speakerIndex];
+                    const anchorConv = converters[anchorIdx];
+                    if (!spConv || !anchorConv) continue;
+
+                    const spX = spConv.horzIndexToRectCoords(spLetter.t0);
+                    const spY = spConv.vertValueToRectCoords(spLetter.pitch);
+                    const anchorX = anchorConv.horzIndexToRectCoords(anchorLetter.t0);
+                    const anchorY = anchorConv.vertValueToRectCoords(anchorLetter.pitch);
+                    deltas.push({ dx: anchorX - spX, dy: anchorY - spY });
+                }
+
+                if (deltas.length === 0) return { dx: 0, dy: 0 };
+                const dx = deltas.reduce((sum, d) => sum + d.dx, 0) / deltas.length;
+                const dy = deltas.reduce((sum, d) => sum + d.dy, 0) / deltas.length;
+                return { dx, dy };
+            })();
+
             const points = [];
             const pointPairs = [];
             const lineCircles = [];
@@ -221,10 +260,20 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 let x = coordConverter.horzIndexToRectCoords(speaker.letters[i].t0);
                 let y = coordConverter.vertValueToRectCoords(speaker.letters[i].pitch);
 
-                const anchor = getAnchorXY(i);
-                if (anchor && speakerIndex !== anchor.anchorIdx) {
-                    x = anchor.x;
-                    y = anchor.y;
+                const mergeInfo = this.props.mergedIndexes?.[i];
+                if (mergeInfo) {
+                    const anchor = getAnchorXY(i);
+                    if (anchor && speakerIndex !== anchor.anchorIdx) {
+                        // merged: lock to anchor position
+                        x = anchor.x;
+                        y = anchor.y;
+                    }
+                    // if this speaker is the anchor (or anchor invalid), keep original x,y
+                    // and do not apply translation (so other merged circles remain unaffected)
+                } else {
+                    // unmerged: translate whole structure to preserve speaker shape
+                    x += translation.dx;
+                    y += translation.dy;
                 }
                 const konvaFontSizeAsPixels = this.props.fontSize * 0.65;
                 const text = speaker.letters[i].syllable;
@@ -303,8 +352,6 @@ export default class PitchArtGeometry extends React.Component<Props> {
 
                                     const stage = e.target.getStage();
                                     if (!stage) return;
-                                        // Get the absolute stage position in the page
-                                        const stageRect = stage.container().getBoundingClientRect();
                                         // Calculate coordinates relative to the stage
                                         const pos = {
                                             x: e.evt.clientX + window.scrollX ,
