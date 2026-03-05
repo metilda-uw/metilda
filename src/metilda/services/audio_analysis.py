@@ -34,8 +34,8 @@ def draw_pitch(ax, pitch, min_pitch, max_pitch):
     # replace unvoiced samples by NaN to not plot
     pitch_values = pitch.selected_array['frequency']
     pitch_values[pitch_values==0] = np.nan
-    ax.plot(pitch.xs(), pitch_values, 'o', markersize=5, color='black')
-    ax.plot(pitch.xs(), pitch_values, 'o', markersize=2, color='black')
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=4, color='#0154df')
+    ax.plot(pitch.xs(), pitch_values, 'o', markersize=1.5, color='#0154df')
     ax.grid(False)
     ax.set_ylim(min_pitch, max_pitch)
     ax.set_ylabel("fundamental frequency [Hz]")
@@ -63,7 +63,7 @@ def audio_analysis_image(upload_path,
 
     # Draw waveform
     ax1.set_xscale
-    ax1.plot(snd.xs(), snd.values.T, color='black')
+    ax1.plot(snd.xs(), snd.values.T, color='#01667F',linewidth=0.5)
     ax1.set_xlim([snd.xmin, snd.xmax])
     ax1.set_xticklabels([])
     ax1.set_ylabel("amplitude")
