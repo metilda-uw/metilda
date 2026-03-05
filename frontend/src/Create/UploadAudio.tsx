@@ -50,6 +50,14 @@ class UploadAudio extends Component <UploadAudioProps, UploadAudioState> {
         // initialize dropdowns
         var elems = document.querySelectorAll('#audioFileInput');
         M.FormSelect.init(elems, {classes: 'metilda-select-dropdown'});
+
+        // Accessibility: Materialize replaces <select> with an unlabeled
+        // <input class="select-dropdown">. Label it for screen readers.
+        document.querySelectorAll('input.select-dropdown').forEach((input) => {
+            if (!input.getAttribute('aria-label')) {
+                input.setAttribute('aria-label', 'Choose audio file');
+            }
+        });
     }
 
     sendFormSubmit(event) {

@@ -372,6 +372,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
               <div className="metilda-previous-recordings-image-col-3">
                 <button
                   className="btn-floating btn-small waves-effect waves-light globalbtn"
+                  aria-label={`Delete recording ${recordingName[recordingName.length - 1]}`}
                   onClick={() =>
                     this.handleClickDeleteRecordings(recording.itemRef)
                   }
@@ -417,7 +418,11 @@ export class WordSyllableReview extends React.Component<Props, State> {
           Enter recording name
         </DialogTitle>
         <DialogContent>
+          <label htmlFor="recording-name-input" className="sr-only">
+            Recording name
+          </label>
           <input
+            id="recording-name-input"
             className="recordingName"
             name="currentRecordingName"
             value={this.state.currentRecordingName}
@@ -809,7 +814,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
           <Typography
             align="left"
             color={"textPrimary"}
-            id="discrete-slider-small-steps"
+            id="pitch-level-slider-label"
             gutterBottom
           >
             Pitch Level
@@ -817,7 +822,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
           <ThemeProvider theme={muiTheme}>
             <Slider
               defaultValue={0}
-              aria-labelledby="discrete-slider-small-steps"
+              aria-labelledby="pitch-level-slider-label"
               valueLabelDisplay="auto"
               step={10}
               marks={true}
@@ -832,7 +837,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
           <Typography
             align="left"
             color={"textPrimary"}
-            id="discrete-slider-small-steps"
+            id="speed-level-slider-label"
             gutterBottom
           >
             Speed Level
@@ -840,7 +845,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
           <ThemeProvider theme={muiTheme}>
             <Slider
               defaultValue={1}
-              aria-labelledby="discrete-slider-small-steps"
+              aria-labelledby="speed-level-slider-label"
               valueLabelDisplay="auto"
               step={0.5}
               marks={true}
@@ -903,11 +908,18 @@ export class WordSyllableReview extends React.Component<Props, State> {
             <div className="col s4">
               {(windowWidth < 1200) ? (
               <>
-              <button onClick={this.handleControlMenuClick}>open controls</button>
+              <button
+                aria-label="Open pitch art controls"
+                onClick={this.handleControlMenuClick}
+              >
+                open controls
+              </button>
               <Modal
                   isOpen={this.state.controlsModal}
                   onRequestClose={this.handleControlMenuClose}
-                  style={this.customStyles}>
+                  style={this.customStyles}
+                  contentLabel="Pitch art controls"
+              >
               {this.renderControls(muiTheme)}
               </Modal>
               </>

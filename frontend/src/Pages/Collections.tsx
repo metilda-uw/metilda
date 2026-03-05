@@ -322,6 +322,21 @@ export default function Collections() {
     setDeleteModalIsOpen(false);
   };
 
+  const reactSelectCustomStyles = {
+    container: (prior) => ({
+      ...prior,
+      width: (windowWidth < 775) ? '90%' : '25%'
+    }),
+    placeholder: (prior) => ({
+      ...prior,
+      color: '#333333',
+    }),
+    singleValue: (prior) => ({
+      ...prior,
+      color: '#333333',
+    }),
+  };
+
   return (
     <div className="page-collections">
       <Header />
@@ -343,10 +358,8 @@ export default function Collections() {
               value={"Select a collection"}
               options={getCollectionOptions()}
               onChange={onCollectionSelectChange}
-              styles={{ container: (prior) => ({
-                ...prior,
-                width: (windowWidth < 775) ? '90%' : '25%'})
-              }}
+              aria-label="Select a collection"
+              styles={reactSelectCustomStyles}
             />
             <Box style={{ display: 'flex', flexDirection: 'row' }}>
               <button
@@ -372,10 +385,15 @@ export default function Collections() {
               isOpen={renameModalIsOpen}
               style={customStyles}
               appElement={document.getElementById("root" || undefined)}
+              contentLabel="Rename collection"
             >
               <p>Enter a new name: </p>
               <div className="col s4">
+                <label htmlFor="rename-collection-input" className="sr-only">
+                  New collection name
+                </label>
                 <input
+                  id="rename-collection-input"
                   className="collectionRename"
                   name="currentCollectionName"
                   onChange={onChangeCollectionName}
@@ -403,6 +421,7 @@ export default function Collections() {
               isOpen={deleteModalIsOpen}
               style={customStyles}
               appElement={document.getElementById("root" || undefined)}
+              contentLabel="Delete collection confirmation"
             >
               <p>Are you sure you want to delete "{selectedCollection}"</p>
               <div className="col s4">
@@ -435,8 +454,9 @@ export default function Collections() {
               justifyContent: (windowWidth < 775) ? 'center' : 'left',
             }}
           >
-            <p>Name:</p>
+            <label htmlFor="create-collection-name">Name:</label>
             <input
+              id="create-collection-name"
               className="form-collections-create-name"
               name="Collection Name"
               value={createCollectionName}
@@ -446,8 +466,9 @@ export default function Collections() {
               required
               style={{ width: (windowWidth < 775) ? '90%' : 'auto'}}
             />
-            <p className="form-collections-create-describe">Description:</p>
+            <label htmlFor="create-collection-description" className="form-collections-create-describe">Description:</label>
             <input
+              id="create-collection-description"
               className="collections-create-description"
               name="Collection Description"
               value={createCollectionDescription}
