@@ -2,8 +2,10 @@ import "./PitchRange.css";
 
 import React, { Component } from "react";
 
-const MIN_HZ = 75;
-const MAX_HZ = 500;
+const MIN_PITCH_FLOOR_HZ = 30;
+const SLIDER_MAX_HZ = 500;
+const DEFAULT_MIN_DISPLAY = 75;
+const DEFAULT_MAX_DISPLAY = 500;
 
 class PitchRange extends Component {
   constructor(props) {
@@ -15,8 +17,8 @@ class PitchRange extends Component {
 
       this.state = useMinMaxInputs
         ? {
-            minHz: Number(props.initMinPitch) || MIN_HZ,
-            maxHz: Number(props.initMaxPitch) || MAX_HZ,
+            minHz: Number(props.initMinPitch) || DEFAULT_MIN_DISPLAY,
+            maxHz: Number(props.initMaxPitch) || DEFAULT_MAX_DISPLAY,
             errors: [],
             isDirty: false,
           }
@@ -30,8 +32,9 @@ class PitchRange extends Component {
       this.submitMinMaxPitch = this.submitMinMaxPitch.bind(this);
   }
 
-  SLIDER_MIN_HZ = MIN_HZ;
-  SLIDER_MAX_HZ = MAX_HZ;
+  /** Pitch art slider: fixed min 75 Hz, max 500 Hz (reverted from 30 for drag line). */
+  SLIDER_MIN_HZ = 75;
+  SLIDER_MAX_HZ = 500;
 
   getSliderMinMeT = () => this.hzToMeT(this.SLIDER_MIN_HZ);
   getSliderMaxMeT = () => this.hzToMeT(this.SLIDER_MAX_HZ);
@@ -43,8 +46,8 @@ class PitchRange extends Component {
     ) {
       if (this.props.useMinMaxInputs) {
         this.setState({
-          minHz: Number(this.props.initMinPitch) || MIN_HZ,
-          maxHz: Number(this.props.initMaxPitch) || MAX_HZ,
+          minHz: Number(this.props.initMinPitch) || DEFAULT_MIN_DISPLAY,
+          maxHz: Number(this.props.initMaxPitch) || DEFAULT_MAX_DISPLAY,
           errors: [],
           isDirty: false,
         });
@@ -92,11 +95,11 @@ class PitchRange extends Component {
     const minHz = Number(this.state.minHz);
     const maxHz = Number(this.state.maxHz);
 
-    if (Number.isNaN(minHz) || minHz < MIN_HZ || minHz > MAX_HZ) {
-      errors.push(`Min pitch must be between ${MIN_HZ} and ${MAX_HZ} Hz`);
+    if (Number.isNaN(minHz) || minHz < MIN_PITCH_FLOOR_HZ) {
+      errors.push(`Min pitch must be at least ${MIN_PITCH_FLOOR_HZ} Hz`);
     }
-    if (Number.isNaN(maxHz) || maxHz < MIN_HZ || maxHz > MAX_HZ) {
-      errors.push(`Max pitch must be between ${MIN_HZ} and ${MAX_HZ} Hz`);
+    if (Number.isNaN(maxHz) || maxHz < MIN_PITCH_FLOOR_HZ) {
+      errors.push(`Max pitch must be at least ${MIN_PITCH_FLOOR_HZ} Hz`);
     }
     if (errors.length === 0 && minHz >= maxHz) {
       errors.push("Min pitch must be less than max pitch");
@@ -134,8 +137,7 @@ class PitchRange extends Component {
                 aria-label="Min pitch (Hz)"
                 id="pitch-range-min-hz"
                 type="number"
-                min={MIN_HZ}
-                max={MAX_HZ}
+                min={MIN_PITCH_FLOOR_HZ}
                 step={1}
                 className="pitch-range-input"
                 value={this.state.minHz}
@@ -158,8 +160,7 @@ class PitchRange extends Component {
                 aria-label="Max pitch (Hz)"
                 id="pitch-range-max-hz"
                 type="number"
-                min={MIN_HZ}
-                max={MAX_HZ}
+                min={MIN_PITCH_FLOOR_HZ}
                 step={1}
                 className="pitch-range-input"
                 value={this.state.maxHz}
