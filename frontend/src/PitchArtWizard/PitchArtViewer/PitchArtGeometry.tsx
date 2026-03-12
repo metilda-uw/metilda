@@ -47,6 +47,7 @@ interface Props {
 }
 
 export default class PitchArtGeometry extends React.Component<Props> {
+
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -54,7 +55,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
             contextMenuX: 0,
             contextMenuY: 0,
             contextMenuSpeakerIndex: null,
-            contextMenuLetterIndex: null
+            contextMenuLetterIndex: null,
+            textOffsets: {},
         };
     }
 
@@ -278,12 +280,32 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 const konvaFontSizeAsPixels = this.props.fontSize * 0.65;
                 const text = speaker.letters[i].syllable;
     
+                const textOffsetKey = `${speakerIndex}-${i}`;
+                const savedOffset = (this.state as any).textOffsets?.[textOffsetKey] || { dx: 0, dy: 0 };
+                const baseTextX = x - (konvaFontSizeAsPixels * text.length / 2.0);
+                const baseTextY = y + circleRadius * 1.9;
                 letterSyllables.push(
-                    <Text key={i}
-                          x={x - (konvaFontSizeAsPixels * text.length / 2.0)}
-                          y={y + circleRadius * 1.9}  // position text below the pitch circle
+                    <Text key={`text-${speakerIndex}-${i}`}
+                          x={baseTextX + savedOffset.dx}
+                          y={baseTextY + savedOffset.dy}
                           fontSize={this.props.fontSize}
-                          text={text}/>
+                          text={text}
+                          fill="#000"
+                          draggable={true}
+                          onDragEnd={(e) => {
+                              const node = e.target;
+                              const newDx = node.x() - baseTextX;
+                              const newDy = node.y() - baseTextY;
+                              this.setState((prev: any) => ({
+                                  textOffsets: {
+                                      ...prev.textOffsets,
+                                      [textOffsetKey]: { dx: newDx, dy: newDy },
+                                  },
+                              }));
+                          }}
+                          onMouseEnter={() => this.props.setPointerEnabled(true)}
+                          onMouseLeave={() => this.props.setPointerEnabled(false)}
+                    />
                 );
     
                 let circleFill = this.props.colorSchemes[speakerIndex].praatDotFillColor;
@@ -318,6 +340,10 @@ export default class PitchArtGeometry extends React.Component<Props> {
                                 onClick={(e) => {
                                     if (e.evt.button === 2) return;
                                     this.props.playSound(currPitch);
+                                    // notify Melody bar to select this segment
+                                    window.dispatchEvent(new CustomEvent('pitchArtDotClicked', {
+                                        detail: { speakerIndex, letterIndex: i }
+                                    }));
                                 }}
                                 onMouseEnter={() => this.props.setPointerEnabled(true)}
                                 onMouseLeave={() => this.props.setPointerEnabled(false)}
