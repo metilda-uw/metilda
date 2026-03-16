@@ -103,3 +103,33 @@
   width: 50%;
   margin: 4px;
 }
+
+.collection-word-list {
+  list-style: none !important;
+  padding-left: 0;
+}
+
+.collection-word-list-item {
+  list-style: none !important;
+  display: contents;
+}
+
+.card .card-content p {
+  color: #333333;
+}
+
+.card .card-content .card-title {
+  color: #1a1a1a;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

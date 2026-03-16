@@ -177,6 +177,18 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.selectedContourElements = [];
   }
 
+  componentDidMount() {
+    // Accessibility: label hidden file inputs rendered by FileReaderInput
+    const container = document.querySelector('.TargetPitchBar');
+    if (container) {
+      container.querySelectorAll('input[type="file"]').forEach((input) => {
+        if (!input.getAttribute('aria-label')) {
+          input.setAttribute('aria-label', 'Open analysis file');
+        }
+      });
+    }
+  }
+
   componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
   }
@@ -600,13 +612,14 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
           (Supported Formats: json)
         </DialogTitle>
         <DialogContent>
-          <input
+           <input
             className="analysisName"
             name="currentAnalysisName"
             value={this.state.currentAnalysisName}
             onChange={this.onChange}
             type="text"
             placeholder={'Ex: "Analysis1.json" or "Analysis1"'}
+            aria-label="Analysis name"
             required
           />
         </DialogContent>

@@ -185,9 +185,13 @@ class CreatePitchArt extends React.Component<
     this.loadUserPitchArtSettings();
     // event listener for window resize
     window.addEventListener("resize", this.setWindowWidth)
+    // Accessibility: label hidden file inputs rendered by ReactFileReader
+    // and react-file-reader-input (no aria-label prop support)
+    document.querySelectorAll('input[type="file"]:not([aria-label])').forEach((input) => {
+      input.setAttribute('aria-label', 'Upload audio file');
+    });
   }
   componentDidUpdate(prevProps) {
-
     if (this.props.currentUserRole != null && !canUserVisitCreatePitchArtpPage(this.props.currentUserRole)) {
       this.props.history.push('/home');
       return;

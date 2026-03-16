@@ -120,6 +120,11 @@ label{
   // Below padding was causing uncentered text issues in the buttons.
   // padding: 10px 20px; /* Adjust values as needed */
   white-space: nowrap; /* Prevent text from wrapping */
+  background-color: #00796b !important;
+}
+
+.globalbtn:hover {
+  background-color: #00695c !important;
 }
 
 h1{
