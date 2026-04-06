@@ -220,12 +220,22 @@ interface OptionalProps {
     speakerIndex?: number;
     speakers?: Speaker[];
     firebase?: any;
+    maxPitch?: number;
+    minPitch?: number;
+    userEmail?: string;
     addSpeaker?: () => void;
     removeSpeaker?: (speakerIndex: number) => void;
     resetLetters?: (speakerIndex: number) => void;
-    setUploadId?: (speakerIndex: number, uploadId: string) => void;
+    setUploadId?: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
     addLetter?: (speakerIndex: number, letter: Letter) => void;
     setLetterPitch?: (speakerIndex: number, letterIndex: number, pitch: number) => void;
+    setSpeakerName?: (speakerIndex: number, speakerName: string) => void;
+    setWord?: (speakerIndex: number, word: string) => void;
+    setWordTranslation?: (speakerIndex: number, wordTranslation: string) => void;
+    setWordTime?: (speakerIndex: number, time: number) => void;
+    parentCallBack?: (selectedFolderName: string) => void;
+    updateAudioPitch?: (index: number, minPitch: number, maxPitch: number) => void;
+    setAudioUrl?: (url: string) => void;
 }
 
 function shallowRender(props: OptionalProps) {
@@ -238,12 +248,22 @@ function makeProps(props: OptionalProps): AudioAnalysisProps {
         firebase: props.firebase || undefined,
         speakerIndex: props.speakerIndex || 0,
         speakers: props.speakers || [],
+        maxPitch: props.maxPitch ?? 500,
+        minPitch: props.minPitch ?? 75,
+        userEmail: props.userEmail ?? "",
         addSpeaker: props.addSpeaker || fakeAddSpeaker,
         resetLetters: props.resetLetters || fakeResetLetter,
         removeSpeaker: props.removeSpeaker || fakeRemoveSpeaker,
         setUploadId: props.setUploadId || fakeSetUploadId,
         addLetter: props.addLetter || fakeAddLetter,
-        setLetterPitch: props.setLetterPitch || fakeSetLetterPitch
+        setLetterPitch: props.setLetterPitch || fakeSetLetterPitch,
+        setSpeakerName: props.setSpeakerName || (() => undefined),
+        setWord: props.setWord || (() => undefined),
+        setWordTranslation: props.setWordTranslation || (() => undefined),
+        setWordTime: props.setWordTime || (() => undefined),
+        parentCallBack: props.parentCallBack || (() => undefined),
+        updateAudioPitch: props.updateAudioPitch || (() => undefined),
+        setAudioUrl: props.setAudioUrl || (() => undefined),
     };
 }
 
@@ -259,7 +279,7 @@ function fakeRemoveSpeaker(speakerIndex: number) {
     // do nothing
 }
 
-function fakeSetUploadId(speakerIndex: number, uploadId: string) {
+function fakeSetUploadId(speakerIndex: number, uploadId: string, _fileIndex: number) {
     // do nothing
 }
 

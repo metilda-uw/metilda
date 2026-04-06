@@ -150,7 +150,7 @@ export class StudentsInfo extends React.Component <StudentsInfoProps, State> {
                   isOpen = {(this.state.infoOpenID === student.name)}
                   onRequestClose={this.handleInfoClose}
                   style={this.customStyles}
-                  appElement={document.getElementById("root" || undefined)}
+                  appElement={document.getElementById("root") || undefined}
                 >
                   <div>Student Name: {student.name}</div>
                   <div>Email: {student.email}</div>

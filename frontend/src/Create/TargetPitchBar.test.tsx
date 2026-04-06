@@ -169,9 +169,15 @@ function shallowRender(props: OptionalProps) {
 }
 
 function makeProps(props: OptionalProps): TargetPitchBarProps {
+    const speakers = props.speakers || [arbitrarySpeaker({letters: [arbitraryLetter()]})];
+    const speakerIndex = props.speakerIndex || 0;
     return {
-        speakers: props.speakers || [arbitrarySpeaker({letters: [arbitraryLetter()]})],
-        speakerIndex: props.speakerIndex || 0,
+        speakers,
+        speakerIndex,
+        letters: speakers[speakerIndex]?.letters ?? [],
+        files: [],
+        firebase: undefined,
+        typeOfBeat: "Melody",
         minAudioTime: props.minAudioTime || 0,
         maxAudioTime: props.maxAudioTime || 0,
         minAudioX: props.minAudioX || 0,
@@ -180,5 +186,10 @@ function makeProps(props: OptionalProps): TargetPitchBarProps {
         removeLetter: props.removeLetter || (() => undefined),
         resetLetters: props.resetLetters || (() => undefined),
         setLetterSyllable: props.setLetterSyllable || (() => undefined),
+        setUploadId: () => undefined,
+        setLetterTime: () => undefined,
+        setLatestAnalysisId: () => undefined,
+        setSpeaker: () => undefined,
+        verticalLines: [],
     };
 }

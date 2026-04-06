@@ -2,6 +2,7 @@
 
 # css output (from SASS compilation)
 /src/**/*.css
+/src/**/*.css.map
 
 # dependencies
 /node_modules

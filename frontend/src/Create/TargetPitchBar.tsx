@@ -17,7 +17,7 @@ import { AudioAction } from "../store/audio/types";
 import { Letter, Speaker } from "../types/types";
 import AudioLetter from "./AudioLetter";
 import fileDownload from "js-file-download";
-import FileReaderInput, { Result } from "react-file-reader-input";
+import FileReaderInputImport, { Result } from "react-file-reader-input";
 import {
   uploadAnalysis,
   updateAnalysis,
@@ -43,7 +43,11 @@ import UpdateSyllable from "./UpdateSyllable";
 import './TargetPitchBar.scss';
 import * as DEFAULT from "../constants/create";
 
-//import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
+const FileReaderInput = FileReaderInputImport as React.ComponentType<{
+  as?: "buffer" | "binary" | "url" | "text";
+  onChange: (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => void;
+  children?: React.ReactNode;
+}>;
 
 export interface TargetPitchBarProps {
   letters: any;

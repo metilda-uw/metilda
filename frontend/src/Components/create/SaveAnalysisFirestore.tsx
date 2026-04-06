@@ -517,7 +517,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           <Modal
             isOpen={updateModalIsOpen || isSaveAsNewVersionModalOpen}
             style={customStyles}
-            appElement={document.getElementById("root" || undefined)}
+            appElement={document.getElementById("root") || undefined}
           >
             <p> Enter the updated details:</p>
             <input
@@ -570,7 +570,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           <Modal
             isOpen={deleteModalIsOpen}
             style={customStyles}
-            appElement={document.getElementById("root" || undefined)}
+            appElement={document.getElementById("root") || undefined}
           >
             <p> Do you want to delete the Pitch Art?</p>
             <div className="collectionRename-cancel-save">
@@ -591,7 +591,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
           <Modal
             isOpen={deleteParentPitchArtModal}
             style={customStyles}
-            appElement={document.getElementById("root" || undefined)}
+            appElement={document.getElementById("root") || undefined}
           >
             <p> Deleting original pitch art will delete all its versions</p>
             <div className="collectionRename-cancel-save">
@@ -636,7 +636,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         <Modal
           isOpen={saveModalIsOpen}
           style={customStyles}
-          appElement={document.getElementById("root" || undefined)}
+          appElement={document.getElementById("root") || undefined}
         >
           <p> Do you want to save the Pitch Art to {selectedCollection} ?</p>
           <p> Enter the following details:</p>
@@ -688,7 +688,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
         <Modal
           isOpen={createModalIsOpen}
           style={customStyles}
-          appElement={document.getElementById("root" || undefined)}
+          appElement={document.getElementById("root") || undefined}
         >
           <form
             onSubmit={handleCreateCollection}
