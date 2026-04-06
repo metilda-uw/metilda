@@ -383,7 +383,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
                   isOpen={(this.state.infoOpenID === file.id)}
                   onRequestClose={this.handleInfoClose}
                   style={this.customStyles}
-                  appElement={document.getElementById("root" || undefined)}
+                  appElement={document.getElementById("root") || undefined}
                 >
                       {file.type === "Upload" && (
                         <>
@@ -793,7 +793,7 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
                   <Modal
                     isOpen={this.state.shareModal}
                     style={this.customStyles}
-                    appElement={document.getElementById("root" || undefined)}
+                    appElement={document.getElementById("root") || undefined}
                   >
                     <p> Enter email id to share with:</p>
                     <input

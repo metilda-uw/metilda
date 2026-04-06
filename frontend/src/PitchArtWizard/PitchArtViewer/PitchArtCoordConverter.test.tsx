@@ -46,7 +46,9 @@ describe("PitchArtCoordConverter", () => {
                     y0: 5,
                     x0: 10,
                     dMin: 0,
-                    dMax: 500
+                    dMax: 500,
+                    tMin: 0,
+                    tMax: 4,
                 };
 
                 pitchValues = [
@@ -108,7 +110,9 @@ describe("PitchArtCoordConverter", () => {
                 y0: 5,
                 x0: 10,
                 dMin: 1,
-                dMax: 10
+                dMax: 10,
+                tMin: 0,
+                tMax: 4,
             };
 
             const subject = new PitchArtCoordConverter(

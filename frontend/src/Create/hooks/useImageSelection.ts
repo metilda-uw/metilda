@@ -9,7 +9,7 @@ interface Speaker {
   uploadId: string;
 }
 
-export const useImageSelection = () => {
+export const createImageSelectionHelpers = () => {
   const imageIntervalToTimeInterval = (
     x1: number, 
     x2: number, 

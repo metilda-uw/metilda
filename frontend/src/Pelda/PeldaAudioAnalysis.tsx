@@ -816,7 +816,7 @@ export class PeldaAudioAnalysis extends React.Component<PeldaAudioAnalysisProps,
                             <label className="group-label">EAF File</label>
                             <div className="metilda-audio-analysis-controls-list-item-row">
                                 <select id="audioFileInput" value={this.state.selectedEafId}
-                                className="eafFileName" placeholder="Choose eaf file"
+                                className="eafFileName"
                                 onChange={async (event) => await this.setState( {selectedEafId: event.target.value})}>
                                     <option value={"-1"} disabled>Choose eaf file</option>
                                     {availableEafFilesList}

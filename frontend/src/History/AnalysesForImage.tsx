@@ -135,7 +135,7 @@ export class AnalysesForImage extends React.Component < AnalysesForImageProps, S
               isOpen={(this.state.infoOpenID === analysis.data.uploadId)}
               onRequestClose={this.handleInfoClose}
               style={this.customStyles}
-              appElement={document.getElementById("root" || undefined)}
+              appElement={document.getElementById("root") || undefined}
             >
               <div>Analysis Letters:</div>
               <div>{analysis.data.letters.map((item: any, i: any) => {

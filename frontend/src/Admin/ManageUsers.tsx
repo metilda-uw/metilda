@@ -331,7 +331,7 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
                   isOpen={(this.state.infoOpenID === user.id)}
                   onRequestClose={this.handleInfoClose}
                   style={this.customStyles}
-                  appElement={document.getElementById("root" || undefined)}
+                  appElement={document.getElementById("root") || undefined}
                 >
                   <div>Role: {user.role}</div>
                   <div>Research Language: {user.researchLanguage}</div>

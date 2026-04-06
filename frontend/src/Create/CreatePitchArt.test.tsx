@@ -5,7 +5,7 @@ import {expect} from "../setupTests";
 import {arbitrarySpeaker} from "../testSupport/arbitraryObjects";
 import {Speaker} from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
-import {CreatePitchArt, CreatePitchArtProps} from "./CreatePitchArt";
+import CreatePitchArt from "./CreatePitchArt";
 import Firebase from "../Firebase/firebase";
 
 const firebase = new Firebase();
@@ -49,12 +49,12 @@ function shallowRender(props: OptionalProps) {
     return shallow(<CreatePitchArt {...makeProps(props)} />);
 }
 
-function makeProps(props: OptionalProps): CreatePitchArtProps {
+function makeProps(props: OptionalProps) {
     return {
         speakers: props.speakers || [],
         setLetterPitch: props.setLetterPitch || fakeSetLetterPitch,
         firebase: props.firebase
-    };
+    } as React.ComponentProps<typeof CreatePitchArt>;
 }
 
 function fakeSetLetterPitch(speakerIndex: number, letterIndex: number, newPitch: number) {

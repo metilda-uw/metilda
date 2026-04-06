@@ -63,6 +63,7 @@ function shallowRender(props: OptionalProps) {
 
 function makeProps(props: OptionalProps): PitchArtLegendProps {
     return {
-        speakers: props.speakers || []
+        speakers: props.speakers || [],
+        firebase: undefined,
     };
 }
