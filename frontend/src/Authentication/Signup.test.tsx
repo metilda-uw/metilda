@@ -36,8 +36,8 @@ describe("Signup", () => {
     const passwordOne = subject.find("input").get(2).props.value;
     const passwordTwo = subject.find("input").get(2).props.value;
     const institution = subject.find("input").get(3).props.value;
-    const researchLanguage = subject.find(".language_Options").props();
-    const role = subject.find(".roles_Options").props();
+    const researchLanguage = subject.find(".language_Options").props() as unknown as { options: typeof languageOptions; value: unknown[] };
+    const role = subject.find(".roles_Options").props() as unknown as { options: typeof roleOptions; value: unknown[] };
     expect(username).to.equal("");
     expect(email).to.equal("");
     expect(passwordOne).to.equal("");

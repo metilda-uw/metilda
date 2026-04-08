@@ -1,9 +1,8 @@
-import app from "firebase/app";
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/database";
-import "firebase/firestore";
-import "firebase/storage";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/database";
+import "firebase/compat/firestore";
+import "firebase/compat/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBO-NeTgR5i13a4fawJylwyoOfTXigvYmU",
@@ -23,9 +22,9 @@ class Firebase {
   realtimedb: any;
 
   constructor() {
-    app.initializeApp(firebaseConfig);
-    this.auth = app.auth();
-    this.storage = app.storage();
+    firebase.initializeApp(firebaseConfig);
+    this.auth = firebase.auth();
+    this.storage = firebase.storage();
     this.firestore = firebase.firestore();
     this.timestamp = firebase.firestore.Timestamp;
     this.realtimedb = firebase.database();

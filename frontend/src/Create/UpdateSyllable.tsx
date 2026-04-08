@@ -50,6 +50,7 @@ export interface UpdateSyllableProps {
     currentT0: number;
     currentT1: number;
     saveSyllable: (syllable: string, t0: number, t1: number) => void;
+    removeSyllable?: () => void;
     handleClose: () => void;
 }
 
@@ -111,15 +112,15 @@ render() {
    
     return(
         <Dialog fullWidth={true} maxWidth="xs" open={this.props.showEditSyllableModal}
-                onClose={this.props.handleClose}aria-labelledby="form-dialog-title">
+                onClose={this.props.handleClose} aria-labelledby="form-dialog-title">
 
         <DialogTitle onClose={this.props.handleClose} id="form-dialog-title">
-            <p>Syllable Details</p>
+            <p>Selected Range</p>
         </DialogTitle>
         <DialogContent>
         <div className="row">
           <div className="col s4">
-            <p>Syllable:</p>
+            <p>text:</p>
           </div>
           <div className="col s4">
             <input 
@@ -136,6 +137,13 @@ render() {
           
         </DialogContent>
         <DialogActions>
+            {this.props.removeSyllable && (
+              <button className="RemoveSyllable waves-effect waves-light btn globalbtn"
+                onClick={this.props.removeSyllable}
+                style={{ marginRight: "auto" }}>
+                  Remove
+              </button>
+            )}
             <button className="SaveSyllable waves-effect waves-light btn globalbtn"
             onClick={() => this.props.saveSyllable(this.state.currentSyllable, 
                             this.state.currentT0, this.state.currentT1)}>

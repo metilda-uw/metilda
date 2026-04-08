@@ -1,9 +1,9 @@
 {
   "engines": {
-    "node": "14.18.2"
+    "node": "24.x"
   },
   "scripts": {
-    "heroku-prebuild": "cd frontend && npm ci && npm run build --verbose"
+    "heroku-prebuild": "cd frontend && npm ci --include=dev && npm run build --verbose"
   },
   "dependencies": {
     "axios": "^1.7.8"

@@ -17,7 +17,7 @@ import { AudioAction } from "../store/audio/types";
 import { Letter, Speaker } from "../types/types";
 import AudioLetter from "./AudioLetter";
 import fileDownload from "js-file-download";
-import FileReaderInput, { Result } from "react-file-reader-input";
+import FileReaderInputImport, { Result } from "react-file-reader-input";
 import {
   uploadAnalysis,
   updateAnalysis,
@@ -43,7 +43,11 @@ import UpdateSyllable from "./UpdateSyllable";
 import './TargetPitchBar.scss';
 import * as DEFAULT from "../constants/create";
 
-//import SaveAnalysisFireStore from "./SaveAnalysisFirestore";
+const FileReaderInput = FileReaderInputImport as React.ComponentType<{
+  as?: "buffer" | "binary" | "url" | "text";
+  onChange: (event: React.ChangeEvent<HTMLInputElement>, results: Result[]) => void;
+  children?: React.ReactNode;
+}>;
 
 export interface TargetPitchBarProps {
   letters: any;
@@ -175,10 +179,23 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.initialX = 0;
     this.initialY = 0;
     this.selectedContourElements = [];
+    this.handlePitchArtDotClicked = this.handlePitchArtDotClicked.bind(this);
+  }
+  
+  componentDidMount() {
+    window.addEventListener('pitchArtDotClicked', this.handlePitchArtDotClicked as EventListener);
   }
 
   componentWillUnmount() {
     document.removeEventListener('click', this.handleDocumentClick);
+    window.removeEventListener('pitchArtDotClicked', this.handlePitchArtDotClicked as EventListener);
+  }
+
+  handlePitchArtDotClicked(event: CustomEvent) {
+    const { speakerIndex, letterIndex } = event.detail;
+    if (speakerIndex === this.props.speakerIndex && letterIndex >= 0) {
+      this.targetPitchSelected(letterIndex);
+    }
   }
 
   resetAllLettersEvent() {
@@ -243,7 +260,11 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
   }
 
   targetPitchSelected(letterIndex: number) {
-    this.setState({ selectedIndex: letterIndex });
+    this.setState({ selectedIndex: letterIndex }, () => {
+      if (letterIndex >= 0) {
+        this.setState({ showEditSyllableModal: true });
+      }
+    });
     this.props.targetPitchSelected(letterIndex);
   }
 
@@ -357,6 +378,7 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
             ].t1
           }
           saveSyllable={this.saveSyllable}
+          removeSyllable={this.handleRemoveFromModal}
           handleClose={this.handleCloseEditSyllableModal}
         ></UpdateSyllable>
       );
@@ -382,6 +404,18 @@ export class TargetPitchBar extends Component<TargetPitchBarProps, State> {
     this.setState({
       showEditSyllableModal: true,
     });
+  };
+
+  // Handle remove action triggered from the Selected Range popup
+  handleRemoveFromModal = () => {
+    this.handleCloseEditSyllableModal();
+    const letters = this.props.speakers[this.props.speakerIndex].letters;
+    const letter = letters[this.state.selectedIndex];
+    if (letter != null && letter.isContour) {
+      this.setState({ showDeleteLetterModal: true });
+    } else {
+      this.removeLetterEvent();
+    }
   };
 
   removeSyllableEvent = () =>{

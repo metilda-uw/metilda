@@ -11,7 +11,7 @@ interface Props {
   history: any;
 }
 
-const withAuthorization = (condition: any) => (Component: React.FC) => {
+const withAuthorization = (condition: any) => (Component: React.ComponentType<any>) => {
   class WithAuthorization extends React.Component<Props> {
     private listener: any;
     componentDidMount() {

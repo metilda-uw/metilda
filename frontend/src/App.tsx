@@ -4,9 +4,9 @@ import "./App.scss";
 import * as React from "react";
 import { Router, Route } from "react-router-dom";
 import { Redirect, Switch } from "react-router-dom";
-import "firebase/auth";
-import "firebase/firestore";
-import firebase from "firebase/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import firebase from "firebase/compat/app";
 import ReactGA from "react-ga";
 
 import { withAuthentication } from "./Session";
@@ -35,17 +35,16 @@ import LearnNew from "./Pages/LearnNew";
 import Feedback from "./Feedback/Feedback";
 import Thankyou from "./Feedback/ThankYou";
 import NotificationsComponent from "./Notifications/Notifications";
-
-const LazyTermsOfUseContent = React.lazy(() => import('./Authentication/terms_of_use_content'));
 import TermsOfUseContent from "./Authentication/terms_of_use_content";
 import DocumentationContent from "./Authentication/Documentation";
-// import Word from "./Components/collections/Word";
 import { ThunkDispatch } from "redux-thunk";
 import { AppActions } from "./store/appActions";
 import { setCurrentUserRole } from "./store/userDetails/actions";
 import { connect } from "react-redux";
 import { AppState } from "./store";
 import * as constants from "./constants";
+
+const LazyTermsOfUseContent = React.lazy(() => import('./Authentication/terms_of_use_content'));
 
 interface Props {
   firebase: any;

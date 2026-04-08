@@ -11,7 +11,7 @@ interface State {
   authUser: any;
 }
 
-const withAuthentication = (Component: React.FC) => {
+const withAuthentication = (Component: React.ComponentType<any>) => {
   class WithAuthentication extends React.Component<Props, State> {
     private listener: any;
     constructor(props: any) {
