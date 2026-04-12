@@ -24,7 +24,7 @@ export const replaceSpeakers = (speakers: Speaker[]):
 export const addSpeaker = (): ActionReturn => (dispatch: Dispatch, getState) => {
   const speakers = getState().audio.speakers;
   const newSpeakers = update(speakers, {
-    $push: [{ uploadId: "", letters: [], speakerName: "Spearker", word: "Word", wordTranslation: "Word Translation" , lineColor:chooseColor(speakers,true),
+    $push: [{ uploadId: "", letters: [], speakerName: "", word: "Word", wordTranslation: "Word Translation" , lineColor:chooseColor(speakers,true),
   dotColor:chooseColor(speakers,false)}],
   });
   dispatch({

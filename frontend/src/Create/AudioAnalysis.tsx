@@ -942,7 +942,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
 
     if (speakerName === undefined) {
-      this.props.setSpeakerName(this.props.speakerIndex, "Speaker");
+      this.props.setSpeakerName(this.props.speakerIndex, "");
     }
     if (word === undefined) {
       this.props.setWord(this.props.speakerIndex, "Word");

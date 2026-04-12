@@ -286,7 +286,7 @@ class PitchArtContainer extends React.Component<Props, State> {
         return (
           <>
             {(windowWidth <= 1000) ? this.renderPopupOptionList() : <></>}
-            <div>
+            <div className={windowWidth > 1000 ? "pitchart-desktop-layout" : ""}>
                 {(windowWidth > 1000) ? this.renderOptionList() : <></>}
                 <div className="col s7" style={{ paddingTop: "15px"}}>
                     <PitchArt

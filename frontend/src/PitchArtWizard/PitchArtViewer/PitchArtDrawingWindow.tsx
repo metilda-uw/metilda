@@ -88,6 +88,7 @@ type MergedIndexesMap = {
 
 interface State {
   activePlayIndex: number;
+  activePlaySpeakerIndex: number;
   showNewImageModal: boolean;
   currentImageName: string;
   allAnalysisIds: any[];
@@ -184,6 +185,7 @@ export class PitchArtDrawingWindow extends React.Component<
     super(props);
     this.state = {
       activePlayIndex: -1,
+      activePlaySpeakerIndex: -1,
       showNewImageModal: false,
       allAnalysisIds: [],
       currentImageName: "",
@@ -220,15 +222,30 @@ export class PitchArtDrawingWindow extends React.Component<
     this.fontSize = 16;
   }
 
+  handlePlaySpeakerEvent = (e: Event) => {
+    const detail = (e as CustomEvent).detail;
+    if (detail && typeof detail.speakerIndex === "number") {
+      this.playPitchArt(detail.speakerIndex);
+    }
+  };
+
   componentDidMount() {
     const stage = this.stageRef.current;
-    if (!stage) return;
+    if (stage) {
+      const container = stage.getStage().container();
+      container.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+      });
+    }
+    if (this.props.showDynamicContent) {
+      document.addEventListener("pitchArtPlaySpeaker", this.handlePlaySpeakerEvent);
+    }
+  }
 
-    const container = stage.getStage().container();
-
-    container.addEventListener("contextmenu", (e) => {
-      e.preventDefault();
-    });
+  componentWillUnmount() {
+    if (this.props.showDynamicContent) {
+      document.removeEventListener("pitchArtPlaySpeaker", this.handlePlaySpeakerEvent);
+    }
   }
 
   downloadImage = () => {
@@ -444,12 +461,30 @@ export class PitchArtDrawingWindow extends React.Component<
     });
   };
 
-  playPitchArt() {
-    if (this.props.speakers.length !== 1) {
+  playPitchArt(targetSpeakerIndex?: number) {
+    const hidden = this.state.hiddenSpeakerIndices || [];
+    const visibleSpeakers: Array<{ speakerIndex: number; letters: Letter[] }> =
+      targetSpeakerIndex !== undefined
+        ? (this.props.speakers[targetSpeakerIndex] &&
+           this.props.speakers[targetSpeakerIndex].letters.length > 0
+            ? [{
+                speakerIndex: targetSpeakerIndex,
+                letters: this.props.speakers[targetSpeakerIndex].letters,
+              }]
+            : [])
+        : this.props.speakers
+            .map((sp, i) => ({ speakerIndex: i, letters: sp.letters }))
+            .filter(({ speakerIndex, letters }) =>
+              !hidden.includes(speakerIndex) && letters.length > 0
+            );
+
+    if (visibleSpeakers.length === 0) {
       return;
     }
 
-    const letters: Letter[] = this.props.speakers[0].letters;
+    Tone.Transport.stop();
+    Tone.Transport.cancel();
+
     const env = new Tone.AmplitudeEnvelope({
       attack: 0.001,
       decay: 0.001,
@@ -463,38 +498,57 @@ export class PitchArtDrawingWindow extends React.Component<
       rolloff: -48,
     }).toMaster();
 
-    // var synth = new window.Tone.Synth().toMaster().chain(filter, env);
     const synth = new Tone.Synth().toMaster().chain(filter, env);
 
-    const tStart = letters.length > 0 ? letters[0].t0 : 0;
-    const tEnd = letters.length > 0 ? letters[letters.length - 1].t1 : 0;
-    const totalDuration = tEnd - tStart;
-    const n = letters.length;
     const showTimeNormalization = this.props.showTimeNormalization;
 
     interface PitchArtNote {
       time: number;
       index: number;
+      speakerIndex: number;
       duration: number;
       pitch: number;
     }
 
-    const notes = letters.map((item, index) => {
-      const time = showTimeNormalization && n > 1
-        ? (index / (n - 1)) * totalDuration
-        : item.t0 - tStart;
-      const duration = showTimeNormalization
-        ? Math.min(0.2, totalDuration / Math.max(1, n))
-        : item.t1 - item.t0;
-      return {
-        time,
-        duration,
-        pitch: item.pitch,
-        index,
-      } as PitchArtNote;
+    const SPEAKER_GAP_SECONDS = 0.4;
+    const notes: PitchArtNote[] = [];
+    let cumulativeOffset = 0;
+
+    for (const sp of visibleSpeakers) {
+      const letters = sp.letters;
+      const tStart = letters[0].t0;
+      const tEnd = letters[letters.length - 1].t1;
+      const totalDuration = tEnd - tStart;
+      const n = letters.length;
+
+      letters.forEach((item, index) => {
+        const time = showTimeNormalization && n > 1
+          ? (index / (n - 1)) * totalDuration
+          : item.t0 - tStart;
+        const duration = showTimeNormalization
+          ? Math.min(0.2, totalDuration / Math.max(1, n))
+          : item.t1 - item.t0;
+        notes.push({
+          time: cumulativeOffset + time,
+          duration,
+          pitch: item.pitch,
+          index,
+          speakerIndex: sp.speakerIndex,
+        });
+      });
+
+      const speakerEndTime = showTimeNormalization && n > 1 ? totalDuration : tEnd - tStart;
+      cumulativeOffset += speakerEndTime + SPEAKER_GAP_SECONDS;
+    }
+
+    notes.push({
+      time: cumulativeOffset,
+      duration: 1,
+      pitch: 1,
+      index: -1,
+      speakerIndex: -1,
     });
-    const endTime = showTimeNormalization && n > 1 ? totalDuration : tEnd - tStart;
-    notes.push({ time: endTime, duration: 1, pitch: 1, index: -1 });
+
     const controller = this;
 
     // @ts-ignore
@@ -502,7 +556,10 @@ export class PitchArtDrawingWindow extends React.Component<
       time: Encoding.Time,
       note: PitchArtNote
     ) {
-      controller.setState({ activePlayIndex: note.index });
+      controller.setState({
+        activePlayIndex: note.index,
+        activePlaySpeakerIndex: note.speakerIndex,
+      });
       if (note.index !== -1) {
         synth.triggerAttackRelease(note.pitch, note.duration, time);
       }
@@ -878,9 +935,8 @@ export class PitchArtDrawingWindow extends React.Component<
             setLetterPitch={this.props.setLetterPitch}
             colorSchemes={colorSchemes}
             playSound={this.playSound}
-            activePlayIndex={
-              this.props.speakers.length === 1 ? this.state.activePlayIndex : -1
-            }
+            activePlayIndex={this.state.activePlayIndex}
+            activePlaySpeakerIndex={this.state.activePlaySpeakerIndex}
             showDynamicContent={this.props.showDynamicContent}
             showArtDesign={this.props.showArtDesign}
             showPitchArtLines={this.props.showPitchArtLines}
