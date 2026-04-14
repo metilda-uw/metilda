@@ -1,4 +1,4 @@
-import "./Header.scss";
+import "./Header.css";
 
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
@@ -136,12 +136,29 @@ class Header extends Component<HeaderProps, State> {
 
   };
 
+  componentDidUpdate(prevProps: HeaderProps) {
+    if (prevProps.currentUserRole != null || this.props.currentUserRole == null) {
+      return;
+    }
+    const role = this.props.currentUserRole;
+    if (role === constants.ADMIN_ROLE) {
+      this.setState({ isAdmin: true, dispalyCreatePitchArtTab: true });
+    } else if (
+      role === constants.TEACHER_ROLE ||
+      role === constants.RESEARCHER_ROLE ||
+      role === constants.STUDENT_ROLE ||
+      role === constants.OTHER_ROLE
+    ) {
+      this.setState({ dispalyCreatePitchArtTab: true });
+    }
+  }
+
   setWindowWidth = () => {
     this.setState({ windowWidth: window.innerWidth })
   }
 
   getCurrentUserRole = async() =>{
-    let userRole = null;
+    let userRole: string | null = null;
     if(this.props.currentUserRole == null){
       const response = await fetch(`/api/get-user-roles/${this.props.firebase.auth.currentUser.email}`,
           {
@@ -157,12 +174,14 @@ class Header extends Component<HeaderProps, State> {
         userRole = body.result[0][0];
         this.props.setCurrentUserRole(userRole);
       }else{
-        this.props.setCurrentUserRole(constants.STUDENT_ROLE);
+        userRole = constants.STUDENT_ROLE;
+        this.props.setCurrentUserRole(userRole);
       }
+    } else {
+      userRole = this.props.currentUserRole;
     }
-    userRole = this.props.currentUserRole;
     if(userRole === constants.ADMIN_ROLE || userRole === constants.TEACHER_ROLE || userRole === constants.RESEARCHER_ROLE || 
-          userRole === constants.STUDENT_ROLE || userRole === constants.OTHER_ROLE){ // All roles can access Create Pitch Art
+          userRole === constants.STUDENT_ROLE || userRole === constants.OTHER_ROLE || userRole === null){ // All roles can access Create Pitch Art
       this.setState({
         dispalyCreatePitchArtTab:true
       })
