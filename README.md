@@ -6,8 +6,8 @@ Audio analysis web app.
 
 ## Links
 ### Web App
-- Stage site: https://metilda-stage.herokuapp.com/
-- Prod site: https://metilda.herokuapp.com/
+- Dev site: https://metilda-development-a68150797699.herokuapp.com/
+- Prod site: https://metilda.net/
 
 ### DevOps
 - Repo: https://github.com/metilda-uw/metilda
