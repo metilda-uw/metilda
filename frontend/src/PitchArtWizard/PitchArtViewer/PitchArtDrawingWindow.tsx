@@ -59,6 +59,8 @@ export interface PitchArtDrawingWindowProps {
   showArtDesign: boolean;
   showPitchArtLines: boolean;
   showLargeCircles: boolean;
+  averageDotSize?: "S" | "M" | "L";
+  contourDotSize?: "S" | "M" | "L";
   showVerticallyCentered: boolean;
   showAccentPitch: boolean;
   showSyllableText: boolean;
@@ -220,6 +222,18 @@ export class PitchArtDrawingWindow extends React.Component<
     this.accentedCircleRadius = 30;
     this.pitchArtSoundLengthSeconds = 0.2;
     this.fontSize = 16;
+  }
+
+  private resolveDotRadius = (
+    size: "S" | "M" | "L" | undefined,
+    fallback: "S" | "M" | "L"
+  ): number => {
+    const effective = size || fallback;
+    switch (effective) {
+      case "S": return 8;
+      case "M": return 14;
+      case "L": return 20;
+    }
   }
 
   handlePlaySpeakerEvent = (e: Event) => {
@@ -949,6 +963,8 @@ export class PitchArtDrawingWindow extends React.Component<
             showPrevPitchValueLists={this.props.showPrevPitchValueLists}
             largeCircleRadius={this.largeCircleRadius}
             smallCircleRadius={this.smallCircleRadius}
+            averageCircleRadius={this.resolveDotRadius(this.props.averageDotSize, "L")}
+            contourCircleRadius={this.resolveDotRadius(this.props.contourDotSize, "S")}
             graphWidth={this.graphWidth}
             fontSize={this.fontSize}
             circleStrokeWidth={this.circleStrokeWidth}

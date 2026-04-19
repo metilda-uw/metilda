@@ -7,6 +7,7 @@ import PitchArt from "./PitchArt";
 import "./PitchArtContainer.css";
 import PitchArtLegend from "./PitchArtLegend";
 import PitchArtToggle from "./PitchArtToggle";
+import PitchArtDotSizeSelect, { DotSize } from "./PitchArtDotSizeSelect";
 import { Popover, Backdrop, createTheme, Box } from "@material-ui/core"
 import * as DEFAULT from "../../constants/create";
 
@@ -72,6 +73,10 @@ class PitchArtContainer extends React.Component<Props, State> {
             this.onVerticallyCenterClick(isSelected);
         }
         this.props.updatePitchArtValue(inputName, isSelected);
+    }
+
+    dotSizeChanged = (inputName: string, value: DotSize) => {
+        this.props.updatePitchArtValue(inputName, value);
     }
 
     applyPitchRange = (minPitch: number, maxPitch: number) => {
@@ -165,13 +170,17 @@ class PitchArtContainer extends React.Component<Props, State> {
                 onText="Yes"
                 onChange={this.toggleChanged}
               />
-              <PitchArtToggle
-                label={"Circle Size"}
-                inputName={"showLargeCircles"}
-                isSelected={this.props.pitchArt.showLargeCircles}
-                offText="Small"
-                onText="Large"
-                onChange={this.toggleChanged}
+              <PitchArtDotSizeSelect
+                label="Average Dot Size"
+                inputName="averageDotSize"
+                value={this.props.pitchArt.averageDotSize}
+                onChange={this.dotSizeChanged}
+              />
+              <PitchArtDotSizeSelect
+                label="Contour Dot Size"
+                inputName="contourDotSize"
+                value={this.props.pitchArt.contourDotSize}
+                onChange={this.dotSizeChanged}
               />
               <PitchArtToggle
                 label={"Time Normalization"}
@@ -303,6 +312,8 @@ class PitchArtContainer extends React.Component<Props, State> {
                         showVerticallyCentered={this.props.pitchArt.showVerticallyCentered}
                         showPitchArtLines={this.props.pitchArt.showPitchArtLines}
                         showLargeCircles={this.props.pitchArt.showLargeCircles}
+                        averageDotSize={this.props.pitchArt.averageDotSize}
+                        contourDotSize={this.props.pitchArt.contourDotSize}
                         showTimeNormalization={this.props.pitchArt.showTimeNormalization}
                         showPitchScale={this.props.pitchArt.showPitchScale}
                         showPerceptualScale={this.props.pitchArt.showPerceptualScale}

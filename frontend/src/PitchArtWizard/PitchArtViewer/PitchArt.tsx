@@ -26,6 +26,8 @@ interface Props {
   showVerticallyCentered: boolean;
   showPitchArtLines: boolean;
   showLargeCircles: boolean;
+  averageDotSize?: "S" | "M" | "L";
+  contourDotSize?: "S" | "M" | "L";
   showTimeNormalization: boolean;
   showPitchScale: boolean;
   showPerceptualScale: boolean;
@@ -103,6 +105,8 @@ class PitchArt extends React.Component<Props> {
         showVerticallyCentered={this.props.showVerticallyCentered}
         showPitchArtLines={this.props.showPitchArtLines}
         showLargeCircles={this.props.showLargeCircles}
+        averageDotSize={this.props.averageDotSize}
+        contourDotSize={this.props.contourDotSize}
         showTimeNormalization={this.props.showTimeNormalization}
         showPitchScale={this.props.showPitchScale}
         showPerceptualScale={this.props.showPerceptualScale}

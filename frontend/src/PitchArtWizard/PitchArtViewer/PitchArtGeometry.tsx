@@ -25,6 +25,8 @@ interface Props {
     showPrevPitchValueLists: boolean;
     largeCircleRadius: number;
     smallCircleRadius: number;
+    averageCircleRadius: number;
+    contourCircleRadius: number;
     graphWidth: number;
     fontSize: number;
     circleStrokeWidth: number;
@@ -220,8 +222,17 @@ export default class PitchArtGeometry extends React.Component<Props> {
         else{
             const pitches = speaker.letters.map((item) => item.pitch);
             const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
-            const circleRadius = this.props.showLargeCircles ?
-                this.props.largeCircleRadius : this.props.smallCircleRadius;
+            const getLetterRadius = (letter: Letter) => {
+                if (letter && letter.isContour) return this.props.contourCircleRadius;
+                return this.props.averageCircleRadius;
+            };
+            const getLetterStrokeWidth = (radius: number) => {
+                return Math.min(this.props.circleStrokeWidth, radius * 0.6);
+            };
+            const maxLabelRadius = Math.max(
+                this.props.averageCircleRadius,
+                this.props.contourCircleRadius
+            );
             const coordConverter = converters[speakerIndex];
 
             const getAnchorXY = (letterIndex: number) => {
@@ -328,7 +339,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 const textOffsetKey = `${speakerIndex}-${i}`;
                 const savedOffset = (this.state as any).textOffsets?.[textOffsetKey] || { dx: 0, dy: 0 };
                 const baseTextX = x - (konvaFontSizeAsPixels * text.length / 2.0);
-                const baseTextY = y + circleRadius * 1.9;
+                const baseTextY = y + getLetterRadius(speaker.letters[i]) * 1.9;
                 letterSyllables.push(
                     <Text key={`text-${speakerIndex}-${i}`}
                           x={baseTextX + savedOffset.dx}
@@ -385,8 +396,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
                                 y={y}
                                 fill={circleFill}
                                 stroke={circleStroke}
-                                strokeWidth={this.props.circleStrokeWidth}
-                                radius={circleRadius}
+                                strokeWidth={getLetterStrokeWidth(getLetterRadius(speaker.letters[i]))}
+                                radius={getLetterRadius(speaker.letters[i])}
                                 onClick={(e) => {
                                     if (e.evt.button === 2) return;
                                     this.props.playSound(currPitch);
@@ -476,7 +487,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 const stackOffset = speakerIndex * labelFontSize * 1.4;
                 const baseLabelX = firstDotCoords.x - labelWidth / 2;
                 const baseLabelY = Math.max(
-                    firstDotCoords.y - circleRadius - labelFontSize * 1.6 - stackOffset,
+                    firstDotCoords.y - maxLabelRadius - labelFontSize * 1.6 - stackOffset,
                     4
                 );
                 const labelOffsetKey = `${speakerIndex}`;
