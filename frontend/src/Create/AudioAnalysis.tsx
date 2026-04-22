@@ -27,7 +27,7 @@ import {
   setUploadId,
 } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
-import { Letter, Speaker } from "../types/types";
+import { FileEntry, Letter, Speaker } from "../types/types";
 import * as DEFAULT from "../constants/create";
 
 import "./UploadAudio.css";
@@ -66,6 +66,8 @@ export interface AudioAnalysisProps {
   parentCallBack: (selectedFolderName: string) => void;
   updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
   setAudioUrl: (url: string) => void; // New prop
+  onFileDeleted: (file: FileEntry) => void;
+  activeFileNames: string[];
 }
 
 interface VerticalLine {
@@ -864,6 +866,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           setUploadId={this.setUploadId}
           userFiles={this.props.files}
           firebase={this.props.firebase}
+          onFileDeleted={this.props.onFileDeleted}
+          activeFileNames={this.props.activeFileNames}
         />
         <PitchRange
           useMinMaxInputs
