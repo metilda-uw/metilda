@@ -264,6 +264,8 @@ function makeProps(props: OptionalProps): AudioAnalysisProps {
         parentCallBack: props.parentCallBack || (() => undefined),
         updateAudioPitch: props.updateAudioPitch || (() => undefined),
         setAudioUrl: props.setAudioUrl || (() => undefined),
+        onFileDeleted: () => undefined,
+        activeFileNames: [],
     };
 }
 

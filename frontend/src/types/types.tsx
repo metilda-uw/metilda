@@ -9,6 +9,17 @@ export interface Letter {
   contourGroupRange?:number[];
 }
 
+export interface FileEntry {
+  index: number;
+  name: string;
+  path: string;
+  size: number;
+  type: "Upload" | "Folder";
+  created: string;
+  updated: string;
+  user: string;
+}
+
 export interface Speaker {
   uploadId: string;
   speakerName?: string;

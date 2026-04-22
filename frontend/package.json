@@ -105,8 +105,11 @@
       "!src/serviceWorker.js"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(konva)).*\\.js$"
-    ]
+      "node_modules/(?!(konva|fast-check|pure-rand)).*\\.js$"
+    ],
+    "moduleNameMapper": {
+      "^pure-rand/(.*)$": "<rootDir>/node_modules/pure-rand/lib/$1.js"
+    }
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -122,7 +125,8 @@
     "@cfaester/enzyme-adapter-react-18": "^0.8.0",
     "@craco/craco": "^7.1.0",
     "@types/chai-enzyme": "^0.6.12",
-    "fake-indexeddb": "^6.2.5"
+    "fake-indexeddb": "^6.2.5",
+    "fast-check": "^4.7.0"
   },
   "overrides": {
     "cheerio": "1.0.0-rc.12",

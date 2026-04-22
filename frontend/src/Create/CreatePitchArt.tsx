@@ -6,9 +6,9 @@ import { connect } from "react-redux";
 import { ThunkDispatch } from "redux-thunk";
 import PitchArtContainer from "../PitchArtWizard/PitchArtViewer/PitchArtContainer";
 import { AppState } from "../store";
-import { setLetterPitch, replaceSpeakers } from "../store/audio/actions";
+import { setLetterPitch, replaceSpeakers, setUploadId, resetLetters } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
-import { Speaker, } from "../types/types";
+import { Speaker, FileEntry } from "../types/types";
 import AudioAnalysis from "./AudioAnalysis";
 import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
@@ -52,6 +52,8 @@ interface CreatePitchArtProps extends React.Component<CreatePitchArtProps, State
     newPitch: number
   ) => void;
   replaceSpeakers: (speakers: Speaker[]) => void;
+  setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) => void;
+  resetLetters: (speakerIndex: number) => void;
   firebase: any;
   match: any;
   location: any;
@@ -606,11 +608,53 @@ class CreatePitchArt extends React.Component<
 
   }
 
+  onFileDeleted = async (file: FileEntry) => {
+    // 1. Delete from Firebase Storage
+    try {
+      const storageRef = this.props.firebase.uploadFile();
+      await storageRef.child(file.path).delete();
+    } catch (ex) {
+      NotificationManager.error(`Failed to delete "${file.name}" from storage.`);
+      return;
+    }
+
+    // 2. Delete from database
+    const formData = new FormData();
+    formData.append("file_id", String(file.index));
+    const response = await fetch("/api/delete-file", {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: formData,
+    });
+    if (!response.ok) {
+      NotificationManager.error(`Failed to delete "${file.name}" from database.`);
+      return;
+    }
+
+    // 3. Remove from file list state
+    this.setState((prev) => ({
+      files: prev.files.filter((f) => f.name !== file.name),
+    }));
+
+    // 4. Reset any speaker slot that had this file active
+    this.props.speakers.forEach((speaker, idx) => {
+      if (speaker.uploadId === file.name) {
+        this.props.setUploadId(idx, "", -1);
+        this.props.resetLetters(idx);
+      }
+    });
+
+    // 5. Show success notification
+    NotificationManager.success(`"${file.name}" deleted successfully.`);
+  }
+
   renderSpeakers = () => {
     if (this.props.match.params.type && this.state.speakers && this.props.match.params.id) {
 
       this.props.firebase.updateSharedPageSpeakers(this.props.speakers, this.props.match.params.type, this.props.match.params.id);
     }
+
+    const activeFileNames = this.props.speakers.map((s) => s.uploadId).filter(Boolean) as string[];
 
     return this.props.speakers.map((item, index) => (
       <AudioAnalysis
@@ -624,6 +668,8 @@ class CreatePitchArt extends React.Component<
         updateAudioPitch={this.updateAudioPitch}
         setAudioUrl={this.setAudioUrl} // Pass the new callback
         userEmail={this.props.firebase.auth.currentUser.email}
+        onFileDeleted={this.onFileDeleted}
+        activeFileNames={activeFileNames}
       />
     ));
   }
@@ -882,6 +928,9 @@ const mapDispatchToProps = (
   replaceSpeakers: (
     speakers: Speaker[]
   ) => dispatch(replaceSpeakers(speakers)),
+  setUploadId: (speakerIndex: number, uploadId: string, fileIndex: number) =>
+    dispatch(setUploadId(speakerIndex, uploadId, fileIndex)),
+  resetLetters: (speakerIndex: number) => dispatch(resetLetters(speakerIndex)),
   // setPitchArtDocId:(pitchArtDocId: string) => dispatch(setPitchArtDocId(pitchArtDocId)),
   setPitchArtCollectionId: (collectionId: string) => dispatch(setPitchArtCollectionId(collectionId)),
   setParentPitchArtDocumentData: (data: any) => dispatch(setParentPitchArtDocumentData(data)),
