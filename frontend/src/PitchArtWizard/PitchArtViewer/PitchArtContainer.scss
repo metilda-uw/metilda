@@ -1,3 +1,19 @@
 .metilda-audio-analysis-controls-list-item p {
   color: black;
 }
+
+@media (min-width: 1001px) {
+  .pitchart-desktop-layout {
+    display: flex !important;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .pitchart-desktop-layout > .col.s5,
+  .pitchart-desktop-layout > .col.s7 {
+    float: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}

@@ -11,6 +11,7 @@ interface Props {
     setLetterPitch: (speakerIndex: number, letterIndex: number, newPitch: number) => void;
     playSound: (pitch: number) => void;
     activePlayIndex: number;
+    activePlaySpeakerIndex: number;
     colorSchemes: ColorScheme[];
     showDynamicContent: boolean;
     showArtDesign: boolean;
@@ -24,6 +25,8 @@ interface Props {
     showPrevPitchValueLists: boolean;
     largeCircleRadius: number;
     smallCircleRadius: number;
+    averageCircleRadius: number;
+    contourCircleRadius: number;
     graphWidth: number;
     fontSize: number;
     circleStrokeWidth: number;
@@ -57,6 +60,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
             contextMenuSpeakerIndex: null,
             contextMenuLetterIndex: null,
             textOffsets: {},
+            speakerLabelOffsets: {},
         };
     }
 
@@ -166,18 +170,69 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     lineJoin="round"
                 />
             );
+            let learnSpeakerLabel = null;
+            if (this.props.speakers.length > 1 && points.length > 0) {
+                const labelText = (speaker.speakerName && speaker.speakerName.trim().length > 0)
+                    ? speaker.speakerName
+                    : `Speaker ${speakerIndex + 1}`;
+                const labelFontSize = this.props.fontSize;
+                const labelCharWidth = labelFontSize * 0.6;
+                const labelWidth = labelText.length * labelCharWidth;
+                const stackOffset = speakerIndex * labelFontSize * 1.4;
+                const baseLabelX = points[0].x - labelWidth / 2;
+                const baseLabelY = Math.max(
+                    points[0].y - circleRadius - labelFontSize * 1.6 - stackOffset,
+                    4
+                );
+                const labelOffsetKey = `learn-${speakerIndex}`;
+                const savedLabelOffset = (this.state as any).speakerLabelOffsets?.[labelOffsetKey] || { dx: 0, dy: 0 };
+                learnSpeakerLabel = (
+                    <Text
+                        key={`speaker-label-learn-${speakerIndex}`}
+                        x={baseLabelX + savedLabelOffset.dx}
+                        y={baseLabelY + savedLabelOffset.dy}
+                        text={labelText}
+                        fontSize={labelFontSize}
+                        fill={this.props.colorSchemes[speakerIndex].lineStrokeColor}
+                        draggable={true}
+                        onDragEnd={(e) => {
+                            const node = e.target;
+                            const newDx = node.x() - baseLabelX;
+                            const newDy = node.y() - baseLabelY;
+                            this.setState((prev: any) => ({
+                                speakerLabelOffsets: {
+                                    ...prev.speakerLabelOffsets,
+                                    [labelOffsetKey]: { dx: newDx, dy: newDy },
+                                },
+                            }));
+                        }}
+                        onMouseEnter={() => this.props.setPointerEnabled(true)}
+                        onMouseLeave={() => this.props.setPointerEnabled(false)}
+                    />
+                );
+            }
             return (
                 <Layer key={speakerIndex}>
                     {line}
                     {lineCircles}
+                    {learnSpeakerLabel}
                 </Layer>
             );
         }
         else{
             const pitches = speaker.letters.map((item) => item.pitch);
             const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
-            const circleRadius = this.props.showLargeCircles ?
-                this.props.largeCircleRadius : this.props.smallCircleRadius;
+            const getLetterRadius = (letter: Letter) => {
+                if (letter && letter.isContour) return this.props.contourCircleRadius;
+                return this.props.averageCircleRadius;
+            };
+            const getLetterStrokeWidth = (radius: number) => {
+                return Math.min(this.props.circleStrokeWidth, radius * 0.6);
+            };
+            const maxLabelRadius = Math.max(
+                this.props.averageCircleRadius,
+                this.props.contourCircleRadius
+            );
             const coordConverter = converters[speakerIndex];
 
             const getAnchorXY = (letterIndex: number) => {
@@ -244,6 +299,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
             const letterSyllables = [];
             const lines = [];
             let currLinePoints = [];
+            let firstDotCoords: { x: number; y: number } | null = null;
             for (let i = 0; i < speaker.letters.length; i++) {
                 if (speaker.letters[i].isWordSep) {
                     if (currLinePoints.length > 0) {
@@ -283,7 +339,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 const textOffsetKey = `${speakerIndex}-${i}`;
                 const savedOffset = (this.state as any).textOffsets?.[textOffsetKey] || { dx: 0, dy: 0 };
                 const baseTextX = x - (konvaFontSizeAsPixels * text.length / 2.0);
-                const baseTextY = y + circleRadius * 1.9;
+                const baseTextY = y + getLetterRadius(speaker.letters[i]) * 1.9;
                 letterSyllables.push(
                     <Text key={`text-${speakerIndex}-${i}`}
                           x={baseTextX + savedOffset.dx}
@@ -312,7 +368,9 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 let circleStroke = this.props.colorSchemes[speakerIndex].lineStrokeColor;
     
                 if (this.props.showDynamicContent) {
-                    if (this.props.activePlayIndex === i) {
+                    const isActiveSpeaker = this.props.activePlaySpeakerIndex === -1
+                        || this.props.activePlaySpeakerIndex === speakerIndex;
+                    if (this.props.activePlayIndex === i && isActiveSpeaker) {
                         circleFill = this.props.colorSchemes[speakerIndex].activePlayColor;
                         circleStroke = this.props.colorSchemes[speakerIndex].activePlayColor;
                     } else if (speaker.letters[i].isManualPitch) {
@@ -324,6 +382,9 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     }
                 }
     
+                if (firstDotCoords === null) {
+                    firstDotCoords = { x, y };
+                }
                 currLinePoints.push(x, y);
                 pointPairs.push([x, y]);
                 const isSecondaryAccent =
@@ -335,8 +396,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
                                 y={y}
                                 fill={circleFill}
                                 stroke={circleStroke}
-                                strokeWidth={this.props.circleStrokeWidth}
-                                radius={circleRadius}
+                                strokeWidth={getLetterStrokeWidth(getLetterRadius(speaker.letters[i]))}
+                                radius={getLetterRadius(speaker.letters[i])}
                                 onClick={(e) => {
                                     if (e.evt.button === 2) return;
                                     this.props.playSound(currPitch);
@@ -406,7 +467,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
             }
     
             let accentedPoint;
-    
+
             if (this.props.showAccentPitch
                 && maxPitchIndex !== null
                 && pointPairs.length >= 1) {
@@ -414,7 +475,49 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     pointPairs[maxPitchIndex][0],
                     pointPairs[maxPitchIndex][1]);
             }
-    
+
+            let speakerLabel = null;
+            if (this.props.speakers.length > 1 && firstDotCoords !== null) {
+                const labelText = (speaker.speakerName && speaker.speakerName.trim().length > 0)
+                    ? speaker.speakerName
+                    : `Speaker ${speakerIndex + 1}`;
+                const labelFontSize = this.props.fontSize;
+                const labelCharWidth = labelFontSize * 0.6;
+                const labelWidth = labelText.length * labelCharWidth;
+                const stackOffset = speakerIndex * labelFontSize * 1.4;
+                const baseLabelX = firstDotCoords.x - labelWidth / 2;
+                const baseLabelY = Math.max(
+                    firstDotCoords.y - maxLabelRadius - labelFontSize * 1.6 - stackOffset,
+                    4
+                );
+                const labelOffsetKey = `${speakerIndex}`;
+                const savedLabelOffset = (this.state as any).speakerLabelOffsets?.[labelOffsetKey] || { dx: 0, dy: 0 };
+                speakerLabel = (
+                    <Text
+                        key={`speaker-label-${speakerIndex}`}
+                        x={baseLabelX + savedLabelOffset.dx}
+                        y={baseLabelY + savedLabelOffset.dy}
+                        text={labelText}
+                        fontSize={labelFontSize}
+                        fill={this.props.colorSchemes[speakerIndex].lineStrokeColor}
+                        draggable={true}
+                        onDragEnd={(e) => {
+                            const node = e.target;
+                            const newDx = node.x() - baseLabelX;
+                            const newDy = node.y() - baseLabelY;
+                            this.setState((prev: any) => ({
+                                speakerLabelOffsets: {
+                                    ...prev.speakerLabelOffsets,
+                                    [labelOffsetKey]: { dx: newDx, dy: newDy },
+                                },
+                            }));
+                        }}
+                        onMouseEnter={() => this.props.setPointerEnabled(true)}
+                        onMouseLeave={() => this.props.setPointerEnabled(false)}
+                    />
+                );
+            }
+
             return (
                 <Layer key={speakerIndex}>
                     {accentedPoint}
@@ -423,6 +526,7 @@ export default class PitchArtGeometry extends React.Component<Props> {
                     }
                     {lineCircles}
                     {this.props.showSyllableText ? letterSyllables : []}
+                    {speakerLabel}
                 </Layer>
             );
         }

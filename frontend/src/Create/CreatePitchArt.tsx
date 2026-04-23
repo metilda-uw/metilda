@@ -92,6 +92,8 @@ interface State {
     showVerticallyCentered: boolean;
     showPitchArtLines: boolean;
     showLargeCircles: boolean;
+    averageDotSize: "S" | "M" | "L";
+    contourDotSize: "S" | "M" | "L";
     showTimeNormalization: boolean;
     showPitchScale: boolean;
     showPerceptualScale: boolean;
@@ -149,6 +151,8 @@ class CreatePitchArt extends React.Component<
         showVerticallyCentered: true,
         showPitchArtLines: true,
         showLargeCircles: true,
+        averageDotSize: "L",
+        contourDotSize: "S",
         showTimeNormalization: true,
         showPitchScale: false,
         showPerceptualScale: true,

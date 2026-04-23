@@ -3,7 +3,7 @@ import * as constants from "../../constants";
 import { AudioAnalysisState } from "../../store/audio/types";
 
 const defaultState: AudioAnalysisState = {
-  speakers: [{ uploadId: "", letters: [] , lineColor:"#272264", dotColor:"#0ba14a"}],
+  speakers: [{ uploadId: "", letters: [], speakerName: "", lineColor:"#272264", dotColor:"#0ba14a"}],
 };
 
 const reducer: Reducer<AudioAnalysisState> = (
