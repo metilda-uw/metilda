@@ -103,8 +103,8 @@ interface State {
   contextMenuSpeakerIndex: number | null;
   contextMenuLetterIndex: number | null;
 
-  // Secondary accent per speaker: speakerIndex -> letterIndex
-  secondaryAccentBySpeaker: { [speakerIndex: number]: number };
+  secondaryAccentBySpeaker: { [speakerIndex: number]: number[] };
+  manualPrimaryAccentBySpeaker: { [speakerIndex: number]: number };
   mergedIndexes: MergedIndexesMap;
 
   // Speaker visibility: indices of speakers whose pitch art is hidden
@@ -197,6 +197,7 @@ export class PitchArtDrawingWindow extends React.Component<
       contextMenuSpeakerIndex: null,
       contextMenuLetterIndex: null,
       secondaryAccentBySpeaker: {},
+      manualPrimaryAccentBySpeaker: {},
       mergedIndexes: {},
       hiddenSpeakerIndices: [],
     };
@@ -787,28 +788,113 @@ export class PitchArtDrawingWindow extends React.Component<
     );
   };
 
+  getPrimaryLetterIndex = (speakerIndex: number): number | null => {
+    const letters = this.props.speakers[speakerIndex]?.letters;
+    if (!letters?.length) {
+      return null;
+    }
+    if (this.props.showAccentPitch) {
+      const pitches = letters.map((l) => l.pitch);
+      if (!pitches.length) {
+        return null;
+      }
+      const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
+      if (maxPitchIndex < 0 || letters[maxPitchIndex]?.isWordSep) {
+        return null;
+      }
+      return maxPitchIndex;
+    }
+    const m = this.state.manualPrimaryAccentBySpeaker[speakerIndex];
+    if (m == null || m < 0 || letters[m]?.isWordSep) {
+      return null;
+    }
+    return m;
+  };
+
+  setManualPrimaryAccent = () => {
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) {
+      return;
+    }
+    const si = contextMenuSpeakerIndex;
+    const li = contextMenuLetterIndex;
+    this.setState((prev) => {
+      const secondaries = prev.secondaryAccentBySpeaker[si] || [];
+      const nextSecond = secondaries.filter((idx) => idx !== li);
+      const nextSecMap = { ...prev.secondaryAccentBySpeaker };
+      if (nextSecond.length) {
+        nextSecMap[si] = nextSecond;
+      } else {
+        delete nextSecMap[si];
+      }
+      return {
+        manualPrimaryAccentBySpeaker: {
+          ...prev.manualPrimaryAccentBySpeaker,
+          [si]: li,
+        },
+        secondaryAccentBySpeaker: nextSecMap,
+        contextMenuVisible: false,
+      };
+    });
+  };
+
+  clearManualPrimaryAccent = () => {
+    const { contextMenuSpeakerIndex } = this.state;
+    if (contextMenuSpeakerIndex === null) {
+      return;
+    }
+    this.setState((prev) => {
+      const next = { ...prev.manualPrimaryAccentBySpeaker };
+      delete next[contextMenuSpeakerIndex];
+      return { manualPrimaryAccentBySpeaker: next, contextMenuVisible: false };
+    });
+  };
+
   addSecondaryAccent = () => {
     const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
 
     if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) {
       return;
     }
+    const si = contextMenuSpeakerIndex;
+    const li = contextMenuLetterIndex;
+    const primary = this.getPrimaryLetterIndex(si);
+    if (primary != null && li === primary) {
+      return;
+    }
 
-    this.setState((prev) => ({
-      secondaryAccentBySpeaker: {
-        ...prev.secondaryAccentBySpeaker,
-        [contextMenuSpeakerIndex]: contextMenuLetterIndex,
-      },
-      contextMenuVisible: false,
-    }));
+    this.setState((prev) => {
+      const existing = prev.secondaryAccentBySpeaker[si] || [];
+      if (existing.includes(li)) {
+        return {
+          contextMenuVisible: false,
+          secondaryAccentBySpeaker: prev.secondaryAccentBySpeaker,
+        };
+      }
+      return {
+        secondaryAccentBySpeaker: {
+          ...prev.secondaryAccentBySpeaker,
+          [si]: [...existing, li],
+        },
+        contextMenuVisible: false,
+      };
+    });
   };
 
   onRemoveSecondaryAccent = () => {
-    const { contextMenuSpeakerIndex } = this.state;
-    if (contextMenuSpeakerIndex === null) return;
+    const { contextMenuSpeakerIndex, contextMenuLetterIndex } = this.state;
+    if (contextMenuSpeakerIndex === null || contextMenuLetterIndex === null) {
+      return;
+    }
     this.setState((prev) => {
+      const list = prev.secondaryAccentBySpeaker[contextMenuSpeakerIndex] || [];
+      const nextList = list.filter((x) => x !== contextMenuLetterIndex);
       const next = { ...prev.secondaryAccentBySpeaker };
-      delete next[contextMenuSpeakerIndex];
+      if (nextList.length === 0) {
+        delete next[contextMenuSpeakerIndex];
+      } else {
+        next[contextMenuSpeakerIndex] = nextList;
+      }
       return { secondaryAccentBySpeaker: next, contextMenuVisible: false };
     });
   };
@@ -982,6 +1068,7 @@ export class PitchArtDrawingWindow extends React.Component<
               })
             }
             secondaryAccentBySpeaker={this.state.secondaryAccentBySpeaker}
+            manualPrimaryAccentBySpeaker={this.state.manualPrimaryAccentBySpeaker}
             mergedIndexes={this.state.mergedIndexes}
             hiddenSpeakerIndices={this.state.hiddenSpeakerIndices}
           />
@@ -992,6 +1079,7 @@ export class PitchArtDrawingWindow extends React.Component<
           <PitchArtContextMenu
               x={this.state.contextMenuX}
               y={this.state.contextMenuY}
+              showAccentPitch={this.props.showAccentPitch}
               onAddSecondaryAccent={this.addSecondaryAccent}
               onRemoveSecondaryAccent={this.onRemoveSecondaryAccent}
               onClose={() => this.setState({ contextMenuVisible: false })}
@@ -1006,8 +1094,18 @@ export class PitchArtDrawingWindow extends React.Component<
               hasSecondaryAccentOnThisCircle={
                 this.state.contextMenuSpeakerIndex !== null &&
                 this.state.contextMenuLetterIndex !== null &&
-                this.state.secondaryAccentBySpeaker[this.state.contextMenuSpeakerIndex] === this.state.contextMenuLetterIndex
+                (this.state.secondaryAccentBySpeaker[this.state.contextMenuSpeakerIndex] || []).includes(
+                  this.state.contextMenuLetterIndex
+                )
               }
+              isPrimaryAccentOnThisCircle={
+                this.state.contextMenuSpeakerIndex !== null &&
+                this.state.contextMenuLetterIndex !== null &&
+                this.getPrimaryLetterIndex(this.state.contextMenuSpeakerIndex) ===
+                  this.state.contextMenuLetterIndex
+              }
+              onSetPrimaryAccent={this.setManualPrimaryAccent}
+              onClearPrimaryAccent={this.clearManualPrimaryAccent}
             />
           )}
         <a className="hide" ref={this.downloadRef}>
