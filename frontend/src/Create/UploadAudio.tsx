@@ -11,6 +11,8 @@ interface UploadAudioProps {
     firebase?: any;
     onFileDeleted?: (file: FileEntry) => void;
     activeFileNames?: string[];
+    selectedFolderName?: string;
+    onBackClick?: () => void;
 }
 
 interface UploadAudioState {
@@ -95,12 +97,28 @@ class UploadAudio extends Component<UploadAudioProps, UploadAudioState> {
 
         const displayName = selectedFileName || 'Choose audio file';
 
+        const { selectedFolderName, onBackClick } = this.props;
+
         return (
-            <div
-                className="metilda-audio-analysis-controls-list-item col s12"
-                key={this.state.updateCounter}
-                ref={this.dropdownRef}
-            >
+            <div className="upload-audio-wrapper">
+                {onBackClick !== undefined && (
+                    <div id="metilda-drop-down-back-button">
+                        {selectedFolderName === 'Uploads' ? (
+                            <button className="audioBackButtonDisabled" disabled={true} title="Go to parent directory">
+                                <i className="material-icons">arrow_back</i>
+                            </button>
+                        ) : (
+                            <button className="audioBackButton" onClick={onBackClick} title="Go to parent directory">
+                                <i className="material-icons">arrow_back</i>
+                            </button>
+                        )}
+                    </div>
+                )}
+                <div
+                    className="metilda-audio-analysis-controls-list-item col s12"
+                    key={this.state.updateCounter}
+                    ref={this.dropdownRef}
+                >
                 <label className="group-label">Audio File</label>
                 <div className="metilda-custom-select">
                     <div
@@ -145,6 +163,7 @@ class UploadAudio extends Component<UploadAudioProps, UploadAudioState> {
                             ))}
                         </ul>
                     )}
+                </div>
                 </div>
             </div>
         );
