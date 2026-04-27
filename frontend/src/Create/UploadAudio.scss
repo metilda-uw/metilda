@@ -18,6 +18,12 @@
     max-width: 380px;
 }
 
+.upload-audio-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 1px;
+}
+
 // Custom file select dropdown
 .metilda-custom-select {
     position: relative;

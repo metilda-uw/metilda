@@ -674,6 +674,8 @@ class CreatePitchArt extends React.Component<
         userEmail={this.props.firebase.auth.currentUser.email}
         onFileDeleted={this.onFileDeleted}
         activeFileNames={activeFileNames}
+        selectedFolderName={this.state.selectedFolderName}
+        onBackClick={this.folderBackButtonClicked}
       />
     ));
   }
@@ -875,17 +877,6 @@ class CreatePitchArt extends React.Component<
         <div className="CreatePitchArt">
           <div className="metilda-page-content">
             <div id="button-drop-down-image-side-by-side">
-              <div id="metilda-drop-down-back-button">
-                {this.state.selectedFolderName === "Uploads" ? (
-                  <button className="audioBackButtonDisabled" disabled={true}>
-                    <i className="material-icons">arrow_back</i>
-                  </button>
-                ) : (
-                  <button className="audioBackButton" onClick={() => this.folderBackButtonClicked()}>
-                    <i className="material-icons">arrow_back</i>
-                  </button>
-                )}
-              </div>
               <div id="drop-down-and-image">{this.renderSpeakers()}</div>
             </div>
             <div className="row">
