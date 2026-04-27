@@ -273,10 +273,13 @@
   margin: 4px;
 }
 
+#metilda-drop-down-back-button {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+
 #metilda-drop-down-back-button .audioBackButton {
-  position: relative;
-  left: 15px;
-  top: 78px;
   width: 40px;
   font-size: 14px;
   text-align: center;
@@ -286,15 +289,13 @@
   border: none;
   color: black;
   border-radius: 5px;
-  z-index: 1;
-  letter-spacing: 0.5px;
   display: block;
+  margin-right: 0px;
+  margin-left: 10px;
+  margin-top: 6px;
 }
 
 #metilda-drop-down-back-button .audioBackButtonDisabled {
-  position: relative;
-  left: 15px;
-  top: 78px;
   width: 40px;
   font-size: 14px;
   text-align: center;
@@ -304,9 +305,10 @@
   border: none;
   color: black;
   border-radius: 5px;
-  z-index: 1;
-  letter-spacing: 0.5px;
   display: block;
+  margin-right: 0px;
+  margin-left: 10px;
+  margin-top: 6px;
 }
 
 #button-drop-down-image-side-by-side {

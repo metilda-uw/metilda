@@ -42,12 +42,31 @@ export default class PitchArtLegend extends React.Component<PitchArtLegendProps,
         this.setState({isColorChangeDialogOpen:false});
     }
 
+    playSpeakerTones = (speakerIndex: number) => {
+        document.dispatchEvent(new CustomEvent('pitchArtPlaySpeaker', {
+            detail: { speakerIndex }
+        }));
+    }
+
     renderSpeaker = (speaker: Speaker, speakerIndex: number) => {
         const color = this.props.speakers[speakerIndex].lineColor ? this.props.speakers[speakerIndex].lineColor :  PitchArtLegend.SPEAKER_COLOR(speakerIndex);
+        const labelText = (speaker.speakerName && speaker.speakerName.trim().length > 0)
+            ? speaker.speakerName
+            : `Speaker ${speakerIndex + 1}`;
+        const hasLetters = speaker.letters && speaker.letters.length > 0;
         return (
             <div className="pitch-art-legend-list-item" key={speakerIndex}>
                 <span style={{backgroundColor: color}} className="pitch-art-legend-icon"></span>
-                <p className="pitch-art-legend-list-item-text">Speaker {speakerIndex + 1}</p>
+                <p className="pitch-art-legend-list-item-text">{labelText}</p>
+                <button
+                    className="waves-effect waves-light btn globalbtn"
+                    disabled={!hasLetters}
+                    onClick={() => this.playSpeakerTones(speakerIndex)}
+                    aria-label={`Play tones for ${labelText}`}
+                >
+                    <i className="material-icons right">play_circle_filled</i>
+                    Play Tones
+                </button>
                 <button className="waves-effect waves-light btn globalbtn" onClick={()=>{this.openColorChangeDailog(speakerIndex)}}>Change Design</button>
             </div>
         );

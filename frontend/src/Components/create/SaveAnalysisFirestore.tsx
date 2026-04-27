@@ -227,7 +227,7 @@ function SaveAnalysisFirestore({ analysis, saveThumbnail, data, callBacks,curren
     const collectionUuid = getCollectionUuidFromName(selectedCollection);
 
     if (word === undefined || wordTranslate === undefined || speakerName === undefined) {
-      NotificationManager.error("Invalid Spearker Name or Word or Word Translation !!!");
+      NotificationManager.error("Invalid Speaker Name or Word or Word Translation !!!");
     }
     else {
       const copyOfData = JSON.parse(JSON.stringify(data));

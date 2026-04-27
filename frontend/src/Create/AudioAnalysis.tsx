@@ -27,7 +27,7 @@ import {
   setUploadId,
 } from "../store/audio/actions";
 import { AudioAction } from "../store/audio/types";
-import { Letter, Speaker } from "../types/types";
+import { FileEntry, Letter, Speaker } from "../types/types";
 import * as DEFAULT from "../constants/create";
 
 import "./UploadAudio.css";
@@ -66,6 +66,10 @@ export interface AudioAnalysisProps {
   parentCallBack: (selectedFolderName: string) => void;
   updateAudioPitch: (index: number, minPitch: number, maxPitch: number) => void;
   setAudioUrl: (url: string) => void; // New prop
+  onFileDeleted: (file: FileEntry) => void;
+  activeFileNames: string[];
+  selectedFolderName?: string;
+  onBackClick?: () => void;
 }
 
 interface VerticalLine {
@@ -864,6 +868,10 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           setUploadId={this.setUploadId}
           userFiles={this.props.files}
           firebase={this.props.firebase}
+          onFileDeleted={this.props.onFileDeleted}
+          activeFileNames={this.props.activeFileNames}
+          selectedFolderName={this.props.selectedFolderName}
+          onBackClick={this.props.onBackClick}
         />
         <PitchRange
           useMinMaxInputs
@@ -942,7 +950,7 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
     const { speakerName, word, wordTranslation } = this.props.speakers[this.props.speakerIndex];
 
     if (speakerName === undefined) {
-      this.props.setSpeakerName(this.props.speakerIndex, "Speaker");
+      this.props.setSpeakerName(this.props.speakerIndex, "");
     }
     if (word === undefined) {
       this.props.setWord(this.props.speakerIndex, "Word");
