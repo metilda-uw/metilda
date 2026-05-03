@@ -247,9 +247,31 @@ def delete_folder():
 
 @app.route('/api/delete-image', methods=["POST"])
 def delete_image():
+    image_id = request.form['image_id']
     with Postgres() as connection:
-        postgres_select_query = """ DELETE FROM image WHERE IMAGE_ID = %s"""
-        results = connection.execute_update_query(postgres_select_query, (request.form['image_id'],))
+        linked_rows = connection.execute_select_query(
+            """SELECT analysis_id FROM image_analysis WHERE image_id = %s""",
+            (image_id,),
+        )
+        analysis_ids = [row[0] for row in linked_rows] if linked_rows else []
+
+        connection.execute_update_query(
+            """DELETE FROM image_analysis WHERE image_id = %s""",
+            (image_id,),
+        )
+
+        if analysis_ids:
+            placeholders = ",".join(["%s"] * len(analysis_ids))
+            delete_analyses_query = (
+                "DELETE FROM analysis WHERE analysis_id IN ("
+                + placeholders
+                + ") AND NOT EXISTS (SELECT 1 FROM image_analysis ia "
+                "WHERE ia.analysis_id = analysis.analysis_id)"
+            )
+            connection.execute_update_query(delete_analyses_query, tuple(analysis_ids))
+
+        postgres_delete_image = """ DELETE FROM image WHERE IMAGE_ID = %s"""
+        results = connection.execute_update_query(postgres_delete_image, (image_id,))
     return jsonify({'result': results})
 
 @app.route('/api/delete-recording', methods=["POST"])
