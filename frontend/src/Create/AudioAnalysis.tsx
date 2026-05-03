@@ -68,6 +68,8 @@ export interface AudioAnalysisProps {
   setAudioUrl: (url: string) => void; // New prop
   onFileDeleted: (file: FileEntry) => void;
   activeFileNames: string[];
+  selectedFolderName?: string;
+  onBackClick?: () => void;
 }
 
 interface VerticalLine {
@@ -868,6 +870,8 @@ export class AudioAnalysis extends React.Component<AudioAnalysisProps, State> {
           firebase={this.props.firebase}
           onFileDeleted={this.props.onFileDeleted}
           activeFileNames={this.props.activeFileNames}
+          selectedFolderName={this.props.selectedFolderName}
+          onBackClick={this.props.onBackClick}
         />
         <PitchRange
           useMinMaxInputs
