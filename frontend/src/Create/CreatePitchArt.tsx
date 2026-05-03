@@ -38,6 +38,7 @@ import { timeStamp } from "console";
 import { AppActions } from "../store/appActions";
 import * as constants from "../constants";
 import { canUserVisitCreatePitchArtpPage } from './ImportUtils';
+import { isStorageObjectNotFound } from "../Firebase/storageErrors";
 import Box from "@material-ui/core/Box";
 
 
@@ -613,13 +614,15 @@ class CreatePitchArt extends React.Component<
   }
 
   onFileDeleted = async (file: FileEntry) => {
-    // 1. Delete from Firebase Storage
+    // 1. Delete from Firebase Storage (missing objects still allow DB cleanup)
+    const storageRef = this.props.firebase.uploadFile();
     try {
-      const storageRef = this.props.firebase.uploadFile();
       await storageRef.child(file.path).delete();
     } catch (ex) {
-      NotificationManager.error(`Failed to delete "${file.name}" from storage.`);
-      return;
+      if (!isStorageObjectNotFound(ex)) {
+        NotificationManager.error(`Failed to delete "${file.name}" from storage.`);
+        return;
+      }
     }
 
     // 2. Delete from database

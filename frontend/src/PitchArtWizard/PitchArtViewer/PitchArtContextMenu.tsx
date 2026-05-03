@@ -3,6 +3,7 @@ import React from "react";
 interface Props {
     x: number;
     y: number;
+    showAccentPitch: boolean;
     onAddSecondaryAccent: () => void;
     onRemoveSecondaryAccent: () => void;
     onClose: () => void;
@@ -15,6 +16,9 @@ interface Props {
     contextMenuLetterIndex: number | null;
     hiddenSpeakerIndices: number[];
     hasSecondaryAccentOnThisCircle: boolean;
+    isPrimaryAccentOnThisCircle: boolean;
+    onSetPrimaryAccent: () => void;
+    onClearPrimaryAccent: () => void;
 }
 
 export default class PitchArtContextMenu extends React.Component<Props> {
@@ -63,6 +67,22 @@ export default class PitchArtContextMenu extends React.Component<Props> {
                         )}
 
                         <div style={{ borderTop: "1px solid #eee", margin: "6px 0" }} />
+                        {!this.props.showAccentPitch && (
+                            <div
+                                style={{ padding: "6px 12px", cursor: "pointer" }}
+                                onClick={() => {
+                                    if (this.props.isPrimaryAccentOnThisCircle) {
+                                        this.props.onClearPrimaryAccent();
+                                    } else {
+                                        this.props.onSetPrimaryAccent();
+                                    }
+                                }}
+                            >
+                                {this.props.isPrimaryAccentOnThisCircle
+                                    ? "Clear primary accent"
+                                    : "Set as primary accent"}
+                            </div>
+                        )}
                         {!this.props.hasSecondaryAccentOnThisCircle ? (
                             <div
                                 style={{ padding: "6px 12px", cursor: "pointer" }}

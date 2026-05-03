@@ -1,10 +1,12 @@
 import React from "react";
+import { NotificationManager } from "react-notifications";
 import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
 import "./History.scss";
 import AnalysesForImage from "./AnalysesForImage";
 import { spinner } from "../Utils/LoadingSpinner";
 import { exportExcel } from "../Utils/ExportExcel";
+import { isStorageObjectNotFound } from "../Firebase/storageErrors";
 
 export interface HistoryProps {
   firebase: any;
@@ -30,6 +32,8 @@ interface ImageEntity {
   name: string;
   createdAt: any;
   imageUrl: any;
+  imagePath: string;
+  legendPath: string | null;
   checked: boolean;
 }
 
@@ -74,11 +78,14 @@ export class History extends React.Component<HistoryProps, State> {
     const storageRef = this.props.firebase.uploadFile();
     body.result.forEach(async (image: any) => {
       const imageUrl = await storageRef.child(image[2]).getDownloadURL();
+      const legendPath = image[3] || null;
       const newImage = {
         id: image[0],
         name: image[1],
         createdAt: image[4],
         imageUrl,
+        imagePath: image[2],
+        legendPath,
         checked: false,
       };
       this.setState({
@@ -199,6 +206,111 @@ export class History extends React.Component<HistoryProps, State> {
     exportExcel(excelData, "data");
   };
 
+  deleteStorageSilently = async (storageRef: any, path: string | null) => {
+    if (!path) {
+      return;
+    }
+    try {
+      await storageRef.child(path).delete();
+    } catch (ex) {
+      if (!isStorageObjectNotFound(ex)) {
+        throw ex;
+      }
+    }
+  };
+
+  deleteSelectedHistory = async () => {
+    const selected = this.state.allUploadedImages.filter((img) => img.checked);
+    if (selected.length === 0) {
+      NotificationManager.info("Select at least one image to delete.");
+      return;
+    }
+    const confirmed = window.confirm(
+      `Delete ${selected.length} selected image(s) and their analyses from history? This cannot be undone.`
+    );
+    if (!confirmed) {
+      return;
+    }
+
+    this.setState({ isLoading: true });
+    const storageRef = this.props.firebase.uploadFile();
+    const deletedIds = new Set<number>();
+    let hadError = false;
+
+    try {
+      for (const image of selected) {
+        try {
+          const analysesResponse = await fetch(
+            `/api/get-analyses-for-image/${image.id.toString()}`,
+            {
+              method: "GET",
+              headers: { Accept: "application/json" },
+            }
+          );
+          if (!analysesResponse.ok) {
+            throw new Error("Failed to load analyses for this image.");
+          }
+          const analysesBody = await analysesResponse.json();
+          const rows = analysesBody.result || [];
+          for (const analysis of rows) {
+            const analysisPath = analysis[2] as string;
+            await this.deleteStorageSilently(storageRef, analysisPath);
+          }
+
+          await this.deleteStorageSilently(storageRef, image.legendPath);
+          await this.deleteStorageSilently(storageRef, image.imagePath);
+
+          const formData = new FormData();
+          formData.append("image_id", String(image.id));
+          const deleteResponse = await fetch(`/api/delete-image`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: formData,
+          });
+          if (!deleteResponse.ok) {
+            throw new Error(`Failed to delete image ${image.name} from database.`);
+          }
+          deletedIds.add(image.id);
+        } catch (e) {
+          hadError = true;
+          NotificationManager.error(
+            `Could not fully delete "${image.name}". ${e instanceof Error ? e.message : ""}`
+          );
+        }
+      }
+
+      const closingDetail =
+        this.state.selectedImageId !== null &&
+        deletedIds.has(this.state.selectedImageId);
+
+      this.setState((prev) => {
+        const allUploadedImages = prev.allUploadedImages.filter(
+          (img) => !deletedIds.has(img.id)
+        );
+        return {
+          allUploadedImages,
+          isImageClicked: closingDetail ? false : prev.isImageClicked,
+          selectedImageId: closingDetail ? null : prev.selectedImageId,
+          selectedImageName: closingDetail ? "" : prev.selectedImageName,
+        };
+      });
+
+      if (deletedIds.size > 0 && !hadError) {
+        NotificationManager.success(
+          deletedIds.size === 1
+            ? "Selected history item deleted."
+            : `${deletedIds.size} history items deleted.`
+        );
+      } else if (deletedIds.size > 0 && hadError) {
+        NotificationManager.info(
+          `${deletedIds.size} item(s) removed; some operations reported errors.`
+        );
+      }
+    } finally {
+      this.setState({ isLoading: false });
+    }
+  };
+
   render() {
     const { isLoading } = this.state;
     return (
@@ -209,21 +321,29 @@ export class History extends React.Component<HistoryProps, State> {
         <p>
           <i>
             <b>Note:</b> 1) Click on each image to view analysis <br />
-            2) Select checkboxes for images and click on 'Export to Excel'
-            button at the bottom of the page to export image-analysis data to
-            excel{" "}
+            2) Select checkboxes and use &apos;Export to Excel&apos; or
+            &apos;Delete selected&apos; at the bottom of the page{" "}
           </i>
         </p>
         <br />
         <div className="imageContainer">{this.renderImageData()}</div>
         {this.state.allUploadedImages.length > 0 && (
-          <button
-            className="ExportToExcel waves-effect waves-light btn globalbtn"
-            onClick={this.exportToExcel}
-          >
-            <i className="material-icons right">file_download</i>
-            Export to Excel
-          </button>
+          <div className="historyActions">
+            <button
+              className="ExportToExcel waves-effect waves-light btn globalbtn"
+              onClick={this.exportToExcel}
+            >
+              <i className="material-icons right">file_download</i>
+              Export to Excel
+            </button>
+            <button
+              className="DeleteSelectedHistory waves-effect waves-light btn globalbtn"
+              onClick={this.deleteSelectedHistory}
+            >
+              <i className="material-icons right">delete</i>
+              Delete selected
+            </button>
+          </div>
         )}
         <AnalysesForImage
           showAnalyses={this.state.isImageClicked}
