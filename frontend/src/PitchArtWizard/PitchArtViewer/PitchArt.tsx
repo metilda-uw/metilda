@@ -33,6 +33,7 @@ interface Props {
   showPerceptualScale: boolean;
   showPitchArtImageColor: boolean;
   showMetildaWatermark: boolean;
+  toneTranspositionSemitones: number;
   speakers: Speaker[];
   firebase: any;
   data: any;
@@ -112,6 +113,7 @@ class PitchArt extends React.Component<Props> {
         showPerceptualScale={this.props.showPerceptualScale}
         showPitchArtImageColor={this.props.showPitchArtImageColor}
         showMetildaWatermark={this.props.showMetildaWatermark}
+        toneTranspositionSemitones={this.props.toneTranspositionSemitones}
         showPrevPitchValueLists={false}
         speakers={this.props.speakers}
         firebase={this.props.firebase}

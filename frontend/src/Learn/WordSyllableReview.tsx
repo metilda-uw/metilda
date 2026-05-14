@@ -941,6 +941,7 @@ export class WordSyllableReview extends React.Component<Props, State> {
                     showLargeCircles={true}
                     showPitchArtImageColor={true}
                     showMetildaWatermark={false}
+                    toneTranspositionSemitones={0}
                     showPrevPitchValueLists={this.state.showPrevPitchValueLists}
                     speakers={speakers}
                     rawPitchValueLists={this.state.userPitchValueLists}
