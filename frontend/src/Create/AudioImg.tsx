@@ -158,11 +158,20 @@ class AudioImg extends Component <AudioImgProps, AudioImgState, JQuery> {
         }));
     }
 
-    componentDidUpdate(prevProps) {
+    componentDidUpdate(prevProps, prevState) {
+        if (!prevState.isLoaded && this.state.isLoaded) {
+            // Image just became visible after a (re)load (e.g. zoom in/out).
+            // renderVerticalLines() measures the img height from the DOM, which
+            // reads 0 while it's still hidden. Re-render now that layout is
+            // settled so the yellow rhythm lines appear immediately, not only
+            // after the next click.
+            this.forceUpdate();
+        }
+
         if (prevProps.minAudioX !== this.props.minAudioX || prevProps.maxAudioX !== this.props.maxAudioX) {
             this.updateVerticalLinePositions();
         }
-        
+
         if (prevProps.verticalLines !== this.props.verticalLines) {
             // Update state when props change
             this.setState({ verticalLines: this.props.verticalLines });

@@ -70,6 +70,7 @@ export interface PitchArtDrawingWindowProps {
   showPitchArtImageColor: boolean;
   showPrevPitchValueLists: boolean;
   showMetildaWatermark: boolean;
+  toneTranspositionSemitones: number;
   rawPitchValueLists?: RawPitchValue[][];
   firebase: any;
   isLearn?: boolean;
@@ -528,6 +529,7 @@ export class PitchArtDrawingWindow extends React.Component<
     const SPEAKER_GAP_SECONDS = 0.4;
     const notes: PitchArtNote[] = [];
     let cumulativeOffset = 0;
+    const transpositionMultiplier = Math.pow(2, (this.props.toneTranspositionSemitones || 0) / 12);
 
     for (const sp of visibleSpeakers) {
       const letters = sp.letters;
@@ -546,7 +548,7 @@ export class PitchArtDrawingWindow extends React.Component<
         notes.push({
           time: cumulativeOffset + time,
           duration,
-          pitch: item.pitch,
+          pitch: item.pitch * transpositionMultiplier,
           index,
           speakerIndex: sp.speakerIndex,
         });
@@ -655,8 +657,9 @@ export class PitchArtDrawingWindow extends React.Component<
   }
 
   playSound(pitch: number) {
+    const transpositionMultiplier = Math.pow(2, (this.props.toneTranspositionSemitones || 0) / 12);
     const synth = new Tone.Synth().toMaster();
-    synth.triggerAttackRelease(pitch, this.pitchArtSoundLengthSeconds);
+    synth.triggerAttackRelease(pitch * transpositionMultiplier, this.pitchArtSoundLengthSeconds);
   }
 
   imageBoundaryClicked(coordConverter: PitchArtCoordConverter) {

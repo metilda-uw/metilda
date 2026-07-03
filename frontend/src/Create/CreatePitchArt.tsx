@@ -104,7 +104,8 @@ interface State {
     showMetildaWatermark: boolean;
     isPitchRangeLocked: boolean;
     lockedMaxPitch: number,
-    lockedMinPitch: number
+    lockedMinPitch: number,
+    toneTranspositionSemitones: number;
   };
   isAChildVersion: boolean;
   parentDocumentId: string;
@@ -163,7 +164,8 @@ class CreatePitchArt extends React.Component<
         showMetildaWatermark: false,
         isPitchRangeLocked: false,
         lockedMaxPitch: DEFAULT.MAX_ANALYSIS_PITCH,
-        lockedMinPitch: DEFAULT.MIN_ANALYSIS_PITCH
+        lockedMinPitch: DEFAULT.MIN_ANALYSIS_PITCH,
+        toneTranspositionSemitones: 0,
       },
       isAChildVersion: false,
       parentDocumentId: '',

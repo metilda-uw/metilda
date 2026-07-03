@@ -223,6 +223,30 @@ class PitchArtContainer extends React.Component<Props, State> {
                 onText="Option 2"
                 onChange={this.toggleChanged}
               />
+              <div className="PitchArtToggle col s6">
+                <div className="PitchArtToggle-label">
+                  <label htmlFor="toneTranspositionSelect">Play Tone Range</label>
+                </div>
+                <div className="PitchArtToggle-toggle">
+                  <select
+                    id="toneTranspositionSelect"
+                    className="browser-default"
+                    value={this.props.pitchArt.toneTranspositionSemitones}
+                    onChange={(e) =>
+                      this.props.updatePitchArtValue(
+                        "toneTranspositionSemitones",
+                        Number(e.target.value)
+                      )
+                    }
+                    aria-label="Play Tone Range"
+                  >
+                    <option value={0}>Original</option>
+                    <option value={12}>+1 Octave</option>
+                    <option value={24}>+2 Octaves</option>
+                    <option value={-12}>-1 Octave</option>
+                  </select>
+                </div>
+              </div>
             </div>
             {
               <PitchArtLegend speakers={this.props.speakers} firebase={this.props.firebase} />
@@ -319,6 +343,7 @@ class PitchArtContainer extends React.Component<Props, State> {
                         showPerceptualScale={this.props.pitchArt.showPerceptualScale}
                         showPitchArtImageColor={this.props.pitchArt.showPitchArtImageColor}
                         showMetildaWatermark={this.props.pitchArt.showMetildaWatermark}
+                        toneTranspositionSemitones={this.props.pitchArt.toneTranspositionSemitones ?? 0}
                         speakers={this.props.speakers}
                         firebase={this.props.firebase}
                         data={this.props.data}
