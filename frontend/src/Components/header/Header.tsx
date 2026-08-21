@@ -304,6 +304,9 @@ class Header extends Component<HeaderProps, State> {
           <Link to="/converter">Converter</Link>
         </li>
         <li className="nav-menu-item">
+          <Link to="/langid">Language ID</Link>
+        </li>
+        <li className="nav-menu-item">
           <Link to="/feedback">Feedback</Link>
         </li>
         {this.state.isAdmin && (
@@ -374,6 +377,7 @@ class Header extends Component<HeaderProps, State> {
             <Button component={Link} to='/signout'>Sign Out</Button>
           </Collapse>
         <Button variant='contained' component={Link} to="/converter">Converter</Button>
+        <Button variant='contained' component={Link} to="/langid">Language ID</Button>
         <Button variant='contained' component={Link} to="/feedback">Feedback</Button>
         {this.state.isAdmin && (
             <Button variant='contained' component={Link} to="/manage-users">Manage Users</Button>

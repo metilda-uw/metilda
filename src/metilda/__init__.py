@@ -36,6 +36,7 @@ CORS(app)
 import metilda.controllers.pitch_art_wizard
 import metilda.controllers.mail
 import metilda.controllers.controller_firestore
+import metilda.controllers.langid
 
 @app.route('/')
 @app.route('/<path:path>')

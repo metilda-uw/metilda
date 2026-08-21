@@ -28,6 +28,7 @@ import passwordForget from "./Authentication/password_forget";
 import accountPage from "./Authentication/account";
 import MyFiles from "./MyFiles/MyFiles";
 import History from "./History/History";
+import LangIdUpload from "./LangId/LangIdUpload";
 import ManageUsers from "./Admin/ManageUsers";
 import Collections from "./Pages/Collections";
 import Converter from "./Converter/Converter";
@@ -166,6 +167,7 @@ const App = () => (
       <Route exact={true} path={ROUTES.ACCOUNT} component={accountPage} />
       <Route exact={true} path={ROUTES.MY_FILES} component={MyFiles} />
       <Route exact={true} path={ROUTES.HISTORY} component={History} />
+      <Route exact={true} path={ROUTES.LANGID} component={LangIdUpload} />
       <Route exact={true} path={ROUTES.SIGN_OUT} component={signOut} />
       <Route exact={true} path={ROUTES.COLLECTIONS} component={Collections} />
       <Route exact={true} path={ROUTES.CONVERTER} component={Converter} />
