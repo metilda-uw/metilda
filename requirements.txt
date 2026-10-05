@@ -87,7 +87,7 @@ threadpoolctl==3.6.0
 toml==0.10.2
 transaction==5.0
 uritemplate==4.2.0
-urllib3==2.6.3
+urllib3==2.8.0
 waitress==3.0.2
 wcwidth==0.6.0
 Werkzeug==3.1.6
