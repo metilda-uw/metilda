@@ -22,6 +22,11 @@ ENV/
 env.bak/
 venv.bak/
 
+# Firebase service-account keys: never commit (Heroku Config Var / FIREBASE_CREDENTIALS_PATH instead)
+src/metilda/certificates/
+serviceAccountKey*.json
+*firebase-adminsdk*.json
+
 # Distribution / packaging
 .Python
 [Bb]in

@@ -26,7 +26,6 @@ app = Flask(__name__,
             template_folder="../../frontend/build")
 app.config["SOUNDS"] = os.path.join(os.path.dirname(__file__), "sounds")
 app.config["PICTURES"] = os.path.join(os.path.dirname(__file__), "pictures")
-app.config["CERTIFICATES"] = os.path.join(os.path.dirname(__file__), "certificates")
 app.config["SPECTROGRAMS"] = os.path.join(os.path.dirname(__file__), "saved_spectrograms")
 
 app.json_provider_class = CustomJSONProvider
