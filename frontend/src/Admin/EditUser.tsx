@@ -6,11 +6,13 @@ import Select from "react-select";
 import "./EditUser.scss";
 import ReactGA from "react-ga";
 import {NotificationManager} from "react-notifications";
+import { authHeaders } from "../Firebase/authHeaders";
 
 export interface EditUserProps {
   editUserClicked: any;
   editUserBackButtonClicked: any;
   editedUser: any;
+  firebase: any;
 }
 
 interface State {
@@ -83,10 +85,12 @@ export class EditUser extends React.Component<EditUserProps, State> {
     formData.append("user_name", username);
     formData.append("university", institution);
     formData.append("password", passwordOne);
+    const loginHeaders = await authHeaders(this.props.firebase);
     const response = await fetch(`/api/update-user-from-admin`, {
           method: "POST",
           headers: {
-              Accept: "application/json"
+              Accept: "application/json",
+              ...loginHeaders
           },
           body: formData
         });
@@ -137,7 +141,8 @@ export class EditUser extends React.Component<EditUserProps, State> {
             await fetch(`/api/delete-previous-user-roles`, {
               method: "POST",
               headers: {
-              Accept: "application/json"
+              Accept: "application/json",
+              ...loginHeaders
               },
               body: recordingData
               });
@@ -151,7 +156,8 @@ export class EditUser extends React.Component<EditUserProps, State> {
               fetch(`/api/create-user-role`, {
                 method: "POST",
                 headers: {
-                Accept: "application/json"
+                Accept: "application/json",
+                ...loginHeaders
                 },
                 body: roleData
                 });

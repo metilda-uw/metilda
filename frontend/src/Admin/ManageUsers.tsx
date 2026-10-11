@@ -476,15 +476,18 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
         <CreateUser
           addUserClicked={this.state.isCreateUserClicked}
           addUserBackButtonClicked={this.addUserBackButtonClicked}
+          firebase={this.props.firebase}
         />
         <EditUser
           editUserClicked={this.state.isEditUserClicked}
           editUserBackButtonClicked={this.editUserBackButtonClicked}
           editedUser={this.state.editedUser}
+          firebase={this.props.firebase}
         />
         <AuthorizeUser
           authorizeUserClicked={this.state.isauthorizeUserClicked}
           authorizeUserBackButtonClicked={this.authorizeUserBackButtonClicked}
+          firebase={this.props.firebase}
         />
       </div>
     );

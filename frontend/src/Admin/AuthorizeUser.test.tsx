@@ -5,6 +5,7 @@ import sinon from "sinon";
 import {AuthorizeUser, AuthorizeUserProps} from "./AuthorizeUser";
 
 const mockedFetch = sinon.stub(window, "fetch");
+const fakeFirebase = { auth: { currentUser: { getIdToken: () => Promise.resolve("test-token") } } };
 describe("AuthorizeUser", () => {
   it("renders the Authorize User", () => {
         const subject = shallowRender({authorizeUserClicked: true});
@@ -43,9 +44,25 @@ describe("AuthorizeUser", () => {
       });
 });
 
+describe("AuthorizeUser login", () => {
+  it("sends the signed-in user's login token with the request", (done) => {
+    const subject = shallowRender({});
+    subject.setState({ role: { value: "Blackfoot", label: "Blackfoot" }, email: "test_user_1@gmail.com" });
+    mockedFetch.resetHistory();
+    mockedFetch.returns(Promise.resolve(new Response(JSON.stringify({ result: 1 }))));
+    subject.find(".CreateUserForm").simulate("submit", { preventDefault() { return "true"; } });
+    setTimeout(() => {
+      expect(mockedFetch.firstCall.args[0]).to.equal("/api/authorize-user");
+      expect((mockedFetch.firstCall.args[1] as any).headers.Authorization).to.equal("Bearer test-token");
+      done();
+    }, 10);
+  });
+});
+
 interface OptionalProps {
   authorizeUserClicked?: any;
   authorizeUserBackButtonClicked?: any;
+  firebase?: any;
 }
 
 function shallowRender(props: OptionalProps) {
@@ -55,6 +72,7 @@ function shallowRender(props: OptionalProps) {
 function makeProps(props: OptionalProps): AuthorizeUserProps {
     return {
       authorizeUserClicked: props.authorizeUserClicked || false,
-      authorizeUserBackButtonClicked: props.authorizeUserBackButtonClicked || (() => undefined)
+      authorizeUserBackButtonClicked: props.authorizeUserBackButtonClicked || (() => undefined),
+      firebase: props.firebase || fakeFirebase
     };
 }

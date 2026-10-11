@@ -2,6 +2,7 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
+import { authHeaders } from "../Firebase/authHeaders";
 import * as ROUTES from "../constants/routes";
 import Select from "react-select";
 import ReactGA from "react-ga";
@@ -197,10 +198,13 @@ class SignUpFormBase extends React.Component<Props, State> {
         formData.append("user_name", username);
         formData.append("university", institution);
 
+        // The new account is signed in already; the server checks this login before saving anything.
+        const loginHeaders = await authHeaders(this.props.firebase);
         const response = await fetch(`/api/create-user`, {
           method: "POST",
           headers: {
-              Accept: "application/json"
+              Accept: "application/json",
+              ...loginHeaders
           },
           body: formData
         });
@@ -226,7 +230,8 @@ class SignUpFormBase extends React.Component<Props, State> {
           const result =  await fetch(`/api/create-user-role`, {
             method: "POST",
             headers: {
-            Accept: "application/json"
+            Accept: "application/json",
+            ...loginHeaders
             },
             body: roleData
             });

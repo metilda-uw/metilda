@@ -7,10 +7,12 @@ import Select from "react-select";
 import "./CreateUser.scss";
 import ReactGA from "react-ga";
 import {NotificationManager} from "react-notifications";
+import { authHeaders } from "../Firebase/authHeaders";
 
 export interface CreateUserProps {
   addUserClicked: any;
   addUserBackButtonClicked: any;
+  firebase: any;
 }
 
 interface State {
@@ -68,10 +70,12 @@ export class CreateUser extends React.Component<CreateUserProps, State> {
     formData.append("user_name", username);
     formData.append("university", institution);
     formData.append("password", passwordOne);
+    const loginHeaders = await authHeaders(this.props.firebase);
     const response = await fetch(`/api/add-new-user-from-admin`, {
           method: "POST",
           headers: {
-              Accept: "application/json"
+              Accept: "application/json",
+              ...loginHeaders
           },
           body: formData
         });
@@ -102,7 +106,8 @@ export class CreateUser extends React.Component<CreateUserProps, State> {
         const result =  await fetch(`/api/create-user-role`, {
           method: "POST",
           headers: {
-          Accept: "application/json"
+          Accept: "application/json",
+          ...loginHeaders
           },
           body: roleData
           });

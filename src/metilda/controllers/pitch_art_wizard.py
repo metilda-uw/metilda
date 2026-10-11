@@ -7,6 +7,7 @@ import flask
 import uuid
 from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
+from .login_checks import admin_required, self_or_admin_required
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io, praat, utils
@@ -133,6 +134,7 @@ def available_files():
 
 
 @app.route('/api/create-user', methods=["POST"])
+@self_or_admin_required('user_id')
 def create_db_user():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
@@ -150,6 +152,7 @@ def create_user_research_language():
     return jsonify({'result': last_row_id})
 
 @app.route('/api/create-user-role', methods=["POST"])
+@self_or_admin_required('user_id')
 def create_user_research_role():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO user_role (USER_ID, USER_ROLE) VALUES (%s,%s) RETURNING USER_ID"""
@@ -478,6 +481,7 @@ def init_firebase_admin():
     firebase_admin.initialize_app(service_account_credential)
 
 @app.route('/api/delete-user', methods=["POST"])
+@admin_required
 def delete_user():
     user_id=request.form['user_id']
     # Delete user from firebase
@@ -493,6 +497,7 @@ def delete_user():
     return jsonify({'result': results})
 
 @app.route('/api/add-new-user-from-admin', methods=["POST"])
+@admin_required
 def add_new_user_from_admin():
     init_firebase_admin()
     try:
@@ -513,6 +518,7 @@ def add_new_user_from_admin():
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/update-user-from-admin', methods=["POST"])
+@admin_required
 def update_user_from_admin():
     init_firebase_admin()
     try:
@@ -539,6 +545,7 @@ def update_user_from_admin():
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/delete-previous-user-roles', methods=["POST"])
+@admin_required
 def delete_previous_user_roles():
     with Postgres() as connection:
         postgres_select_query = """ DELETE FROM user_role WHERE USER_ID = %s AND USER_ROLE=%s"""
@@ -555,6 +562,7 @@ def delete_previous_user_research_language():
     return jsonify({'result': results})
 
 @app.route('/api/authorize-user', methods=["POST"])
+@admin_required
 def authorize_user():
     with Postgres() as connection:
         postgres_insert_query = """ UPDATE user_role SET VERIFIED = true WHERE USER_ID=%s AND USER_ROLE=%s"""
