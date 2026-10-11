@@ -6,10 +6,12 @@ import Select from "react-select";
 import "./AuthorizeUser.scss";
 import ReactGA from "react-ga";
 import {NotificationManager} from "react-notifications";
+import { authHeaders } from "../Firebase/authHeaders";
 
 export interface AuthorizeUserProps {
   authorizeUserClicked: any;
   authorizeUserBackButtonClicked: any;
+  firebase: any;
 }
 
 interface State {
@@ -58,10 +60,12 @@ export class AuthorizeUser extends React.Component<AuthorizeUserProps, State> {
     const formData = new FormData();
     formData.append("email", email);
     formData.append("user_role", role.value);
+    const loginHeaders = await authHeaders(this.props.firebase);
     const response = await fetch(`/api/authorize-user`, {
           method: "POST",
           headers: {
-              Accept: "application/json"
+              Accept: "application/json",
+              ...loginHeaders
           },
           body: formData
         });

@@ -1,4 +1,5 @@
 import os
+import json
 from os import environ
 import shutil
 import tempfile
@@ -6,6 +7,7 @@ import flask
 import uuid
 from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
+from .login_checks import admin_required, self_or_admin_required
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io, praat, utils
@@ -132,6 +134,7 @@ def available_files():
 
 
 @app.route('/api/create-user', methods=["POST"])
+@self_or_admin_required('user_id')
 def create_db_user():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
@@ -149,6 +152,7 @@ def create_user_research_language():
     return jsonify({'result': last_row_id})
 
 @app.route('/api/create-user-role', methods=["POST"])
+@self_or_admin_required('user_id')
 def create_user_research_role():
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO user_role (USER_ID, USER_ROLE) VALUES (%s,%s) RETURNING USER_ID"""
@@ -475,14 +479,35 @@ def get_user_research_language(user_id):
         results = connection.execute_select_query(postgres_select_query,(filter_values,))
     return jsonify({'result': results})
 
+def init_firebase_admin():
+    """Initialise the Firebase Admin SDK once per process.
+
+    The service-account key is never stored in the repository. It comes from the environment:
+    FIREBASE_SERVICE_ACCOUNT_JSON holds the key's JSON (a Heroku Config Var), and
+    FIREBASE_CREDENTIALS_PATH points at a key file outside the repository (local development).
+    """
+    if len(firebase_admin._apps):
+        return
+    service_account_json = environ.get('FIREBASE_SERVICE_ACCOUNT_JSON')
+    if service_account_json:
+        try:
+            service_account_info = json.loads(service_account_json)
+        except ValueError:
+            raise RuntimeError('FIREBASE_SERVICE_ACCOUNT_JSON is not valid JSON') from None
+        service_account_credential = credentials.Certificate(service_account_info)
+    elif environ.get('FIREBASE_CREDENTIALS_PATH'):
+        service_account_credential = credentials.Certificate(environ['FIREBASE_CREDENTIALS_PATH'])
+    else:
+        raise RuntimeError('Firebase credentials are not configured: set FIREBASE_SERVICE_ACCOUNT_JSON '
+                           '(or FIREBASE_CREDENTIALS_PATH for local development)')
+    firebase_admin.initialize_app(service_account_credential)
+
 @app.route('/api/delete-user', methods=["POST"])
+@admin_required
 def delete_user():
     user_id=request.form['user_id']
     # Delete user from firebase
-    if (not len(firebase_admin._apps)):
-        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
-        service_account_credential = credentials.Certificate(certificate_path)
-        firebase_admin.initialize_app(service_account_credential)
+    init_firebase_admin()
     user = auth.get_user_by_email(user_id)
     auth.delete_user(user.uid)
     print('Successfully deleted user from firebase')
@@ -494,11 +519,9 @@ def delete_user():
     return jsonify({'result': results})
 
 @app.route('/api/add-new-user-from-admin', methods=["POST"])
+@admin_required
 def add_new_user_from_admin():
-    if (not len(firebase_admin._apps)):
-        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
-        service_account_credential = credentials.Certificate(certificate_path)
-        firebase_admin.initialize_app(service_account_credential)
+    init_firebase_admin()
     try:
         # Insert user into firebase
         user = auth.create_user(
@@ -517,11 +540,9 @@ def add_new_user_from_admin():
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/update-user-from-admin', methods=["POST"])
+@admin_required
 def update_user_from_admin():
-    if (not len(firebase_admin._apps)):
-        certificate_path = os.path.join(app.config["CERTIFICATES"], "serviceAccountKey.json")
-        service_account_credential = credentials.Certificate(certificate_path)
-        firebase_admin.initialize_app(service_account_credential)
+    init_firebase_admin()
     try:
         # Update user in firebase
         previous_email=request.form['previous_email']
@@ -546,6 +567,7 @@ def update_user_from_admin():
         return jsonify({'result': 'Error: '+str(e)})
 
 @app.route('/api/delete-previous-user-roles', methods=["POST"])
+@admin_required
 def delete_previous_user_roles():
     with Postgres() as connection:
         postgres_select_query = """ DELETE FROM user_role WHERE USER_ID = %s AND USER_ROLE=%s"""
@@ -562,6 +584,7 @@ def delete_previous_user_research_language():
     return jsonify({'result': results})
 
 @app.route('/api/authorize-user', methods=["POST"])
+@admin_required
 def authorize_user():
     with Postgres() as connection:
         postgres_insert_query = """ UPDATE user_role SET VERIFIED = true WHERE USER_ID=%s AND USER_ROLE=%s"""

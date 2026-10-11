@@ -9,6 +9,7 @@ import { idText } from "typescript";
 import { set } from "react-ga";
 import {getLineColors, getDotColors} from '../Designs/pitchArtDesigns';
 import * as constants from "../constants";
+import { authHeaders } from "../Firebase/authHeaders";
 
 
 export function importSpeakerFile(
@@ -156,16 +157,22 @@ export function deleteUser(userId: any, firebase: any) {
     // const uid = firebase.auth.currentUser.email;
     const formData = new FormData();
     formData.append("user_id", userId);
-    fetch(`/api/delete-user`, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-      },
-      body: formData,
-    }).then((response) => {
-      response.json();
-      resolve(response);
-    });
+    authHeaders(firebase)
+      .then((loginHeaders) =>
+        fetch(`/api/delete-user`, {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            ...loginHeaders,
+          },
+          body: formData,
+        })
+      )
+      .then((response) => {
+        response.json();
+        resolve(response);
+      })
+      .catch(reject);
   });
   return filePromise;
 }
