@@ -5,6 +5,7 @@ import sinon from "sinon";
 import {EditUser, EditUserProps} from "./EditUser";
 
 const mockedFetch = sinon.stub(window, "fetch");
+const fakeFirebase = { auth: { currentUser: { getIdToken: () => Promise.resolve("test-token") } } };
 describe("EditUser", () => {
   it("renders the Edit User", () => {
         const subject = shallowRender({editUserClicked: true});
@@ -167,10 +168,29 @@ describe("EditUser", () => {
 });
 });
 
+describe("EditUser login", () => {
+  it("sends the signed-in user's login token with the request", (done) => {
+    window.confirm = jest.fn().mockImplementation(() => true);
+    const subject = shallowRender({});
+    subject.setProps({ editedUser: { username: "test_user", email: "test_user@gmail.com", passwordOne: "",
+                                     institution: "test_institution", role: [], languageOfResearch: [] } });
+    mockedFetch.resetHistory();
+    // an error answer stops the page after the first request, which is the one we check
+    mockedFetch.returns(Promise.resolve(new Response(JSON.stringify({ result: "Error" }))));
+    subject.find(".CreateUserForm").simulate("submit", { preventDefault() { return true; } });
+    setTimeout(() => {
+      expect(mockedFetch.firstCall.args[0]).to.equal("/api/update-user-from-admin");
+      expect((mockedFetch.firstCall.args[1] as any).headers.Authorization).to.equal("Bearer test-token");
+      done();
+    }, 10);
+  });
+});
+
 interface OptionalProps {
   editUserClicked?: any;
   editUserBackButtonClicked?: any;
   editedUser?: any;
+  firebase?: any;
 }
 
 function shallowRender(props: OptionalProps) {
@@ -181,6 +201,7 @@ function makeProps(props: OptionalProps): EditUserProps {
     return {
       editUserClicked: props.editUserClicked || true,
       editUserBackButtonClicked: props.editUserBackButtonClicked || (() => undefined),
-      editedUser: props.editedUser || undefined
+      editedUser: props.editedUser || undefined,
+      firebase: props.firebase || fakeFirebase
     };
 }
