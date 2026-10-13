@@ -90,7 +90,7 @@ uritemplate==4.2.0
 urllib3==2.6.3
 waitress==3.0.2
 wcwidth==0.6.0
-Werkzeug==3.1.6
+Werkzeug==3.1.9
 zc.lockfile==4.0
 ZConfig==4.3
 zipp==3.23.0
