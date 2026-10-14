@@ -240,29 +240,12 @@ export class History extends React.Component<HistoryProps, State> {
     try {
       for (const image of selected) {
         try {
-          const analysesResponse = await fetch(
-            `/api/get-analyses-for-image/${image.id.toString()}`,
-            {
-              method: "GET",
-              headers: { Accept: "application/json" },
-            }
-          );
-          if (!analysesResponse.ok) {
-            throw new Error("Failed to load analyses for this image.");
-          }
-          const analysesBody = await analysesResponse.json();
-          const rows = analysesBody.result || [];
-          for (const analysis of rows) {
-            const analysisPath = analysis[2] as string;
-            await this.deleteStorageSilently(storageRef, analysisPath);
-          }
-
-          await this.deleteStorageSilently(storageRef, image.legendPath);
-          await this.deleteStorageSilently(storageRef, image.imagePath);
-
+          // The database goes first. The server answers with the Storage paths of the analyses it
+          // removed (an analysis another image still uses is kept), so only those files are deleted
+          // here. If the database step fails nothing is deleted at all.
           const formData = new FormData();
           formData.append("image_id", String(image.id));
-          const deleteResponse = await fetch(`/api/delete-image`, {
+          const deleteResponse = await fetch(`/api/delete-image-with-analyses`, {
             method: "POST",
             headers: { Accept: "application/json" },
             body: formData,
@@ -270,11 +253,27 @@ export class History extends React.Component<HistoryProps, State> {
           if (!deleteResponse.ok) {
             throw new Error(`Failed to delete image ${image.name} from database.`);
           }
+          const deleteBody = await deleteResponse.json();
           deletedIds.add(image.id);
+
+          const analysisPaths: string[] = deleteBody.deletedAnalysisPaths || [];
+          try {
+            for (const analysisPath of analysisPaths) {
+              await this.deleteStorageSilently(storageRef, analysisPath);
+            }
+            await this.deleteStorageSilently(storageRef, image.legendPath);
+            await this.deleteStorageSilently(storageRef, image.imagePath);
+          } catch (storageError) {
+            // The records are already gone; only unused files could not be removed.
+            hadError = true;
+            NotificationManager.error(
+              `"${image.name}" was deleted, but some of its files could not be removed from storage.`
+            );
+          }
         } catch (e) {
           hadError = true;
           NotificationManager.error(
-            `Could not fully delete "${image.name}". ${e instanceof Error ? e.message : ""}`
+            `Could not delete "${image.name}". ${e instanceof Error ? e.message : ""}`
           );
         }
       }
