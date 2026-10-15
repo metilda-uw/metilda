@@ -8,6 +8,7 @@ import uuid
 from flask import request, jsonify, send_file, flash,send_file, make_response
 from .Postgres import Postgres
 from .login_checks import admin_required, self_or_admin_required
+from . import login_checks
 from metilda import app
 from metilda.default import MIN_PITCH_HZ, MAX_PITCH_HZ
 from metilda.services import audio_analysis, file_io, praat, utils
@@ -136,12 +137,44 @@ def available_files():
 @app.route('/api/create-user', methods=["POST"])
 @self_or_admin_required('user_id')
 def create_db_user():
+    # The row can already exist: the website registers a signed-in user automatically
+    # (/api/ensure-user), and that can happen while sign-up is still running. Sign-up's own details
+    # then replace the placeholder name, and the existing user id is returned so the role and
+    # language rows are attached to it.
     with Postgres() as connection:
-        postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
-        CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
-        record_to_insert = (request.form['user_id'], request.form['user_name'], request.form['university'])
-        last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+        updated = connection.execute_select_query(
+            """ UPDATE users SET USER_NAME = %s, UNIVERSITY = %s WHERE LOWER(USER_ID) = LOWER(%s) RETURNING USER_ID """,
+            (request.form['user_name'], request.form['university'], request.form['user_id']))
+        if updated:
+            last_row_id = updated[0][0]
+        else:
+            postgres_insert_query = """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY,
+            CREATED_AT, LAST_LOGIN) VALUES (%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING USER_ID"""
+            record_to_insert = (request.form['user_id'], request.form['user_name'], request.form['university'])
+            last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
     return jsonify({'result': last_row_id})
+
+@app.route('/api/ensure-user', methods=["POST"])
+def ensure_db_user():
+    """Make sure the signed-in user has a row in users. A login can exist without one (for example
+    an account that signed up on the other site: staging and production share the Firebase logins
+    but not the database), and then every upload or save fails. The email comes only from the
+    verified login, never from the request, so nobody can register someone else. No role is created."""
+    email = login_checks.get_caller_email_exact()
+    if email is None:
+        return jsonify({'result': 'Error: login required'}), 401
+    created = None
+    with Postgres() as connection:
+        existing = connection.execute_select_query(
+            """ SELECT 1 FROM users WHERE LOWER(USER_ID) = LOWER(%s) """, (email,))
+        if existing == []:
+            created = connection.execute_update_query(
+                """ INSERT INTO users (USER_ID, USER_NAME, UNIVERSITY, CREATED_AT, LAST_LOGIN)
+                    VALUES (%s, %s, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP) ON CONFLICT DO NOTHING """,
+                (email, email.split('@')[0][:100]))
+    if existing is None or (existing == [] and created is None):
+        return jsonify({'result': 'Error: could not check the account'}), 500
+    return jsonify({'result': 'created' if created else 'exists'})
 
 @app.route('/api/create-user-research-language', methods=["POST"])
 def create_user_research_language():
@@ -171,6 +204,8 @@ def update_db_user():
 
 @app.route('/api/create-file', methods=["POST"])
 def create_file():
+    owner_rows = None
+    recording_id = 'not a recording'
     with Postgres() as connection:
         postgres_insert_query = """ INSERT INTO audio (AUDIO_ID, USER_ID, FILE_NAME, FILE_PATH, FILE_TYPE, FILE_SIZE,
          CREATED_AT, UPDATED_AT) VALUES (DEFAULT,%s,%s,%s,%s,%s,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP) RETURNING AUDIO_ID"""
@@ -178,14 +213,21 @@ def create_file():
         request.form['file_size'])
         last_row_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
 
-        postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
-        insert_values = (last_row_id, request.form['user_id'], "own")
-        connection.execute_insert_query(postgres_insert_audio_user, insert_values, need_last_row_id=False)
+        if last_row_id is not None:
+            postgres_insert_audio_user = """ INSERT INTO audio_user(AUDIO_ID, USER_ID, PERMISSION) VALUES( %s, %s, %s) """
+            insert_values = (last_row_id, request.form['user_id'], "own")
+            owner_rows = connection.execute_update_query(postgres_insert_audio_user, insert_values)
 
-        if request.form['file_type'] == 'Recording':
-            postgres_insert_query = """ INSERT INTO recording_info (AUDIO_ID, NUMBER_OF_SYLLABLES, RECORDING_NAME) VALUES (%s,%s,%s) RETURNING AUDIO_ID"""
-            record_to_insert = (last_row_id, request.form['number_of_syllables'], request.form['recording_word_name'])
-            connection.execute_insert_query(postgres_insert_query, record_to_insert)
+            if owner_rows is not None and request.form['file_type'] == 'Recording':
+                postgres_insert_query = """ INSERT INTO recording_info (AUDIO_ID, NUMBER_OF_SYLLABLES, RECORDING_NAME) VALUES (%s,%s,%s) RETURNING AUDIO_ID"""
+                record_to_insert = (last_row_id, request.form['number_of_syllables'], request.form['recording_word_name'])
+                recording_id = connection.execute_insert_query(postgres_insert_query, record_to_insert)
+
+    # A failed insert returns None and aborts the transaction, so nothing was saved. Saying so lets
+    # the page show an error instead of "Uploaded file successfully!" (for example when the account
+    # has no row in users, the audio table refuses the file).
+    if last_row_id is None or owner_rows is None or recording_id is None:
+        return jsonify({'result': 'Error: the file could not be registered'}), 500
     return jsonify({'result': last_row_id})
 
 
