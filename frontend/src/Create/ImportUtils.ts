@@ -61,10 +61,23 @@ export function uploadAudio(results: FileList, firebase: any) {
               Accept: "application/json",
             },
             body: formData,
-          }).then((response) => {
-            NotificationManager.success("Uploaded file successfully!");
-            resolve(response);
-          });
+          })
+            .then((response) => {
+              if (!response.ok) {
+                // MeTILDA did not record the file, so remove the copy just stored and say so.
+                filesRef.delete().catch(() => undefined);
+                NotificationManager.error(FILE_NOT_SAVED_MESSAGE);
+                reject(new Error("The file could not be registered."));
+                return;
+              }
+              NotificationManager.success("Uploaded file successfully!");
+              resolve(response);
+            })
+            .catch((ex: any) => {
+              // No answer from the server: the outcome is unknown, so the stored file is kept.
+              NotificationManager.error(UPLOAD_NOT_CONFIRMED_MESSAGE);
+              reject(ex);
+            });
         })
         .catch((ex: any) => {
           reject(ex);
@@ -74,6 +87,13 @@ export function uploadAudio(results: FileList, firebase: any) {
   });
   return filePromise;
 }
+
+export const FILE_NOT_SAVED_MESSAGE =
+  "Error: the file could not be saved to your account. Please sign out, sign in again and try once more.";
+export const RECORDING_NOT_SAVED_MESSAGE =
+  "Error: the recording could not be saved to your account. Please sign out, sign in again and try once more.";
+export const UPLOAD_NOT_CONFIRMED_MESSAGE =
+  "Error: the upload could not be confirmed. Please check My Files before trying again.";
 
 export function uploadRecording(
   result: any,
@@ -110,6 +130,13 @@ export function uploadRecording(
         body: formData,
       })
         .then((response) => {
+          if (!response.ok) {
+            // MeTILDA did not record the recording, so remove the copy just stored and say so.
+            filesRef.delete().catch(() => undefined);
+            NotificationManager.error(RECORDING_NOT_SAVED_MESSAGE);
+            reject(new Error("The recording could not be registered."));
+            return;
+          }
           response.json();
           NotificationManager.success("Uploaded recording successfully!");
           resolve(response);

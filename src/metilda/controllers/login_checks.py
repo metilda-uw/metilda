@@ -24,9 +24,10 @@ if 'clock_skew_in_seconds' in inspect.signature(id_token.verify_firebase_token).
     _verify_options['clock_skew_in_seconds'] = CLOCK_SKEW_SECONDS
 
 
-def get_caller_email():
-    """Return the verified, lower-case email of the signed-in caller, or None when the
-    Authorization header is missing or the token is not valid."""
+def get_caller_email_exact():
+    """Return the verified email of the signed-in caller exactly as Firebase reports it (the
+    website uses this same value as the user id), or None when the Authorization header is
+    missing or the token is not valid."""
     header = request.headers.get('Authorization', '')
     if not header.startswith('Bearer '):
         return None
@@ -37,7 +38,13 @@ def get_caller_email():
     except Exception as error:
         print('Login check failed: {}'.format(error))
         return None
-    email = claims.get('email')
+    return claims.get('email') or None
+
+
+def get_caller_email():
+    """Return the verified, lower-case email of the signed-in caller, or None when the
+    Authorization header is missing or the token is not valid."""
+    email = get_caller_email_exact()
     return email.lower() if email else None
 
 
