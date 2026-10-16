@@ -249,34 +249,45 @@ def delete_folder():
         results = connection.execute_update_query(postgres_delete_query, (request.form['file_id'],))
     return jsonify({'result': results})
 
+# Deletes only the image (its image_analysis links go with it). The analysis is NOT touched: saving
+# again over an existing analysis removes its old images through this route and must keep the
+# analysis. History > Delete selected uses /api/delete-image-with-analyses.
 @app.route('/api/delete-image', methods=["POST"])
 def delete_image():
+    with Postgres() as connection:
+        postgres_select_query = """ DELETE FROM image WHERE IMAGE_ID = %s"""
+        results = connection.execute_update_query(postgres_select_query, (request.form['image_id'],))
+    return jsonify({'result': results})
+
+@app.route('/api/delete-image-with-analyses', methods=["POST"])
+def delete_image_with_analyses():
+    """Delete a saved image together with the analyses that no other image uses (History >
+    Delete selected). An analysis that another image still uses is kept, and so is its file.
+    The database changes first, in one transaction; the answer lists the Storage paths of the
+    analyses that were removed so the page deletes exactly those files afterwards. If anything
+    fails nothing is deleted and the answer is HTTP 500."""
     image_id = request.form['image_id']
     with Postgres() as connection:
         linked_rows = connection.execute_select_query(
-            """SELECT analysis_id FROM image_analysis WHERE image_id = %s""",
-            (image_id,),
-        )
+            """ SELECT analysis_id FROM image_analysis WHERE image_id = %s """, (image_id,))
         analysis_ids = [row[0] for row in linked_rows] if linked_rows else []
 
-        connection.execute_update_query(
-            """DELETE FROM image_analysis WHERE image_id = %s""",
-            (image_id,),
-        )
+        links_deleted = connection.execute_update_query(
+            """ DELETE FROM image_analysis WHERE image_id = %s """, (image_id,))
+        image_deleted = connection.execute_update_query(
+            """ DELETE FROM image WHERE IMAGE_ID = %s """, (image_id,))
 
+        removed_rows = []
         if analysis_ids:
-            placeholders = ",".join(["%s"] * len(analysis_ids))
-            delete_analyses_query = (
-                "DELETE FROM analysis WHERE analysis_id IN ("
-                + placeholders
-                + ") AND NOT EXISTS (SELECT 1 FROM image_analysis ia "
-                "WHERE ia.analysis_id = analysis.analysis_id)"
-            )
-            connection.execute_update_query(delete_analyses_query, tuple(analysis_ids))
+            removed_rows = connection.execute_select_query(
+                """ DELETE FROM analysis WHERE analysis_id = ANY(%s)
+                    AND NOT EXISTS (SELECT 1 FROM image_analysis ia WHERE ia.analysis_id = analysis.analysis_id)
+                    RETURNING analysis_file_path """, (analysis_ids,))
 
-        postgres_delete_image = """ DELETE FROM image WHERE IMAGE_ID = %s"""
-        results = connection.execute_update_query(postgres_delete_image, (image_id,))
-    return jsonify({'result': results})
+    # A failed statement returns None and aborts the transaction, so nothing was committed.
+    if linked_rows is None or links_deleted is None or image_deleted is None or removed_rows is None:
+        return jsonify({'result': 'Error: could not delete the image'}), 500
+    return jsonify({'result': image_deleted, 'deletedAnalysisPaths': [row[0] for row in removed_rows]})
 
 @app.route('/api/delete-recording', methods=["POST"])
 def delete_recording():
