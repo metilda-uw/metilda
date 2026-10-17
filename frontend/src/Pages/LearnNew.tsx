@@ -218,6 +218,7 @@ export default function LearnNew() {
                   showLargeCircles={true}
                   showPitchArtImageColor={true}
                   showMetildaWatermark={false}
+                  toneTranspositionSemitones={0}
                   showPrevPitchValueLists={showPrevPitchValueLists}
                   speakers={speakers}
                   rawPitchValueLists={userPitchValueLists}

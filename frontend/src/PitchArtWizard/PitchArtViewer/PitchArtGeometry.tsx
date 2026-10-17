@@ -40,7 +40,8 @@ interface Props {
         speakerIndex: number,
         letterIndex: number
         ) => void;
-    secondaryAccentBySpeaker?: { [speakerIndex: number]: number };
+    secondaryAccentBySpeaker?: { [speakerIndex: number]: number[] };
+    manualPrimaryAccentBySpeaker?: { [speakerIndex: number]: number | undefined };
     mergedIndexes: {
         [letterIndex: number]: {
             anchorSpeakerIndex: number;
@@ -221,7 +222,21 @@ export default class PitchArtGeometry extends React.Component<Props> {
         }
         else{
             const pitches = speaker.letters.map((item) => item.pitch);
-            const maxPitchIndex = pitches.indexOf(Math.max(...pitches));
+            const maxPitchIndex = pitches.length ? pitches.indexOf(Math.max(...pitches)) : -1;
+            const secondaryList: number[] =
+                this.props.secondaryAccentBySpeaker?.[speakerIndex] || [];
+            let primaryLetterIndex: number | null = null;
+            if (this.props.showAccentPitch) {
+                if (maxPitchIndex >= 0 && !speaker.letters[maxPitchIndex]?.isWordSep) {
+                    primaryLetterIndex = maxPitchIndex;
+                }
+            } else {
+                const pm = this.props.manualPrimaryAccentBySpeaker?.[speakerIndex];
+                if (pm != null && pm >= 0 && !speaker.letters[pm]?.isWordSep) {
+                    primaryLetterIndex = pm;
+                }
+            }
+            const coordsByLetterIndex: { [letterIndex: number]: [number, number] } = {};
             const getLetterRadius = (letter: Letter) => {
                 if (letter && letter.isContour) return this.props.contourCircleRadius;
                 return this.props.averageCircleRadius;
@@ -387,8 +402,8 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 }
                 currLinePoints.push(x, y);
                 pointPairs.push([x, y]);
-                const isSecondaryAccent =
-                        (this.props.secondaryAccentBySpeaker && this.props.secondaryAccentBySpeaker[speakerIndex] === i) === true;
+                coordsByLetterIndex[i] = [x, y];
+                const isSecondaryAccent = secondaryList.includes(i) && i !== primaryLetterIndex;
                 lineCircles.push(
                     <React.Fragment key={`${speakerIndex}-${i}`}>
                         <Circle key={i + circleFill + circleStroke}
@@ -466,14 +481,12 @@ export default class PitchArtGeometry extends React.Component<Props> {
                 );
             }
     
-            let accentedPoint;
-
-            if (this.props.showAccentPitch
-                && maxPitchIndex !== null
-                && pointPairs.length >= 1) {
-                accentedPoint = this.accentedPoint(
-                    pointPairs[maxPitchIndex][0],
-                    pointPairs[maxPitchIndex][1]);
+            let accentedPoint = null;
+            if (primaryLetterIndex != null) {
+                const c = coordsByLetterIndex[primaryLetterIndex];
+                if (c) {
+                    accentedPoint = this.accentedPoint(c[0], c[1]);
+                }
             }
 
             let speakerLabel = null;

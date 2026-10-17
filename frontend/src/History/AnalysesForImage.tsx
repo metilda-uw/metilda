@@ -12,7 +12,7 @@ export interface AnalysesForImageProps {
   analysesBackButtonClicked: any;
   analysesForSelectedImage: any[];
   imageName: string;
-  imageId: number;
+  imageId: number | null;
 }
 
 interface AnalysisEntity {
@@ -55,38 +55,48 @@ export class AnalysesForImage extends React.Component < AnalysesForImageProps, S
     };
   }
   async componentWillReceiveProps(nextProps: AnalysesForImageProps) {
-    const {imageId} = this.props;
-    if (nextProps.imageId !== imageId) {
+    const { imageId } = this.props;
+    if (nextProps.imageId === imageId) {
+      return;
+    }
+
+    if (nextProps.imageId === null || nextProps.imageId === undefined) {
       this.setState({
         analyses: [],
-        isLoading: true,
-      });
-
-      const response = await fetch(`/api/get-analyses-for-image/${nextProps.imageId.toString()}`, {
-        method: "GET",
-        headers: {
-          Accept: "application/json"
-        }
-      });
-      const body = await response.json();
-      const storageRef = this.props.firebase.uploadFile();
-      body.result.forEach(async (analysis: any) => {
-        const analysisName = analysis[1];
-        const analysisPath = analysis[2];
-        const analysisCreatedAt = analysis[4];
-        const url = await storageRef.child(analysisPath).getDownloadURL();
-        const dataResponse = await fetch(url);
-        const analysisData = await dataResponse.json();
-        const newAnalysis = {name: analysisName, createdAt: analysisCreatedAt, data: analysisData};
-        this.setState({
-          analyses: [...this.state.analyses, newAnalysis]
-        });
-      });
-
-      this.setState({
         isLoading: false,
       });
+      return;
     }
+
+    this.setState({
+      analyses: [],
+      isLoading: true,
+    });
+
+    const response = await fetch(`/api/get-analyses-for-image/${nextProps.imageId.toString()}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json"
+      }
+    });
+    const body = await response.json();
+    const storageRef = this.props.firebase.uploadFile();
+    body.result.forEach(async (analysis: any) => {
+      const analysisName = analysis[1];
+      const analysisPath = analysis[2];
+      const analysisCreatedAt = analysis[4];
+      const url = await storageRef.child(analysisPath).getDownloadURL();
+      const dataResponse = await fetch(url);
+      const analysisData = await dataResponse.json();
+      const newAnalysis = {name: analysisName, createdAt: analysisCreatedAt, data: analysisData};
+      this.setState({
+        analyses: [...this.state.analyses, newAnalysis]
+      });
+    });
+
+    this.setState({
+      isLoading: false,
+    });
   }
 
   componentDidMount(): void {

@@ -11,6 +11,15 @@
 .image input[type="image"]{
   width:100%
 }
-.ExportToExcel{
-  margin:30px;
+.historyActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 30px 40px;
+}
+
+.historyActions .ExportToExcel,
+.historyActions .DeleteSelectedHistory {
+  margin: 0;
 }

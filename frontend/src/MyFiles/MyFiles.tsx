@@ -12,6 +12,7 @@ import SharedUsersForMyFiles from "./SharedUsersForMyFiles"
 import Modal from "react-modal";
 import { Radio, RadioGroup, FormControlLabel, Box, Button, IconButton } from "@material-ui/core"
 import InfoIcon from '@material-ui/icons/Info';
+import { isStorageObjectNotFound } from "../Firebase/storageErrors";
 
 export interface MyFilesProps {
   firebase: any;
@@ -548,11 +549,18 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
     try {
       for (const file of this.state.files) {
         if (file.checked && file.type !== "Folder") {
-          // Delete file from cloud
           const filePath = file.path;
           const storageRef = this.props.firebase.uploadFile();
           const fileRef = storageRef.child(filePath);
-          const responseFromCloud = await fileRef.delete();
+          try {
+            await fileRef.delete();
+          } catch (ex) {
+            if (!isStorageObjectNotFound(ex)) {
+              console.log(ex);
+              uncheckedFiles.push(file);
+              continue;
+            }
+          }
           // Delete file from DB
           const formData = new FormData();
           formData.append("file_id", file.id);
@@ -689,7 +697,13 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
         const uid = this.props.firebase.auth.currentUser.email;
         for (const file of this.state.files) {
           const fileRef = storageRef.child(file.path);
-          await fileRef.delete();
+          try {
+            await fileRef.delete();
+          } catch (ex) {
+            if (!isStorageObjectNotFound(ex)) {
+              throw ex;
+            }
+          }
           const formData = new FormData();
           formData.append("file_id", file.id);
           await fetch(`/api/delete-folder`, {
@@ -703,7 +717,13 @@ export class MyFiles extends React.Component<MyFilesProps, State> {
         const path =
           uid + "/Uploads/" + this.state.selectedFolderName + "/.ignore";
         const fRef = storageRef.child(path);
-        const response = await fRef.delete();
+        try {
+          await fRef.delete();
+        } catch (ex) {
+          if (!isStorageObjectNotFound(ex)) {
+            throw ex;
+          }
+        }
         this.subFolderBackButtonClicked();
       } catch (ex) {
         console.log(ex);

@@ -126,7 +126,7 @@
     "@craco/craco": "^7.1.0",
     "@types/chai-enzyme": "^0.6.12",
     "fake-indexeddb": "^6.2.5",
-    "fast-check": "^4.7.0"
+    "fast-check": "^4.8.0"
   },
   "overrides": {
     "cheerio": "1.0.0-rc.12",

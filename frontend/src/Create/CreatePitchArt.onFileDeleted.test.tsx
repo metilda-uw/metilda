@@ -11,6 +11,7 @@ import { expect } from "../setupTests";
 import sinon from "sinon";
 import { NotificationManager } from "react-notifications";
 import { FileEntry, Speaker } from "../types/types";
+import { isStorageObjectNotFound } from "../Firebase/storageErrors";
 
  // Pure extraction of onFileDeleted logic 
 
@@ -26,13 +27,14 @@ interface OnFileDeletedDeps {
 }
 
 async function onFileDeleted(file: FileEntry, deps: OnFileDeletedDeps): Promise<void> {
-    // 1. Delete from Firebase Storage
+    const storageRef = deps.firebase.uploadFile();
     try {
-        const storageRef = deps.firebase.uploadFile();
         await storageRef.child(file.path).delete();
     } catch (ex) {
-        NotificationManager.error(`Failed to delete "${file.name}" from storage.`);
-        return;
+        if (!isStorageObjectNotFound(ex)) {
+            NotificationManager.error(`Failed to delete "${file.name}" from storage.`);
+            return;
+        }
     }
 
     // 2. Delete from database
@@ -78,16 +80,16 @@ const sampleFile: FileEntry = {
     user: "user@example.com",
 };
 
-function makeDeleteRef(shouldThrow = false) {
+function makeDeleteRef(shouldThrow = false, rejection?: unknown) {
     return {
         delete: shouldThrow
-            ? sinon.stub().rejects(new Error("Storage error"))
+            ? sinon.stub().rejects(rejection ?? new Error("Storage error"))
             : sinon.stub().resolves(),
     };
 }
 
-function makeFirebase(shouldThrow = false) {
-    const deleteRef = makeDeleteRef(shouldThrow);
+function makeFirebase(shouldThrow = false, rejection?: unknown) {
+    const deleteRef = makeDeleteRef(shouldThrow, rejection);
     const childStub = sinon.stub().returns(deleteRef);
     const uploadFileStub = sinon.stub().returns({ child: childStub });
     return { uploadFile: uploadFileStub, childStub, deleteRef };
@@ -117,7 +119,7 @@ describe("CreatePitchArt.onFileDeleted", () => {
         notificationSuccessStub.restore();
     });
 
-    it("does not call POST /api/delete-file if Firebase Storage delete throws", async () => {
+    it("does not call POST /api/delete-file if Firebase Storage delete throws a non-not-found error", async () => {
         const { uploadFile } = makeFirebase(/* shouldThrow */ true);
         const fetchStub = sinon.stub().resolves(makeOkResponse());
 
@@ -136,7 +138,24 @@ describe("CreatePitchArt.onFileDeleted", () => {
         );
     });
 
-    it("shows error notification on storage failure", async () => {
+    it("calls POST /api/delete-file when storage object is already missing", async () => {
+        const notFound = { code: "storage/object-not-found" };
+        const { uploadFile } = makeFirebase(/* shouldThrow */ true, notFound);
+        const fetchStub = sinon.stub().resolves(makeOkResponse());
+
+        await onFileDeleted(sampleFile, {
+            firebase: { uploadFile },
+            fetchFn: fetchStub as unknown as typeof fetch,
+            speakers: [],
+            setState: sinon.stub(),
+            setUploadId: sinon.stub(),
+            resetLetters: sinon.stub(),
+        });
+
+        expect(fetchStub.calledOnce).to.equal(true);
+    });
+
+    it("shows error notification on storage failure (non-not-found)", async () => {
         const { uploadFile } = makeFirebase(/* shouldThrow */ true);
         const fetchStub = sinon.stub().resolves(makeOkResponse());
 
@@ -157,6 +176,24 @@ describe("CreatePitchArt.onFileDeleted", () => {
             sampleFile.name,
             "Error message should include the file name"
         );
+    });
+
+    it("does not show storage error when object was already deleted from storage", async () => {
+        const notFound = { code: "storage/object-not-found" };
+        const { uploadFile } = makeFirebase(true, notFound);
+        const fetchStub = sinon.stub().resolves(makeOkResponse());
+
+        await onFileDeleted(sampleFile, {
+            firebase: { uploadFile },
+            fetchFn: fetchStub as unknown as typeof fetch,
+            speakers: [],
+            setState: sinon.stub(),
+            setUploadId: sinon.stub(),
+            resetLetters: sinon.stub(),
+        });
+
+        expect(notificationErrorStub.called).to.equal(false);
+        expect(notificationSuccessStub.calledOnce).to.equal(true);
     });
 
     it("shows error notification when DB response is non-2xx", async () => {

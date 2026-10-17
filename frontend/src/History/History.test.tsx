@@ -17,6 +17,8 @@ describe("History", () => {
         name: "test_image",
         createdAt: "",
         imageUrl: "/images/test_image",
+        imagePath: "users/x/img.png",
+        legendPath: null,
         checked: false,
       },
     ];
@@ -27,6 +29,7 @@ describe("History", () => {
     expect(subject.find(Header)).to.be.present();
     expect(subject.find(".imageContainer")).to.be.present();
     expect(subject.find(".ExportToExcel")).to.be.present();
+    expect(subject.find(".DeleteSelectedHistory")).to.be.present();
     expect(subject.find(".metilda-loading-spinner-image")).to.be.not.present();
   });
 
@@ -43,6 +46,8 @@ describe("History", () => {
         name: "test_image",
         createdAt: "",
         imageUrl: "/images/test_image",
+        imagePath: "users/x/img.png",
+        legendPath: null,
         checked: false,
       },
     ];
@@ -69,6 +74,8 @@ describe("History", () => {
         name: "test_image",
         createdAt: "",
         imageUrl: "/images/test_image",
+        imagePath: "users/x/img.png",
+        legendPath: null,
         checked: true,
       },
     ]);
@@ -82,6 +89,8 @@ describe("History", () => {
         name: "test_image",
         createdAt: "",
         imageUrl: "/images/test_image",
+        imagePath: "users/x/img.png",
+        legendPath: null,
         checked: false,
       },
     ];
@@ -98,7 +107,7 @@ describe("History", () => {
       const mockResponse = new Response(JSON.stringify(body));
       return Promise.resolve(mockResponse);
     }
-    subject.find("button").at(0).simulate("click");
+    subject.find(".ExportToExcel").simulate("click");
   });
 });
 

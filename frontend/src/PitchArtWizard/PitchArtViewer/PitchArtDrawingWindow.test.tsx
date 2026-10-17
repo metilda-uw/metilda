@@ -70,6 +70,7 @@ interface OptionalProps {
     showPitchArtImageColor?: boolean;
     showPrevPitchValueLists?: boolean;
     showMetildaWatermark?: boolean;
+    toneTranspositionSemitones?: number;
     rawPitchValueLists?: RawPitchValue[][];
     firebase?: any;
     setLatestAnalysisId?: (speakerIndex: number, latestAnalysisId: number, latestAnalysisName: string,
@@ -105,6 +106,7 @@ function makeProps(props: OptionalProps): PitchArtDrawingWindowProps {
         showPitchArtImageColor: props.showPitchArtImageColor || false,
         showPrevPitchValueLists: props.showPrevPitchValueLists || false,
         showMetildaWatermark: props.showMetildaWatermark || false,
+        toneTranspositionSemitones: props.toneTranspositionSemitones || 0,
         rawPitchValueLists: props.rawPitchValueLists || undefined,
         firebase: props.firebase || undefined,
         setLatestAnalysisId: props.setLatestAnalysisId || (() => undefined),

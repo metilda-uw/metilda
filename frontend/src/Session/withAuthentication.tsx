@@ -2,6 +2,7 @@ import React from "react";
 
 import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
+import { ensureRegistered, forgetRegistrationCheck } from "./ensureRegistered";
 
 interface Props {
   firebase: any;
@@ -25,9 +26,14 @@ const withAuthentication = (Component: React.ComponentType<any>) => {
     componentDidMount() {
       this.listener = this.props.firebase.auth.onAuthStateChanged(
         (authUser: any) => {
-          authUser
-            ? this.setState({ authUser })
-            : this.setState({ authUser: null });
+          if (authUser) {
+            this.setState({ authUser });
+            // A login without a MeTILDA account row cannot upload or save; this adds the row.
+            ensureRegistered(this.props.firebase, authUser);
+          } else {
+            this.setState({ authUser: null });
+            forgetRegistrationCheck();
+          }
         }
       );
     }
