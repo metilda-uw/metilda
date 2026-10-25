@@ -3,7 +3,7 @@ attrs==25.4.0
 BTrees==6.3
 CacheControl==0.14.4
 cachetools==7.0.1
-certifi==2026.2.25
+certifi==2026.10.19
 cffi==2.0.0
 chardet==6.0.0.post1
 charset-normalizer==3.4.4
