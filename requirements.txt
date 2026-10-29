@@ -44,7 +44,7 @@ locust==2.43.3
 lxml==6.0.2
 MarkupSafe==3.0.3
 matplotlib==3.10.8
-mistune==3.2.0
+mistune==3.3.3
 more-itertools==10.8.0
 msgpack==1.1.2
 numpy==2.4.2
