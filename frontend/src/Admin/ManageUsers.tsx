@@ -5,6 +5,7 @@ import { withAuthorization } from "../Session";
 import Header from "../Components/header/Header";
 import { spinner } from "../Utils/LoadingSpinner";
 import { deleteUser } from "../Create/ImportUtils";
+import { authHeaders } from "../Firebase/authHeaders";
 import CreateUser from "./CreateUser";
 import EditUser from "./EditUser";
 import AuthorizeUser from "./AuthorizeUser";
@@ -144,12 +145,14 @@ export class ManageUsers extends React.Component<ManageUsersProps, State> {
       users: [],
       isLoading: true,
     });
-    // Get all users
+    // Get all users (the server answers only signed-in callers, so send the login token)
+    const loginHeaders = await authHeaders(this.props.firebase);
     const response = await fetch(`api/get-users`, {
       method: "GET",
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
+        ...loginHeaders,
       },
     });
     const body = await response.json();

@@ -509,10 +509,20 @@ def get_admin(user_id):
 
 @app.route('/api/get-users', methods=["GET"])
 def get_users():
-    with Postgres() as connection:
+    # Signed-in callers only. An Admin (Manage Users) gets the full rows; anyone else gets only
+    # the user id (the email) and the name, which Send message needs for its recipient list.
+    # Rows keep the positions the frontend reads: id, university, created at, last login, name.
+    caller = login_checks.get_caller_email()
+    if caller is None:
+        return login_checks._refuse(401, 'login required')
+    if login_checks.is_admin(caller):
         postgres_select_query = """ SELECT * FROM USERS """
-        filter_values=()
-        results = connection.execute_select_query(postgres_select_query,(filter_values,))
+    else:
+        postgres_select_query = """ SELECT USER_ID, NULL, NULL, NULL, USER_NAME FROM USERS """
+    with Postgres() as connection:
+        results = connection.execute_select_query(postgres_select_query)
+    if results is None:
+        return login_checks._refuse(500, 'could not read the users')
     return jsonify({'result': results})
 
 @app.route('/api/get-user-roles/<string:user_id>', methods=["GET"])

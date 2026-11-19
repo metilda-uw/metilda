@@ -202,7 +202,7 @@ const SentMessagesComponent = () =>{
       
       let usersData = users;
       if(users.length == 0){
-        const users = await getUsers() as any;
+        const users = await getUsers(firebase) as any;
         
         usersData = users.map((user) =>{ return {value:user.id , label: user.name}})
         setUsers(usersData);  
