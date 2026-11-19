@@ -1,12 +1,17 @@
-export const getUsers = async () => {
+import { authHeaders } from "../Firebase/authHeaders";
+
+// The server answers only signed-in callers, so the login token is sent with the request.
+export const getUsers = async (firebase: any) => {
     
     // Get all users
     try {
+        const loginHeaders = await authHeaders(firebase);
         const response = await fetch(`api/get-users`, {
           method: "GET",
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
+            ...loginHeaders,
           },
         });
       
