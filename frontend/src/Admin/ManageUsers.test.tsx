@@ -121,6 +121,19 @@ describe("MyFiles", () => {
     confirmStub.restore();
   });
 
+  it("sends the signed-in admin's login token when it loads the users", async () => {
+    mockedFetch.resetHistory();
+    const tokenFirebase = {
+      auth: { currentUser: { email: "boss@example.com", getIdToken: () => Promise.resolve("admin-token") } },
+    };
+    mockedFetch.returns(Promise.resolve(new Response(JSON.stringify({ result: [] }))));
+    const subject = shallowRender({ firebase: tokenFirebase });
+    await (subject.instance() as any).getUsers();
+    const usersCall = mockedFetch.getCalls().find((call) => call.args[0] === "api/get-users");
+    expect(usersCall).to.not.equal(undefined);
+    expect((usersCall.args[1] as any).headers.Authorization).to.equal("Bearer admin-token");
+  });
+
   it("clicking authorize user button should authorize an user", () => {
     const subject = shallowRender({});
     subject.find(".AuthorizeUser").simulate("click");

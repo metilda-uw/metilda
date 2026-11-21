@@ -80,7 +80,27 @@ def client():
 
 # Test all GET methods
 
-def test_data_api_get_users(client):
+def test_data_api_get_users_needs_a_login(client):
+    rv = client.get('/api/get-users')
+    assert rv.status_code == 401
+    assert json.loads(rv.data) == {'result': 'Error: login required'}
+
+def test_data_api_get_users_gives_a_non_admin_only_ids_and_names(client, monkeypatch):
+    # The login token is faked; the role check and the query run against the test database.
+    from metilda.controllers import login_checks
+    monkeypatch.setattr(login_checks, 'get_caller_email', lambda: 'teacher@uw.edu')
+    rv = client.get('/api/get-users')
+    assert rv.status_code == 200
+    assert json.loads(rv.data) == {'result':
+                [['student@uw.edu', None, None, None, 'student'],
+                ['teacher@uw.edu', None, None, None, 'teacher'],
+                ['admin@uw.edu', None, None, None, 'admin']
+                ]}
+
+def test_data_api_get_users(client, monkeypatch):
+    # An Admin still gets the full rows. The login token is faked; the role check is real.
+    from metilda.controllers import login_checks
+    monkeypatch.setattr(login_checks, 'get_caller_email', lambda: 'admin@uw.edu')
     rv = client.get(
         '/api/get-users'
     )

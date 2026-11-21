@@ -215,7 +215,7 @@ class Header extends Component<HeaderProps, State> {
   renderSendMessageOverlay = async () =>{
    
 
-    const users = await getUsers() as any;
+    const users = await getUsers(this.props.firebase) as any;
     
     const usersData = users.map((user) =>{ return {value:user.id , label: user.name}});
 
